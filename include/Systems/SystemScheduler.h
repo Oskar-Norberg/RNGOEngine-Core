@@ -17,7 +17,8 @@ class SystemScheduler
 {
 public:
     template<InheritsISystem<> T>
-    void RegisterSystem();
+    void RegisterSystem(const std::string& name = "",
+        const std::vector<std::string>& before = {}, const std::vector<std::string>& after = {});
 
     template<InheritsISystem<> T>
     void UnregisterSystem();
