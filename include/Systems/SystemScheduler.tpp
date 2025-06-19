@@ -11,6 +11,7 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
 {
     // Create Registered System (on the heap unfortunately).
     std::unique_ptr<RegisteredSystem> newSystem = std::make_unique<RegisteredSystem>(std::make_unique<T>(), name, before, after);
+    std::string newSystemName = newSystem->name;
 
     // Move existing systems for reordering.
     std::vector<std::unique_ptr<RegisteredSystem>> vertices;
@@ -105,6 +106,7 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
         ptr_map[system.get()] = std::move(system);
     }
 
+    // Transfer ownership to the list.
     m_systems.clear();
     while (!stack.empty()) {
         RegisteredSystem* ptr = stack.top();
@@ -113,28 +115,29 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
         m_systems.emplace_back(std::move(ptr_map[ptr]));
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // Transfer ownership to the list.
-
     // Add iterator to the uninitialized systems queue.
-    // const auto it = ;
-    // m_uninitializedSystems.push(it);
+    auto it = m_systems.end();
+
+    for (auto iter = m_systems.begin(); iter != m_systems.end(); ++iter)
+    {
+        // Referring to this by name is really not ideal. But it works for now.
+        if (iter->get()->name == newSystemName)
+        {
+            it = iter;
+            break;
+        }
+    }
+
+    // This has got to be slow as hell.
+    // TODO: Because this works by iterators, if multiple systems are registered before the first update, this will break. NEEDS TO BE FIXED.
+    if (it != m_systems.end())
+    {
+        m_uninitializedSystems.push(it);
+    }
+    else
+    {
+        // TODO: Something has gone terribly, terribly wrong. Add assert/log here.
+    }
 }
 
 template <InheritsISystem<> T>
