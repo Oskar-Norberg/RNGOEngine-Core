@@ -9,8 +9,8 @@ int main()
     engine.LoadScene<TestScene>();
 
     auto& systemScheduler = engine.GetSystemScheduler();
-    systemScheduler.RegisterSystem<TestSystem>();
-    systemScheduler.RegisterSystem<TestSystem2>();
+    systemScheduler.RegisterSystem<TestSystem>("TestSystem");
+    systemScheduler.RegisterSystem<TestSystem2>("TestSystem2", {}, {"TestSystem"});
 
     engine.Run();
 

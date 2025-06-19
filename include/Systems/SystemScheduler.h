@@ -17,6 +17,7 @@ class ISystem;
 class SystemScheduler
 {
 public:
+    // TODO: Add support for registering multiple systems at once.
     template<InheritsISystem<> T>
     void RegisterSystem(const std::string& name = "",
         const std::vector<std::string>& before = {}, const std::vector<std::string>& after = {});
