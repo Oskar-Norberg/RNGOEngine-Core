@@ -20,5 +20,6 @@ public:
 };
 
 // This should probably be in a Concepts file.
+// TODO: This should be a generic InheritsFrom concept.
 template <typename T>
 concept InheritsISystem = std::derived_from<T, ISystem>;

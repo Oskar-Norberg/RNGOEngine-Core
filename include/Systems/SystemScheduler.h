@@ -9,6 +9,7 @@
 #include <queue>
 
 #include "ISystem.h"
+#include "RegisteredSystem.h"
 
 class World;
 class ISystem;
@@ -26,13 +27,11 @@ public:
     void Update(World& world, float deltaTime);
 
 private:
-    std::list<std::unique_ptr<ISystem>> m_systems;
+    std::list<std::unique_ptr<RegisteredSystem>> m_systems;
 
     // Indices of pending systems.
-    std::queue<std::list<std::unique_ptr<ISystem>>::iterator> m_uninitializedSystems;
-    std::queue<std::list<std::unique_ptr<ISystem>>::iterator> m_pendingDestroySystems;
-
-    void AddSystem(std::unique_ptr<ISystem> system);
+    std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_uninitializedSystems;
+    std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_pendingDestroySystems;
 
     void InitializeSystems();
 
