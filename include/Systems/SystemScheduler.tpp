@@ -1,12 +1,16 @@
 #pragma once
+
+#include <functional>
+#include <stack>
 #include <unordered_map>
+#include <unordered_set>
 
 template <InheritsISystem<> T>
 void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<std::string>& before,
     const std::vector<std::string>& after)
 {
     // Create Registered System (on the heap unfortunately).
-    std::unique_ptr<RegisteredSystem> system = std::make_unique<RegisteredSystem>(std::make_unique<T>(), name, before, after);
+    std::unique_ptr<RegisteredSystem> newSystem = std::make_unique<RegisteredSystem>(std::make_unique<T>(), name, before, after);
 
     // Move existing systems for reordering.
     std::vector<std::unique_ptr<RegisteredSystem>> vertices;
@@ -15,7 +19,7 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
     {
         vertices.push_back(std::move(registered_system));
     }
-    vertices.emplace_back(std::move(system));
+    vertices.emplace_back(std::move(newSystem));
 
     // Initialize edge lists.
     std::pmr::unordered_map<const RegisteredSystem*, std::vector<const RegisteredSystem*>> edges;
@@ -67,6 +71,48 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
         }
     }
 
+    // DFS Topological sort
+    std::pmr::unordered_set<RegisteredSystem*> visited;
+    std::pmr::unordered_set<RegisteredSystem*> on_stack;
+    std::stack<RegisteredSystem*> stack;
+
+    // TODO: This desperately needs to be moved to a separate class.
+    std::function<void(RegisteredSystem*)> dfs;
+    dfs = [&](RegisteredSystem* node) {
+        if (visited.contains(node))
+            return;
+
+        visited.insert(node);
+        on_stack.insert(node);
+
+        for (auto neighbor : edges[node]) {
+            dfs(const_cast<RegisteredSystem*>(neighbor));
+        }
+
+        on_stack.erase(node);
+        stack.push(node);
+    };
+
+    for (const auto& system : vertices) {
+        if (!visited.contains(system.get())) {
+            dfs(system.get());
+        }
+    }
+
+    // Lookup table for system pointers.
+    std::unordered_map<RegisteredSystem*, std::unique_ptr<RegisteredSystem>> ptr_map;
+    for (auto& system : vertices) {
+        ptr_map[system.get()] = std::move(system);
+    }
+
+    m_systems.clear();
+    while (!stack.empty()) {
+        RegisteredSystem* ptr = stack.top();
+        stack.pop();
+
+        m_systems.emplace_back(std::move(ptr_map[ptr]));
+    }
+
 
 
 
@@ -87,8 +133,8 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
     // Transfer ownership to the list.
 
     // Add iterator to the uninitialized systems queue.
-    const auto it = std::prev(m_systems.end());
-    m_uninitializedSystems.push(it);
+    // const auto it = ;
+    // m_uninitializedSystems.push(it);
 }
 
 template <InheritsISystem<> T>
