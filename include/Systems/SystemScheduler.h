@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <list>
 #include <memory>
 #include <queue>
 
@@ -18,21 +17,22 @@ class SystemScheduler
 {
 public:
     // TODO: Add support for registering multiple systems at once.
-    template<InheritsISystem<> T>
+    template <InheritsISystem<> T>
     void RegisterSystem(const std::string& name = "",
-        const std::vector<std::string>& before = {}, const std::vector<std::string>& after = {});
+                        const std::vector<std::string>& before = {}, const std::vector<std::string>& after = {});
 
-    template<InheritsISystem<> T>
+    template <InheritsISystem<> T>
     void UnregisterSystem();
 
     void Update(World& world, float deltaTime);
 
 private:
-    std::list<std::unique_ptr<RegisteredSystem>> m_systems;
+    std::vector<std::unique_ptr<RegisteredSystem>> m_systems;
 
     // Indices of pending systems.
-    std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_uninitializedSystems;
-    std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_pendingDestroySystems;
+    // TODO: I don't ~love~, that these are raw pointers. But I cant use iterators cause they invalidate whenever a system is shuffled around.
+    std::queue<RegisteredSystem*> m_uninitializedSystems;
+    std::queue<RegisteredSystem*> m_pendingDestroySystems;
 
     void InitializeSystems();
 
