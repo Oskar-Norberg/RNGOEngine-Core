@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <queue>
 
 #include "ISystem.h"
 #include "RegisteredSystem.h"
@@ -29,9 +30,9 @@ private:
     std::vector<std::unique_ptr<RegisteredSystem>> m_systems;
 
     // Indices of pending systems.
-    // TODO: Reimplement this.
-    // std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_uninitializedSystems;
-    // std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_pendingDestroySystems;
+    // TODO: I don't ~love~, that these are raw pointers. But I cant use iterators cause they invalidate whenever a system is shuffled around.
+    std::queue<RegisteredSystem*> m_uninitializedSystems;
+    std::queue<RegisteredSystem*> m_pendingDestroySystems;
 
     void InitializeSystems();
 

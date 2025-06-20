@@ -8,6 +8,9 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
     // Create new registered system.
     m_systems.emplace_back(std::make_unique<RegisteredSystem>(std::make_unique<T>(), name, before, after));
 
+    // Add system to uninitialized systems queue.
+    m_uninitializedSystems.push(m_systems.back().get());
+
     // Name -> RegisteredSystem* Lookup table.
     std::unordered_map<std::string, RegisteredSystem*> systemMap;
     for (auto& registeredSystem : m_systems)

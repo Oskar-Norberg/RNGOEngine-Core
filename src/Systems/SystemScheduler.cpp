@@ -23,21 +23,39 @@ void SystemScheduler::Update(World& world, float deltaTime)
 
 void SystemScheduler::InitializeSystems()
 {
-    // while (!m_uninitializedSystems.empty())
-    // {
-    //     auto it = m_uninitializedSystems.front();
-    //     it->get()->system->Initialize();
-    //     m_uninitializedSystems.pop();
-    // }
+    while (!m_uninitializedSystems.empty())
+    {
+        m_uninitializedSystems.front()->system->Initialize();
+        m_uninitializedSystems.pop();
+    }
 }
 
 void SystemScheduler::DeletePendingSystems()
 {
-    // while (!m_pendingDestroySystems.empty())
-    // {
-    //     auto it = m_pendingDestroySystems.front();
-    //     it->get()->system->Exit();
-    //     m_systems.erase(it);
-    //     m_pendingDestroySystems.pop();
-    // }
+    while (!m_pendingDestroySystems.empty())
+    {
+        // Call exit on system.
+        m_pendingDestroySystems.front()->system->Exit();
+
+
+        // Find the system in m_systems.
+        auto it = std::find_if(m_systems.begin(), m_systems.end(),
+            [this](const std::unique_ptr<RegisteredSystem>& system)
+            {
+                return system.get() == m_pendingDestroySystems.front();
+            }
+        );
+
+        // Delete system if found.
+        if (it != m_systems.end())
+        {
+            m_systems.erase(it);
+        }
+        else
+        {
+            // TODO: Log error, system marked for deletion not found in system list. Should never occur.
+        }
+
+        m_pendingDestroySystems.pop();
+    }
 }
