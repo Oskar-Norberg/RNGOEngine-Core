@@ -28,11 +28,12 @@ public:
     void Update(World& world, float deltaTime);
 
 private:
-    std::list<std::unique_ptr<RegisteredSystem>> m_systems;
+    std::vector<std::unique_ptr<RegisteredSystem>> m_systems;
 
     // Indices of pending systems.
-    std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_uninitializedSystems;
-    std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_pendingDestroySystems;
+    // TODO: Reimplement this.
+    // std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_uninitializedSystems;
+    // std::queue<std::list<std::unique_ptr<RegisteredSystem>>::iterator> m_pendingDestroySystems;
 
     void InitializeSystems();
 

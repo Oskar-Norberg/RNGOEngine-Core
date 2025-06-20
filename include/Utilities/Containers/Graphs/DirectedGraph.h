@@ -5,7 +5,6 @@
 #pragma once
 
 #include <functional>
-#include <stack>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -13,24 +12,27 @@
 template <typename T>
 class DirectedGraph
 {
-public:
-    void AddVertex(T* vertex);
+    using VertexPtr = T*;
 
-    void AddEdge(T* from, T* to);
+public:
+
+    void AddVertex(VertexPtr vertex);
+
+    void AddEdge(VertexPtr from, VertexPtr to);
 
     // Consider moving this to a DAG utilities class.
     std::vector<T*> TopologicalSort();
 
 private:
-    std::pmr::unordered_set<T> vertices;
-    std::pmr::unordered_map<T, std::pmr::unordered_set<T>> edges;
+    std::pmr::unordered_set<VertexPtr> vertices;
+    std::pmr::unordered_map<VertexPtr, std::pmr::unordered_set<VertexPtr>> edges;
 
     /// 
     /// @param node Starting node.
     /// @param visited Set of visited nodes.
     /// @param callback Callback function to call when a node is visited.
     ///
-    void dfs(T* node, std::pmr::unordered_set<T*>& visited, std::function<void(T*)> callback);
+    void dfs(VertexPtr node, std::pmr::unordered_set<VertexPtr>& visited, std::function<void(VertexPtr)> callback);
 };
 
 #include "DirectedGraph.tpp"

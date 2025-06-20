@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <stack>
 
 template <typename T>
@@ -13,7 +12,7 @@ void DirectedGraph<T>::AddVertex(T* vertex)
 
     // Add vertex and initialize its edge set.
     vertices.insert(vertex);
-    edges[vertex] = std::pmr::unordered_set<T>();
+    edges[vertex] = std::pmr::unordered_set<T*>();
 }
 
 template <typename T>
