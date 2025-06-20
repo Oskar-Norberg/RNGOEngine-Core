@@ -1,7 +1,7 @@
 #pragma once
 #include "Utilities/Containers/Graphs/DirectedGraph.h"
 
-template <InheritsISystem<> T>
+template <DerivedFrom<ISystem> T>
 void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<std::string>& before,
                                      const std::vector<std::string>& after)
 {
@@ -58,7 +58,7 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
               });
 }
 
-template <InheritsISystem<> T>
+template <DerivedFrom<ISystem> T>
 void SystemScheduler::UnregisterSystem()
 {
     m_systems.emplace_back(std::make_unique<T>());

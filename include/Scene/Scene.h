@@ -21,6 +21,3 @@ public:
     std::string sceneName;
     World world;
 };
-
-template <typename T>
-concept DerivedFromScene = std::derived_from<T, Scene>;

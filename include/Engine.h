@@ -4,13 +4,14 @@
 
 #pragma once
 
+#include "Concepts/Concepts.h"
 #include "Scene/Scene.h"
 #include "Systems/SystemScheduler.h"
 
 class Engine
 {
 public:
-    template<DerivedFromScene<> T>
+    template <DerivedFrom<Scene> T>
     void LoadScene()
     {
         m_currentScene = std::make_unique<T>();
