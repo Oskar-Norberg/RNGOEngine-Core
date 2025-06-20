@@ -23,6 +23,8 @@ public:
         if (context.resourceMap.TryGetResource<int>(resource))
         {
             std::cout << "TestSystem2 Update " << resource << std::endl;
+
+            context.resourceMap.AddResource(5.0f);
         }
         else
         {
