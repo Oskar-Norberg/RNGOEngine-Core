@@ -4,9 +4,7 @@
 
 #pragma once
 
-#include <list>
 #include <memory>
-#include <queue>
 
 #include "ISystem.h"
 #include "RegisteredSystem.h"
@@ -18,11 +16,11 @@ class SystemScheduler
 {
 public:
     // TODO: Add support for registering multiple systems at once.
-    template<InheritsISystem<> T>
+    template <InheritsISystem<> T>
     void RegisterSystem(const std::string& name = "",
-        const std::vector<std::string>& before = {}, const std::vector<std::string>& after = {});
+                        const std::vector<std::string>& before = {}, const std::vector<std::string>& after = {});
 
-    template<InheritsISystem<> T>
+    template <InheritsISystem<> T>
     void UnregisterSystem();
 
     void Update(World& world, float deltaTime);

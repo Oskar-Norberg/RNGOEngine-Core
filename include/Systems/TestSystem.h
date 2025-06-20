@@ -14,5 +14,6 @@ public:
     {
         int resource = 27;
         context.resourceMap.AddResource(resource);
+        std::cout << "TestSystem Update: Added resource with value " << resource << std::endl;
     }
 };

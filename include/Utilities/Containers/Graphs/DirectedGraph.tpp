@@ -46,6 +46,9 @@ std::vector<T*> DirectedGraph<T>::TopologicalSort()
         stack.pop();
     }
 
+    // Reverse because of post-order traversal. Could be optimized by doing pre-order traversal instead.
+    std::reverse(sortedOrder.begin(), sortedOrder.end());
+
     return sortedOrder;
 }
 

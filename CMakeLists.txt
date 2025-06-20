@@ -22,6 +22,8 @@ add_executable(${PROJECT_NAME} main.cpp
         include/Systems/TestSystem2.h
         include/Systems/RegisteredSystem.h
         include/Utilities/Containers/Graphs/DirectedGraph.h
+        include/Systems/TestSystem3.h
+        include/Systems/TestSystem4.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include

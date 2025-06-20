@@ -3,7 +3,7 @@
 
 template <InheritsISystem<> T>
 void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<std::string>& before,
-    const std::vector<std::string>& after)
+                                     const std::vector<std::string>& after)
 {
     // Create new registered system.
     m_systems.emplace_back(std::make_unique<RegisteredSystem>(std::make_unique<T>(), name, before, after));
@@ -42,7 +42,6 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
     std::vector<RegisteredSystem*> sortedSystems = graph.TopologicalSort();
 
     // Sort the owning list of systems based on the topological sort.
-    // Sort the owning list of systems based on the topological sort.
     std::unordered_map<RegisteredSystem*, size_t> orderMap;
     for (size_t i = 0; i < sortedSystems.size(); ++i)
     {
@@ -50,9 +49,10 @@ void SystemScheduler::RegisterSystem(const std::string& name, const std::vector<
     }
 
     std::sort(m_systems.begin(), m_systems.end(),
-        [&orderMap](const std::unique_ptr<RegisteredSystem>& a, const std::unique_ptr<RegisteredSystem>& b) {
-            return orderMap[a.get()] < orderMap[b.get()];
-        });
+              [&orderMap](const std::unique_ptr<RegisteredSystem>& a, const std::unique_ptr<RegisteredSystem>& b)
+              {
+                  return orderMap[a.get()] < orderMap[b.get()];
+              });
 }
 
 template <InheritsISystem<> T>
