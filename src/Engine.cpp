@@ -9,11 +9,6 @@
 
 #include "Systems/SystemContext.h"
 
-SystemScheduler& Engine::GetSystemScheduler()
-{
-    return m_systems;
-}
-
 void Engine::Run()
 {
     while (true)

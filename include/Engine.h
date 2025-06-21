@@ -17,7 +17,6 @@ public:
         m_currentScene = std::make_unique<T>();
     }
 
-    SystemScheduler& GetSystemScheduler();
     void Run();
 
 private:

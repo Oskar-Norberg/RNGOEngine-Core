@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <iostream>
+
 #include "SystemContext.h"
 #include "Systems/ISystem.h"
 

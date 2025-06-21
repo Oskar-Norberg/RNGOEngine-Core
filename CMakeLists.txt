@@ -20,7 +20,6 @@ add_executable(${PROJECT_NAME} main.cpp
         src/Systems/SystemScheduler.cpp
         src/World/World.cpp
         include/Systems/TestSystem2.h
-        include/Systems/RegisteredSystem.h
         include/Utilities/Containers/Graphs/DirectedGraph.h
         include/Systems/TestSystem3.h
         include/Systems/TestSystem4.h
