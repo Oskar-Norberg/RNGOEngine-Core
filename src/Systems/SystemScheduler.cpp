@@ -19,7 +19,7 @@ void SystemScheduler::Update(World& world, float deltaTime)
 
     std::apply([this, &world, &context](auto&&... system)
     {
-        ((system.Update(world, context)), ...);
+        ((system.CallUpdate(world, context)), ...);
     }, m_systems);
 }
 
@@ -30,7 +30,7 @@ void SystemScheduler::InitializeSystems()
 
     std::apply([this](auto&&... system)
     {
-        ((system.Initialize()), ...);
+        ((system.CallInitialize()), ...);
     }, m_systems);
 
     m_initialized = true;

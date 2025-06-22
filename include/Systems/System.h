@@ -14,26 +14,26 @@ template <typename Derived>
 class System
 {
 public:
-    void Initialize()
+    void CallInitialize()
     {
         // Check if derived class has an initialize method. Otherwise, ignore.
-        if constexpr (requires(Derived d) { d.Update(); })
+        if constexpr (requires(Derived& d) { d.Initialize(); })
         {
             static_cast<Derived*>(this)->Initialize();
         }
     }
 
-    void Update(World& world, SystemContext& context)
+    void CallUpdate(World& world, SystemContext& context)
     {
-        if constexpr (requires(Derived d, World& world, SystemContext& context) { d.Update(world, context); })
+        if constexpr (requires(Derived& d, World& world, SystemContext& context) { d.Update(world, context); })
         {
             static_cast<Derived*>(this)->Update(world, context);
         }
     }
 
-    void Exit()
+    void CallExit()
     {
-        if constexpr (requires(Derived d) { d.Exit(); })
+        if constexpr (requires(Derived& d) { d.Exit(); })
         {
             static_cast<Derived*>(this)->Exit();
         }
