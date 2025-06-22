@@ -7,12 +7,12 @@
 #include <iostream>
 
 #include "SystemContext.h"
-#include "Systems/ISystem.h"
+#include "Systems/System.h"
 
-class TestSystem : public ISystem
+class TestSystem : public System<TestSystem>
 {
 public:
-    void Update(World& world, SystemContext& context) override
+    void Update(World& world, SystemContext& context)
     {
         int resource = 27;
         context.resourceMap.AddResource(resource);

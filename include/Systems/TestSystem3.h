@@ -3,12 +3,12 @@
 //
 
 #pragma once
-#include "ISystem.h"
+#include "System.h"
 
-class TestSystem3 : public ISystem
+class TestSystem3 : public System<TestSystem3>
 {
 public:
-    void Update(World& world, SystemContext& context) override
+    void Update(World& world, SystemContext& context)
     {
         float resource;
 

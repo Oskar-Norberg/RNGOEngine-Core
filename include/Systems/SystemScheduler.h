@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "ISystem.h"
+#include "System.h"
 
 #include "TestSystem.h"
 #include "TestSystem2.h"

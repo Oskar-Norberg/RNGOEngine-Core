@@ -9,7 +9,7 @@ add_executable(${PROJECT_NAME} main.cpp
         include/Engine.h
         include/Scene/Scene.h
         src/Engine.cpp
-        include/Systems/ISystem.h
+        include/Systems/System.h
         include/Systems/SystemContext.h
         include/Systems/ResourceMap.h
         include/Systems/TestSystem.h

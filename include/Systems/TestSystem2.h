@@ -5,18 +5,18 @@
 #pragma once
 #include <iostream>
 
-#include "ISystem.h"
+#include "System.h"
 #include "SystemContext.h"
 
-class TestSystem2 : public ISystem
+class TestSystem2 : public System<TestSystem2>
 {
 public:
-    void Initialize() override
+    void Initialize()
     {
         std::cout << "TestSystem2 Initialized" << std::endl;
     }
 
-    void Update(World& world, SystemContext& context) override
+    void Update(World& world, SystemContext& context)
     {
         int resource;
 
@@ -32,7 +32,7 @@ public:
         }
     }
 
-    void Exit() override
+    void Exit()
     {
         std::cout << "TestSystem2 Exited" << std::endl;
     }
