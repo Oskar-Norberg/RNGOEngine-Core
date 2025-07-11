@@ -1,1 +1,0 @@
-This really ought to be a submodule, but for now this is just a copy of the glfw repo.

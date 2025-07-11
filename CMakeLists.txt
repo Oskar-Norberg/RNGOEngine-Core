@@ -5,11 +5,6 @@ project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)
 
-# Vendor libraries
-add_subdirectory(vendor/glad)
-add_subdirectory(vendor/glfw)
-add_subdirectory(vendor/glm)
-
 add_executable(${PROJECT_NAME} main.cpp
         include/Engine.h
         include/Scene/Scene.h
@@ -31,15 +26,5 @@ add_executable(${PROJECT_NAME} main.cpp
         include/Concepts/Concepts.h
 )
 
-# Entt
-target_include_directories(${PROJECT_NAME} PUBLIC 
-        include
-        vendor/entt/include
-)
-
-# OpenGL
-target_link_libraries(${PROJECT_NAME} PRIVATE
-        glfw
-        glad
-        glm
-)
+target_include_directories(${PROJECT_NAME} PUBLIC include
+        vendor/entt/include)

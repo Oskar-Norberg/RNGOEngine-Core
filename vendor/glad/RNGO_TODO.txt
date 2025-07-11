@@ -1,1 +1,0 @@
-Same as other glfw, this ought to be a submodule instead of just a clone.
