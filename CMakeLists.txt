@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.31)
 
-set(PROJECT_NAME RNGOEngine)
+set(PROJECT_NAME RNGOEngine_Core)
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(${PROJECT_NAME} main.cpp
+add_library(${PROJECT_NAME} STATIC
         include/Engine.h
         include/Scene/Scene.h
         src/Engine.cpp
