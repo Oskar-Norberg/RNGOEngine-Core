@@ -12,14 +12,12 @@ SystemScheduler::SystemScheduler() : m_initialized(false)
 
 void SystemScheduler::Update(World& world, float deltaTime)
 {
-    SystemContext context;
-    context.deltaTime = deltaTime;
+    m_context.resourceMapper.ClearTransientResources();
+    m_context.deltaTime = deltaTime;
 
-    InitializeSystems();
-
-    std::apply([this, &world, &context](auto&&... system)
+    std::apply([this, &world](auto&&... system)
     {
-        ((system.CallUpdate(world, context)), ...);
+        ((system.CallUpdate(world, m_context)), ...);
     }, m_systems);
 }
 

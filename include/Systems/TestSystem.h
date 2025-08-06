@@ -15,7 +15,7 @@ public:
     void Update(World& world, SystemContext& context)
     {
         int resource = 27;
-        context.resourceMap.AddResource(resource);
+        context.resourceMapper.AddTransientResource(resource);
         std::cout << "TestSystem Update: Added resource with value " << resource << std::endl;
     }
 };

@@ -25,5 +25,7 @@ private:
     std::tuple<TestSystem, TestSystem2, TestSystem3, TestSystem4> m_systems;
     bool m_initialized;
 
+    SystemContext m_context;
+
     void InitializeSystems();
 };

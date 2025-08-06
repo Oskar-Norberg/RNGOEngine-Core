@@ -12,7 +12,7 @@ public:
     {
         bool resource;
 
-        if (context.resourceMap.TryGetResource<bool>(resource))
+        if (context.resourceMapper.TryGetTransientResource<bool>(resource))
         {
             std::cout << "TestSystem4 Update: " << std::boolalpha << resource << std::endl;
         }

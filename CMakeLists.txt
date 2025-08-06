@@ -24,6 +24,7 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/TestSystem3.h
         include/Systems/TestSystem4.h
         include/Concepts/Concepts.h
+        include/Systems/ResourceMapper.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include

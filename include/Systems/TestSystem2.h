@@ -20,11 +20,11 @@ public:
     {
         int resource;
 
-        if (context.resourceMap.TryGetResource<int>(resource))
+        if (context.resourceMapper.TryGetTransientResource<int>(resource))
         {
             std::cout << "TestSystem2 Update " << resource << std::endl;
 
-            context.resourceMap.AddResource(5.0f);
+            context.resourceMapper.AddTransientResource(5.0f);
         }
         else
         {

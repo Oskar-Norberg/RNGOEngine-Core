@@ -12,11 +12,11 @@ public:
     {
         float resource;
 
-        if (context.resourceMap.TryGetResource<float>(resource))
+        if (context.resourceMapper.TryGetTransientResource<float>(resource))
         {
             std::cout << "TestSystem3  Update:" << resource << std::endl;
 
-            context.resourceMap.AddResource(bool { true });
+            context.resourceMapper.AddTransientResource(bool { true });
         }
         else
         {

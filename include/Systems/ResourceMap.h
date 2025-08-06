@@ -11,17 +11,25 @@
 class ResourceMap
 {
 public:
-    // Make a try add resource and a set resource function. User might not want to override existing resources.
     template<typename T>
-    void AddResource(const T& resource)
+    void AddResource(const T resource, bool override = false)
     {
+        if (!override)
+        {
+            const auto it = m_resources.find(typeid(T));
+            if (it != m_resources.end())
+            {
+                return;
+            }
+        }
+
         m_resources[typeid(T)] = resource;
     }
 
     template<typename T>
     bool TryGetResource(T& outResource) const
     {
-        auto it = m_resources.find(typeid(T));
+        const auto it = m_resources.find(typeid(T));
         if (it != m_resources.end())
         {
             outResource = std::any_cast<T>(it->second);
@@ -29,6 +37,11 @@ public:
         }
 
         return false;
+    }
+
+    void Clear()
+    {
+        m_resources.clear();
     }
 
 private:
