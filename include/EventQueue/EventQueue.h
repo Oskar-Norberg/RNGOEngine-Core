@@ -9,29 +9,53 @@
 #include <typeindex>
 #include <unordered_map>
 
+#include "Concepts/Concepts.h"
+#include "IEvent.h"
+
 class EventQueue
 {
 public:
-    template<typename T>
-    void PushEvent(T&& event)
+    template<DerivedFrom<IEvent> T, typename... Args>
+    void EmplaceEvent(Args&&... args)
     {
-        std::type_index typeIndex = typeid(T);
+        const auto typeIndex = std::type_index(typeid(T));
         auto it = m_currentEvents.find(typeIndex);
 
         if (it == m_currentEvents.end())
         {
-            m_currentEvents[typeIndex] = std::queue<std::any>();
+            m_currentEvents[typeIndex] = std::vector<std::unique_ptr<IEvent>>();
+            it = m_currentEvents.find(typeIndex);
         }
 
-        m_currentEvents[typeIndex].push(std::forward<T>(event));
+        it->second.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
     }
 
-    template<typename T>
-    const std::queue<std::any>& GetEvents() const
+    template<DerivedFrom<IEvent> T>
+    // TODO: Really expensive does a full copy of all events.
+    // Implement custom iterator that can automatically cast the events to the correct type.
+    std::vector<T> GetEvents() const
     {
-        return m_currentEvents[typeid(T)];
+        std::vector<T> events;
+        const auto typeIndex = std::type_index(typeid(T));
+
+        const auto it = m_currentEvents.find(typeIndex);
+        if (it != m_currentEvents.end())
+        {
+            events.reserve(it->second.size());
+            for (const auto& eventPtr : it->second)
+            {
+                events.push_back(static_cast<const T&>(*eventPtr));
+            }
+        }
+
+        return events;
+    }
+
+    void Clear()
+    {
+        m_currentEvents.clear();
     }
 
 private:
-    std::unordered_map<std::type_index, std::queue<std::any>> m_currentEvents;
+    std::unordered_map<std::type_index, std::vector<std::unique_ptr<IEvent>>> m_currentEvents;
 };
