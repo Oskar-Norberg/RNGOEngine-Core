@@ -34,7 +34,7 @@ public:
     template<DerivedFrom<ISystem> T, typename... Args>
     void RegisterSystem(Args&&... args)
     {
-        m_systems.emplace_back(ScheduledSystem{ std::make_unique<T>(std::forward<Args>(args)...) });
+        m_systems.emplace_back(ScheduledSystem{std::make_unique<T>(std::forward<Args>(args)...)});
     }
 
 private:

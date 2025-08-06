@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME} STATIC
         src/World/World.cpp
         include/Utilities/Containers/Graphs/DirectedGraph.h
         include/Systems/ResourceMapper.h
+        include/EventQueue/EventQueue.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
