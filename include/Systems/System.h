@@ -14,12 +14,12 @@ template <typename Derived>
 class System
 {
 public:
-    void CallInitialize()
+    void CallInitialize(SystemContext& context)
     {
         // Check if derived class has an initialize method. Otherwise, ignore.
-        if constexpr (requires(Derived& d) { d.Initialize(); })
+        if constexpr (requires(Derived& d, SystemContext& context) { d.Initialize(context); })
         {
-            static_cast<Derived*>(this)->Initialize();
+            static_cast<Derived*>(this)->Initialize(context);
         }
     }
 

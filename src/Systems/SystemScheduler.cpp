@@ -3,11 +3,11 @@
 //
 
 #include "Systems/SystemScheduler.h"
-
 #include "Systems/SystemContext.h"
 
-SystemScheduler::SystemScheduler() : m_initialized(false)
+SystemScheduler::SystemScheduler()
 {
+    InitializeSystems();
 }
 
 void SystemScheduler::Update(World& world, float deltaTime)
@@ -23,13 +23,16 @@ void SystemScheduler::Update(World& world, float deltaTime)
 
 void SystemScheduler::InitializeSystems()
 {
-    if (m_initialized)
-        return;
-
     std::apply([this](auto&&... system)
     {
-        ((system.CallInitialize()), ...);
+        ((system.CallInitialize(m_context)), ...);
     }, m_systems);
+}
 
-    m_initialized = true;
+void SystemScheduler::TerminateSystems()
+{
+    std::apply([this](auto&&... system)
+    {
+        ((system.CallExit()), ...);
+    }, m_systems);
 }

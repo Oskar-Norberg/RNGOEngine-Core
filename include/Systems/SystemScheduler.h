@@ -5,6 +5,7 @@
 #pragma once
 
 #include "System.h"
+
 #include "TestSystem.h"
 #include "TestSystem2.h"
 #include "TestSystem3.h"
@@ -13,7 +14,6 @@
 class World;
 class ISystem;
 
-// TODO: Implement destruction of systems.
 class SystemScheduler
 {
 public:
@@ -23,9 +23,9 @@ public:
 
 private:
     std::tuple<TestSystem, TestSystem2, TestSystem3, TestSystem4> m_systems;
-    bool m_initialized;
 
     SystemContext m_context;
 
     void InitializeSystems();
+    void TerminateSystems();
 };
