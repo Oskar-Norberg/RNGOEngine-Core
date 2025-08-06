@@ -5,7 +5,6 @@
 #pragma once
 
 #include "System.h"
-
 #include "TestSystem.h"
 #include "TestSystem2.h"
 #include "TestSystem3.h"
