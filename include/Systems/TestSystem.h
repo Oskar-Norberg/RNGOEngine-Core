@@ -6,13 +6,13 @@
 
 #include <iostream>
 
+#include "ISystem.h"
 #include "SystemContext.h"
-#include "Systems/System.h"
 
-class TestSystem : public System<TestSystem>
+class TestSystem : public ISystem
 {
 public:
-    void Update(World& world, SystemContext& context)
+    virtual void Update(World& world, SystemContext& context) override
     {
         int resource = 27;
         context.resourceMapper.AddTransientResource(resource);

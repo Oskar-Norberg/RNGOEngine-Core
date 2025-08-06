@@ -9,7 +9,7 @@ add_library(${PROJECT_NAME} STATIC
         include/Engine.h
         include/Scene/Scene.h
         src/Engine.cpp
-        include/Systems/System.h
+        include/Systems/ISystem.h
         include/Systems/SystemContext.h
         include/Systems/ResourceMap.h
         include/Systems/TestSystem.h

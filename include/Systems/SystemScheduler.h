@@ -4,15 +4,13 @@
 
 #pragma once
 
-#include "System.h"
+#include <memory>
+#include <vector>
 
-#include "TestSystem.h"
-#include "TestSystem2.h"
-#include "TestSystem3.h"
-#include "TestSystem4.h"
+#include "ISystem.h"
+#include "SystemContext.h"
 
 class World;
-class ISystem;
 
 class SystemScheduler
 {
@@ -22,7 +20,7 @@ public:
     void Update(World& world, float deltaTime);
 
 private:
-    std::tuple<TestSystem, TestSystem2, TestSystem3, TestSystem4> m_systems;
+    std::vector<std::unique_ptr<ISystem>> m_systems;
 
     SystemContext m_context;
 

@@ -3,10 +3,21 @@
 //
 
 #include "Systems/SystemScheduler.h"
+
 #include "Systems/SystemContext.h"
+#include "Systems/TestSystem.h"
+#include "Systems/TestSystem2.h"
+#include "Systems/TestSystem3.h"
+#include "Systems/TestSystem4.h"
 
 SystemScheduler::SystemScheduler()
 {
+    m_systems.emplace_back(std::make_unique<TestSystem>());
+    m_systems.emplace_back(std::make_unique<TestSystem2>());
+    m_systems.emplace_back(std::make_unique<TestSystem3>());
+    m_systems.emplace_back(std::make_unique<TestSystem4>());
+    m_systems.emplace_back(std::make_unique<TestSystem4>());
+
     InitializeSystems();
 }
 
@@ -15,24 +26,24 @@ void SystemScheduler::Update(World& world, float deltaTime)
     m_context.resourceMapper.ClearTransientResources();
     m_context.deltaTime = deltaTime;
 
-    std::apply([this, &world](auto&&... system)
+    for (auto& system : m_systems)
     {
-        ((system.CallUpdate(world, m_context)), ...);
-    }, m_systems);
+        system->Update(world, m_context);
+    }
 }
 
 void SystemScheduler::InitializeSystems()
 {
-    std::apply([this](auto&&... system)
+    for (auto& system : m_systems)
     {
-        ((system.CallInitialize(m_context)), ...);
-    }, m_systems);
+        system->Initialize(m_context);
+    }
 }
 
 void SystemScheduler::TerminateSystems()
 {
-    std::apply([this](auto&&... system)
+    for (auto& system : m_systems)
     {
-        ((system.CallExit()), ...);
-    }, m_systems);
+        system->Exit();
+    }
 }
