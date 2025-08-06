@@ -5,26 +5,18 @@
 #include "Systems/SystemScheduler.h"
 
 #include "Systems/SystemContext.h"
-#include "Systems/TestSystem.h"
-#include "Systems/TestSystem2.h"
-#include "Systems/TestSystem3.h"
-#include "Systems/TestSystem4.h"
 
-SystemScheduler::SystemScheduler()
+SystemScheduler::~SystemScheduler()
 {
-    m_systems.emplace_back(std::make_unique<TestSystem>());
-    m_systems.emplace_back(std::make_unique<TestSystem2>());
-    m_systems.emplace_back(std::make_unique<TestSystem3>());
-    m_systems.emplace_back(std::make_unique<TestSystem4>());
-    m_systems.emplace_back(std::make_unique<TestSystem4>());
-
-    InitializeSystems();
+    // TODO: The engine should explicitly call Initialize and terminate.
+    TerminateSystems();
 }
-
 void SystemScheduler::Update(World& world, float deltaTime)
 {
     m_context.resourceMapper.ClearTransientResources();
     m_context.deltaTime = deltaTime;
+
+    InitializeSystems();
 
     for (auto& system : m_systems)
     {
@@ -34,9 +26,14 @@ void SystemScheduler::Update(World& world, float deltaTime)
 
 void SystemScheduler::InitializeSystems()
 {
+    // TODO: O(n) polling each frame.
     for (auto& system : m_systems)
     {
-        system->Initialize(m_context);
+        if (!system.initialized)
+        {
+            system->Initialize(m_context);
+            system.initialized = true;
+        }
     }
 }
 
@@ -45,5 +42,6 @@ void SystemScheduler::TerminateSystems()
     for (auto& system : m_systems)
     {
         system->Exit();
+        system.initialized = false;
     }
 }

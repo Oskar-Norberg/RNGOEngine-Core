@@ -11,10 +11,16 @@
 class Engine
 {
 public:
-    template <DerivedFrom<Scene> T>
+    template<DerivedFrom<Scene> T>
     void LoadScene()
     {
         m_currentScene = std::make_unique<T>();
+    }
+
+    template<DerivedFrom<ISystem> T, typename... Args>
+    void RegisterSystem(Args&&... args)
+    {
+        m_systems.RegisterSystem<T>(std::forward<Args>(args)...);
     }
 
     void Run();

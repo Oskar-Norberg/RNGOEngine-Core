@@ -12,18 +12,13 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/ISystem.h
         include/Systems/SystemContext.h
         include/Systems/ResourceMap.h
-        include/Systems/TestSystem.h
         include/World/World.h
         include/Entity/Entity.h
         include/Scene/Test/TestScene.h
         include/Systems/SystemScheduler.h
         src/Systems/SystemScheduler.cpp
         src/World/World.cpp
-        include/Systems/TestSystem2.h
         include/Utilities/Containers/Graphs/DirectedGraph.h
-        include/Systems/TestSystem3.h
-        include/Systems/TestSystem4.h
-        include/Concepts/Concepts.h
         include/Systems/ResourceMapper.h
 )
 
