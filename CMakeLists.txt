@@ -13,7 +13,6 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/SystemContext.h
         include/Systems/ResourceMap.h
         include/World/World.h
-        include/Entity/Entity.h
         include/Scene/Test/TestScene.h
         include/Systems/SystemScheduler.h
         src/Systems/SystemScheduler.cpp

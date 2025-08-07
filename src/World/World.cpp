@@ -4,13 +4,12 @@
 
 #include "World/World.h"
 
-Entity World::CreateEntity()
+entt::entity World::CreateEntity()
 {
-    auto entity = m_registry.create();
-    return Entity(entity, m_registry);
+    return m_registry.create();
 }
 
-void World::DestroyEntity(const Entity& entity)
+void World::DestroyEntity(entt::entity entity)
 {
-    m_registry.destroy(entity.m_entity);
+    m_registry.destroy(entity);
 }

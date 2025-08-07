@@ -5,14 +5,13 @@
 #pragma once
 
 #include <entt.hpp>
-#include "Entity/Entity.h"
 
 class World
 {
 public:
-    Entity CreateEntity();
+    entt::entity CreateEntity();
 
-    void DestroyEntity(const Entity& entity);
+    void DestroyEntity(entt::entity entity);
 
     // TODO: The goal is for no one to access the registry directly. Accessing only through the Entity/World wrappers. But for now, this is good enough.
     entt::registry& GetRegistry() { return m_registry; }

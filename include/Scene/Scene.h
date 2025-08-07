@@ -4,9 +4,6 @@
 
 #pragma once
 
-#include <string>
-
-#include "Entity/Entity.h"
 #include "World/World.h"
 
 class Scene
