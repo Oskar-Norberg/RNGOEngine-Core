@@ -4,6 +4,10 @@
 
 #include "Systems/SystemScheduler.h"
 
+#include <iostream>
+
+#include "Engine.h"
+#include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Systems/SystemContext.h"
 
 SystemScheduler::~SystemScheduler()
@@ -11,7 +15,7 @@ SystemScheduler::~SystemScheduler()
     // TODO: The engine should explicitly call Initialize and terminate.
     TerminateSystems();
 }
-void SystemScheduler::Update(World& world, float deltaTime)
+void SystemScheduler::Update(Engine& engine, World& world, float deltaTime)
 {
     m_context.resourceMapper.ClearTransientResources();
     m_context.deltaTime = deltaTime;
@@ -22,6 +26,8 @@ void SystemScheduler::Update(World& world, float deltaTime)
     {
         system->Update(world, m_context);
     }
+
+    PollEngineEvents(engine, m_context.eventQueue);
 }
 
 void SystemScheduler::InitializeSystems()
@@ -43,5 +49,14 @@ void SystemScheduler::TerminateSystems()
     {
         system->Exit();
         system.initialized = false;
+    }
+}
+void SystemScheduler::PollEngineEvents(Engine& engine, EventQueue& eventQueue)
+{
+    const auto exitEvents = eventQueue.GetEvents<ExitEvent>();
+
+    if (!exitEvents.empty())
+    {
+        engine.Quit();
     }
 }

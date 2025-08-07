@@ -12,6 +12,7 @@
 #include "ISystem.h"
 #include "SystemContext.h"
 
+class Engine;
 class World;
 
 struct ScheduledSystem
@@ -29,7 +30,7 @@ class SystemScheduler
 {
 public:
     ~SystemScheduler();
-    void Update(World& world, float deltaTime);
+    void Update(Engine& engine, World& world, float deltaTime);
 
     template<DerivedFrom<ISystem> T, typename... Args>
     void RegisterSystem(Args&&... args)
@@ -44,4 +45,6 @@ private:
 
     void InitializeSystems();
     void TerminateSystems();
+
+    void PollEngineEvents(Engine& engine, EventQueue& eventQueue);
 };

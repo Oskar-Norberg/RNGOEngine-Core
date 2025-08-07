@@ -11,15 +11,22 @@
 
 void Engine::Run()
 {
-    while (true)
+    while (m_running)
     {
         constexpr float deltaTime = 1000.0f / 60.0f;
 
         SystemContext context;
         context.deltaTime = deltaTime;
 
-        m_systems.Update(m_currentScene->world, context.deltaTime);
+        m_systems.Update(*this, m_currentScene->world, context.deltaTime);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<int>(deltaTime))); // ~60fps
+        std::this_thread::sleep_for(
+            std::chrono::milliseconds(static_cast<int>(deltaTime))
+        );  // ~60fps
     }
+}
+
+void Engine::Quit()
+{
+    m_running = false;
 }
