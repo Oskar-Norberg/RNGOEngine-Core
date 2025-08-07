@@ -17,7 +17,6 @@ SystemScheduler::~SystemScheduler()
 }
 void SystemScheduler::Update(Engine& engine, World& world, float deltaTime)
 {
-    m_context.resourceMapper.ClearTransientResources();
     m_context.deltaTime = deltaTime;
 
     InitializeSystems();
@@ -28,6 +27,9 @@ void SystemScheduler::Update(Engine& engine, World& world, float deltaTime)
     }
 
     PollEngineEvents(engine, m_context.eventQueue);
+
+    m_context.resourceMapper.ClearTransientResources();
+    m_context.eventQueue.Clear();
 }
 
 void SystemScheduler::InitializeSystems()
