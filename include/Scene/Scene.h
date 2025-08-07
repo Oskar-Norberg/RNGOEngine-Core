@@ -18,6 +18,5 @@ public:
     virtual void Update(float deltaTime) {}
     virtual void Exit() {}
 
-    std::string sceneName;
     World world;
 };

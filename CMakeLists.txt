@@ -21,7 +21,6 @@ add_library(${PROJECT_NAME} STATIC
         include/Utilities/Containers/Graphs/DirectedGraph.h
         include/Systems/ResourceMapper.h
         include/EventQueue/EventQueue.h
-        include/EventQueue/IEvent.h
         include/EventQueue/EngineEvents/EngineEvents.h
 )
 

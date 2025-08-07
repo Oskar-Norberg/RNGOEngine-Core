@@ -10,12 +10,11 @@
 #include <unordered_map>
 
 #include "Concepts/Concepts.h"
-#include "IEvent.h"
 
 class EventQueue
 {
 public:
-    template<DerivedFrom<IEvent> T, typename... Args>
+    template<typename T, typename... Args>
     void EmplaceEvent(Args&&... args)
     {
         const auto typeIndex = std::type_index(typeid(T));
@@ -30,7 +29,7 @@ public:
         it->second.emplace_back(T(std::forward<Args>(args)...));
     }
 
-    template<DerivedFrom<IEvent> T>
+    template<typename T>
     // TODO: Really expensive does a full copy of all events.
     // Implement custom iterator that can automatically cast the events to the correct type.
     std::vector<T> GetEvents() const

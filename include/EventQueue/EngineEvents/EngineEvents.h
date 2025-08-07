@@ -3,8 +3,7 @@
 //
 
 #pragma once
-#include "EventQueue/IEvent.h"
 
-struct ExitEvent : public IEvent
+struct ExitEvent
 {
 };
