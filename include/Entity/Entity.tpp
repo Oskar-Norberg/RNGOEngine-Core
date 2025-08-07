@@ -1,9 +1,9 @@
 #pragma once
 
-template<typename T>
-void Entity::AddComponent(const T& component)
+template<typename T, typename... Args>
+void Entity::AddComponent(Args&& ...args)
 {
-    m_registry.emplace<T>(m_entity, component);
+    m_registry.emplace<T>(m_entity, std::forward<Args>(args)...);
 }
 
 template<typename T>

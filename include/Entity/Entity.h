@@ -15,8 +15,8 @@ struct Entity
     Entity(const Entity& other) = default;
     Entity& operator=(const Entity& other);
 
-    template<typename T>
-    void AddComponent(const T& component);
+    template<typename T, typename... Args>
+    void AddComponent(Args&& ...args);
 
     template<typename T>
     T& GetComponent();
