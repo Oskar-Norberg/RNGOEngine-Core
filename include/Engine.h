@@ -25,7 +25,10 @@ public:
 
     void Run();
 
+    void Quit();
+
 private:
+    bool m_running = true;
     // I hate that these are heap allocated.
     std::unique_ptr<Scene> m_currentScene;
     SystemScheduler m_systems;
