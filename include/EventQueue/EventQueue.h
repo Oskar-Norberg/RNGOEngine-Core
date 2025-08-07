@@ -23,11 +23,11 @@ public:
 
         if (it == m_currentEvents.end())
         {
-            m_currentEvents[typeIndex] = std::vector<std::unique_ptr<IEvent>>();
+            m_currentEvents[typeIndex] = {};
             it = m_currentEvents.find(typeIndex);
         }
 
-        it->second.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
+        it->second.emplace_back(T(std::forward<Args>(args)...));
     }
 
     template<DerivedFrom<IEvent> T>
@@ -44,7 +44,7 @@ public:
             events.reserve(it->second.size());
             for (const auto& eventPtr : it->second)
             {
-                events.push_back(static_cast<const T&>(*eventPtr));
+                events.push_back(std::any_cast<T>(eventPtr));
             }
         }
 
@@ -57,5 +57,5 @@ public:
     }
 
 private:
-    std::unordered_map<std::type_index, std::vector<std::unique_ptr<IEvent>>> m_currentEvents;
+    std::unordered_map<std::type_index, std::vector<std::any>> m_currentEvents;
 };
