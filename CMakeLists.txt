@@ -22,6 +22,7 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/ResourceMapper.h
         include/EventQueue/EventQueue.h
         include/EventQueue/IEvent.h
+        include/EventQueue/EngineEvents/EngineEvents.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
