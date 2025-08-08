@@ -4,20 +4,18 @@
 
 #include "Engine.h"
 
-#include <thread>
 #include <chrono>
 
 void Engine::Run()
 {
+    auto lastFrame = std::chrono::high_resolution_clock::now();
+
     while (m_running)
     {
-        constexpr float deltaTime = 1000.0f / 60.0f;
+        float deltaTime = std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - lastFrame).count();
+        lastFrame = std::chrono::high_resolution_clock::now();
 
         m_systems.Update(*this, m_currentScene->world, deltaTime);
-
-        std::this_thread::sleep_for(
-            std::chrono::milliseconds(static_cast<int>(deltaTime))
-        );  // ~60fps
     }
 }
 
