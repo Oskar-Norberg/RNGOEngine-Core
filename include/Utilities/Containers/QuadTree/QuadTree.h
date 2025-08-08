@@ -78,19 +78,48 @@ namespace RNGOEngine
             }
         }
 
-        // Only compile these in debug mode.
-        # ifndef  NDEBUG
+        std::vector<T> WithinRange(BoundingBox box) const
+        {
+            if (!m_boundingBox.Contains(box.start) && !m_boundingBox.Contains(box.end))
+            {
+                return {};
+            }
+
+            std::vector<T> results;
+            for (size_t i = 0; i < m_dataIndex; i++)
+            {
+                if (box.Contains(m_data[i].position))
+                {
+                    return {m_data[i].data};
+                }
+            }
+
+            // Query Subtrees
+            if (m_subTrees.has_value())
+            {
+                for (const auto& subTree : m_subTrees.value())
+                {
+                    auto subTreeResults = subTree->WithinRange(box);
+                    results.insert(results.end(), subTreeResults.begin(), subTreeResults.end());
+                }
+            }
+
+            return results;
+        }
+
+// Only compile these in debug mode.
+#ifndef NDEBUG
         BoundingBox GetBoundingBox() const
         {
             return m_boundingBox;
         }
 
-        const std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>>& GetSubTrees() const
+        const std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>>& GetSubTrees(
+        ) const
         {
             return m_subTrees;
         }
-        #endif
-
+#endif
 
     private:
         bool CanContain(const Point& point) const
@@ -123,12 +152,8 @@ namespace RNGOEngine
             float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
 
             BoundingBox nwBox = {m_boundingBox.start, {midX, midY}};
-            BoundingBox neBox = {
-                {midX, m_boundingBox.start.y}, {m_boundingBox.end.x, midY}
-            };
-            BoundingBox swBox = {
-                {m_boundingBox.start.x, midY}, {midX, m_boundingBox.end.y}
-            };
+            BoundingBox neBox = {{midX, m_boundingBox.start.y}, {m_boundingBox.end.x, midY}};
+            BoundingBox swBox = {{m_boundingBox.start.x, midY}, {midX, m_boundingBox.end.y}};
             BoundingBox seBox = {{midX, midY}, m_boundingBox.end};
 
             m_subTrees = std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>{
