@@ -29,6 +29,12 @@ namespace RNGOEngine
             return (point.x >= start.x && point.x <= end.x) &&
                    (point.y >= start.y && point.y <= end.y);
         }
+
+        bool Intersects(const BoundingBox& other) const
+        {
+            return !(other.end.x < start.x || other.start.x > end.x ||
+                     other.end.y < start.y || other.start.y > end.y);
+        }
     };
 
     template<typename T>
@@ -61,14 +67,8 @@ namespace RNGOEngine
 
             if (m_subTrees.has_value())
             {
-                for (const auto& quadTree : m_subTrees.value())
-                {
-                    if (quadTree->CanContain(position))
-                    {
-                        quadTree->AddNode(data, position);
-                        return;
-                    }
-                }
+                const auto childIndex = GetChildIndex(position);
+                m_subTrees.value()[childIndex]->AddNode(data, position);
             }
             else
             {
@@ -80,7 +80,7 @@ namespace RNGOEngine
 
         std::vector<T> WithinRange(BoundingBox box) const
         {
-            if (!m_boundingBox.Contains(box.start) && !m_boundingBox.Contains(box.end))
+            if (!m_boundingBox.Intersects(box))
             {
                 return {};
             }
@@ -90,7 +90,7 @@ namespace RNGOEngine
             {
                 if (box.Contains(m_data[i].position))
                 {
-                    return {m_data[i].data};
+                    results.push_back(m_data[i].data);
                 }
             }
 
@@ -99,10 +99,14 @@ namespace RNGOEngine
             {
                 for (const auto& subTree : m_subTrees.value())
                 {
-                    auto subTreeResults = subTree->WithinRange(box);
-                    results.insert(results.end(), subTreeResults.begin(), subTreeResults.end());
+                    if (subTree->m_boundingBox.Intersects(box))
+                    {
+                        auto subTreeResults = subTree->WithinRange(box);
+                        results.insert(results.end(), subTreeResults.begin(), subTreeResults.end());
+                    }
                 }
             }
+
 
             return results;
         }
@@ -122,6 +126,11 @@ namespace RNGOEngine
 #endif
 
     private:
+        BoundingBox m_boundingBox;
+        std::array<QuadTreeNode<T>, CAPACITY> m_data;
+        size_t m_dataIndex = 0;
+        std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>> m_subTrees;
+
         bool CanContain(const Point& point) const
         {
             return m_boundingBox.Contains(point);
@@ -143,6 +152,8 @@ namespace RNGOEngine
                     }
                 }
             }
+
+            m_dataIndex = 0;
         }
 
         void GenerateSubTrees()
@@ -164,11 +175,15 @@ namespace RNGOEngine
             };
         }
 
-        BoundingBox m_boundingBox;
-        std::array<QuadTreeNode<T>, CAPACITY> m_data;
-        size_t m_dataIndex = 0;
-        std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>> m_subTrees;
-    };
+        QuadTreeDirection GetChildIndex(const Point& point) const
+        {
+            float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
+            float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
 
-#include "QuadTree.tpp"
+            if (point.x <= midX)
+                return (point.y <= midY) ? NORTH_WEST : SOUTH_WEST;
+
+            return (point.y <= midY) ? NORTH_EAST : SOUTH_EAST;
+        }
+    };
 }
