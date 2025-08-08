@@ -4,6 +4,11 @@
 
 #pragma once
 
+#include <optional>
+#include <array>
+#include <memory>
+#include <vector>
+
 namespace RNGOEngine
 {
 
