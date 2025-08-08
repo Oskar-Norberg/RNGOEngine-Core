@@ -23,6 +23,7 @@ add_library(${PROJECT_NAME} STATIC
         include/EventQueue/EngineEvents/EngineEvents.h
         include/Utilities/Containers/QuadTree/QuadTree.h
         include/Utilities/Containers/QuadTree/QuadTree.tpp
+        include/Benchmarking/STDOUTStopwatch.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
