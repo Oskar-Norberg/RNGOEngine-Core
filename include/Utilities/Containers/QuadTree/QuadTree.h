@@ -62,6 +62,8 @@ namespace RNGOEngine
 
         void AddNode(T data, Point position)
         {
+            totalCapacity++;
+
             if (!CanContain(position))
             {
                 return;
@@ -88,6 +90,7 @@ namespace RNGOEngine
         std::vector<T> WithinRange(BoundingBox box) const
         {
             std::vector<T> result;
+            result.reserve(totalCapacity);
 
             WithinRangeRecursive(box, result);
 
@@ -113,6 +116,7 @@ namespace RNGOEngine
         std::array<QuadTreeNode<T>, CAPACITY> m_data;
         size_t m_dataIndex = 0;
         std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>> m_subTrees;
+        size_t totalCapacity = 0;
 
         bool CanContain(const Point& point) const
         {
