@@ -8,15 +8,15 @@ void QuadTree<T, CAPACITY>::AddNode(T data, Point position)
         return;
     }
 
-    if (m_dataIndex >= CAPACITY && !m_subTrees.has_value())
+    if (m_dataIndex >= CAPACITY && !IsSubdivided())
     {
         Subdivide();
     }
 
-    if (m_subTrees.has_value())
+    if (IsSubdivided())
     {
         const auto childIndex = GetChildIndex(position);
-        m_subTrees.value()[childIndex]->AddNode(data, position);
+        m_subTrees[childIndex]->AddNode(data, position);
     }
     else
     {
@@ -27,7 +27,7 @@ void QuadTree<T, CAPACITY>::AddNode(T data, Point position)
 }
 
 template<typename T, size_t CAPACITY>
-    std::vector<T> QuadTree<T, CAPACITY>::WithinRange(BoundingBox box) const
+std::vector<T> QuadTree<T, CAPACITY>::WithinRange(BoundingBox box) const
 {
     std::vector<T> result;
     result.reserve(totalCapacity);
@@ -38,20 +38,20 @@ template<typename T, size_t CAPACITY>
 }
 
 template<typename T, size_t CAPACITY>
-    bool QuadTree<T, CAPACITY>::CanContain(const Point& point) const
+bool QuadTree<T, CAPACITY>::CanContain(const Point& point) const
 {
     return m_boundingBox.Contains(point);
 }
 
 template<typename T, size_t CAPACITY>
-    void QuadTree<T, CAPACITY>::Subdivide()
+void QuadTree<T, CAPACITY>::Subdivide()
 {
     GenerateSubTrees();
 
     // Emplace existing data into subtrees
     for (size_t i = 0; i < m_dataIndex; i++)
     {
-        for (const auto& quadTree : m_subTrees.value())
+        for (const auto& quadTree : m_subTrees)
         {
             if (quadTree->CanContain(m_data[i].position))
             {
@@ -65,7 +65,7 @@ template<typename T, size_t CAPACITY>
 }
 
 template<typename T, size_t CAPACITY>
-    void QuadTree<T, CAPACITY>::GenerateSubTrees()
+void QuadTree<T, CAPACITY>::GenerateSubTrees()
 {
     // Midpoint
     float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
@@ -85,7 +85,7 @@ template<typename T, size_t CAPACITY>
 }
 
 template<typename T, size_t CAPACITY>
-    QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Point& point) const
+QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Point& point) const
 {
     float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
     float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
@@ -97,9 +97,9 @@ template<typename T, size_t CAPACITY>
 }
 
 template<typename T, size_t CAPACITY>
-    void QuadTree<T, CAPACITY>::WithinRangeRecursive(
-        BoundingBox boundingBox, std::vector<T>& result
-    ) const
+void QuadTree<T, CAPACITY>::WithinRangeRecursive(
+    BoundingBox boundingBox, std::vector<T>& result
+) const
 {
     if (!m_boundingBox.Intersects(boundingBox))
     {
@@ -115,11 +115,17 @@ template<typename T, size_t CAPACITY>
     }
 
     // Query Subtrees
-    if (m_subTrees.has_value())
+    if (IsSubdivided())
     {
-        for (const auto& subTree : m_subTrees.value())
+        for (const auto& subTree : m_subTrees)
         {
             subTree->WithinRangeRecursive(boundingBox, result);
         }
     }
+}
+
+template<typename T, size_t CAPACITY>
+bool QuadTree<T, CAPACITY>::IsSubdivided() const
+{
+    return m_subTrees[0] != nullptr;
 }

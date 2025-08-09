@@ -82,7 +82,7 @@ namespace RNGOEngine
         BoundingBox m_boundingBox;
         std::array<QuadTreeNode<T>, CAPACITY> m_data;
         size_t m_dataIndex = 0;
-        std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>> m_subTrees;
+        std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
         size_t totalCapacity = 0;
 
         bool CanContain(const Point& point) const;
@@ -94,6 +94,8 @@ namespace RNGOEngine
         QuadTreeDirection GetChildIndex(const Point& point) const;
 
         void WithinRangeRecursive(BoundingBox boundingBox, std::vector<T>& result) const;
+
+        bool IsSubdivided() const;
     };
 
 #include "Utilities/Containers/QuadTree/QuadTree.tpp"
