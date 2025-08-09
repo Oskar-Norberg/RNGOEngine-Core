@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <optional>
 #include <array>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace RNGOEngine
@@ -37,8 +37,10 @@ namespace RNGOEngine
 
         bool Intersects(const BoundingBox& other) const
         {
-            return !(other.end.x < start.x || other.start.x > end.x ||
-                     other.end.y < start.y || other.start.y > end.y);
+            return !(
+                other.end.x < start.x || other.start.x > end.x || other.end.y < start.y ||
+                other.start.y > end.y
+            );
         }
     };
 
@@ -85,35 +87,11 @@ namespace RNGOEngine
 
         std::vector<T> WithinRange(BoundingBox box) const
         {
-            if (!m_boundingBox.Intersects(box))
-            {
-                return {};
-            }
+            std::vector<T> result;
 
-            std::vector<T> results;
-            for (size_t i = 0; i < m_dataIndex; i++)
-            {
-                if (box.Contains(m_data[i].position))
-                {
-                    results.push_back(m_data[i].data);
-                }
-            }
+            WithinRangeRecursive(box, result);
 
-            // Query Subtrees
-            if (m_subTrees.has_value())
-            {
-                for (const auto& subTree : m_subTrees.value())
-                {
-                    if (subTree->m_boundingBox.Intersects(box))
-                    {
-                        auto subTreeResults = subTree->WithinRange(box);
-                        results.insert(results.end(), subTreeResults.begin(), subTreeResults.end());
-                    }
-                }
-            }
-
-
-            return results;
+            return result;
         }
 
 // Only compile these in debug mode.
@@ -189,6 +167,31 @@ namespace RNGOEngine
                 return (point.y <= midY) ? NORTH_WEST : SOUTH_WEST;
 
             return (point.y <= midY) ? NORTH_EAST : SOUTH_EAST;
+        }
+
+        void WithinRangeRecursive(BoundingBox boundingBox, std::vector<T>& result) const
+        {
+            if (!m_boundingBox.Intersects(boundingBox))
+            {
+                return;
+            }
+
+            for (size_t i = 0; i < m_dataIndex; i++)
+            {
+                if (boundingBox.Contains(m_data[i].position))
+                {
+                    result.push_back(m_data[i].data);
+                }
+            }
+
+            // Query Subtrees
+            if (m_subTrees.has_value())
+            {
+                for (const auto& subTree : m_subTrees.value())
+                {
+                    subTree->WithinRangeRecursive(boundingBox, result);
+                }
+            }
         }
     };
 }

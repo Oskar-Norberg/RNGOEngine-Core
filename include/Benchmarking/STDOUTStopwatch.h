@@ -57,7 +57,7 @@ public:
             {
                 auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(elapsed);
                 count = duration.count();
-                precisionString = "ns";
+                precisionString = " ns";
                 break;
             }
             case MILLISECONDS:
@@ -82,7 +82,7 @@ public:
             }
         }
 
-        std::cout << "Elapsed time: " << count << precisionString << std::endl;
+        std::cout << "Elapsed time: " << count << " " << precisionString << std::endl;
     }
 
 private:
