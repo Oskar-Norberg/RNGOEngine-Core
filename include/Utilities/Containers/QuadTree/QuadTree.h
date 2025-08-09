@@ -51,6 +51,14 @@ namespace RNGOEngine
         T data;
     };
 
+    /// 
+    /// @tparam T Payload/data type stored in tree.
+    /// @tparam CAPACITY Max number of nodes in a quad.
+    /// @brief The tree has two ways of being used:
+    /// Creating an instance of the tree and letting it go out of scope when you are done, deallocating the memory.
+    /// Or by using the Initialize method to clear the tree's data but reuse the allocated memory.
+    /// This will lead to more memory usage but a faster construction time.
+    ///
     template<typename T, size_t CAPACITY>
     class QuadTree
     {
