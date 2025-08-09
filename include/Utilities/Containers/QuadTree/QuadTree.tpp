@@ -1,4 +1,16 @@
-﻿template<typename T, size_t CAPACITY>
+﻿#pragma once
+
+template<typename T, size_t CAPACITY>
+void QuadTree<T, CAPACITY>::Initialize(BoundingBox boundingBox)
+{
+    m_boundingBox = boundingBox;
+    m_dataIndex = 0;
+    totalCapacity = 0;
+
+    m_isSubdivided = false;
+}
+
+template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddNode(T data, Point position)
 {
     totalCapacity++;
@@ -8,12 +20,12 @@ void QuadTree<T, CAPACITY>::AddNode(T data, Point position)
         return;
     }
 
-    if (m_dataIndex >= CAPACITY && !IsSubdivided())
+    if (m_dataIndex >= CAPACITY && !m_isSubdivided)
     {
         Subdivide();
     }
 
-    if (IsSubdivided())
+    if (m_isSubdivided)
     {
         const auto childIndex = GetChildIndex(position);
         m_subTrees[childIndex]->AddNode(data, position);
@@ -62,6 +74,7 @@ void QuadTree<T, CAPACITY>::Subdivide()
     }
 
     m_dataIndex = 0;
+    m_isSubdivided = true;
 }
 
 template<typename T, size_t CAPACITY>
@@ -76,12 +89,18 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees()
     BoundingBox swBox = {{m_boundingBox.start.x, midY}, {midX, m_boundingBox.end.y}};
     BoundingBox seBox = {{midX, midY}, m_boundingBox.end};
 
-    m_subTrees = std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>{
-        std::make_unique<QuadTree<T, CAPACITY>>(nwBox),
-        std::make_unique<QuadTree<T, CAPACITY>>(neBox),
-        std::make_unique<QuadTree<T, CAPACITY>>(swBox),
-        std::make_unique<QuadTree<T, CAPACITY>>(seBox)
-    };
+    if (m_subTrees[0] == nullptr)
+    {
+        m_subTrees = std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>{
+            std::make_unique<QuadTree<T, CAPACITY>>(), std::make_unique<QuadTree<T, CAPACITY>>(),
+            std::make_unique<QuadTree<T, CAPACITY>>(), std::make_unique<QuadTree<T, CAPACITY>>()
+        };
+    }
+
+    m_subTrees[NORTH_WEST]->Initialize(nwBox);
+    m_subTrees[NORTH_EAST]->Initialize(neBox);
+    m_subTrees[SOUTH_WEST]->Initialize(swBox);
+    m_subTrees[SOUTH_EAST]->Initialize(seBox);
 }
 
 template<typename T, size_t CAPACITY>
@@ -115,17 +134,11 @@ void QuadTree<T, CAPACITY>::WithinRangeRecursive(
     }
 
     // Query Subtrees
-    if (IsSubdivided())
+    if (m_isSubdivided)
     {
         for (const auto& subTree : m_subTrees)
         {
             subTree->WithinRangeRecursive(boundingBox, result);
         }
     }
-}
-
-template<typename T, size_t CAPACITY>
-bool QuadTree<T, CAPACITY>::IsSubdivided() const
-{
-    return m_subTrees[0] != nullptr;
 }
