@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <optional>
 #include <array>
 #include <memory>
+#include <optional>
 #include <vector>
 
 namespace RNGOEngine
@@ -37,8 +37,10 @@ namespace RNGOEngine
 
         bool Intersects(const BoundingBox& other) const
         {
-            return !(other.end.x < start.x || other.start.x > end.x ||
-                     other.end.y < start.y || other.start.y > end.y);
+            return !(
+                other.end.x < start.x || other.start.x > end.x || other.end.y < start.y ||
+                other.start.y > end.y
+            );
         }
     };
 
@@ -49,6 +51,11 @@ namespace RNGOEngine
         T data;
     };
 
+    /// 
+    /// @tparam T Payload/data type stored in tree.
+    /// @tparam CAPACITY Max number of nodes in a quad.
+    /// @brief Spatially partitioned QuadTree.
+    ///
     template<typename T, size_t CAPACITY>
     class QuadTree
     {
@@ -58,72 +65,18 @@ namespace RNGOEngine
         {
         }
 
-        void AddNode(T data, Point position)
-        {
-            if (!CanContain(position))
-            {
-                return;
-            }
+        void AddNode(T data, Point position);
 
-            if (m_dataIndex >= CAPACITY && !m_subTrees.has_value())
-            {
-                Subdivide();
-            }
+        std::vector<T> WithinRange(BoundingBox box) const;
 
-            if (m_subTrees.has_value())
-            {
-                const auto childIndex = GetChildIndex(position);
-                m_subTrees.value()[childIndex]->AddNode(data, position);
-            }
-            else
-            {
-                m_data[m_dataIndex].data = data;
-                m_data[m_dataIndex].position = position;
-                m_dataIndex++;
-            }
-        }
-
-        std::vector<T> WithinRange(BoundingBox box) const
-        {
-            if (!m_boundingBox.Intersects(box))
-            {
-                return {};
-            }
-
-            std::vector<T> results;
-            for (size_t i = 0; i < m_dataIndex; i++)
-            {
-                if (box.Contains(m_data[i].position))
-                {
-                    results.push_back(m_data[i].data);
-                }
-            }
-
-            // Query Subtrees
-            if (m_subTrees.has_value())
-            {
-                for (const auto& subTree : m_subTrees.value())
-                {
-                    if (subTree->m_boundingBox.Intersects(box))
-                    {
-                        auto subTreeResults = subTree->WithinRange(box);
-                        results.insert(results.end(), subTreeResults.begin(), subTreeResults.end());
-                    }
-                }
-            }
-
-
-            return results;
-        }
-
-// Only compile these in debug mode.
+        // Only compile these in debug mode.
 #ifndef NDEBUG
         BoundingBox GetBoundingBox() const
         {
             return m_boundingBox;
         }
 
-        const std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>>& GetSubTrees(
+        const std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>& GetSubTrees(
         ) const
         {
             return m_subTrees;
@@ -134,61 +87,21 @@ namespace RNGOEngine
         BoundingBox m_boundingBox;
         std::array<QuadTreeNode<T>, CAPACITY> m_data;
         size_t m_dataIndex = 0;
-        std::optional<std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>> m_subTrees;
+        std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
+        size_t totalCapacity = 0;
 
-        bool CanContain(const Point& point) const
-        {
-            return m_boundingBox.Contains(point);
-        }
+        bool CanContain(const Point& point) const;
 
-        void Subdivide()
-        {
-            GenerateSubTrees();
+        void Subdivide();
 
-            // Emplace existing data into subtrees
-            for (size_t i = 0; i < m_dataIndex; i++)
-            {
-                for (const auto& quadTree : m_subTrees.value())
-                {
-                    if (quadTree->CanContain(m_data[i].position))
-                    {
-                        quadTree->AddNode(m_data[i].data, m_data[i].position);
-                        break;
-                    }
-                }
-            }
+        void GenerateSubTrees();
 
-            m_dataIndex = 0;
-        }
+        QuadTreeDirection GetChildIndex(const Point& point) const;
 
-        void GenerateSubTrees()
-        {
-            // Midpoint
-            float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
-            float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
+        void WithinRangeRecursive(BoundingBox boundingBox, std::vector<T>& result) const;
 
-            BoundingBox nwBox = {m_boundingBox.start, {midX, midY}};
-            BoundingBox neBox = {{midX, m_boundingBox.start.y}, {m_boundingBox.end.x, midY}};
-            BoundingBox swBox = {{m_boundingBox.start.x, midY}, {midX, m_boundingBox.end.y}};
-            BoundingBox seBox = {{midX, midY}, m_boundingBox.end};
-
-            m_subTrees = std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>{
-                std::make_unique<QuadTree<T, CAPACITY>>(nwBox),
-                std::make_unique<QuadTree<T, CAPACITY>>(neBox),
-                std::make_unique<QuadTree<T, CAPACITY>>(swBox),
-                std::make_unique<QuadTree<T, CAPACITY>>(seBox)
-            };
-        }
-
-        QuadTreeDirection GetChildIndex(const Point& point) const
-        {
-            float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
-            float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
-
-            if (point.x <= midX)
-                return (point.y <= midY) ? NORTH_WEST : SOUTH_WEST;
-
-            return (point.y <= midY) ? NORTH_EAST : SOUTH_EAST;
-        }
+        bool IsSubdivided() const;
     };
+
+#include "Utilities/Containers/QuadTree/QuadTree.tpp"
 }
