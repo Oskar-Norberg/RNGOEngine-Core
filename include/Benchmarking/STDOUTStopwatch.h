@@ -17,39 +17,24 @@ enum StopwatchPrecision
 class STDOUTStopwatch
 {
 public:
-    STDOUTStopwatch(std::string title, StopwatchPrecision precision, bool clearPrint = false)
-        : m_precision(precision), m_title(std::move(title)), m_clearPrint(clearPrint)
+    STDOUTStopwatch(StopwatchPrecision precision, std::string title)
+        : m_precision(precision), m_title(std::move(title))
     {
         m_startTime = std::chrono::high_resolution_clock::now();
     }
 
-    STDOUTStopwatch(std::string title, StopwatchPrecision precision)
-        : STDOUTStopwatch(title, precision, false)
-    {
-    }
-
     STDOUTStopwatch(StopwatchPrecision precision)
-        : STDOUTStopwatch("", precision, false)
-    {
-    }
-
-    STDOUTStopwatch(bool clearPrint, StopwatchPrecision precision)
-        : STDOUTStopwatch("", precision, clearPrint)
-    {
-    }
-
-    STDOUTStopwatch(bool clearPrint)
-        : STDOUTStopwatch("", MILLISECONDS, clearPrint)
+        : STDOUTStopwatch(precision, "")
     {
     }
 
     STDOUTStopwatch(std::string title)
-        : STDOUTStopwatch(title, MILLISECONDS, false)
+        : STDOUTStopwatch(MILLISECONDS, title)
     {
     }
 
     STDOUTStopwatch()
-        : STDOUTStopwatch("", MILLISECONDS, false)
+        : STDOUTStopwatch(MILLISECONDS, "")
     {
     }
 
@@ -97,19 +82,11 @@ public:
             }
         }
 
-        if (m_clearPrint)
-        {
-            std::cout << count << std::endl;
-        }
-        else
-        {
-            std::cout << "Elapsed time: " << count << " " << precisionString << std::endl;
-        }
+        std::cout << "Elapsed time: " << count << " " << precisionString << std::endl;
     }
 
 private:
     StopwatchPrecision m_precision;
     std::string m_title;
     std::chrono::high_resolution_clock::time_point m_startTime;
-    bool m_clearPrint;
 };
