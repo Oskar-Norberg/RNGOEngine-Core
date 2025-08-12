@@ -6,12 +6,13 @@
 
 #include <array>
 #include <memory>
-#include <optional>
+#include <stack>
 #include <vector>
+
+#include "Profiling/Profiling.h"
 
 namespace RNGOEngine
 {
-
     enum QuadTreeDirection
     {
         NORTH_WEST = 0,

@@ -29,10 +29,38 @@ void QuadTree<T, CAPACITY>::AddNode(T data, Point position)
 template<typename T, size_t CAPACITY>
 std::vector<T> QuadTree<T, CAPACITY>::WithinRange(BoundingBox box) const
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::WithinRange");
+
     std::vector<T> result;
     result.reserve(totalCapacity);
 
-    WithinRangeRecursive(box, result);
+    std::stack<const QuadTree<T, CAPACITY>*> stack;
+    stack.push(this);
+
+    while (!stack.empty())
+    {
+        const QuadTree<T, CAPACITY>* currentTree = stack.top();
+        stack.pop();
+
+        if (!currentTree->m_boundingBox.Intersects(box))
+        {
+            continue;
+        }
+
+        for (size_t i = 0; i < currentTree->m_dataIndex; i++)
+        {
+            result.push_back(currentTree->m_data[i].data);
+        }
+
+        if (currentTree->IsSubdivided())
+        {
+            for (const auto& subTrees : currentTree->m_subTrees)
+            {
+                stack.push(subTrees.get());
+            }
+        }
+    }
 
     return result;
 }
