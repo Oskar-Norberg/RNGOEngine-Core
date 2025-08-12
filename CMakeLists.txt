@@ -29,6 +29,7 @@ add_library(${PROJECT_NAME} STATIC
         include/Utilities/Containers/QuadTree/QuadTree.h
         include/Utilities/Containers/QuadTree/QuadTree.tpp
         include/Benchmarking/STDOUTStopwatch.h
+        include/Profiling/Profiling.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include

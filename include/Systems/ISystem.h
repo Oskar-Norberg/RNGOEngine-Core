@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include <string_view>
 
 struct SystemContext;
 class World;
@@ -23,4 +24,12 @@ public:
     virtual void Exit()
     {
     }
+
+    std::string_view GetName() const
+    {
+        return m_debugName;
+    }
+
+protected:
+    std::string_view m_debugName;
 };
