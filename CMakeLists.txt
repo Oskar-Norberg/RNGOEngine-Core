@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.31)
 
+# Enable / Disable Tracy. Should be disabled in release builds.
+option(TRACY_ENABLE "" on)
+
 set(PROJECT_NAME RNGOEngine_Core)
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)
+
+add_subdirectory(vendor/tracy)
 
 add_library(${PROJECT_NAME} STATIC
         include/Engine.h
@@ -28,3 +33,5 @@ add_library(${PROJECT_NAME} STATIC
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
         vendor/entt/include)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
