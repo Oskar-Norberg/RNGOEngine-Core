@@ -8,6 +8,7 @@
 
 #include "Engine.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
+#include "Profiling/Profiling.h"
 #include "Systems/SystemContext.h"
 
 SystemScheduler::~SystemScheduler()
@@ -23,6 +24,9 @@ void SystemScheduler::Update(Engine& engine, World& world, float deltaTime)
 
     for (auto& system : m_systems)
     {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_VIEW(system->GetName());
+        
         system->Update(world, m_context);
     }
 
@@ -34,6 +38,8 @@ void SystemScheduler::Update(Engine& engine, World& world, float deltaTime)
 
 void SystemScheduler::InitializeSystems()
 {
+    ZoneScoped;
+
     // TODO: O(n) polling each frame.
     for (auto& system : m_systems)
     {
@@ -47,6 +53,8 @@ void SystemScheduler::InitializeSystems()
 
 void SystemScheduler::TerminateSystems()
 {
+    ZoneScoped;
+
     for (auto& system : m_systems)
     {
         system->Exit();
@@ -55,6 +63,8 @@ void SystemScheduler::TerminateSystems()
 }
 void SystemScheduler::PollEngineEvents(Engine& engine, EventQueue& eventQueue)
 {
+    ZoneScoped;
+
     const auto exitEvents = eventQueue.GetEvents<ExitEvent>();
 
     if (!exitEvents.empty())
