@@ -6,8 +6,7 @@
 
 #include <tracy/Tracy.hpp>
 
-#define RNGO_FRAME_START(name) FrameMarkStart(name)
-#define RNGO_FRAME_END(name) FrameMarkEnd(name)
+#define RNGO_FRAME_MARK FrameMark
 
 #define RNGO_ZONE_SCOPE ZoneScoped
 
