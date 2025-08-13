@@ -5,46 +5,51 @@
 #pragma once
 
 #include <memory>
-#include <queue>
 #include <vector>
 
-#include "Concepts/Concepts.h"
 #include "ISystem.h"
 #include "SystemContext.h"
+#include "Concepts/Concepts.h"
 
-class Engine;
-class World;
-
-struct ScheduledSystem
+namespace RNGOEngine::Core
 {
-    std::unique_ptr<ISystem> system = nullptr;
-    bool initialized = false;
+    class Engine;
+    class World;
+}
 
-    ISystem* operator->() const
-    {
-        return system.get();
-    }
-};
-
-class SystemScheduler
+namespace RNGOEngine::Systems
 {
-public:
-    ~SystemScheduler();
-    void Update(Engine& engine, World& world, float deltaTime);
-
-    template<DerivedFrom<ISystem> T, typename... Args>
-    void RegisterSystem(Args&&... args)
+    struct ScheduledSystem
     {
-        m_systems.emplace_back(ScheduledSystem{std::make_unique<T>(std::forward<Args>(args)...)});
-    }
+        std::unique_ptr<ISystem> system = nullptr;
+        bool initialized = false;
 
-private:
-    std::vector<ScheduledSystem> m_systems;
+        ISystem* operator->() const
+        {
+            return system.get();
+        }
+    };
 
-    SystemContext m_context;
+    class SystemScheduler
+    {
+    public:
+        ~SystemScheduler();
+        void Update(Core::Engine& engine, Core::World& world, float deltaTime);
 
-    void InitializeSystems();
-    void TerminateSystems();
+        template<Concepts::DerivedFrom<ISystem> T, typename... Args>
+        void RegisterSystem(Args&&... args)
+        {
+            m_systems.emplace_back(ScheduledSystem{std::make_unique<T>(std::forward<Args>(args)...)});
+        }
 
-    void PollEngineEvents(Engine& engine, EventQueue& eventQueue);
-};
+    private:
+        std::vector<ScheduledSystem> m_systems;
+
+        SystemContext m_context;
+
+        void InitializeSystems();
+        void TerminateSystems();
+
+        void PollEngineEvents(Core::Engine& engine, Events::EventQueue& eventQueue);
+    };
+}

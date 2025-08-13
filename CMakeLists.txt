@@ -18,7 +18,6 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/SystemContext.h
         include/Systems/ResourceMap.h
         include/World/World.h
-        include/Scene/Test/TestScene.h
         include/Systems/SystemScheduler.h
         src/Systems/SystemScheduler.cpp
         src/World/World.cpp
@@ -30,6 +29,8 @@ add_library(${PROJECT_NAME} STATIC
         include/Utilities/Containers/QuadTree/QuadTree.tpp
         include/Benchmarking/STDOUTStopwatch.h
         include/Profiling/Profiling.h
+        include/Math/Point.h
+        include/Math/BoundingBox.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include

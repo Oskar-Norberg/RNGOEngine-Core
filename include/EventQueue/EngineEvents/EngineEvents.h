@@ -4,6 +4,9 @@
 
 #pragma once
 
-struct ExitEvent
+namespace RNGOEngine::Events
 {
-};
+    struct ExitEvent
+    {
+    };
+}

@@ -4,12 +4,15 @@
 
 #include "World/World.h"
 
-entt::entity World::CreateEntity()
+namespace RNGOEngine::Core
 {
-    return m_registry.create();
-}
+    entt::entity World::CreateEntity()
+    {
+        return m_registry.create();
+    }
 
-void World::DestroyEntity(entt::entity entity)
-{
-    m_registry.destroy(entity);
+    void World::DestroyEntity(entt::entity entity)
+    {
+        m_registry.destroy(entity);
+    }
 }

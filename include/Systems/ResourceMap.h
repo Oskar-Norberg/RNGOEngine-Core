@@ -8,42 +8,45 @@
 #include <typeindex>
 #include <unordered_map>
 
-class ResourceMap
+namespace RNGOEngine::Systems::Resources
 {
-public:
-    template<typename T>
-    void AddResource(const T resource, bool override = false)
+    class ResourceMap
     {
-        if (!override)
+    public:
+        template<typename T>
+        void AddResource(const T resource, bool override = false)
+        {
+            if (!override)
+            {
+                const auto it = m_resources.find(typeid(T));
+                if (it != m_resources.end())
+                {
+                    return;
+                }
+            }
+
+            m_resources[typeid(T)] = resource;
+        }
+
+        template<typename T>
+        bool TryGetResource(T& outResource) const
         {
             const auto it = m_resources.find(typeid(T));
             if (it != m_resources.end())
             {
-                return;
+                outResource = std::any_cast<T>(it->second);
+                return true;
             }
+
+            return false;
         }
 
-        m_resources[typeid(T)] = resource;
-    }
-
-    template<typename T>
-    bool TryGetResource(T& outResource) const
-    {
-        const auto it = m_resources.find(typeid(T));
-        if (it != m_resources.end())
+        void Clear()
         {
-            outResource = std::any_cast<T>(it->second);
-            return true;
+            m_resources.clear();
         }
 
-        return false;
-    }
-
-    void Clear()
-    {
-        m_resources.clear();
-    }
-
-private:
-    std::unordered_map<std::type_index, std::any> m_resources;
-};
+    private:
+        std::unordered_map<std::type_index, std::any> m_resources;
+    };
+}

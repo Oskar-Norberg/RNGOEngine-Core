@@ -3,33 +3,44 @@
 //
 
 #pragma once
+
 #include <string_view>
 
-struct SystemContext;
-class World;
-
-class ISystem
+namespace RNGOEngine::Systems
 {
-public:
-    virtual ~ISystem() = default;
+    struct SystemContext;
+}
 
-    virtual void Initialize(SystemContext& context)
+namespace RNGOEngine::Core
+{
+    class World;
+}
+
+namespace RNGOEngine::Systems
+{
+    class ISystem
     {
-    }
+    public:
+        virtual ~ISystem() = default;
 
-    virtual void Update(World& world, SystemContext& context)
-    {
-    }
+        virtual void Initialize(SystemContext& context)
+        {
+        }
 
-    virtual void Exit()
-    {
-    }
+        virtual void Update(Core::World& world, SystemContext& context)
+        {
+        }
 
-    std::string_view GetName() const
-    {
-        return m_debugName;
-    }
+        virtual void Exit()
+        {
+        }
 
-protected:
-    std::string_view m_debugName;
-};
+        std::string_view GetName() const
+        {
+            return m_debugName;
+        }
+
+    protected:
+        std::string_view m_debugName;
+    };
+}

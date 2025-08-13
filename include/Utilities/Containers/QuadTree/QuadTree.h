@@ -9,9 +9,11 @@
 #include <stack>
 #include <vector>
 
+#include "Math/BoundingBox.h"
+#include "Math/Point.h"
 #include "Profiling/Profiling.h"
 
-namespace RNGOEngine
+namespace RNGOEngine::Containers::Graphs
 {
     enum QuadTreeDirection
     {
@@ -21,34 +23,10 @@ namespace RNGOEngine
         SOUTH_EAST = 3
     };
 
-    struct Point
-    {
-        float x, y;
-    };
-
-    struct BoundingBox
-    {
-        Point start, end;
-
-        bool Contains(Point point) const
-        {
-            return (point.x >= start.x && point.x <= end.x) &&
-                   (point.y >= start.y && point.y <= end.y);
-        }
-
-        bool Intersects(const BoundingBox& other) const
-        {
-            return !(
-                other.end.x < start.x || other.start.x > end.x || other.end.y < start.y ||
-                other.start.y > end.y
-            );
-        }
-    };
-
     template<typename T>
     struct QuadTreeNode
     {
-        Point position;
+        Math::Point position;
         T data;
     };
 
@@ -61,7 +39,7 @@ namespace RNGOEngine
     class QuadTree
     {
     public:
-        explicit QuadTree(BoundingBox boundingBox)
+        explicit QuadTree(Math::BoundingBox boundingBox)
             : m_boundingBox(boundingBox)
         {
         }
@@ -72,10 +50,10 @@ namespace RNGOEngine
             RNGO_ZONE_NAME_C("QuadTree Destructor");
         }
 
-        void AddNode(T data, Point position);
+        void AddNode(T data, Math::Point position);
 
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
-        std::vector<T> WithinRange(BoundingBox box) const;
+        std::vector<T> WithinRange(Math::BoundingBox box) const;
 
         // Only compile these in debug mode.
 #ifndef NDEBUG
@@ -92,21 +70,21 @@ namespace RNGOEngine
 #endif
 
     private:
-        BoundingBox m_boundingBox;
+        Math::BoundingBox m_boundingBox;
         std::array<QuadTreeNode<T>, CAPACITY> m_data;
         size_t m_dataIndex = 0;
         std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
         size_t totalCapacity = 0;
 
-        bool CanContain(const Point& point) const;
+        bool CanContain(const Math::Point& point) const;
 
         void Subdivide();
 
         void GenerateSubTrees();
 
-        QuadTreeDirection GetChildIndex(const Point& point) const;
+        QuadTreeDirection GetChildIndex(const Math::Point& point) const;
 
-        void WithinRangeRecursive(BoundingBox boundingBox, std::vector<T>& result) const;
+        void WithinRangeRecursive(Math::BoundingBox boundingBox, std::vector<T>& result) const;
 
         bool IsSubdivided() const;
     };

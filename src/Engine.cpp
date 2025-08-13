@@ -7,24 +7,26 @@
 #include <chrono>
 #include "Profiling/Profiling.h"
 
-
-void Engine::Run()
+namespace RNGOEngine::Core
 {
-    auto lastFrame = std::chrono::high_resolution_clock::now();
-
-    while (m_running)
+    void Engine::Run()
     {
+        auto lastFrame = std::chrono::high_resolution_clock::now();
 
-        float deltaTime = std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - lastFrame).count();
-        lastFrame = std::chrono::high_resolution_clock::now();
+        while (m_running)
+        {
+            float deltaTime = std::chrono::duration<float>(
+                std::chrono::high_resolution_clock::now() - lastFrame).count();
+            lastFrame = std::chrono::high_resolution_clock::now();
 
-        m_systems.Update(*this, m_currentScene->world, deltaTime);
+            m_systems.Update(*this, m_currentScene->world, deltaTime);
 
-        RNGO_FRAME_MARK;
+            RNGO_FRAME_MARK;
+        }
     }
-}
 
-void Engine::Quit()
-{
-    m_running = false;
+    void Engine::Quit()
+    {
+        m_running = false;
+    }
 }

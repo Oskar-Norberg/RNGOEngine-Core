@@ -6,5 +6,8 @@
 
 #include <concepts>
 
-template<class T, class U>
-concept DerivedFrom = std::derived_from<T, U>;
+namespace RNGOEngine::Concepts
+{
+    template<class T, class U>
+    concept DerivedFrom = std::derived_from<T, U>;
+}

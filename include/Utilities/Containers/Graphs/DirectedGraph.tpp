@@ -1,7 +1,6 @@
 #pragma once
-#include <stack>
 
-template <typename T>
+template<typename T>
 void DirectedGraph<T>::AddVertex(T* vertex)
 {
     // Vertex already exists, no need to add it again.
@@ -15,13 +14,13 @@ void DirectedGraph<T>::AddVertex(T* vertex)
     edges[vertex] = std::pmr::unordered_set<T*>();
 }
 
-template <typename T>
+template<typename T>
 void DirectedGraph<T>::AddEdge(T* from, T* to)
 {
     edges[from].insert(to);
 }
 
-template <typename T>
+template<typename T>
 std::vector<T*> DirectedGraph<T>::TopologicalSort()
 {
     std::pmr::unordered_set<T*> visited;
@@ -34,7 +33,10 @@ std::vector<T*> DirectedGraph<T>::TopologicalSort()
     {
         if (!visited.contains(vertex))
         {
-            dfs(vertex, visited, [&](T* node) { stack.push(node); });
+            dfs(vertex, visited, [&](T* node)
+            {
+                stack.push(node);
+            });
         }
     }
 
@@ -52,8 +54,9 @@ std::vector<T*> DirectedGraph<T>::TopologicalSort()
     return sortedOrder;
 }
 
-template <typename T>
-void DirectedGraph<T>::dfs(T* node, std::pmr::unordered_set<T*>& visited, std::function<void(T*)> callback)
+template<typename T>
+void DirectedGraph<T>::dfs(T* node, std::pmr::unordered_set<T*>& visited,
+                           std::function<void(T*)> callback)
 {
     if (visited.contains(node))
         return;

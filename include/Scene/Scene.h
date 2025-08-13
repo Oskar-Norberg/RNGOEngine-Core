@@ -6,14 +6,17 @@
 
 #include "World/World.h"
 
-class Scene
+namespace RNGOEngine::Core
 {
-public:
-    virtual ~Scene() = default;
+    class Scene
+    {
+    public:
+        virtual ~Scene() = default;
 
-    virtual void Initialize() {}
-    virtual void Update(float deltaTime) {}
-    virtual void Exit() {}
+        virtual void Initialize() {}
+        virtual void Update(float deltaTime) {}
+        virtual void Exit() {}
 
-    World world;
-};
+        World world;
+    };
+}

@@ -1,5 +1,5 @@
 ﻿template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddNode(T data, Point position)
+void QuadTree<T, CAPACITY>::AddNode(T data, Math::Point position)
 {
     totalCapacity++;
 
@@ -95,7 +95,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 }
 
 template<typename T, size_t CAPACITY>
-std::vector<T> QuadTree<T, CAPACITY>::WithinRange(BoundingBox box) const
+std::vector<T> QuadTree<T, CAPACITY>::WithinRange(Math::BoundingBox box) const
 {
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::WithinRange");
@@ -134,7 +134,7 @@ std::vector<T> QuadTree<T, CAPACITY>::WithinRange(BoundingBox box) const
 }
 
 template<typename T, size_t CAPACITY>
-bool QuadTree<T, CAPACITY>::CanContain(const Point& point) const
+bool QuadTree<T, CAPACITY>::CanContain(const Math::Point& point) const
 {
     return m_boundingBox.Contains(point);
 }
@@ -167,10 +167,10 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees()
     float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
     float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
 
-    BoundingBox nwBox = {m_boundingBox.start, {midX, midY}};
-    BoundingBox neBox = {{midX, m_boundingBox.start.y}, {m_boundingBox.end.x, midY}};
-    BoundingBox swBox = {{m_boundingBox.start.x, midY}, {midX, m_boundingBox.end.y}};
-    BoundingBox seBox = {{midX, midY}, m_boundingBox.end};
+    Math::BoundingBox nwBox = {m_boundingBox.start, {midX, midY}};
+    Math::BoundingBox neBox = {{midX, m_boundingBox.start.y}, {m_boundingBox.end.x, midY}};
+    Math::BoundingBox swBox = {{m_boundingBox.start.x, midY}, {midX, m_boundingBox.end.y}};
+    Math::BoundingBox seBox = {{midX, midY}, m_boundingBox.end};
 
     m_subTrees = std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>{
         std::make_unique<QuadTree<T, CAPACITY>>(nwBox),
@@ -181,7 +181,7 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees()
 }
 
 template<typename T, size_t CAPACITY>
-QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Point& point) const
+QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Math::Point& point) const
 {
     float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
     float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
@@ -194,7 +194,7 @@ QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Point& point) const
 
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::WithinRangeRecursive(
-    BoundingBox boundingBox, std::vector<T>& result
+    Math::BoundingBox boundingBox, std::vector<T>& result
 ) const
 {
     if (!m_boundingBox.Intersects(boundingBox))
