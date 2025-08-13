@@ -66,8 +66,15 @@ namespace RNGOEngine
         {
         }
 
+        ~QuadTree()
+        {
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("QuadTree Destructor");
+        }
+
         void AddNode(T data, Point position);
 
+        std::vector<std::pair<T, T>> GetCollisionPairs() const;
         std::vector<T> WithinRange(BoundingBox box) const;
 
         // Only compile these in debug mode.
