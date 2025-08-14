@@ -20,16 +20,9 @@ namespace RNGOEngine::Events
         {
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_C("EventQueue::EmplaceEvent");
+            
             const auto typeIndex = std::type_index(typeid(T));
-            auto it = m_currentEvents.find(typeIndex);
-
-            if (it == m_currentEvents.end())
-            {
-                m_currentEvents[typeIndex] = {};
-                it = m_currentEvents.find(typeIndex);
-            }
-
-            it->second.emplace_back(T(std::forward<Args>(args)...));
+            m_currentEvents[typeIndex].emplace_back(T(std::forward<Args>(args)...));
         }
 
         template<typename T>
