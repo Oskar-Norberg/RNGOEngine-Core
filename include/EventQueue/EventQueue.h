@@ -15,12 +15,38 @@ namespace RNGOEngine::Events
     class EventQueue
     {
     public:
+        template<typename T>
+        void PushEventMultiple(std::vector<T>& event)
+        {
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("EventQueue::PushEventBulk");
+
+            const auto typeIndex = std::type_index(typeid(T));
+            auto& eventList = m_currentEvents[typeIndex];
+            eventList.reserve(eventList.size() + event.size());
+            
+            for (auto&& e : event)
+            {
+                eventList.emplace_back(std::move(e));
+            }
+        }
+
+        template<typename T>
+        void PushEvent(T&& event)
+        {
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("EventQueue::PushEvent");
+
+            const auto typeIndex = std::type_index(typeid(T));
+            m_currentEvents[typeIndex].emplace_back(std::move(event));
+        }
+
         template<typename T, typename... Args>
         void EmplaceEvent(Args&&... args)
         {
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_C("EventQueue::EmplaceEvent");
-            
+
             const auto typeIndex = std::type_index(typeid(T));
             m_currentEvents[typeIndex].emplace_back(T(std::forward<Args>(args)...));
         }
