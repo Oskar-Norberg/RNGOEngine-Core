@@ -33,60 +33,54 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
     RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
 
     std::vector<std::pair<T, T>> collisionPairs;
-    collisionPairs.reserve(totalCapacity);
+    collisionPairs.reserve(EstimatedNrOfCollisionPairs());
 
-    std::stack<const QuadTree<T, CAPACITY>*> stack;
-    stack.push(this);
+    struct TreeAncestry
+    {
+        const QuadTree* node;
+        std::vector<const QuadTreeNode<T>*> parentData;
+    };
+
+    std::stack<TreeAncestry> stack;
+    stack.emplace(this, std::vector<const QuadTreeNode<T>*>());
 
     while (!stack.empty())
     {
-        auto* currentTree = stack.top();
+        TreeAncestry currentTree = std::move(stack.top());
         stack.pop();
 
-        for (size_t i = 0; i < currentTree->m_dataIndex; i++)
+        const auto* node = currentTree.node;
+
+        for (size_t i = 0; i < node->m_dataIndex; ++i)
         {
-            for (size_t j = i + 1; j < currentTree->m_dataIndex; j++)
+            for (size_t j = i + 1; j < node->m_dataIndex; ++j)
             {
-                // TODO: Perf test against emplace back
-                collisionPairs.push_back(
-                    std::make_pair(currentTree->m_data[i].data, currentTree->m_data[j].data));
+                collisionPairs.emplace_back(
+                    node->m_data[i].data, node->m_data[j].data);
             }
         }
 
-        if (!currentTree->IsSubdivided())
+        for (size_t i = 0; i < node->m_dataIndex; ++i)
         {
-            continue;
+            for (const auto* parentNode : currentTree.parentData)
+            {
+                collisionPairs.emplace_back(
+                    node->m_data[i].data, parentNode->data);
+            }
         }
 
-        std::stack<const QuadTree<T, CAPACITY>*> subTreeStack;
-        for (const auto& subTree : currentTree->m_subTrees)
+        if (node->IsSubdivided())
         {
-            stack.push(subTree.get());
-            subTreeStack.push(subTree.get());
-        }
+            std::vector<const QuadTreeNode<T>*> newParentData = currentTree.parentData;
 
-        while (!subTreeStack.empty())
-        {
-            const auto* subTree = subTreeStack.top();
-            subTreeStack.pop();
-
-            for (size_t i = 0; i < subTree->m_dataIndex; i++)
+            for (size_t i = 0; i < node->m_dataIndex; ++i)
             {
-                for (size_t j = 0; j < currentTree->m_dataIndex; j++)
-                {
-                    collisionPairs.push_back(
-                        std::make_pair(subTree->m_data[i].data, currentTree->m_data[j].data));
-                }
+                newParentData.emplace_back(&node->m_data[i]);
             }
 
-            if (!subTree->IsSubdivided())
+            for (const auto& child : node->m_subTrees)
             {
-                continue;
-            }
-
-            for (const auto& subSubTree : subTree->m_subTrees)
-            {
-                subTreeStack.push(subSubTree.get());
+                stack.emplace(child.get(), newParentData);
             }
         }
     }

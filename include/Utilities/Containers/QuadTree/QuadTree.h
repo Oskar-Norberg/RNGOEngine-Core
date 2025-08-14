@@ -55,6 +55,11 @@ namespace RNGOEngine::Containers::Graphs
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
         std::vector<T> WithinRange(Math::BoundingBox box) const;
 
+        size_t EstimatedNrOfCollisionPairs() const
+        {
+            return totalCapacity * (totalCapacity - 1) / 2;
+        }
+
         // Only compile these in debug mode.
 #ifndef NDEBUG
         BoundingBox GetBoundingBox() const
