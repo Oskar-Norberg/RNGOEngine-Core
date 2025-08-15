@@ -33,54 +33,31 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
     RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
 
     std::vector<std::pair<T, T>> collisionPairs;
-    collisionPairs.reserve(EstimatedNrOfCollisionPairs());
 
-    struct TreeAncestry
-    {
-        const QuadTree* node;
-        std::vector<const QuadTreeNode<T>*> parentData;
-    };
 
-    std::stack<TreeAncestry> stack;
-    stack.emplace(this, std::vector<const QuadTreeNode<T>*>());
+    std::stack<const QuadTree*> stack;
+    stack.emplace(this);
 
     while (!stack.empty())
     {
-        TreeAncestry currentTree = std::move(stack.top());
+        const QuadTree* currentTree = std::move(stack.top());
         stack.pop();
 
-        const auto* node = currentTree.node;
-
-        for (size_t i = 0; i < node->m_dataIndex; ++i)
+        for (size_t i = 0; i < currentTree->m_dataIndex; ++i)
         {
-            for (size_t j = i + 1; j < node->m_dataIndex; ++j)
+            for (size_t j = i + 1; j < currentTree->m_dataIndex; ++j)
             {
                 collisionPairs.emplace_back(
-                    node->m_data[i].data, node->m_data[j].data);
+                    currentTree->m_data[i].data, currentTree->m_data[j].data);
             }
         }
+        
 
-        for (size_t i = 0; i < node->m_dataIndex; ++i)
+        if (currentTree->IsSubdivided())
         {
-            for (const auto* parentNode : currentTree.parentData)
+            for (const auto& child : currentTree->m_subTrees)
             {
-                collisionPairs.emplace_back(
-                    node->m_data[i].data, parentNode->data);
-            }
-        }
-
-        if (node->IsSubdivided())
-        {
-            std::vector<const QuadTreeNode<T>*> newParentData = currentTree.parentData;
-
-            for (size_t i = 0; i < node->m_dataIndex; ++i)
-            {
-                newParentData.emplace_back(&node->m_data[i]);
-            }
-
-            for (const auto& child : node->m_subTrees)
-            {
-                stack.emplace(child.get(), newParentData);
+                stack.emplace(child.get());
             }
         }
     }
@@ -95,7 +72,6 @@ std::vector<T> QuadTree<T, CAPACITY>::WithinRange(Math::BoundingBox box) const
     RNGO_ZONE_NAME_C("QuadTree::WithinRange");
 
     std::vector<T> result;
-    result.reserve(totalCapacity);
 
     std::stack<const QuadTree<T, CAPACITY>*> stack;
     stack.push(this);
