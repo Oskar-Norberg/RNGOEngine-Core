@@ -44,17 +44,16 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
     std::vector<std::pair<T, T>> collisionPairs;
 
     using ParentStack = std::vector<const QuadTree<T, CAPACITY>*>;
-
     std::stack<std::pair<const QuadTree<T, CAPACITY>*, ParentStack>> stack;
     stack.push({this, {}});
 
     while (!stack.empty())
     {
-        auto [currentTree, parents] = stack.top();
+        auto [currentTree, parents] = std::move(stack.top());
         stack.pop();
 
         // Tree - Tree
-        auto& currentTreeData = currentTree->m_data;
+        const auto& currentTreeData = currentTree->m_data;
         const size_t currentTreeSize = currentTreeData.size();
         for (size_t i = 0; i < currentTreeSize; i++)
         {
@@ -73,19 +72,23 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
         // Tree - Parent
         for (const auto* parent : parents)
         {
-            auto& parentData = parent->m_data;
+            const auto& parentData = parent->m_data;
             const size_t parentSize = parentData.size();
+            const auto& currentBounds = currentTree->m_boundingBox;
 
-            for (int i = 0; i < currentTreeSize; ++i)
+            for (size_t j = 0; j < parentSize; ++j)
             {
-                for (int j = 0; j < parentSize; ++j)
+                const auto& parentNode = parentData[j];
+                if (parentNode.bounds.Intersects(currentBounds))
                 {
-                    const auto& childNode = currentTreeData[i];
-                    const auto& parentNode = parentData[j];
-
-                    if (childNode.bounds.Intersects(parentNode.bounds))
+                    for (size_t i = 0; i < currentTreeSize; ++i)
                     {
-                        collisionPairs.emplace_back(childNode.data, parentNode.data);
+                        const auto& childNode = currentTreeData[i];
+                        
+                        if (parentNode.bounds.Intersects(childNode.bounds))
+                        {
+                            collisionPairs.emplace_back(parentNode.data, childNode.data);
+                        }
                     }
                 }
             }
