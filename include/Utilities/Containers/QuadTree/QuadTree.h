@@ -24,10 +24,22 @@ namespace RNGOEngine::Containers::Graphs
         SOUTH_EAST = 3
     };
 
+    using NodeID = size_t;
+    constexpr NodeID ROOT_NODE_ID = 0;
+    constexpr NodeID INVALID_NODE_ID = std::numeric_limits<NodeID>::max();
+
     template<typename T>
-    struct QuadTreeNode
+    struct QuadTreeData
     {
         T data;
+        Math::BoundingBox bounds;
+    };
+
+    template<typename T, size_t CAPACITY>
+    struct QuadTreeNode
+    {
+        std::vector<QuadTreeData<T>> data;
+        std::array<NodeID, 4> children;
         Math::BoundingBox bounds;
     };
 
@@ -41,8 +53,9 @@ namespace RNGOEngine::Containers::Graphs
     {
     public:
         explicit QuadTree(const Math::BoundingBox& boundingBox)
-            : m_boundingBox(boundingBox)
         {
+            // TODO: Create root
+            CreateNode(boundingBox);
         }
 
         ~QuadTree()
@@ -55,31 +68,26 @@ namespace RNGOEngine::Containers::Graphs
 
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
 
-        // Only compile these in debug mode.
-#ifndef NDEBUG
-        Math::BoundingBox GetBoundingBox() const
-        {
-            return m_boundingBox;
-        }
-
-        const std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>& GetSubTrees(
-        ) const
-        {
-            return m_subTrees;
-        }
-#endif
-
     private:
-        Math::BoundingBox m_boundingBox;
-        std::vector<QuadTreeNode<T>> m_data;
-        std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
+        std::vector<QuadTreeNode<T, CAPACITY>> m_trees;
         size_t totalCapacity = 0;
 
-        void Subdivide();
+        std::vector<QuadTreeData<T>> GetNodeData(NodeID id) const;
+        // TODO: ID should really be the first parameter
+        void SetNodeData(std::vector<QuadTreeData<T>>&& data, NodeID id);
+        void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
+        Math::BoundingBox GetBoundingBox(NodeID id) const;
+        std::array<NodeID, 4> GetChildren(NodeID id) const;
+        void Subdivide(NodeID id);
+        bool IsFull(NodeID id) const;
+        bool IsSubdivided(NodeID id) const;
 
-        void GenerateSubTrees();
+    private:
+        NodeID CreateNode(const Math::BoundingBox& bounds);
+        NodeID CreateNode(T data, const Math::BoundingBox& bounds);
+        void GenerateSubTrees(NodeID id);
 
-        bool IsSubdivided() const;
+        void SetChildren(NodeID id, std::array<NodeID, 4> children);
     };
 
 #include "Utilities/Containers/QuadTree/QuadTree.tpp"
