@@ -1,46 +1,18 @@
-﻿template<typename T, size_t CAPACITY>
+﻿#include <utility>
+
+template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
 {
-    totalCapacity++;
-
-    if (m_dataIndex >= CAPACITY && !IsSubdivided())
-    {
-        Subdivide();
-    }
-
-    if (IsSubdivided())
-    {
-        for (const auto& subTree : m_subTrees)
-        {
-            if (subTree->m_boundingBox.Intersects(bounds))
-            {
-                subTree->AddNode(data, bounds);
-            }
-        }
-    }
-    else
-    {
-        // Add to overflow if it doesn't fit entirely.
-        if (m_boundingBox.Contains(bounds))
-        {
-            m_data[m_dataIndex].data = data;
-            m_data[m_dataIndex].bounds = bounds;
-            m_dataIndex++;
-        }
-        else
-        {
-            m_overflowData.emplace_back(data, bounds);
-        }
-    }
+    AddNodeInternal(data, bounds, s_nextID++);
 }
 
 template<typename T, size_t CAPACITY>
-std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> QuadTree<T, CAPACITY>::GetCollisionPairs() const
+std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 {
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
 
-    std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> collisionPairs;
+    std::vector<std::pair<T, T>> collisionPairs;
 
     std::stack<const QuadTree*> stack;
     stack.emplace(this);
@@ -60,7 +32,7 @@ std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> QuadTree<T, CAPAC
                     const auto idA = currentTree->m_data[i].data;
                     const auto idB = currentTree->m_data[j].data;
 
-                    collisionPairs.insert(std::minmax(idA, idB));
+                    collisionPairs.emplace_back(std::minmax(idA, idB));
                 }
             }
 
@@ -69,13 +41,8 @@ std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> QuadTree<T, CAPAC
             {
                 if (currentTree->m_data[i].bounds.Intersects(overflowNode.bounds))
                 {
-                    const std::pair<T, T> pair = std::minmax(
-                        currentTree->m_data[i].data, overflowNode.data);
-
-                    if (!collisionPairs.contains(pair))
-                    {
-                        collisionPairs.insert(pair);
-                    }
+                    if (currentTree->m_data[i].id < overflowNode.id)
+                        collisionPairs.emplace_back(currentTree->m_data[i].data, overflowNode.data);
                 }
             }
         }
@@ -88,15 +55,9 @@ std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> QuadTree<T, CAPAC
                 if (currentTree->m_overflowData[i].bounds.Intersects(
                     currentTree->m_overflowData[j].bounds))
                 {
-                    const std::pair<T, T> pair =
-                        std::minmax(
-                            currentTree->m_overflowData[i].data,
-                            currentTree->m_overflowData[j].data
-                        );
-
-                    if (!collisionPairs.contains(pair))
+                    if (currentTree->m_overflowData[i].id < currentTree->m_overflowData[j].id)
                     {
-                        collisionPairs.insert(pair);
+                        collisionPairs.emplace_back(currentTree->m_overflowData[i].data, currentTree->m_overflowData[j].data);
                     }
                 }
             }
@@ -153,6 +114,40 @@ std::vector<T> QuadTree<T, CAPACITY>::WithinRange(const Math::BoundingBox& box) 
 }
 
 template<typename T, size_t CAPACITY>
+void QuadTree<T, CAPACITY>::AddNodeInternal(T data, const Math::BoundingBox& bounds, size_t ID)
+{
+    totalCapacity++;
+
+    if (m_dataIndex >= CAPACITY && !IsSubdivided())
+    {
+        Subdivide();
+    }
+
+    if (IsSubdivided())
+    {
+        for (const auto& subTree : m_subTrees)
+        {
+            if (subTree->m_boundingBox.Intersects(bounds))
+            {
+                subTree->AddNode(data, bounds);
+            }
+        }
+    }
+    else
+    {
+        // Add to overflow if it doesn't fit entirely.
+        if (m_boundingBox.Contains(bounds))
+        {
+            m_data[m_dataIndex++] = {data, bounds, s_nextID++};
+        }
+        else
+        {
+            m_overflowData.emplace_back(data, bounds, s_nextID++);
+        }
+    }
+}
+
+template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::Subdivide()
 {
     GenerateSubTrees();
@@ -164,7 +159,8 @@ void QuadTree<T, CAPACITY>::Subdivide()
         {
             if (quadTree->m_boundingBox.Intersects(m_data[i].bounds))
             {
-                quadTree->AddNode(m_data[i].data, m_data[i].bounds);
+                // Use the internal method to pass ID
+                quadTree->AddNodeInternal(m_data[i].data, m_data[i].bounds, m_data[i].id);
             }
         }
     }
@@ -176,7 +172,7 @@ void QuadTree<T, CAPACITY>::Subdivide()
         {
             if (quadTree->m_boundingBox.Intersects(overflowData.bounds))
             {
-                quadTree->AddNode(overflowData.data, overflowData.bounds);
+                quadTree->AddNodeInternal(overflowData.data, overflowData.bounds, overflowData.id);
             }
         }
     }

@@ -29,6 +29,7 @@ namespace RNGOEngine::Containers::Graphs
     {
         T data;
         Math::BoundingBox bounds;
+        size_t id;
     };
 
     /// 
@@ -53,7 +54,7 @@ namespace RNGOEngine::Containers::Graphs
 
         void AddNode(T data, const Math::BoundingBox& bounds);
 
-        std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> GetCollisionPairs() const;
+        std::vector<std::pair<T, T>> GetCollisionPairs() const;
         std::vector<T> WithinRange(const Math::BoundingBox& box) const;
 
         size_t EstimatedNrOfCollisionPairs() const
@@ -76,6 +77,9 @@ namespace RNGOEngine::Containers::Graphs
 #endif
 
     private:
+        static size_t s_nextID;
+
+    private:
         Math::BoundingBox m_boundingBox;
         std::array<QuadTreeNode<T>, CAPACITY> m_data;
         std::vector<QuadTreeNode<T>> m_overflowData;
@@ -83,16 +87,22 @@ namespace RNGOEngine::Containers::Graphs
         std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
         size_t totalCapacity = 0;
 
+        void AddNodeInternal(T data, const Math::BoundingBox& bounds, size_t ID);
+
         void Subdivide();
 
         void GenerateSubTrees();
 
         QuadTreeDirection GetChildIndex(const Math::Point& point) const;
 
-        void WithinRangeRecursive(const Math::BoundingBox& boundingBox, std::vector<T>& result) const;
+        void WithinRangeRecursive(const Math::BoundingBox& boundingBox,
+                                  std::vector<T>& result) const;
 
         bool IsSubdivided() const;
     };
 
 #include "Utilities/Containers/QuadTree/QuadTree.tpp"
+
+    template<typename T, size_t CAPACITY>
+    size_t QuadTree<T, CAPACITY>::s_nextID = 0;
 }
