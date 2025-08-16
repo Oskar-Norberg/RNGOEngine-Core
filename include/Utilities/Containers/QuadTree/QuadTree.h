@@ -29,7 +29,6 @@ namespace RNGOEngine::Containers::Graphs
     {
         T data;
         Math::BoundingBox bounds;
-        size_t id;
     };
 
     /// 
@@ -64,7 +63,7 @@ namespace RNGOEngine::Containers::Graphs
 
         // Only compile these in debug mode.
 #ifndef NDEBUG
-        BoundingBox GetBoundingBox() const
+        Math::BoundingBox GetBoundingBox() const
         {
             return m_boundingBox;
         }
@@ -77,17 +76,10 @@ namespace RNGOEngine::Containers::Graphs
 #endif
 
     private:
-        static size_t s_nextID;
-
-    private:
         Math::BoundingBox m_boundingBox;
-        std::array<QuadTreeNode<T>, CAPACITY> m_data;
-        std::vector<QuadTreeNode<T>> m_overflowData;
-        size_t m_dataIndex = 0;
+        std::vector<QuadTreeNode<T>> m_data;
         std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
         size_t totalCapacity = 0;
-
-        void AddNodeInternal(T data, const Math::BoundingBox& bounds, size_t ID);
 
         void Subdivide();
 
@@ -102,7 +94,4 @@ namespace RNGOEngine::Containers::Graphs
     };
 
 #include "Utilities/Containers/QuadTree/QuadTree.tpp"
-
-    template<typename T, size_t CAPACITY>
-    size_t QuadTree<T, CAPACITY>::s_nextID = 0;
 }
