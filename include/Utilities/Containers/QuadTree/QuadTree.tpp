@@ -63,36 +63,46 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
         // Tree - Tree
         const auto currentTreeData = GetNodeData(currentTree);
         const size_t currentTreeSize = currentTreeData.size();
-        for (size_t i = 0; i < currentTreeSize; i++)
-        {
-            for (size_t j = i + 1; j < currentTreeSize; j++)
-            {
-                const auto& nodeA = currentTreeData[i];
-                const auto& nodeB = currentTreeData[j];
 
-                if (nodeA.bounds.Intersects(nodeB.bounds))
+        {
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("QuadTree::Tree - Tree Collision Detection");
+            
+            for (size_t i = 0; i < currentTreeSize; i++)
+            {
+                for (size_t j = i + 1; j < currentTreeSize; j++)
                 {
-                    collisionPairs.emplace_back(nodeA.data, nodeB.data);
+                    const auto& nodeA = currentTreeData[i];
+                    const auto& nodeB = currentTreeData[j];
+
+                    if (nodeA.bounds.Intersects(nodeB.bounds))
+                    {
+                        collisionPairs.emplace_back(nodeA.data, nodeB.data);
+                    }
                 }
             }
         }
 
         // Tree - Parent
-        for (const auto parent : parents)
         {
-            const auto parentData = GetNodeData(parent);
-            const size_t parentSize = parentData.size();
-            const auto& currentBounds = GetBoundingBox(currentTree);
-
-            for (size_t j = 0; j < parentSize; j++)
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("QuadTree::Tree - Parent Collision Detection");
+            for (const auto parent : parents)
             {
-                if (parentData[j].bounds.Intersects(currentBounds))
+                const auto parentData = GetNodeData(parent);
+                const size_t parentSize = parentData.size();
+                const auto& currentBounds = GetBoundingBox(currentTree);
+
+                for (size_t j = 0; j < parentSize; j++)
                 {
-                    for (size_t i = 0; i < currentTreeSize; i++)
+                    if (parentData[j].bounds.Intersects(currentBounds))
                     {
-                        if (parentData[j].bounds.Intersects(currentTreeData[i].bounds))
+                        for (size_t i = 0; i < currentTreeSize; i++)
                         {
-                            collisionPairs.emplace_back(parentData[j].data, currentTreeData[i].data);
+                            if (parentData[j].bounds.Intersects(currentTreeData[i].bounds))
+                            {
+                                collisionPairs.emplace_back(parentData[j].data, currentTreeData[i].data);
+                            }
                         }
                     }
                 }
@@ -100,14 +110,18 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
         }
 
         // Enqueue Children
-        if (IsSubdivided(currentTree))
         {
-            parents.push_back(currentTree);
-
-            auto children = GetChildren(currentTree);
-            for (const auto subTree : children)
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("QuadTree::Tree - Enqueue Children");
+            if (IsSubdivided(currentTree))
             {
-                stack.push({subTree, parents});
+                parents.push_back(currentTree);
+
+                auto children = GetChildren(currentTree);
+                for (const auto subTree : children)
+                {
+                    stack.push({subTree, parents});
+                }
             }
         }
     }
@@ -118,6 +132,8 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 template<typename T, size_t CAPACITY>
 std::array<NodeID, 4> QuadTree<T, CAPACITY>::GetChildren(NodeID id) const
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::GetChildren");
     return m_trees[id].children;
 }
 
@@ -160,42 +176,63 @@ void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
 template<typename T, size_t CAPACITY>
 std::vector<QuadTreeData<T>> QuadTree<T, CAPACITY>::GetNodeData(NodeID id) const
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::GetNodeData");
+    
     return m_trees[id].data;
 }
 
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::SetNodeData(std::vector<QuadTreeData<T>>&& data, NodeID id)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::SetNodeData");
+    
     m_trees[id].data = std::move(data);
 }
 
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::AddDataToNode");
+    
     m_trees[id].data.emplace_back(data, bounds);
 }
 
 template<typename T, size_t CAPACITY>
 Math::BoundingBox QuadTree<T, CAPACITY>::GetBoundingBox(NodeID id) const
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::GetBoundingBox");
+    
     return m_trees[id].bounds;
 }
 
 template<typename T, size_t CAPACITY>
 bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::IsSubdivided");
+    
     return m_trees[id].children[0] != INVALID_NODE_ID;
 }
 
 template<typename T, size_t CAPACITY>
 bool QuadTree<T, CAPACITY>::IsFull(NodeID id) const
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::IsFull");
+    
     return m_trees[id].data.size() >= CAPACITY;
 }
 
 template<typename T, size_t CAPACITY>
 NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::CreateNode");
+    
     m_trees.emplace_back(QuadTreeNode<T, CAPACITY>{
         {}, {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID}, bounds});
     return m_trees.size() - 1;
@@ -204,6 +241,9 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
 template<typename T, size_t CAPACITY>
 NodeID QuadTree<T, CAPACITY>::CreateNode(T data, const Math::BoundingBox& bounds)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::CreateNode");
+    
     m_trees.emplace_back(QuadTreeNode<T, CAPACITY>{
         data, {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID}, bounds});
     return m_trees.size() - 1;
@@ -212,6 +252,9 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(T data, const Math::BoundingBox& bounds
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::GenerateSubTrees");
+    
     Math::BoundingBox boundingBox = GetBoundingBox(id);
     // Midpoint
     float midX = (boundingBox.start.x + boundingBox.end.x) / 2;
@@ -233,5 +276,8 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::SetChildren(NodeID id, std::array<NodeID, 4> children)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::SetChildren");
+    
     m_trees[id].children = children;
 }

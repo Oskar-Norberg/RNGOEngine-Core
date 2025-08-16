@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "Math/BoundingBox.h"
-#include "Math/Point.h"
 #include "Profiling/Profiling.h"
 #include "Utilities/Hash/PairHash.h"
 
@@ -52,10 +51,20 @@ namespace RNGOEngine::Containers::Graphs
     class QuadTree
     {
     public:
-        explicit QuadTree(const Math::BoundingBox& boundingBox)
+        explicit QuadTree(size_t nrNodesEstimate, const Math::BoundingBox& boundingBox)
         {
-            // TODO: Create root
+            if (nrNodesEstimate > 0)
+            {
+                // TODO: Find better heuristic
+                m_trees.reserve(nrNodesEstimate / CAPACITY);
+            }
+            
             CreateNode(boundingBox);
+        }
+        
+        explicit QuadTree(const Math::BoundingBox& boundingBox)
+            : QuadTree(0, boundingBox)
+        {
         }
 
         ~QuadTree()
