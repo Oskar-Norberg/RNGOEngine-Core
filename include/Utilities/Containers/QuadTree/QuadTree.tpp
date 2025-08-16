@@ -1,12 +1,7 @@
 ﻿template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddNode(T data, Math::Point position)
+void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
 {
     totalCapacity++;
-
-    if (!CanContain(position))
-    {
-        return;
-    }
 
     if (m_dataIndex >= CAPACITY && !IsSubdivided())
     {
@@ -15,14 +10,27 @@ void QuadTree<T, CAPACITY>::AddNode(T data, Math::Point position)
 
     if (IsSubdivided())
     {
-        const auto childIndex = GetChildIndex(position);
-        m_subTrees[childIndex]->AddNode(data, position);
+        for (const auto& subTree : m_subTrees)
+        {
+            if (subTree->m_boundingBox.Intersects(bounds))
+            {
+                subTree->AddNode(data, bounds);
+            }
+        }
     }
     else
     {
-        m_data[m_dataIndex].data = data;
-        m_data[m_dataIndex].position = position;
-        m_dataIndex++;
+        // Add to overflow if it doesn't fit entirely.
+        if (m_boundingBox.Contains(bounds))
+        {
+            m_data[m_dataIndex].data = data;
+            m_data[m_dataIndex].bounds = bounds;
+            m_dataIndex++;
+        }
+        else
+        {
+            m_overflowData.emplace_back(data, bounds);
+        }
     }
 }
 
@@ -44,13 +52,40 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 
         for (size_t i = 0; i < currentTree->m_dataIndex; ++i)
         {
+            // Tree - Tree collisions
             for (size_t j = i + 1; j < currentTree->m_dataIndex; ++j)
             {
-                collisionPairs.emplace_back(
-                    currentTree->m_data[i].data, currentTree->m_data[j].data);
+                if (currentTree->m_data[i].bounds.Intersects(currentTree->m_data[j].bounds))
+                {
+                    collisionPairs.emplace_back(
+                        currentTree->m_data[i].data, currentTree->m_data[j].data);
+                }
+            }
+
+            // Tree - Overflow collisions
+            for (const auto overflowNode : currentTree->m_overflowData)
+            {
+                if (currentTree->m_data[i].bounds.Intersects(overflowNode.bounds))
+                {
+                    collisionPairs.emplace_back(currentTree->m_data[i].data, overflowNode.data);
+                }
             }
         }
-        
+
+        // Overflow - Overflow collisions
+        for (size_t i = 0; i < currentTree->m_overflowData.size(); ++i)
+        {
+            for (size_t j = i + 1; j < currentTree->m_overflowData.size(); ++j)
+            {
+                if (currentTree->m_overflowData[i].bounds.Intersects(
+                    currentTree->m_overflowData[j].bounds))
+                {
+                    collisionPairs.emplace_back(
+                        currentTree->m_overflowData[i].data,
+                        currentTree->m_overflowData[j].data);
+                }
+            }
+        }
 
         if (currentTree->IsSubdivided())
         {
@@ -65,7 +100,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 }
 
 template<typename T, size_t CAPACITY>
-std::vector<T> QuadTree<T, CAPACITY>::WithinRange(Math::BoundingBox box) const
+std::vector<T> QuadTree<T, CAPACITY>::WithinRange(const Math::BoundingBox& box) const
 {
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::WithinRange");
@@ -103,12 +138,6 @@ std::vector<T> QuadTree<T, CAPACITY>::WithinRange(Math::BoundingBox box) const
 }
 
 template<typename T, size_t CAPACITY>
-bool QuadTree<T, CAPACITY>::CanContain(const Math::Point& point) const
-{
-    return m_boundingBox.Contains(point);
-}
-
-template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::Subdivide()
 {
     GenerateSubTrees();
@@ -118,15 +147,28 @@ void QuadTree<T, CAPACITY>::Subdivide()
     {
         for (const auto& quadTree : m_subTrees)
         {
-            if (quadTree->CanContain(m_data[i].position))
+            if (quadTree->m_boundingBox.Intersects(m_data[i].bounds))
             {
-                quadTree->AddNode(m_data[i].data, m_data[i].position);
-                break;
+                quadTree->AddNode(m_data[i].data, m_data[i].bounds);
+            }
+        }
+    }
+
+    // Emplace overflow
+    for (auto overflowData : m_overflowData)
+    {
+        for (const auto& quadTree : m_subTrees)
+        {
+            if (quadTree->m_boundingBox.Intersects(overflowData.bounds))
+            {
+                quadTree->AddNode(overflowData.data, overflowData.bounds);
             }
         }
     }
 
     m_dataIndex = 0;
+    // TODO: Consider shrinking to fit because overflow is cleared.
+    m_overflowData.clear();
 }
 
 template<typename T, size_t CAPACITY>
@@ -163,7 +205,7 @@ QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Math::Point& point)
 
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::WithinRangeRecursive(
-    Math::BoundingBox boundingBox, std::vector<T>& result
+    const Math::BoundingBox& boundingBox, std::vector<T>& result
 ) const
 {
     if (!m_boundingBox.Intersects(boundingBox))

@@ -18,6 +18,11 @@ namespace RNGOEngine::Math
                    (point.y >= start.y && point.y <= end.y);
         }
 
+        bool Contains(const BoundingBox& other) const
+        {
+            return Contains(other.start) && Contains(other.end);
+        }
+
         bool Intersects(const BoundingBox& other) const
         {
             return !(
