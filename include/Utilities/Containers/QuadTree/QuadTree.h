@@ -12,6 +12,7 @@
 #include "Math/BoundingBox.h"
 #include "Math/Point.h"
 #include "Profiling/Profiling.h"
+#include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine::Containers::Graphs
 {
@@ -52,7 +53,7 @@ namespace RNGOEngine::Containers::Graphs
 
         void AddNode(T data, const Math::BoundingBox& bounds);
 
-        std::vector<std::pair<T, T>> GetCollisionPairs() const;
+        std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> GetCollisionPairs() const;
         std::vector<T> WithinRange(const Math::BoundingBox& box) const;
 
         size_t EstimatedNrOfCollisionPairs() const

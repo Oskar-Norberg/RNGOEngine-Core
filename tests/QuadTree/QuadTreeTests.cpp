@@ -40,7 +40,7 @@ TEST(QuadTreeTests, CollisionsNotZero)
         }
     }
 
-    const std::vector<std::pair<int, int>> collisionPairs = quadTree.GetCollisionPairs();
+    const auto collisionPairs = quadTree.GetCollisionPairs();
 
     ASSERT_GT(collisionPairs.size(), 0);
 }
@@ -68,7 +68,7 @@ TEST(QuadTreeTests, NoDuplicateCollisionPairs)
         }
     }
 
-    const std::vector<std::pair<int, int>> collisionPairs = quadTree.GetCollisionPairs();
+    const auto collisionPairs = quadTree.GetCollisionPairs();
 
     std::unordered_set<std::pair<int, int>, PairHash> uniquePairs;
 
@@ -108,7 +108,7 @@ TEST(QuadTreeTests, NoSelfCollisions)
         }
     }
 
-    const std::vector<std::pair<int, int>> collisionPairs = quadTree.GetCollisionPairs();
+    const auto collisionPairs = quadTree.GetCollisionPairs();
 
     std::unordered_set<std::pair<int, int>, PairHash> uniquePairs;
 

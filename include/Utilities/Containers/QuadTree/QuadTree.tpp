@@ -35,12 +35,12 @@ void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
 }
 
 template<typename T, size_t CAPACITY>
-std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
+std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 {
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
 
-    std::vector<std::pair<T, T>> collisionPairs;
+    std::unordered_set<std::pair<T, T>, Utilities::Hash::PairHash> collisionPairs;
 
     std::stack<const QuadTree*> stack;
     stack.emplace(this);
@@ -57,8 +57,10 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             {
                 if (currentTree->m_data[i].bounds.Intersects(currentTree->m_data[j].bounds))
                 {
-                    collisionPairs.emplace_back(
-                        currentTree->m_data[i].data, currentTree->m_data[j].data);
+                    const auto idA = currentTree->m_data[i].data;
+                    const auto idB = currentTree->m_data[j].data;
+
+                    collisionPairs.insert(std::minmax(idA, idB));
                 }
             }
 
@@ -67,7 +69,13 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             {
                 if (currentTree->m_data[i].bounds.Intersects(overflowNode.bounds))
                 {
-                    collisionPairs.emplace_back(currentTree->m_data[i].data, overflowNode.data);
+                    const std::pair<T, T> pair = std::minmax(
+                        currentTree->m_data[i].data, overflowNode.data);
+
+                    if (!collisionPairs.contains(pair))
+                    {
+                        collisionPairs.insert(pair);
+                    }
                 }
             }
         }
@@ -80,9 +88,16 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
                 if (currentTree->m_overflowData[i].bounds.Intersects(
                     currentTree->m_overflowData[j].bounds))
                 {
-                    collisionPairs.emplace_back(
-                        currentTree->m_overflowData[i].data,
-                        currentTree->m_overflowData[j].data);
+                    const std::pair<T, T> pair =
+                        std::minmax(
+                            currentTree->m_overflowData[i].data,
+                            currentTree->m_overflowData[j].data
+                        );
+
+                    if (!collisionPairs.contains(pair))
+                    {
+                        collisionPairs.insert(pair);
+                    }
                 }
             }
         }
