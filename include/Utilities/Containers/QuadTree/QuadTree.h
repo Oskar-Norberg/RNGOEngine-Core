@@ -54,12 +54,6 @@ namespace RNGOEngine::Containers::Graphs
         void AddNode(T data, const Math::BoundingBox& bounds);
 
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
-        std::vector<T> WithinRange(const Math::BoundingBox& box) const;
-
-        size_t EstimatedNrOfCollisionPairs() const
-        {
-            return totalCapacity * (totalCapacity - 1) / 2;
-        }
 
         // Only compile these in debug mode.
 #ifndef NDEBUG
@@ -84,11 +78,6 @@ namespace RNGOEngine::Containers::Graphs
         void Subdivide();
 
         void GenerateSubTrees();
-
-        QuadTreeDirection GetChildIndex(const Math::Point& point) const;
-
-        void WithinRangeRecursive(const Math::BoundingBox& boundingBox,
-                                  std::vector<T>& result) const;
 
         bool IsSubdivided() const;
     };

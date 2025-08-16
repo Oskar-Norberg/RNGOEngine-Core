@@ -1,6 +1,9 @@
 ﻿template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::AddNode");
+    
     totalCapacity++;
 
     if (m_data.size() >= CAPACITY && !IsSubdivided())
@@ -103,46 +106,11 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 }
 
 template<typename T, size_t CAPACITY>
-std::vector<T> QuadTree<T, CAPACITY>::WithinRange(const Math::BoundingBox& box) const
-{
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::WithinRange");
-
-    std::vector<T> result;
-
-    // std::stack<const QuadTree<T, CAPACITY>*> stack;
-    // stack.push(this);
-    //
-    // while (!stack.empty())
-    // {
-    //     const QuadTree<T, CAPACITY>* currentTree = stack.top();
-    //     stack.pop();
-    //
-    //     if (!currentTree->m_boundingBox.Intersects(box))
-    //     {
-    //         continue;
-    //     }
-    //
-    //     for (size_t i = 0; i < currentTree->m_dataIndex; i++)
-    //     {
-    //         result.push_back(currentTree->m_data[i].data);
-    //     }
-    //
-    //     if (currentTree->IsSubdivided())
-    //     {
-    //         for (const auto& subTrees : currentTree->m_subTrees)
-    //         {
-    //             stack.push(subTrees.get());
-    //         }
-    //     }
-    // }
-
-    return result;
-}
-
-template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::Subdivide()
 {
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("QuadTree::Subdivide");
+    
     GenerateSubTrees();
 
     // Emplace existing data into subtrees
@@ -189,46 +157,6 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees()
         std::make_unique<QuadTree<T, CAPACITY>>(swBox),
         std::make_unique<QuadTree<T, CAPACITY>>(seBox)
     };
-}
-
-template<typename T, size_t CAPACITY>
-QuadTreeDirection QuadTree<T, CAPACITY>::GetChildIndex(const Math::Point& point) const
-{
-    float midX = (m_boundingBox.start.x + m_boundingBox.end.x) / 2;
-    float midY = (m_boundingBox.start.y + m_boundingBox.end.y) / 2;
-
-    if (point.x <= midX)
-        return (point.y <= midY) ? NORTH_WEST : SOUTH_WEST;
-
-    return (point.y <= midY) ? NORTH_EAST : SOUTH_EAST;
-}
-
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::WithinRangeRecursive(
-    const Math::BoundingBox& boundingBox, std::vector<T>& result
-) const
-{
-    // if (!m_boundingBox.Intersects(boundingBox))
-    // {
-    //     return;
-    // }
-    //
-    // for (size_t i = 0; i < m_dataIndex; i++)
-    // {
-    //     if (boundingBox.Contains(m_data[i].position))
-    //     {
-    //         result.push_back(m_data[i].data);
-    //     }
-    // }
-    //
-    // // Query Subtrees
-    // if (IsSubdivided())
-    // {
-    //     for (const auto& subTree : m_subTrees)
-    //     {
-    //         subTree->WithinRangeRecursive(boundingBox, result);
-    //     }
-    // }
 }
 
 template<typename T, size_t CAPACITY>
