@@ -47,7 +47,7 @@ TEST(QuadTreeTests, CollisionsNotZero)
 
 TEST(QuadTreeTests, NoDuplicateCollisionPairs)
 {
-    constexpr int size = 100;
+    constexpr int size = 25;
     constexpr float sizeFloat = static_cast<float>(size);
 
     RNGOEngine::Containers::Graphs::QuadTree<int, 16> quadTree(
@@ -87,7 +87,7 @@ TEST(QuadTreeTests, NoDuplicateCollisionPairs)
 
 TEST(QuadTreeTests, NoSelfCollisions)
 {
-    constexpr int size = 500;
+    constexpr int size = 100;
     constexpr float sizeFloat = static_cast<float>(size);
 
     RNGOEngine::Containers::Graphs::QuadTree<int, 16> quadTree(

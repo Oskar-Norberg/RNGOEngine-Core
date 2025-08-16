@@ -13,36 +13,47 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
     RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
 
     std::vector<std::pair<T, T>> collisionPairs;
+    std::unordered_set<std::pair<size_t, size_t>, Utilities::Hash::PairHash> seenPairs;
 
     std::stack<const QuadTree*> stack;
     stack.emplace(this);
 
     while (!stack.empty())
     {
-        const QuadTree* currentTree = std::move(stack.top());
+        const QuadTree* currentTree = stack.top();
         stack.pop();
 
+        // Tree - Tree collisions
         for (size_t i = 0; i < currentTree->m_dataIndex; ++i)
         {
-            // Tree - Tree collisions
             for (size_t j = i + 1; j < currentTree->m_dataIndex; ++j)
             {
                 if (currentTree->m_data[i].bounds.Intersects(currentTree->m_data[j].bounds))
                 {
-                    const auto idA = currentTree->m_data[i].data;
-                    const auto idB = currentTree->m_data[j].data;
-
-                    collisionPairs.emplace_back(std::minmax(idA, idB));
+                    const auto& nodeA = currentTree->m_data[i];
+                    const auto& nodeB = currentTree->m_data[j];
+                    auto idPair = std::minmax(nodeA.id, nodeB.id);
+                    
+                    if (seenPairs.insert(idPair).second)
+                    {
+                        collisionPairs.emplace_back(nodeA.data, nodeB.data);
+                    }
                 }
             }
 
             // Tree - Overflow collisions
-            for (const auto overflowNode : currentTree->m_overflowData)
+            for (const auto& overflowNode : currentTree->m_overflowData)
             {
                 if (currentTree->m_data[i].bounds.Intersects(overflowNode.bounds))
                 {
-                    if (currentTree->m_data[i].id < overflowNode.id)
-                        collisionPairs.emplace_back(currentTree->m_data[i].data, overflowNode.data);
+                    const auto& nodeA = currentTree->m_data[i];
+                    const auto& nodeB = overflowNode;
+                    auto idPair = std::minmax(nodeA.id, nodeB.id);
+                    
+                    if (seenPairs.insert(idPair).second)
+                    {
+                        collisionPairs.emplace_back(nodeA.data, nodeB.data);
+                    }
                 }
             }
         }
@@ -55,19 +66,24 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
                 if (currentTree->m_overflowData[i].bounds.Intersects(
                     currentTree->m_overflowData[j].bounds))
                 {
-                    if (currentTree->m_overflowData[i].id < currentTree->m_overflowData[j].id)
+                    const auto& nodeA = currentTree->m_overflowData[i];
+                    const auto& nodeB = currentTree->m_overflowData[j];
+                    auto idPair = std::minmax(nodeA.id, nodeB.id);
+                    
+                    if (seenPairs.insert(idPair).second)
                     {
-                        collisionPairs.emplace_back(currentTree->m_overflowData[i].data, currentTree->m_overflowData[j].data);
+                        collisionPairs.emplace_back(nodeA.data, nodeB.data);
                     }
                 }
             }
         }
 
+        // Process child subtrees
         if (currentTree->IsSubdivided())
         {
             for (const auto& child : currentTree->m_subTrees)
             {
-                stack.emplace(child.get());
+                stack.push(child.get());
             }
         }
     }
@@ -129,7 +145,7 @@ void QuadTree<T, CAPACITY>::AddNodeInternal(T data, const Math::BoundingBox& bou
         {
             if (subTree->m_boundingBox.Intersects(bounds))
             {
-                subTree->AddNode(data, bounds);
+                subTree->AddNodeInternal(data, bounds, ID);
             }
         }
     }
@@ -138,11 +154,11 @@ void QuadTree<T, CAPACITY>::AddNodeInternal(T data, const Math::BoundingBox& bou
         // Add to overflow if it doesn't fit entirely.
         if (m_boundingBox.Contains(bounds))
         {
-            m_data[m_dataIndex++] = {data, bounds, s_nextID++};
+            m_data[m_dataIndex++] = {data, bounds, ID};
         }
         else
         {
-            m_overflowData.emplace_back(data, bounds, s_nextID++);
+            m_overflowData.emplace_back(data, bounds, ID);
         }
     }
 }
