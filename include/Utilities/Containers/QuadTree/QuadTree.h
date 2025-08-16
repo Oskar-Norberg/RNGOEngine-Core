@@ -6,8 +6,8 @@
 
 #include <array>
 #include <memory>
-#include <stack>
 #include <vector>
+#include <stack>
 
 #include "Math/BoundingBox.h"
 #include "Math/Point.h"
@@ -26,8 +26,8 @@ namespace RNGOEngine::Containers::Graphs
     template<typename T>
     struct QuadTreeNode
     {
-        Math::Point position;
         T data;
+        Math::BoundingBox bounds;
     };
 
     /// 
@@ -39,7 +39,7 @@ namespace RNGOEngine::Containers::Graphs
     class QuadTree
     {
     public:
-        explicit QuadTree(Math::BoundingBox boundingBox)
+        explicit QuadTree(const Math::BoundingBox& boundingBox)
             : m_boundingBox(boundingBox)
         {
         }
@@ -50,7 +50,7 @@ namespace RNGOEngine::Containers::Graphs
             RNGO_ZONE_NAME_C("QuadTree Destructor");
         }
 
-        void AddNode(T data, Math::Point position);
+        void AddNode(T data, const Math::BoundingBox& boundingBox);
 
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
         std::vector<T> WithinRange(Math::BoundingBox box) const;
@@ -76,8 +76,7 @@ namespace RNGOEngine::Containers::Graphs
 
     private:
         Math::BoundingBox m_boundingBox;
-        std::array<QuadTreeNode<T>, CAPACITY> m_data;
-        size_t m_dataIndex = 0;
+        std::vector<QuadTreeNode<T>> m_data;
         std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
         size_t totalCapacity = 0;
 
