@@ -10,6 +10,13 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(vendor/tracy)
 
+set(DO_TESTS ON CACHE BOOL "Enable tests" FORCE)
+
+if (DO_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif ()
+
 add_library(${PROJECT_NAME} STATIC
         include/Engine.h
         include/Scene/Scene.h

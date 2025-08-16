@@ -34,7 +34,6 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 
     std::vector<std::pair<T, T>> collisionPairs;
 
-
     std::stack<const QuadTree*> stack;
     stack.emplace(this);
 
