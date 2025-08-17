@@ -25,7 +25,8 @@ void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
             const std::array<NodeID, 4>& children = GetChildren(currentID);
             for (const auto child : children)
             {
-                if (GetNodeBounds(child).Contains(bounds))
+                const auto& childNode = GetNode(child);
+                if (childNode.bounds.Contains(bounds))
                 {
                     currentID = child;
                     childCanFit = true;
@@ -99,10 +100,10 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
                 const auto& parentDataHandles = GetNodeDataHandles(parent);
                 const size_t parentSize = parentDataHandles.size();
 
-                const auto& currentBounds = GetNodeBounds(currentTree);
-                const auto& parentBounds = GetNodeBounds(parent);
+                const auto& currentNode = GetNode(currentTree);
+                const auto& parentNode = GetNode(parent);
 
-                if (parentBounds.Intersects(currentBounds))
+                if (parentNode.bounds.Intersects(currentNode.bounds))
                 {
                     for (size_t j = 0; j < parentSize; j++)
                     {
@@ -142,6 +143,12 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 }
 
 template<typename T, size_t CAPACITY>
+const QuadTreeNode& QuadTree<T, CAPACITY>::GetNode(NodeID id) const
+{
+    return m_trees[id];
+}
+
+template<typename T, size_t CAPACITY>
 const std::array<NodeID, 4>& QuadTree<T, CAPACITY>::GetChildren(NodeID id) const
 {
     RNGO_ZONE_SCOPE;
@@ -171,7 +178,8 @@ void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
 
         for (const auto child : children)
         {
-            if (GetNodeBounds(child).Contains(currentData.bounds))
+            const auto& childNode = GetNode(child);
+            if (childNode.bounds.Contains(currentData.bounds))
             {
                 MoveDataToNode(nodeDataHandles[i], child);
                 added = true;
@@ -229,12 +237,6 @@ bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
 }
 
 template<typename T, size_t CAPACITY>
-const Math::BoundingBox& QuadTree<T, CAPACITY>::GetNodeBounds(NodeID id) const
-{
-    return m_treeBounds[m_trees[id].boundsHandle];
-}
-
-template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::ClearNodeDataHandles(NodeID id)
 {
     m_trees[id].data.clear();
@@ -261,8 +263,6 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::CreateNode");
 
-    m_treeBounds.emplace_back(bounds);
-
     // QuadTreeNode newNode = {
     //     {},
     //     {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID},
@@ -273,7 +273,7 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
     m_trees.emplace_back(QuadTreeNode{
         {},
         {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID},
-        m_treeBounds.size() - 1
+        bounds
     });
 
     return m_trees.size() - 1;
@@ -285,20 +285,21 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::GenerateSubTrees");
 
-    Math::BoundingBox boundingBox = GetNodeBounds(id);
+    const auto& bounds = m_trees[id].bounds;
+    const Math::BoundingBox& boundingBox = bounds;
     // Midpoint
-    float midX = (boundingBox.start.x + boundingBox.end.x) / 2;
-    float midY = (boundingBox.start.y + boundingBox.end.y) / 2;
+    const float midX = (boundingBox.start.x + boundingBox.end.x) / 2;
+    const float midY = (boundingBox.start.y + boundingBox.end.y) / 2;
 
-    Math::BoundingBox nwBox = {boundingBox.start, {midX, midY}};
-    Math::BoundingBox neBox = {{midX, boundingBox.start.y}, {boundingBox.end.x, midY}};
-    Math::BoundingBox swBox = {{boundingBox.start.x, midY}, {midX, boundingBox.end.y}};
-    Math::BoundingBox seBox = {{midX, midY}, boundingBox.end};
+    const Math::BoundingBox nwBox = {boundingBox.start, {midX, midY}};
+    const Math::BoundingBox neBox = {{midX, boundingBox.start.y}, {boundingBox.end.x, midY}};
+    const Math::BoundingBox swBox = {{boundingBox.start.x, midY}, {midX, boundingBox.end.y}};
+    const Math::BoundingBox seBox = {{midX, midY}, boundingBox.end};
 
-    auto nwChild = CreateNode(nwBox);
-    auto neChild = CreateNode(neBox);
-    auto swChild = CreateNode(swBox);
-    auto seChild = CreateNode(seBox);
+    const auto nwChild = CreateNode(nwBox);
+    const auto neChild = CreateNode(neBox);
+    const auto swChild = CreateNode(swBox);
+    const auto seChild = CreateNode(seBox);
 
     SetChildren(id, {nwChild, neChild, swChild, seChild});
 }

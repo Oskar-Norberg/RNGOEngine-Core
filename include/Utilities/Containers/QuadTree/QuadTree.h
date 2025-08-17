@@ -49,7 +49,7 @@ namespace RNGOEngine::Containers::Graphs
         // TODO: Data fragmentation because of vector. Unlucky.
         std::vector<NodeDataID> data;
         std::array<NodeID, 4> children;
-        NodeDataID boundsHandle;
+        Math::BoundingBox bounds;
     };
 
     /// 
@@ -67,7 +67,6 @@ namespace RNGOEngine::Containers::Graphs
             {
                 // TODO: Find better heuristic
                 m_trees.reserve(nrNodesEstimate / CAPACITY);
-                m_treeBounds.reserve(nrNodesEstimate / CAPACITY);
                 m_data.reserve(nrNodesEstimate);
             }
 
@@ -91,20 +90,19 @@ namespace RNGOEngine::Containers::Graphs
 
     private:
         std::vector<QuadTreeNode> m_trees;
-        std::vector<Math::BoundingBox> m_treeBounds;
 
         std::vector<DataEntry<T>> m_data;
         
         size_t totalCapacity = 0;
+
+    private:
+        const QuadTreeNode& GetNode(NodeID id) const;
         
     private:
         const std::array<NodeID, 4>& GetChildren(NodeID id) const;
         void Subdivide(NodeID id);
         bool IsFull(NodeID id) const;
         bool IsSubdivided(NodeID id) const;
-
-    private:
-        const Math::BoundingBox& GetNodeBounds(NodeID id) const;
 
     private:
         void ClearNodeDataHandles(NodeID id);
