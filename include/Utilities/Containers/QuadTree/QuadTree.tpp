@@ -61,7 +61,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
         stack.pop();
 
         // Tree - Tree
-        const auto currentTreeData = GetNodeData(currentTree);
+        const auto& currentTreeData = GetNodeData(currentTree);
         const size_t currentTreeSize = currentTreeData.size();
 
         {
@@ -89,7 +89,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             RNGO_ZONE_NAME_C("QuadTree::Tree - Parent Collision Detection");
             for (const auto parent : parents)
             {
-                const auto parentData = GetNodeData(parent);
+                const auto& parentData = GetNodeData(parent);
                 const size_t parentSize = parentData.size();
                 const auto& currentBounds = GetBoundingBox(currentTree);
 
@@ -174,7 +174,7 @@ void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
 }
 
 template<typename T, size_t CAPACITY>
-std::vector<QuadTreeData<T>> QuadTree<T, CAPACITY>::GetNodeData(NodeID id) const
+const std::vector<QuadTreeData<T>>& QuadTree<T, CAPACITY>::GetNodeData(NodeID id) const
 {
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::GetNodeData");

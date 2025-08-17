@@ -81,7 +81,7 @@ namespace RNGOEngine::Containers::Graphs
         std::vector<QuadTreeNode<T, CAPACITY>> m_trees;
         size_t totalCapacity = 0;
 
-        std::vector<QuadTreeData<T>> GetNodeData(NodeID id) const;
+        const std::vector<QuadTreeData<T>>& GetNodeData(NodeID id) const;
         // TODO: ID should really be the first parameter
         void SetNodeData(std::vector<QuadTreeData<T>>&& data, NodeID id);
         void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
