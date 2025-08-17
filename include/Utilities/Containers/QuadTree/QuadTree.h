@@ -36,13 +36,10 @@ namespace RNGOEngine::Containers::Graphs
         NodeDataID boundsID;
     };
 
-    // TODO: T is not being used.
-    template<typename T, size_t CAPACITY>
     struct QuadTreeNode
     {
-        std::array<DataHandle, CAPACITY> data;
-        size_t dataIndex = 0;
-        
+        // TODO: Data fragmentation because of vector. Unlucky.
+        std::vector<DataHandle> data;
         std::array<NodeID, 4> children;
         NodeDataID boundsHandle;
     };
@@ -85,7 +82,7 @@ namespace RNGOEngine::Containers::Graphs
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
 
     private:
-        std::vector<QuadTreeNode<T, CAPACITY>> m_trees;
+        std::vector<QuadTreeNode> m_trees;
         std::vector<Math::BoundingBox> m_treeBounds;
 
         std::vector<T> m_data;
@@ -106,7 +103,7 @@ namespace RNGOEngine::Containers::Graphs
         void ClearNodeDataHandles(NodeID id);
         const T& GetData(DataHandle id) const;
         const Math::BoundingBox& GetDataBounds(DataHandle id) const;
-        std::pair<const std::array<DataHandle, CAPACITY>&, size_t> GetNodeDataHandles(NodeID id) const;
+        const std::vector<DataHandle>& GetNodeDataHandles(NodeID id) const;
         // TODO: ID should really be the first parameter
         void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
         void MoveDataToNode(DataHandle dataHandle, NodeID nodeID);
