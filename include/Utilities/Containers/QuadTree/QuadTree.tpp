@@ -75,12 +75,12 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
                     const auto& nodeAHandle = currentTreeDataHandles[i];
                     const auto& nodeBHandle = currentTreeDataHandles[j];
 
-                    const auto& nodeABounds = GetDataBounds(nodeAHandle);
-                    const auto& nodeBBounds = GetDataBounds(nodeBHandle);
+                    const auto& nodeAData = GetData(nodeAHandle);
+                    const auto& nodeBData = GetData(nodeBHandle);
 
-                    if (nodeABounds.Intersects(nodeBBounds))
+                    if (nodeAData.bounds.Intersects(nodeBData.bounds))
                     {
-                        collisionPairs.emplace_back(GetData(nodeAHandle), GetData(nodeBHandle));
+                        collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
                     }
                 }
             }
@@ -103,16 +103,13 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
                     for (size_t j = 0; j < parentSize; j++)
                     {
                         const auto& parentData = GetData(parentDataHandles[j]);
-                        const auto& parentDataBounds = GetDataBounds(parentDataHandles[j]);
                         for (size_t i = 0; i < currentTreeSize; i++)
                         {
                             const auto& currentTreeData = GetData(currentTreeDataHandles[i]);
-                            const auto& currentTreeDataBounds = GetDataBounds(
-                                currentTreeDataHandles[i]);
 
-                            if (parentDataBounds.Intersects(currentTreeDataBounds))
+                            if (parentData.bounds.Intersects(currentTreeData.bounds))
                             {
-                                collisionPairs.emplace_back(parentData, currentTreeData);
+                                collisionPairs.emplace_back(parentData.data, currentTreeData.data);
                             }
                         }
                     }
@@ -159,18 +156,18 @@ void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
 
     const auto nodeDataHandles = GetNodeDataHandles(id);
 
-    std::vector<DataHandle> dataHandleOverflows;
+    std::vector<DataID> dataHandleOverflows;
 
     const size_t dataHandlesSize = nodeDataHandles.size();
     for (size_t i = 0; i < dataHandlesSize; i++)
     {
-        const auto& currentDataBounds = GetDataBounds(nodeDataHandles[i]);
+        const auto& currentData = GetData(nodeDataHandles[i]);
         bool added = false;
         const std::array<NodeID, 4>& children = GetChildren(id);
 
         for (const auto child : children)
         {
-            if (GetNodeBounds(child).Contains(currentDataBounds))
+            if (GetNodeBounds(child).Contains(currentData.bounds))
             {
                 MoveDataToNode(nodeDataHandles[i], child);
                 added = true;
@@ -193,7 +190,7 @@ void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
 }
 
 template<typename T, size_t CAPACITY>
-const std::vector<DataHandle>& QuadTree<T, CAPACITY>::GetNodeDataHandles(NodeID id) const
+const std::vector<DataID>& QuadTree<T, CAPACITY>::GetNodeDataHandles(NodeID id) const
 {
     return m_trees[id].data;
 }
@@ -210,19 +207,18 @@ void QuadTree<T, CAPACITY>::AddDataToNode(T data, const Math::BoundingBox& bound
         return;
     }
 
-    m_data.emplace_back(data);
-    m_dataBounds.emplace_back(bounds);
+    m_data.emplace_back(data, bounds);
 
     auto& treeNode = m_trees[id];
-    treeNode.data.emplace_back(m_data.size() - 1, m_dataBounds.size() - 1);
+    treeNode.data.emplace_back(m_data.size() - 1);
 }
 
 template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::MoveDataToNode(DataHandle dataHandle, NodeID nodeID)
+void QuadTree<T, CAPACITY>::MoveDataToNode(DataID dataID, NodeID nodeID)
 {
     auto& node = m_trees[nodeID];
 
-    node.data.emplace_back(dataHandle);
+    node.data.emplace_back(dataID);
 }
 
 template<typename T, size_t CAPACITY>
@@ -247,18 +243,9 @@ void QuadTree<T, CAPACITY>::ClearNodeDataHandles(NodeID id)
 }
 
 template<typename T, size_t CAPACITY>
-const T& QuadTree<T, CAPACITY>::GetData(DataHandle id) const
+const DataEntry<T>& QuadTree<T, CAPACITY>::GetData(DataID id) const
 {
-    return m_data[id.dataID];
-}
-
-template<typename T, size_t CAPACITY>
-const Math::BoundingBox& QuadTree<T, CAPACITY>::GetDataBounds(DataHandle id) const
-{
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::GetBoundingBox");
-
-    return m_dataBounds[id.boundsID];
+    return m_data[id];
 }
 
 template<typename T, size_t CAPACITY>
@@ -286,7 +273,7 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
     // m_trees.emplace_back(std::move(newNode));
 
     m_trees.emplace_back(QuadTreeNode{
-        std::vector<DataHandle>{},
+        {},
         {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID},
         m_treeBounds.size() - 1
     });

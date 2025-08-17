@@ -23,28 +23,34 @@ namespace RNGOEngine::Containers::Graphs
         SOUTH_EAST = 3
     };
 
+
+    // ID of the node itself.
     using NodeID = size_t;
     constexpr NodeID ROOT_NODE_ID = 0;
     constexpr NodeID INVALID_NODE_ID = std::numeric_limits<NodeID>::max();
 
+    // ID for data pertaining to the node such as the bounds.
     using NodeDataID = NodeID;
     constexpr NodeDataID INVALID_NODE_DATA_ID = std::numeric_limits<NodeDataID>::max();
 
-    struct DataHandle
+    // ID for the data stored in the node.
+    using DataID = NodeDataID;
+
+    // Store these in a struct because they will almost always be accessed together.
+    template<typename T>
+    struct DataEntry
     {
-        NodeDataID dataID;
-        NodeDataID boundsID;
+        T data;
+        Math::BoundingBox bounds;
     };
 
     struct QuadTreeNode
     {
         // TODO: Data fragmentation because of vector. Unlucky.
-        std::vector<DataHandle> data;
+        std::vector<NodeDataID> data;
         std::array<NodeID, 4> children;
         NodeDataID boundsHandle;
     };
-
-    // TODO: Add separate splitting size along with max capacity.
 
     /// 
     /// @tparam T Payload/data type stored in tree.
@@ -85,8 +91,7 @@ namespace RNGOEngine::Containers::Graphs
         std::vector<QuadTreeNode> m_trees;
         std::vector<Math::BoundingBox> m_treeBounds;
 
-        std::vector<T> m_data;
-        std::vector<Math::BoundingBox> m_dataBounds;
+        std::vector<DataEntry<T>> m_data;
         
         size_t totalCapacity = 0;
         
@@ -101,12 +106,11 @@ namespace RNGOEngine::Containers::Graphs
 
     private:
         void ClearNodeDataHandles(NodeID id);
-        const T& GetData(DataHandle id) const;
-        const Math::BoundingBox& GetDataBounds(DataHandle id) const;
-        const std::vector<DataHandle>& GetNodeDataHandles(NodeID id) const;
+        const DataEntry<T>& GetData(DataID id) const;
+        const std::vector<DataID>& GetNodeDataHandles(NodeID id) const;
         // TODO: ID should really be the first parameter
         void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
-        void MoveDataToNode(DataHandle dataHandle, NodeID nodeID);
+        void MoveDataToNode(DataID dataID, NodeID nodeID);
 
     private:
         NodeID CreateNode(const Math::BoundingBox& bounds);
