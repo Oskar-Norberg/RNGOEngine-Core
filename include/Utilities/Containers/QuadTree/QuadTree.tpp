@@ -7,29 +7,33 @@ void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
     totalCapacity++;
 
     auto currentID = ROOT_NODE_ID;
+    
     while (true)
     {
-        if (IsFull(currentID) && !IsSubdivided(currentID))
+        bool isSubdivided = IsSubdivided(currentID);
+        
+        if (IsFull(currentID) && !isSubdivided)
         {
             Subdivide(currentID);
+            isSubdivided = true;
         }
 
-        if (IsSubdivided(currentID))
+        if (isSubdivided)
         {
-            bool added = false;
+            bool childCanFit = false;
 
-            const std::array<NodeID, 4> children = GetChildren(currentID);
+            const std::array<NodeID, 4>& children = GetChildren(currentID);
             for (const auto child : children)
             {
                 if (GetNodeBounds(child).Contains(bounds))
                 {
                     currentID = child;
-                    added = true;
+                    childCanFit = true;
                     break;
                 }
             }
 
-            if (!added)
+            if (!childCanFit)
             {
                 AddDataToNode(data, bounds, currentID);
                 break;
