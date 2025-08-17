@@ -1,9 +1,6 @@
 ﻿template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::AddNode");
-
     totalCapacity++;
 
     auto currentID = ROOT_NODE_ID;
@@ -151,18 +148,12 @@ const QuadTreeNode& QuadTree<T, CAPACITY>::GetNode(NodeID id) const
 template<typename T, size_t CAPACITY>
 const std::array<NodeID, 4>& QuadTree<T, CAPACITY>::GetChildren(NodeID id) const
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::GetChildren");
-
     return m_trees[id].children;
 }
 
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::Subdivide");
-
     GenerateSubTrees(id);
 
     const auto nodeDataHandles = GetNodeDataHandles(id);
@@ -210,9 +201,6 @@ const std::vector<DataID>& QuadTree<T, CAPACITY>::GetNodeDataHandles(NodeID id) 
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id)
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::AddDataToNode");
-
     m_data.emplace_back(data, bounds);
 
     auto& treeNode = m_trees[id];
@@ -230,9 +218,6 @@ void QuadTree<T, CAPACITY>::MoveDataToNode(DataID dataID, NodeID nodeID)
 template<typename T, size_t CAPACITY>
 bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::IsSubdivided");
-
     return m_trees[id].children[0] != INVALID_NODE_ID;
 }
 
@@ -251,18 +236,12 @@ const DataEntry<T>& QuadTree<T, CAPACITY>::GetData(DataID id) const
 template<typename T, size_t CAPACITY>
 bool QuadTree<T, CAPACITY>::IsFull(NodeID id) const
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::IsFull");
-
     return m_trees[id].data.size() >= CAPACITY;
 }
 
 template<typename T, size_t CAPACITY>
 NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::CreateNode");
-
     // QuadTreeNode newNode = {
     //     {},
     //     {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID},
@@ -282,9 +261,6 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::GenerateSubTrees");
-
     const auto& bounds = m_trees[id].bounds;
     const Math::BoundingBox& boundingBox = bounds;
     // Midpoint
@@ -307,8 +283,5 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
 template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::SetChildren(NodeID id, std::array<NodeID, 4> children)
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::SetChildren");
-
     m_trees[id].children = children;
 }

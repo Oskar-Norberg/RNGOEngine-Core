@@ -96,27 +96,27 @@ namespace RNGOEngine::Containers::Graphs
         size_t totalCapacity = 0;
 
     private:
-        const QuadTreeNode& GetNode(NodeID id) const;
+        inline const QuadTreeNode& GetNode(NodeID id) const;
         
     private:
-        const std::array<NodeID, 4>& GetChildren(NodeID id) const;
-        void Subdivide(NodeID id);
-        bool IsFull(NodeID id) const;
-        bool IsSubdivided(NodeID id) const;
+        inline const std::array<NodeID, 4>& GetChildren(NodeID id) const;
+        inline void Subdivide(NodeID id);
+        inline bool IsFull(NodeID id) const;
+        inline bool IsSubdivided(NodeID id) const;
 
     private:
-        void ClearNodeDataHandles(NodeID id);
-        const DataEntry<T>& GetData(DataID id) const;
-        const std::vector<DataID>& GetNodeDataHandles(NodeID id) const;
+        inline void ClearNodeDataHandles(NodeID id);
+        inline const DataEntry<T>& GetData(DataID id) const;
+        inline const std::vector<DataID>& GetNodeDataHandles(NodeID id) const;
         // TODO: ID should really be the first parameter
-        void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
-        void MoveDataToNode(DataID dataID, NodeID nodeID);
+        inline void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
+        inline void MoveDataToNode(DataID dataID, NodeID nodeID);
 
     private:
-        NodeID CreateNode(const Math::BoundingBox& bounds);
-        void GenerateSubTrees(NodeID id);
+        inline NodeID CreateNode(const Math::BoundingBox& bounds);
+        inline void GenerateSubTrees(NodeID id);
 
-        void SetChildren(NodeID id, std::array<NodeID, 4> children);
+        inline void SetChildren(NodeID id, std::array<NodeID, 4> children);
     };
 
 #include "Utilities/Containers/QuadTree/QuadTree.tpp"
