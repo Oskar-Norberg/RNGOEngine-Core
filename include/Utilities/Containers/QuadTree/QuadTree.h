@@ -67,6 +67,8 @@ namespace RNGOEngine::Containers::Graphs
             {
                 // TODO: Find better heuristic
                 m_trees.reserve(nrNodesEstimate / CAPACITY);
+                m_treeBounds.reserve(nrNodesEstimate / CAPACITY);
+                m_data.reserve(nrNodesEstimate);
             }
 
             CreateNode(boundingBox);

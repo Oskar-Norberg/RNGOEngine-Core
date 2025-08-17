@@ -205,12 +205,6 @@ void QuadTree<T, CAPACITY>::AddDataToNode(T data, const Math::BoundingBox& bound
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::AddDataToNode");
 
-    if (m_trees[id].data.size() >= CAPACITY)
-    {
-        assert(false && "QuadTree node data index exceeded capacity!");
-        return;
-    }
-
     m_data.emplace_back(data, bounds);
 
     auto& treeNode = m_trees[id];
