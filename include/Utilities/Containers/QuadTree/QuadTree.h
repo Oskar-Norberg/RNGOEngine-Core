@@ -27,20 +27,27 @@ namespace RNGOEngine::Containers::Graphs
     constexpr NodeID ROOT_NODE_ID = 0;
     constexpr NodeID INVALID_NODE_ID = std::numeric_limits<NodeID>::max();
 
-    template<typename T>
-    struct QuadTreeData
+    using NodeDataID = NodeID;
+    constexpr NodeDataID INVALID_NODE_DATA_ID = std::numeric_limits<NodeDataID>::max();
+
+    struct DataHandle
     {
-        T data;
-        Math::BoundingBox bounds;
+        NodeDataID dataID;
+        NodeDataID boundsID;
     };
 
+    // TODO: T is not being used.
     template<typename T, size_t CAPACITY>
     struct QuadTreeNode
     {
-        std::vector<QuadTreeData<T>> data;
+        std::array<DataHandle, CAPACITY> data;
+        size_t dataIndex = 0;
+        
         std::array<NodeID, 4> children;
-        Math::BoundingBox bounds;
+        NodeDataID boundsHandle;
     };
+
+    // TODO: Add separate splitting size along with max capacity.
 
     /// 
     /// @tparam T Payload/data type stored in tree.
@@ -58,10 +65,10 @@ namespace RNGOEngine::Containers::Graphs
                 // TODO: Find better heuristic
                 m_trees.reserve(nrNodesEstimate / CAPACITY);
             }
-            
+
             CreateNode(boundingBox);
         }
-        
+
         explicit QuadTree(const Math::BoundingBox& boundingBox)
             : QuadTree(0, boundingBox)
         {
@@ -79,21 +86,33 @@ namespace RNGOEngine::Containers::Graphs
 
     private:
         std::vector<QuadTreeNode<T, CAPACITY>> m_trees;
-        size_t totalCapacity = 0;
+        std::vector<Math::BoundingBox> m_treeBounds;
 
-        const std::vector<QuadTreeData<T>>& GetNodeData(NodeID id) const;
-        // TODO: ID should really be the first parameter
-        void SetNodeData(std::vector<QuadTreeData<T>>&& data, NodeID id);
-        void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
-        Math::BoundingBox GetBoundingBox(NodeID id) const;
-        std::array<NodeID, 4> GetChildren(NodeID id) const;
+        std::vector<T> m_data;
+        std::vector<Math::BoundingBox> m_dataBounds;
+        
+        size_t totalCapacity = 0;
+        
+    private:
+        const std::array<NodeID, 4>& GetChildren(NodeID id) const;
         void Subdivide(NodeID id);
         bool IsFull(NodeID id) const;
         bool IsSubdivided(NodeID id) const;
 
     private:
+        const Math::BoundingBox& GetNodeBounds(NodeID id) const;
+
+    private:
+        void ClearNodeDataHandles(NodeID id);
+        const T& GetData(DataHandle id) const;
+        const Math::BoundingBox& GetDataBounds(DataHandle id) const;
+        std::pair<const std::array<DataHandle, CAPACITY>&, size_t> GetNodeDataHandles(NodeID id) const;
+        // TODO: ID should really be the first parameter
+        void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
+        void MoveDataToNode(DataHandle dataHandle, NodeID nodeID);
+
+    private:
         NodeID CreateNode(const Math::BoundingBox& bounds);
-        NodeID CreateNode(T data, const Math::BoundingBox& bounds);
         void GenerateSubTrees(NodeID id);
 
         void SetChildren(NodeID id, std::array<NodeID, 4> children);
