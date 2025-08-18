@@ -93,6 +93,22 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
     std::unordered_set<std::pair<DataID, DataID>, Utilities::Hash::PairHash> seenPairs;
     std::vector<std::pair<T, T>> collisionPairs;
 
+    const auto TryAddIntersection = [this, &seenPairs, &collisionPairs](
+        const DataID nodeAHandle, const DataID nodeBHandle)
+    {
+        const auto& nodeAData = GetData(nodeAHandle);
+        const auto& nodeBData = GetData(nodeBHandle);
+        if (nodeAData.bounds.Intersects(nodeBData.bounds))
+        {
+            const auto idPair = std::minmax(nodeAHandle, nodeBHandle);
+
+            if (seenPairs.insert(idPair).second)
+            {
+                collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
+            }
+        }
+    };
+
     for (const auto currentNodeID : leafNodes)
     {
         const auto& currentTreeDataHandles = GetNodeDataHandles(currentNodeID);
@@ -107,21 +123,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             {
                 for (size_t j = i + 1; j < currentTreeSize; j++)
                 {
-                    const auto nodeAHandle = currentTreeDataHandles[i];
-                    const auto nodeBHandle = currentTreeDataHandles[j];
-
-                    auto idPair = std::minmax(nodeAHandle, nodeBHandle);
-
-                    if (seenPairs.insert(idPair).second)
-                    {
-                        const auto& nodeAData = GetData(nodeAHandle);
-                        const auto& nodeBData = GetData(nodeBHandle);
-
-                        if (nodeAData.bounds.Intersects(nodeBData.bounds))
-                        {
-                            collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
-                        }
-                    }
+                    TryAddIntersection(currentTreeDataHandles[i], currentTreeDataHandles[j]);
                 }
             }
         }
@@ -137,21 +139,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             {
                 for (size_t j = 0; j < overFlowSize; j++)
                 {
-                    const auto nodeAHandle = currentTreeDataHandles[i];
-                    const auto nodeBHandle = currentTreeOverflow[j];
-
-                    auto idPair = std::minmax(nodeAHandle, nodeBHandle);
-
-                    if (seenPairs.insert(idPair).second)
-                    {
-                        const auto& nodeAData = GetData(nodeAHandle);
-                        const auto& nodeBData = GetData(nodeBHandle);
-
-                        if (nodeAData.bounds.Intersects(nodeBData.bounds))
-                        {
-                            collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
-                        }
-                    }
+                    TryAddIntersection(currentTreeDataHandles[i], currentTreeOverflow[j]);
                 }
             }
         }
@@ -164,21 +152,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             {
                 for (size_t j = i + 1; j < overFlowSize; j++)
                 {
-                    const auto nodeAHandle = currentTreeOverflow[i];
-                    const auto nodeBHandle = currentTreeOverflow[j];
-
-                    auto idPair = std::minmax(nodeAHandle, nodeBHandle);
-
-                    if (seenPairs.insert(idPair).second)
-                    {
-                        const auto& nodeAData = GetData(nodeAHandle);
-                        const auto& nodeBData = GetData(nodeBHandle);
-
-                        if (nodeAData.bounds.Intersects(nodeBData.bounds))
-                        {
-                            collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
-                        }
-                    }
+                    TryAddIntersection(currentTreeOverflow[i], currentTreeOverflow[j]);
                 }
             }
         }
