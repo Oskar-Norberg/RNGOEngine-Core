@@ -48,6 +48,9 @@ namespace RNGOEngine::Containers::Graphs
     {
         // TODO: Data fragmentation because of vector. Unlucky.
         std::vector<NodeDataID> data;
+        std::vector<NodeDataID> overflow;
+
+        // See QuadTreeDirection for the ordering.
         std::array<NodeID, 4> children;
         Math::BoundingBox bounds;
     };
@@ -108,13 +111,23 @@ namespace RNGOEngine::Containers::Graphs
         inline void ClearNodeDataHandles(NodeID id);
         inline const DataEntry<T>& GetData(DataID id) const;
         inline const std::vector<DataID>& GetNodeDataHandles(NodeID id) const;
+        inline const std::vector<DataID>& GetNodeOverflowHandles(NodeID id) const;
+
+    private:
+        DataID EmplaceData(T data, const Math::BoundingBox& bounds);
+    private:
         // TODO: ID should really be the first parameter
         inline void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
         inline void MoveDataToNode(DataID dataID, NodeID nodeID);
 
+        inline void MoveDataToOverflow(DataID dataID, NodeID nodeID);
+
     private:
         inline NodeID CreateNode(const Math::BoundingBox& bounds);
+
+    private:
         inline void GenerateSubTrees(NodeID id);
+        void TransferDataToChildren(NodeID id);
 
         inline void SetChildren(NodeID id, std::array<NodeID, 4> children);
     };
