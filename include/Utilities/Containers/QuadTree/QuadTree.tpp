@@ -133,7 +133,13 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
                         continue;
                     }
 
-                    TryAddIntersection(currentTreeDataHandles[i], currentTreeDataHandles[j]);
+                    // No risk for duplicates in tree-only collision detection. Skip seenPairs check.
+                    const auto& nodeAData = GetData(nodeAHandle);
+                    const auto& nodeBData = GetData(nodeBHandle);
+                    if (nodeAData.bounds.Intersects(nodeBData.bounds))
+                    {
+                        collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
+                    }
                 }
             }
         }
