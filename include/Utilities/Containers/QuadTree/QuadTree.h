@@ -87,7 +87,7 @@ namespace RNGOEngine::Containers::Graphs
             RNGO_ZONE_NAME_C("QuadTree Destructor");
         }
 
-        void AddNode(T data, const Math::BoundingBox& bounds);
+        void AddNode(T&& data, const Math::BoundingBox& bounds);
 
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
 
@@ -114,10 +114,10 @@ namespace RNGOEngine::Containers::Graphs
         inline const std::vector<DataID>& GetNodeOverflowHandles(NodeID id) const;
 
     private:
-        DataID EmplaceData(T data, const Math::BoundingBox& bounds);
+        DataID EmplaceData(T&& data, const Math::BoundingBox& bounds);
     private:
         // TODO: ID should really be the first parameter
-        inline void AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id);
+        inline void AddDataToNode(T&& data, const Math::BoundingBox& bounds, NodeID id);
         inline void MoveDataToNode(DataID dataID, NodeID nodeID);
 
         inline void MoveDataToOverflow(DataID dataID, NodeID nodeID);

@@ -1,12 +1,12 @@
 ﻿template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
+void QuadTree<T, CAPACITY>::AddNode(T&& data, const Math::BoundingBox& bounds)
 {
     totalCapacity++;
 
     std::stack<NodeID> stack;
     stack.push(ROOT_NODE_ID);
 
-    DataID dataID = EmplaceData(data, bounds);
+    DataID dataID = EmplaceData(std::forward<T>(data), bounds);
 
     while (!stack.empty())
     {
@@ -209,16 +209,16 @@ const std::vector<DataID>& QuadTree<T, CAPACITY>::GetNodeOverflowHandles(NodeID 
 }
 
 template<typename T, size_t CAPACITY>
-DataID QuadTree<T, CAPACITY>::EmplaceData(T data, const Math::BoundingBox& bounds)
+DataID QuadTree<T, CAPACITY>::EmplaceData(T&& data, const Math::BoundingBox& bounds)
 {
-    m_data.emplace_back(data, bounds);
+    m_data.emplace_back(std::move(data), bounds);
     return m_data.size() - 1;
 }
 
 template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddDataToNode(T data, const Math::BoundingBox& bounds, NodeID id)
+void QuadTree<T, CAPACITY>::AddDataToNode(T&& data, const Math::BoundingBox& bounds, NodeID id)
 {
-    m_data.emplace_back(data, bounds);
+    m_data.emplace_back(std::move(data), bounds);
 
     auto& treeNode = m_trees[id];
     treeNode.data.emplace_back(m_data.size() - 1);
