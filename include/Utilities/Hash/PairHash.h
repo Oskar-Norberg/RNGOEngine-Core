@@ -10,6 +10,11 @@
 
 namespace RNGOEngine::Utilities::Hash
 {
+    inline uint64_t PackUint32Pair(uint32_t a, uint32_t b)
+    {
+        return (static_cast<uint64_t>(a) << 32) | static_cast<uint64_t>(b);
+    }
+    
     struct PairHash
     {
         template<typename T1, typename T2>

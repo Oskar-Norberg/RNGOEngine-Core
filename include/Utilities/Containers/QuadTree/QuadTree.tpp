@@ -90,7 +90,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
         }
     }
 
-    std::unordered_set<std::pair<DataID, DataID>, Utilities::Hash::PairHash> seenPairs;
+    std::unordered_set<uint64_t> seenPairs;
     std::vector<std::pair<T, T>> collisionPairs;
 
     const auto TryAddIntersection = [this, &seenPairs, &collisionPairs](
@@ -100,9 +100,11 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
         const auto& nodeBData = GetData(nodeBHandle);
         if (nodeAData.bounds.Intersects(nodeBData.bounds))
         {
-            const auto idPair = std::minmax(nodeAHandle, nodeBHandle);
+            const auto packedPair = nodeAHandle > nodeBHandle
+                                        ? Utilities::Hash::PackUint32Pair(nodeAHandle, nodeBHandle)
+                                        : Utilities::Hash::PackUint32Pair(nodeBHandle, nodeAHandle);
 
-            if (seenPairs.insert(idPair).second)
+            if (seenPairs.insert(packedPair).second)
             {
                 collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
             }
@@ -123,6 +125,14 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
             {
                 for (size_t j = i + 1; j < currentTreeSize; j++)
                 {
+                    const auto nodeAHandle = currentTreeDataHandles[i];
+                    const auto nodeBHandle = currentTreeDataHandles[j];
+
+                    if (nodeAHandle >= nodeBHandle)
+                    {
+                        continue;
+                    }
+
                     TryAddIntersection(currentTreeDataHandles[i], currentTreeDataHandles[j]);
                 }
             }
