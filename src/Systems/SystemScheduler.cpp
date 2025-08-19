@@ -41,7 +41,8 @@ namespace RNGOEngine::Systems
 
     void SystemScheduler::InitializeSystems()
     {
-        ZoneScoped;
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("SystemScheduler::InitializeSystems");
 
         // TODO: O(n) polling each frame.
         for (auto& system : m_systems)
@@ -56,7 +57,8 @@ namespace RNGOEngine::Systems
 
     void SystemScheduler::TerminateSystems()
     {
-        ZoneScoped;
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("SystemScheduler::TerminateSystems");
 
         for (auto& system : m_systems)
         {
@@ -67,7 +69,8 @@ namespace RNGOEngine::Systems
 
     void SystemScheduler::PollEngineEvents(Core::Engine& engine, Events::EventQueue& eventQueue)
     {
-        ZoneScoped;
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("SystemScheduler::PollEngineEvents");
 
         const auto exitEvents = eventQueue.GetEvents<Events::ExitEvent>();
 

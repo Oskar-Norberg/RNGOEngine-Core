@@ -10,8 +10,8 @@
 #include <vector>
 
 #include "Math/BoundingBox.h"
-#include "Math/Point.h"
 #include "Profiling/Profiling.h"
+#include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine::Containers::Graphs
 {
@@ -23,11 +23,36 @@ namespace RNGOEngine::Containers::Graphs
         SOUTH_EAST = 3
     };
 
+
+    // ID of the node itself.
+    using NodeID = size_t;
+    constexpr NodeID ROOT_NODE_ID = 0;
+    constexpr NodeID INVALID_NODE_ID = std::numeric_limits<NodeID>::max();
+
+    // ID for data pertaining to the node such as the bounds.
+    using NodeDataID = NodeID;
+    constexpr NodeDataID INVALID_NODE_DATA_ID = std::numeric_limits<NodeDataID>::max();
+
+    // ID for the data stored in the node.
+    using DataID = NodeDataID;
+
+    // Store these in a struct because they will almost always be accessed together.
     template<typename T>
+    struct DataEntry
+    {
+        T data;
+        Math::BoundingBox bounds;
+    };
+
     struct QuadTreeNode
     {
-        Math::Point position;
-        T data;
+        // TODO: Data fragmentation because of vector. Unlucky.
+        std::vector<NodeDataID> data;
+        std::vector<NodeDataID> overflow;
+
+        // See QuadTreeDirection for the ordering.
+        std::array<NodeID, 4> children;
+        Math::BoundingBox bounds;
     };
 
     /// 
@@ -39,8 +64,20 @@ namespace RNGOEngine::Containers::Graphs
     class QuadTree
     {
     public:
-        explicit QuadTree(Math::BoundingBox boundingBox)
-            : m_boundingBox(boundingBox)
+        explicit QuadTree(size_t nrNodesEstimate, const Math::BoundingBox& boundingBox)
+        {
+            if (nrNodesEstimate > 0)
+            {
+                // TODO: Find better heuristic
+                m_trees.reserve(nrNodesEstimate / CAPACITY);
+                m_data.reserve(nrNodesEstimate);
+            }
+
+            CreateNode(boundingBox);
+        }
+
+        explicit QuadTree(const Math::BoundingBox& boundingBox)
+            : QuadTree(0, boundingBox)
         {
         }
 
@@ -50,48 +87,49 @@ namespace RNGOEngine::Containers::Graphs
             RNGO_ZONE_NAME_C("QuadTree Destructor");
         }
 
-        void AddNode(T data, Math::Point position);
+        void AddNode(T&& data, const Math::BoundingBox& bounds);
 
         std::vector<std::pair<T, T>> GetCollisionPairs() const;
-        std::vector<T> WithinRange(Math::BoundingBox box) const;
-
-        size_t EstimatedNrOfCollisionPairs() const
-        {
-            return totalCapacity * (totalCapacity - 1) / 2;
-        }
-
-        // Only compile these in debug mode.
-#ifndef NDEBUG
-        BoundingBox GetBoundingBox() const
-        {
-            return m_boundingBox;
-        }
-
-        const std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4>& GetSubTrees(
-        ) const
-        {
-            return m_subTrees;
-        }
-#endif
 
     private:
-        Math::BoundingBox m_boundingBox;
-        std::array<QuadTreeNode<T>, CAPACITY> m_data;
-        size_t m_dataIndex = 0;
-        std::array<std::unique_ptr<QuadTree<T, CAPACITY>>, 4> m_subTrees;
+        std::vector<QuadTreeNode> m_trees;
+
+        std::vector<DataEntry<T>> m_data;
+        
         size_t totalCapacity = 0;
 
-        bool CanContain(const Math::Point& point) const;
+    private:
+        inline const QuadTreeNode& GetNode(NodeID id) const;
+        
+    private:
+        inline const std::array<NodeID, 4>& GetChildren(NodeID id) const;
+        inline void Subdivide(NodeID id);
+        inline bool IsFull(NodeID id) const;
+        inline bool IsSubdivided(NodeID id) const;
 
-        void Subdivide();
+    private:
+        inline void ClearNodeDataHandles(NodeID id);
+        inline const DataEntry<T>& GetData(DataID id) const;
+        inline const std::vector<DataID>& GetNodeDataHandles(NodeID id) const;
+        inline const std::vector<DataID>& GetNodeOverflowHandles(NodeID id) const;
 
-        void GenerateSubTrees();
+    private:
+        DataID EmplaceData(T&& data, const Math::BoundingBox& bounds);
+    private:
+        // TODO: ID should really be the first parameter
+        inline void AddDataToNode(T&& data, const Math::BoundingBox& bounds, NodeID id);
+        inline void MoveDataToNode(DataID dataID, NodeID nodeID);
 
-        QuadTreeDirection GetChildIndex(const Math::Point& point) const;
+        inline void MoveDataToOverflow(DataID dataID, NodeID nodeID);
 
-        void WithinRangeRecursive(Math::BoundingBox boundingBox, std::vector<T>& result) const;
+    private:
+        inline NodeID CreateNode(const Math::BoundingBox& bounds);
 
-        bool IsSubdivided() const;
+    private:
+        inline void GenerateSubTrees(NodeID id);
+        void TransferDataToChildren(NodeID id);
+
+        inline void SetChildren(NodeID id, std::array<NodeID, 4> children);
     };
 
 #include "Utilities/Containers/QuadTree/QuadTree.tpp"
