@@ -61,11 +61,17 @@ void QuadTree<T, CAPACITY>::AddNode(T&& data, const Math::BoundingBox& bounds)
 template<typename T, size_t CAPACITY>
 std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 {
+    GetCollisionPairs(ROOT_NODE_ID);
+}
+
+template<typename T, size_t CAPACITY>
+std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id) const
+{
     RNGO_ZONE_SCOPE;
     RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
 
     std::vector<NodeID> stack;
-    stack.emplace_back(ROOT_NODE_ID);
+    stack.emplace_back(id);
 
     std::vector<NodeID> leafNodes;
 

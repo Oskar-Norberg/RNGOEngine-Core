@@ -87,20 +87,30 @@ namespace RNGOEngine::Containers::Graphs
             RNGO_ZONE_NAME_C("QuadTree Destructor");
         }
 
+    public:
         void AddNode(T&& data, const Math::BoundingBox& bounds);
 
-        std::vector<std::pair<T, T>> GetCollisionPairs() const;
+    public:
+        inline std::vector<std::pair<T, T>> GetCollisionPairs() const;
+        std::vector<std::pair<T, T>> GetCollisionPairs(NodeID id) const;
+
+    public:
+        const std::array<NodeID, 4>& GetRootChildren() const
+        {
+            // TODO: This might shit itself if root is invalid
+            return GetChildren(ROOT_NODE_ID);
+        }
 
     private:
         std::vector<QuadTreeNode> m_trees;
 
         std::vector<DataEntry<T>> m_data;
-        
+
         size_t totalCapacity = 0;
 
     private:
         inline const QuadTreeNode& GetNode(NodeID id) const;
-        
+
     private:
         inline const std::array<NodeID, 4>& GetChildren(NodeID id) const;
         inline void Subdivide(NodeID id);
@@ -115,6 +125,7 @@ namespace RNGOEngine::Containers::Graphs
 
     private:
         DataID EmplaceData(T&& data, const Math::BoundingBox& bounds);
+
     private:
         // TODO: ID should really be the first parameter
         inline void AddDataToNode(T&& data, const Math::BoundingBox& bounds, NodeID id);
