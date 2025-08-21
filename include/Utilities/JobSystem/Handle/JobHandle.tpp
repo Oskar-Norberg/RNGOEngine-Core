@@ -1,23 +1,27 @@
 ﻿template<typename T>
 JobHandle<T>::JobHandle()
-    : m_future()
+    : m_future(std::nullopt)
 {
 }
 
 template<typename T>
-JobHandle<T>::JobHandle(std::future<T>&& f)
+JobHandle<T>::JobHandle(std::future<T> future)
+    : m_future(std::optional(std::move(future)))
 {
-    m_future = std::move(f);
 }
 
 template<typename T>
 void JobHandle<T>::Wait()
 {
-    m_future.wait();
+    assert(m_future.has_value() && "JobHandle::Wait called on an empty future.");
+
+    m_future.value().wait();
 }
 
 template<typename T>
 T JobHandle<T>::Get()
 {
-    return m_future.get();
+    assert(m_future.has_value() && "JobHandle::Get called on an empty future.");
+
+    return m_future.value().get();
 }

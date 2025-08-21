@@ -16,6 +16,9 @@ namespace RNGOEngine::Utilities
         auto Enqueue(F&& f, Args&&... args) -> JobHandle<decltype(f(args...))>;
 
     private:
+        std::vector<std::future<std::any>> m_futures;
+
+    private:
         ThreadPool::ThreadPool m_threadPool;
     };
 
