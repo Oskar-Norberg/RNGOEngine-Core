@@ -61,7 +61,7 @@ void QuadTree<T, CAPACITY>::AddNode(T&& data, const Math::BoundingBox& bounds)
 template<typename T, size_t CAPACITY>
 std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
 {
-    GetCollisionPairs(ROOT_NODE_ID);
+    return GetCollisionPairs(ROOT_NODE_ID);
 }
 
 template<typename T, size_t CAPACITY>
