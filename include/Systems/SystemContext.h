@@ -6,7 +6,7 @@
 
 #include "EventQueue/EventQueue.h"
 #include "ResourceMapper.h"
-#include "Utilities/ThreadPool/ThreadPool.h"
+#include "Utilities/JobSystem/JobSystem.h"
 
 namespace RNGOEngine::Systems
 {
@@ -17,6 +17,6 @@ namespace RNGOEngine::Systems
 
         Events::EventQueue eventQueue;
         Resources::ResourceMapper resourceMapper;
-        Utilities::ThreadPool::ThreadPool threadPool;
+        Utilities::JobSystem jobSystem;
     };
 }
