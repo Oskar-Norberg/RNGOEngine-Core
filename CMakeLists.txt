@@ -41,6 +41,10 @@ add_library(${PROJECT_NAME} STATIC
         include/Utilities/ThreadPool/ThreadPool.h
         src/Utilities/ThreadPool.cpp
         include/Utilities/ThreadPool/ThreadPool.tpp
+        include/Utilities/JobSystem/JobSystem.h
+        include/Utilities/JobSystem/JobSystem.tpp
+        include/Utilities/JobSystem/Handle/JobHandle.h
+        include/Utilities/JobSystem/Handle/JobHandle.tpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
