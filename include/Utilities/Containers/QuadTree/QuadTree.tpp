@@ -96,24 +96,17 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
         }
     }
 
-    std::unordered_set<uint64_t> seenPairs;
     std::vector<std::pair<T, T>> collisionPairs;
 
-    const auto TryAddIntersection = [this, &seenPairs, &collisionPairs](
+    const auto TryAddIntersection = [this, &collisionPairs](
         const DataID nodeAHandle, const DataID nodeBHandle)
     {
         const auto& nodeAData = GetData(nodeAHandle);
         const auto& nodeBData = GetData(nodeBHandle);
         if (nodeAData.bounds.Intersects(nodeBData.bounds))
         {
-            const auto packedPair = nodeAHandle > nodeBHandle
-                                        ? Utilities::Hash::PackUint32Pair(nodeAHandle, nodeBHandle)
-                                        : Utilities::Hash::PackUint32Pair(nodeBHandle, nodeAHandle);
 
-            if (seenPairs.insert(packedPair).second)
-            {
-                collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
-            }
+            collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
         }
     };
 

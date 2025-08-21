@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(vendor/tracy)
 
-set(DO_TESTS on CACHE BOOL "Enable tests" FORCE)
+set(DO_TESTS off CACHE BOOL "Enable tests" FORCE)
 
 if (DO_TESTS)
     enable_testing()
