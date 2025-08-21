@@ -184,15 +184,21 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
 }
 
 template<typename T, size_t CAPACITY>
-const QuadTreeNode& QuadTree<T, CAPACITY>::GetNode(NodeID id) const
-{
-    return m_trees[id];
-}
-
-template<typename T, size_t CAPACITY>
 const std::array<NodeID, 4>& QuadTree<T, CAPACITY>::GetChildren(NodeID id) const
 {
     return m_trees[id].children;
+}
+
+template<typename T, size_t CAPACITY>
+bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
+{
+    return m_trees[id].children[0] != INVALID_NODE_ID;
+}
+
+template<typename T, size_t CAPACITY>
+const QuadTreeNode& QuadTree<T, CAPACITY>::GetNode(NodeID id) const
+{
+    return m_trees[id];
 }
 
 template<typename T, size_t CAPACITY>
@@ -242,12 +248,6 @@ template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::MoveDataToOverflow(DataID dataID, NodeID nodeID)
 {
     m_trees[nodeID].overflow.emplace_back(dataID);
-}
-
-template<typename T, size_t CAPACITY>
-bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
-{
-    return m_trees[id].children[0] != INVALID_NODE_ID;
 }
 
 template<typename T, size_t CAPACITY>
