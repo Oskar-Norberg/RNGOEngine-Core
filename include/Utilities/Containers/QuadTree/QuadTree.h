@@ -95,11 +95,8 @@ namespace RNGOEngine::Containers::Graphs
         std::vector<std::pair<T, T>> GetCollisionPairs(NodeID id) const;
 
     public:
-        const std::array<NodeID, 4>& GetRootChildren() const
-        {
-            // TODO: This might shit itself if root is invalid
-            return GetChildren(ROOT_NODE_ID);
-        }
+        inline const std::array<NodeID, 4>& GetChildren(NodeID id) const;
+        inline bool IsSubdivided(NodeID id) const;
 
     private:
         std::vector<QuadTreeNode> m_trees;
@@ -112,11 +109,8 @@ namespace RNGOEngine::Containers::Graphs
         inline const QuadTreeNode& GetNode(NodeID id) const;
 
     private:
-        inline const std::array<NodeID, 4>& GetChildren(NodeID id) const;
         inline void Subdivide(NodeID id);
         inline bool IsFull(NodeID id) const;
-        inline bool IsSubdivided(NodeID id) const;
-
     private:
         inline void ClearNodeDataHandles(NodeID id);
         inline const DataEntry<T>& GetData(DataID id) const;

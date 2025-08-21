@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.31)
 
 # Enable / Disable Tracy. Should be disabled in release builds.
-set(TRACY_ENABLE off CACHE BOOL "Enable Tracy profiler" FORCE)
+set(TRACY_ENABLE on CACHE BOOL "Enable Tracy profiler" FORCE)
 
 set(PROJECT_NAME RNGOEngine_Core)
 project(${PROJECT_NAME})
@@ -10,7 +10,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(vendor/tracy)
 
-set(DO_TESTS on CACHE BOOL "Enable tests" FORCE)
+set(DO_TESTS off CACHE BOOL "Enable tests" FORCE)
 
 if (DO_TESTS)
     enable_testing()
@@ -38,6 +38,13 @@ add_library(${PROJECT_NAME} STATIC
         include/Profiling/Profiling.h
         include/Math/Point.h
         include/Math/BoundingBox.h
+        include/Utilities/ThreadPool/ThreadPool.h
+        src/Utilities/ThreadPool.cpp
+        include/Utilities/ThreadPool/ThreadPool.tpp
+        include/Utilities/JobSystem/JobSystem.h
+        include/Utilities/JobSystem/JobSystem.tpp
+        include/Utilities/JobSystem/Handle/JobHandle.h
+        include/Utilities/JobSystem/Handle/JobHandle.tpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
