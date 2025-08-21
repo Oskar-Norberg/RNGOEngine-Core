@@ -88,6 +88,7 @@ namespace RNGOEngine::Containers::Graphs
         }
 
     public:
+        void AddNode(T data, const Math::BoundingBox& bounds);
         void AddNode(T&& data, const Math::BoundingBox& bounds);
 
     public:
@@ -106,6 +107,9 @@ namespace RNGOEngine::Containers::Graphs
         size_t totalCapacity = 0;
 
     private:
+        inline void AddNode(DataID dataID, const Math::BoundingBox& bounds);
+
+    private:
         inline const QuadTreeNode& GetNode(NodeID id) const;
 
     private:
@@ -118,6 +122,7 @@ namespace RNGOEngine::Containers::Graphs
         inline const std::vector<DataID>& GetNodeOverflowHandles(NodeID id) const;
 
     private:
+        DataID EmplaceData(T data, const Math::BoundingBox& bounds);
         DataID EmplaceData(T&& data, const Math::BoundingBox& bounds);
 
     private:

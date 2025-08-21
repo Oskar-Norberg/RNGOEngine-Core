@@ -1,61 +1,16 @@
 ﻿template<typename T, size_t CAPACITY>
+void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
+{
+    DataID dataID = EmplaceData(data, bounds);
+    AddNode(dataID, bounds);
+}
+
+template<typename T, size_t CAPACITY>
 void QuadTree<T, CAPACITY>::AddNode(T&& data, const Math::BoundingBox& bounds)
 {
-    totalCapacity++;
-
-    std::stack<NodeID> stack;
-    stack.push(ROOT_NODE_ID);
-
     DataID dataID = EmplaceData(std::forward<T>(data), bounds);
-
-    while (!stack.empty())
-    {
-        const auto currentID = stack.top();
-        stack.pop();
-
-        bool isSubdivided = IsSubdivided(currentID);
-
-        if (IsFull(currentID) && !isSubdivided)
-        {
-            Subdivide(currentID);
-            isSubdivided = true;
-        }
-
-        if (isSubdivided)
-        {
-            const std::array<NodeID, 4>& children = GetChildren(currentID);
-            for (const auto child : children)
-            {
-                const auto& childNode = GetNode(child);
-
-                if (childNode.bounds.Contains(bounds))
-                {
-                    stack.push(child);
-                    continue;
-                }
-
-                if (childNode.bounds.Intersects(bounds))
-                {
-                    stack.push(child);
-                }
-            }
-        }
-        else
-        {
-            const auto& currentNode = GetNode(currentID);
-
-            if (currentNode.bounds.Contains(bounds))
-            {
-                MoveDataToNode(dataID, currentID);
-                continue;
-            }
-
-            if (currentNode.bounds.Intersects(bounds))
-            {
-                MoveDataToOverflow(dataID, currentID);
-            }
-        }
-    }
+    
+    AddNode(dataID, bounds);
 }
 
 template<typename T, size_t CAPACITY>
@@ -105,7 +60,6 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
         const auto& nodeBData = GetData(nodeBHandle);
         if (nodeAData.bounds.Intersects(nodeBData.bounds))
         {
-
             collisionPairs.emplace_back(nodeAData.data, nodeBData.data);
         }
     };
@@ -189,6 +143,65 @@ bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
 }
 
 template<typename T, size_t CAPACITY>
+void QuadTree<T, CAPACITY>::AddNode(DataID dataID, const Math::BoundingBox& bounds)
+{
+    totalCapacity++;
+
+    std::stack<NodeID> stack;
+    stack.push(ROOT_NODE_ID);
+
+
+    while (!stack.empty())
+    {
+        const auto currentID = stack.top();
+        stack.pop();
+
+        bool isSubdivided = IsSubdivided(currentID);
+
+        if (IsFull(currentID) && !isSubdivided)
+        {
+            Subdivide(currentID);
+            isSubdivided = true;
+        }
+
+        if (isSubdivided)
+        {
+            const std::array<NodeID, 4>& children = GetChildren(currentID);
+            for (const auto child : children)
+            {
+                const auto& childNode = GetNode(child);
+
+                if (childNode.bounds.Contains(bounds))
+                {
+                    stack.push(child);
+                    continue;
+                }
+
+                if (childNode.bounds.Intersects(bounds))
+                {
+                    stack.push(child);
+                }
+            }
+        }
+        else
+        {
+            const auto& currentNode = GetNode(currentID);
+
+            if (currentNode.bounds.Contains(bounds))
+            {
+                MoveDataToNode(dataID, currentID);
+                continue;
+            }
+
+            if (currentNode.bounds.Intersects(bounds))
+            {
+                MoveDataToOverflow(dataID, currentID);
+            }
+        }
+    }
+}
+
+template<typename T, size_t CAPACITY>
 const QuadTreeNode& QuadTree<T, CAPACITY>::GetNode(NodeID id) const
 {
     return m_trees[id];
@@ -211,6 +224,13 @@ template<typename T, size_t CAPACITY>
 const std::vector<DataID>& QuadTree<T, CAPACITY>::GetNodeOverflowHandles(NodeID id) const
 {
     return m_trees[id].overflow;
+}
+
+template<typename T, size_t CAPACITY>
+DataID QuadTree<T, CAPACITY>::EmplaceData(T data, const Math::BoundingBox& bounds)
+{
+    m_data.emplace_back(data, bounds);
+    return m_data.size() - 1;
 }
 
 template<typename T, size_t CAPACITY>
