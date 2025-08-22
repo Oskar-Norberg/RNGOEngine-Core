@@ -14,6 +14,8 @@ template<typename T>
 void JobHandle<T>::Wait()
 {
     assert(m_future.has_value() && "JobHandle::Wait called on an empty future.");
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("JobHandle::Wait");
 
     m_future.value().wait();
 }
@@ -22,6 +24,8 @@ template<typename T>
 T JobHandle<T>::Get()
 {
     assert(m_future.has_value() && "JobHandle::Get called on an empty future.");
+    RNGO_ZONE_SCOPE;
+    RNGO_ZONE_NAME_C("JobHandle::Get");
 
     return m_future.value().get();
 }

@@ -18,9 +18,9 @@ namespace RNGOEngine::Systems::Resources
         }
 
         template<typename T>
-        void AddTransientResource(const T resource, bool override = false)
+        void AddTransientResource(T&& resource, bool override = false)
         {
-            m_transientResources.AddResource(resource, override);
+            m_transientResources.AddResource(std::forward<T>(resource), override);
         }
 
         template<typename T>
@@ -30,9 +30,9 @@ namespace RNGOEngine::Systems::Resources
         }
 
         template<typename T>
-        void AddPersistentResource(const T resource, bool override = false)
+        void AddPersistentResource(T&& resource, bool override = false)
         {
-            m_persistentResources.AddResource(resource, override);
+            m_persistentResources.AddResource(std::forward<T>(resource), override);
         }
 
         void ClearTransientResources()

@@ -14,7 +14,7 @@ namespace RNGOEngine::Systems::Resources
     {
     public:
         template<typename T>
-        void AddResource(const T resource, bool override = false)
+        void AddResource(T&& resource, bool override = false)
         {
             if (!override)
             {
@@ -25,7 +25,7 @@ namespace RNGOEngine::Systems::Resources
                 }
             }
 
-            m_resources[typeid(T)] = resource;
+            m_resources[typeid(T)] = std::forward<T>(resource);
         }
 
         template<typename T>
