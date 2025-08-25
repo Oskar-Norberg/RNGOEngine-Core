@@ -22,5 +22,11 @@ namespace RNGOEngine::Core::Window
 
     private:
         GLFWwindow* m_window;
+
+        char lastFrameKeys[GLFW_KEY_LAST + 1];
+        bool keySetInitialized = false;
+
+    private:
+        void PollKeyboardEvents(Events::EventQueue& eventQueue);
     };
 }

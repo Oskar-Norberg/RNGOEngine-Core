@@ -6,7 +6,6 @@
 #include <cassert>
 
 #include "Window/GLFW/GLFWWindow.h"
-
 #include "EventQueue/EngineEvents/EngineEvents.h"
 
 namespace RNGOEngine::Core::Window
@@ -37,6 +36,8 @@ namespace RNGOEngine::Core::Window
     {
         glfwPollEvents();
 
+        PollKeyboardEvents(eventQueue);
+
         if (glfwWindowShouldClose(m_window))
         {
             eventQueue.EmplaceEvent<Events::ExitEvent>();
@@ -51,5 +52,34 @@ namespace RNGOEngine::Core::Window
     void GLFWWindow::SetName(std::string_view name)
     {
         glfwSetWindowTitle(m_window, name.data());
+    }
+
+    void GLFWWindow::PollKeyboardEvents(Events::EventQueue& eventQueue)
+    {
+        std::vector<int> keysPressed;
+        std::vector<int> keysReleased;
+
+        for (int i = GLFW_KEY_SPACE; i <= GLFW_KEY_MENU; i++)
+        {
+            const auto getKey = glfwGetKey(m_window, i);
+            if (getKey == GLFW_PRESS)
+            {
+                keysPressed.push_back(i);
+            }
+            else if (getKey == GLFW_RELEASE)
+            {
+                keysReleased.push_back(i);
+            }
+        }
+
+        for (const auto keyPressed : keysPressed)
+        {
+            eventQueue.EmplaceEvent<Events::KeyEvent>(keyPressed, Events::KeyAction::Press);
+        }
+        
+        for (const auto keyReleased : keysReleased)
+        {
+            eventQueue.EmplaceEvent<Events::KeyEvent>(keyReleased, Events::KeyAction::Release);
+        }
     }
 }

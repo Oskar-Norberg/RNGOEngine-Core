@@ -53,6 +53,7 @@ add_library(${PROJECT_NAME} STATIC
         include/Window/IWindow.h
         include/Window/GLFW/GLFWWindow.h
         src/Window/GLFWWindow.cpp
+        include/Data/KeyCodes.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
