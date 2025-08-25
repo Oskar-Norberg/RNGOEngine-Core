@@ -11,6 +11,9 @@ project(${PROJECT_NAME})
 set(CMAKE_CXX_STANDARD 20)
 
 add_subdirectory(vendor/tracy)
+add_subdirectory(vendor/glfw-fetcher)
+add_subdirectory(vendor/glad)
+add_subdirectory(vendor/glm)
 
 set(DO_TESTS off CACHE BOOL "Enable tests" FORCE)
 
@@ -27,9 +30,9 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/SystemContext.h
         include/Systems/ResourceMap.h
         include/World/World.h
+        src/World/World.cpp
         include/Systems/SystemScheduler.h
         src/Systems/SystemScheduler.cpp
-        src/World/World.cpp
         include/Utilities/Containers/Graphs/DirectedGraph.h
         include/Systems/ResourceMapper.h
         include/EventQueue/EventQueue.h
@@ -52,4 +55,9 @@ add_library(${PROJECT_NAME} STATIC
 target_include_directories(${PROJECT_NAME} PUBLIC include
         vendor/entt/include)
 
+# OpenGL
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw glad)
+# GLM
+target_link_libraries(${PROJECT_NAME} PRIVATE glm)
+# Tracy
 target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
