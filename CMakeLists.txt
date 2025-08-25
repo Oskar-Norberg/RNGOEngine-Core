@@ -13,6 +13,7 @@ set(CMAKE_CXX_STANDARD 20)
 add_subdirectory(vendor/tracy)
 add_subdirectory(vendor/glfw-fetcher)
 add_subdirectory(vendor/glad)
+add_subdirectory(vendor/glm)
 
 set(DO_TESTS off CACHE BOOL "Enable tests" FORCE)
 
@@ -56,6 +57,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC include
 
 # OpenGL
 target_link_libraries(${PROJECT_NAME} PUBLIC glfw glad)
-
+# GLM
+target_link_libraries(${PROJECT_NAME} PRIVATE glm)
 # Tracy
 target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
