@@ -10,12 +10,21 @@
 #include "Scene/Scene.h"
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
+#include "Window/IWindow.h"
 
 namespace RNGOEngine::Core
 {
+    enum EngineConfig
+    {
+        Headless,
+        GLFW_OpenGL,
+    };
+    
     class Engine
     {
     public:
+        explicit Engine(EngineConfig config);
+
         template<Concepts::DerivedFrom<Scene> T>
         void LoadScene()
         {
@@ -30,12 +39,22 @@ namespace RNGOEngine::Core
 
         void Run();
 
-        void Quit();
-
     private:
         bool m_running = true;
+        
         // I hate that these are heap allocated.
         std::unique_ptr<Scene> m_currentScene;
+        std::unique_ptr<Window::IWindow> m_window;
         Systems::SystemScheduler m_systems;
+
+        Events::EventQueue m_eventQueue;
+
+    private:
+        void PollWindowEvents();
+        void SwapBuffers();
+
+    private:
+        void PollEngineEvents();
+        void ClearEvents();
     };
 }

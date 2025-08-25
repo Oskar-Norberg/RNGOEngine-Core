@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <vector>
 #include <any>
 #include <typeindex>
 #include <unordered_map>

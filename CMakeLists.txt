@@ -50,6 +50,9 @@ add_library(${PROJECT_NAME} STATIC
         include/Utilities/JobSystem/JobSystem.tpp
         include/Utilities/JobSystem/Handle/JobHandle.h
         include/Utilities/JobSystem/Handle/JobHandle.tpp
+        include/Window/IWindow.h
+        include/Window/GLFW/GLFWWindow.h
+        src/Window/GLFWWindow.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include

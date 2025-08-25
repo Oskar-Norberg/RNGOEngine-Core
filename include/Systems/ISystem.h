@@ -6,6 +6,8 @@
 
 #include <string_view>
 
+#include "EventQueue/EventQueue.h"
+
 namespace RNGOEngine::Systems
 {
     struct SystemContext;
@@ -27,7 +29,7 @@ namespace RNGOEngine::Systems
         {
         }
 
-        virtual void Update(Core::World& world, SystemContext& context)
+        virtual void Update(Core::World& world, SystemContext& context, Events::EventQueue& eventQueue)
         {
         }
 

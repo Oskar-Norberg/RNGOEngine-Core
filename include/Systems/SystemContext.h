@@ -15,7 +15,6 @@ namespace RNGOEngine::Systems
         // Should be a time-span, but for now we use a float.
         float deltaTime = 0.0f;
 
-        Events::EventQueue eventQueue;
         Resources::ResourceMapper resourceMapper;
         Utilities::JobSystem jobSystem;
     };
