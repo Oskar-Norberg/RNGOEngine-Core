@@ -7,13 +7,11 @@
 #include <span>
 
 #include "DrawQueue.h"
+#include "RenderHandles.h"
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-    using MeshHandle = unsigned int;
-    using ShaderHandle = unsigned int;
-    
     // TODO: Add resizing methods.
     class IRenderer
     {

@@ -3,7 +3,21 @@
 //
 
 #pragma once
+#include <vector>
 
-struct DrawQueue
+#include "RenderHandles.h"
+
+namespace RNGOEngine::Core::Renderer
 {
-};
+
+    struct Drawable
+    {
+        MeshHandle mesh;
+        ShaderHandle shader;
+    };
+
+    struct DrawQueue
+    {
+        std::vector<Drawable> opaqueObjects;
+    };
+}

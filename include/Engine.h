@@ -7,11 +7,11 @@
 #include <memory>
 
 #include "Concepts/Concepts.h"
+#include "Window/IWindow.h"
 #include "Renderer/IRenderer.h"
-#include "Scene/Scene.h"
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
-#include "Window/IWindow.h"
+#include "Scene/Scene.h"
 
 namespace RNGOEngine::Core
 {

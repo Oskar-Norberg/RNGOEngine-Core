@@ -9,6 +9,7 @@
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
+#include "Systems/Core/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
 
 namespace RNGOEngine::Core
@@ -17,6 +18,7 @@ namespace RNGOEngine::Core
     {
         if (config == EngineConfig::Headless)
         {
+            // TODO: Add NullRenderer and NullWindow.
             m_window = nullptr;
         }
         else if (config == EngineConfig::GLFW_OpenGL)
@@ -25,6 +27,9 @@ namespace RNGOEngine::Core
             m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
             m_renderer = std::make_unique<Renderer::GLFWRenderer>();
         }
+
+        // Add RenderSystem
+        RegisterSystem<Systems::Core::RenderSystem>();
     }
 
     void Engine::Run()
