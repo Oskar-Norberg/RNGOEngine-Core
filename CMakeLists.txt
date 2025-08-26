@@ -65,6 +65,13 @@ add_library(${PROJECT_NAME} STATIC
         include/Utilities/IO/SimpleFileReader/SimpleFileReader.h
 )
 
+# OpenGL
+target_link_libraries(${PROJECT_NAME} PUBLIC glfw glad)
+# GLM
+target_link_libraries(${PROJECT_NAME} PUBLIC glm)
+# Tracy
+target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
+
 target_include_directories(${PROJECT_NAME} PUBLIC include
         vendor/entt/include)
 
@@ -73,10 +80,3 @@ add_custom_target(CopyAssets
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
 add_dependencies(${PROJECT_NAME} CopyAssets)
-
-# OpenGL
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw glad)
-# GLM
-target_link_libraries(${PROJECT_NAME} PRIVATE glm)
-# Tracy
-target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)

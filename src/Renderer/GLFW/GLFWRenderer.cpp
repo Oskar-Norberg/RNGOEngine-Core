@@ -94,6 +94,48 @@ namespace RNGOEngine::Core::Renderer
         return shaderProgram;
     }
 
+    void GLFWRenderer::SetBool(ShaderHandle shader, std::string_view name, bool value)
+    {
+        glUseProgram(shader);
+        glUniform1i(glGetUniformLocation(shader, name.data()), static_cast<int>(value));
+    }
+
+    void GLFWRenderer::SetInt(ShaderHandle shader, std::string_view name, int value)
+    {
+        glUseProgram(shader);
+        glUniform1i(glGetUniformLocation(shader, name.data()), value);
+    }
+
+    void GLFWRenderer::SetFloat(ShaderHandle shader, std::string_view name, float value)
+    {
+        glUseProgram(shader);
+        glUniform1f(glGetUniformLocation(shader, name.data()), value);
+    }
+
+    void GLFWRenderer::SetVec2(ShaderHandle shader, std::string_view name, const glm::vec2& value)
+    {
+        glUseProgram(shader);
+        glUniform2fv(glGetUniformLocation(shader, name.data()), 1, &value[0]);
+    }
+
+    void GLFWRenderer::SetVec3(ShaderHandle shader, std::string_view name, const glm::vec3& value)
+    {
+        glUseProgram(shader);
+        glUniform3fv(glGetUniformLocation(shader, name.data()), 1, &value[0]);
+    }
+
+    void GLFWRenderer::SetVec4(ShaderHandle shader, std::string_view name, const glm::vec4& value)
+    {
+        glUseProgram(shader);
+        glUniform4fv(glGetUniformLocation(shader, name.data()), 1, &value[0]);
+    }
+
+    void GLFWRenderer::SetMat4(ShaderHandle shader, std::string_view name, const glm::mat4& value)
+    {
+        glUseProgram(shader);
+        glUniformMatrix4fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, &value[0][0]);
+    }
+
     bool GLFWRenderer::CheckCompilationErrors(unsigned int shader)
     {
         int success;

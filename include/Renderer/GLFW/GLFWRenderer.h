@@ -18,6 +18,15 @@ namespace RNGOEngine::Core::Renderer
         MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
         ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override;
 
+    public:
+        void SetBool(ShaderHandle shader, std::string_view name, bool value) override;
+        void SetInt(ShaderHandle shader, std::string_view name, int value) override;
+        void SetFloat(ShaderHandle shader, std::string_view name, float value) override;
+        void SetVec2(ShaderHandle shader, std::string_view name, const glm::vec2& value) override;
+        void SetVec3(ShaderHandle shader, std::string_view name, const glm::vec3& value) override;
+        void SetVec4(ShaderHandle shader, std::string_view name, const glm::vec4& value) override;
+        void SetMat4(ShaderHandle shader, std::string_view name, const glm::mat4& value) override;
+
     private:
         bool CheckCompilationErrors(unsigned int shader);
         bool CheckLinkingErrors(unsigned int program);
