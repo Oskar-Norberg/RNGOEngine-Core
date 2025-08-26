@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Concepts/Concepts.h"
+#include "Renderer/IRenderer.h"
 #include "Scene/Scene.h"
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
@@ -41,19 +42,24 @@ namespace RNGOEngine::Core
 
     private:
         bool m_running = true;
-        
-        // I hate that these are heap allocated.
-        std::unique_ptr<Scene> m_currentScene;
+
         std::unique_ptr<Window::IWindow> m_window;
+        std::unique_ptr<Renderer::IRenderer> m_renderer;
+        
+        std::unique_ptr<Scene> m_currentScene;
         Systems::SystemScheduler m_systems;
 
         Events::EventQueue m_eventQueue;
 
     private:
-        void PollWindowEvents();
+        void UpdateSystems(float deltaTime);
+
+    private:
+        void Render();
         void SwapBuffers();
 
     private:
+        void PollWindowEvents();
         void PollEngineEvents();
         void ClearEvents();
     };

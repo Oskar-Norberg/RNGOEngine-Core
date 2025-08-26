@@ -8,6 +8,7 @@
 
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
+#include "Renderer/GLFW/GLFWRenderer.h"
 #include "Window/GLFW/GLFWWindow.h"
 
 namespace RNGOEngine::Core
@@ -22,6 +23,7 @@ namespace RNGOEngine::Core
         {
             // TODO: Temporary arbitrary height, width and name.
             m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
+            m_renderer = std::make_unique<Renderer::GLFWRenderer>();
         }
     }
 
@@ -36,8 +38,9 @@ namespace RNGOEngine::Core
 
             PollWindowEvents();
 
-            m_systems.Update(m_eventQueue, m_currentScene->world, deltaTime);
+            UpdateSystems(deltaTime);
 
+            Render();
             SwapBuffers();
 
             PollEngineEvents();
@@ -52,6 +55,19 @@ namespace RNGOEngine::Core
         if (m_window)
         {
             m_window->PollEvents(m_eventQueue);
+        }
+    }
+
+    void Engine::UpdateSystems(float deltaTime)
+    {
+        m_systems.Update(m_eventQueue, m_currentScene->world, deltaTime);
+    }
+
+    void Engine::Render()
+    {
+        if (m_renderer)
+        {
+            m_renderer->Render(*m_window);
         }
     }
 

@@ -54,6 +54,9 @@ add_library(${PROJECT_NAME} STATIC
         include/Window/GLFW/GLFWWindow.h
         src/Window/GLFWWindow.cpp
         include/Data/KeyCodes.h
+        include/Renderer/IRenderer.h
+        include/Renderer/GLFW/GLFWRenderer.h
+        src/Renderer/GLFW/GLFWRenderer.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include
