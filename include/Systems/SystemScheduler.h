@@ -34,7 +34,7 @@ namespace RNGOEngine::Systems
     {
     public:
         ~SystemScheduler();
-        void Update(Events::EventQueue& eventQueue, Core::World& world, float deltaTime);
+        void Update(Events::EventQueue& eventQueue, Core::Renderer::IRenderer& renderer, Core::World& world, float deltaTime);
 
         template<Concepts::DerivedFrom<ISystem> T, typename... Args>
         void RegisterSystem(Args&&... args)
@@ -49,7 +49,5 @@ namespace RNGOEngine::Systems
 
         void InitializeSystems();
         void TerminateSystems();
-
-        void ForwardEngineEvents(const Events::EventQueue& eventQueue);
     };
 }

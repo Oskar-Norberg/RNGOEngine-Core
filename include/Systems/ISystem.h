@@ -8,14 +8,22 @@
 
 #include "EventQueue/EventQueue.h"
 
-namespace RNGOEngine::Systems
+namespace RNGOEngine
 {
-    struct SystemContext;
-}
+    namespace Core
+    {
+        namespace Renderer
+        {
+            class IRenderer;
+        }
 
-namespace RNGOEngine::Core
-{
-    class World;
+        class World;
+    }
+
+    namespace Systems
+    {
+        struct SystemContext;
+    }
 }
 
 namespace RNGOEngine::Systems
@@ -29,7 +37,8 @@ namespace RNGOEngine::Systems
         {
         }
 
-        virtual void Update(Core::World& world, SystemContext& context, Events::EventQueue& eventQueue)
+        virtual void Update(Core::World& world, SystemContext& context, Events::EventQueue& eventQueue,
+                            Core::Renderer::IRenderer& renderer)
         {
         }
 

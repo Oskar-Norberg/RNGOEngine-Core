@@ -13,8 +13,8 @@ namespace RNGOEngine::Systems::Core
     class RenderSystem : public ISystem
     {
     public:
-        void Update(RNGOEngine::Core::World& world, SystemContext& context,
-                    Events::EventQueue& eventQueue) override
+        void Update(RNGOEngine::Core::World& world, SystemContext& context, Events::EventQueue& eventQueue,
+                    RNGOEngine::Core::Renderer::IRenderer& renderer) override
         {
             const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
 
@@ -25,6 +25,7 @@ namespace RNGOEngine::Systems::Core
             }
 
             // Submit draw queue to renderer.
+            renderer.SubmitDrawQueue(std::move(drawQueue));
         }
     };
 }

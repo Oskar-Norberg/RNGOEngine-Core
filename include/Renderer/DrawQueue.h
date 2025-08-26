@@ -12,6 +12,8 @@ namespace RNGOEngine::Core::Renderer
 
     struct Drawable
     {
+        
+        
         MeshHandle mesh;
         ShaderHandle shader;
     };

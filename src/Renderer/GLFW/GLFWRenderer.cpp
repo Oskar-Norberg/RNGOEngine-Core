@@ -26,25 +26,45 @@ namespace RNGOEngine::Core::Renderer
     {
         glClearColor(0.25f, 0.35f, 0.25f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Render Opaques
+        for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
+        {
+            glUseProgram(opaqueDrawable.shader);
+            glBindVertexArray(opaqueDrawable.mesh);
+
+            assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
+
+            const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
+            glDrawElements(GL_TRIANGLES, meshSpec.nrOfVertices + meshSpec.nrOfIndices, GL_UNSIGNED_INT, 0);
+        }
     }
 
     MeshHandle GLFWRenderer::CreateMesh(std::span<float> vertices, std::span<unsigned> indices)
     {
-        unsigned int VBO;
+        unsigned int VAO, VBO, EBO;
+        glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+
+        glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), vertices.data(), GL_STATIC_DRAW);
 
-        unsigned int EBO;
-        glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), indices.data(), GL_STATIC_DRAW);
 
-        unsigned int VAO;
-        glGenVertexArrays(1, &VAO);
-        glBindVertexArray(VAO);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
+        glEnableVertexAttribArray(0);
+
+        m_meshSpecifications.insert(
+            std::make_pair(VAO, MeshSpecification
+                           {
+                               .nrOfVertices = static_cast<unsigned int>(vertices.size() / 3),
+                               .nrOfIndices = static_cast<unsigned int>(indices.size() / 3)
+                           }
+            ));
 
         return VAO;
     }
@@ -78,7 +98,7 @@ namespace RNGOEngine::Core::Renderer
     {
         int success;
         char infoLog[512];
-        
+
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
@@ -93,7 +113,7 @@ namespace RNGOEngine::Core::Renderer
     {
         int success;
         char infoLog[512];
-        
+
         glGetShaderiv(program, GL_LINK_STATUS, &success);
         if (!success)
         {

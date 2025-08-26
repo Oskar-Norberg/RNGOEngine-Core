@@ -21,5 +21,14 @@ namespace RNGOEngine::Core::Renderer
     private:
         bool CheckCompilationErrors(unsigned int shader);
         bool CheckLinkingErrors(unsigned int program);
+
+    private:
+        struct MeshSpecification
+        {
+            unsigned int nrOfVertices;
+            unsigned int nrOfIndices;
+        };
+
+        std::unordered_map<MeshHandle, MeshSpecification> m_meshSpecifications;
     };
 }

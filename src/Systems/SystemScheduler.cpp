@@ -18,7 +18,7 @@ namespace RNGOEngine::Systems
         TerminateSystems();
     }
 
-    void SystemScheduler::Update(Events::EventQueue& eventQueue, Core::World& world, float deltaTime)
+    void SystemScheduler::Update(Events::EventQueue& eventQueue, Core::Renderer::IRenderer& renderer, Core::World& world, float deltaTime)
     {
         m_context.deltaTime = deltaTime;
 
@@ -29,7 +29,7 @@ namespace RNGOEngine::Systems
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_VIEW(system->GetName());
         
-            system->Update(world, m_context, eventQueue);
+            system->Update(world, m_context, eventQueue, renderer);
         }
 
         m_context.resourceMapper.ClearTransientResources();

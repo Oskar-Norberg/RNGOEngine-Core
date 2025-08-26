@@ -76,7 +76,7 @@ namespace RNGOEngine::Core
 
     void Engine::UpdateSystems(float deltaTime)
     {
-        m_systems.Update(m_eventQueue, m_currentScene->world, deltaTime);
+        m_systems.Update(m_eventQueue, *m_renderer, m_currentScene->world, deltaTime);
     }
 
     void Engine::Render()
