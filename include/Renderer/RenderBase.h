@@ -18,6 +18,10 @@ namespace RNGOEngine::Core::Renderer
 
         void Render(Window::IWindow& window) override = 0;
 
+    public:
+        MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override = 0;
+        ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override = 0;
+
     protected:
         DrawQueue m_drawQueue;
     };

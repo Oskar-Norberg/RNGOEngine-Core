@@ -20,7 +20,7 @@ namespace RNGOEngine::Core
         Headless,
         GLFW_OpenGL,
     };
-    
+
     class Engine
     {
     public:
@@ -40,12 +40,24 @@ namespace RNGOEngine::Core
 
         void Run();
 
+        // Renderer Helpers
+    public:
+        Renderer::MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned> indices) const
+        {
+            return m_renderer->CreateMesh(vertices, indices);
+        }
+
+        Renderer::ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) const
+        {
+            return m_renderer->CreateShader(vertexSource, fragmentSource);
+        }
+
     private:
         bool m_running = true;
 
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
-        
+
         std::unique_ptr<Scene> m_currentScene;
         Systems::SystemScheduler m_systems;
 

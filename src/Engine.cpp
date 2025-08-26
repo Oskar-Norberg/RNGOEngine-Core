@@ -29,11 +29,19 @@ namespace RNGOEngine::Core
 
     void Engine::Run()
     {
+        // TODO: Shitty solution, one engine = one scene.
+        // TODO: pleaes fix
+        // TODO: fix please
+        assert(m_currentScene && "No scene loaded!");
+        m_currentScene->Initialize(*this);
+
         auto lastFrame = std::chrono::high_resolution_clock::now();
 
         while (m_running)
         {
-            float deltaTime = std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - lastFrame).count();
+            float deltaTime = std::chrono::duration<float>(
+                std::chrono::high_resolution_clock::now() - lastFrame
+            ).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
             PollWindowEvents();
@@ -47,6 +55,8 @@ namespace RNGOEngine::Core
 
             RNGO_FRAME_MARK;
         }
+
+        m_currentScene->Exit(*this);
     }
 
     void Engine::PollWindowEvents()
@@ -70,7 +80,6 @@ namespace RNGOEngine::Core
         {
             m_renderer->Render(*m_window);
             m_window->SwapBuffers();
-            
         }
     }
 

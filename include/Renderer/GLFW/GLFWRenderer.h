@@ -13,5 +13,13 @@ namespace RNGOEngine::Core::Renderer
     public:
         GLFWRenderer();
         void Render(Window::IWindow& window) override;
+
+    public:
+        MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
+        ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override;
+
+    private:
+        bool CheckCompilationErrors(unsigned int shader);
+        bool CheckLinkingErrors(unsigned int program);
     };
 }
