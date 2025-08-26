@@ -16,7 +16,10 @@ namespace RNGOEngine::Core::Window
         ~GLFWWindow() override;
 
     public:
-        void PollEvents(Events::EventQueue& eventQueue) override;
+        void PollWindowEvents(Events::EventQueue& eventQueue) override;
+        void PollKeyboardEvents(Events::EventQueue& eventQueue) override;
+        void PollMouseEvents(Events::EventQueue& eventQueue) override;
+
         void SwapBuffers() override;
         void SetName(std::string_view name) override;
 
@@ -27,6 +30,5 @@ namespace RNGOEngine::Core::Window
         bool keySetInitialized = false;
 
     private:
-        void PollKeyboardEvents(Events::EventQueue& eventQueue);
     };
 }

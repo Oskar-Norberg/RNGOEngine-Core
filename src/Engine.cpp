@@ -41,7 +41,6 @@ namespace RNGOEngine::Core
             UpdateSystems(deltaTime);
 
             Render();
-            SwapBuffers();
 
             PollEngineEvents();
             ClearEvents();
@@ -54,7 +53,9 @@ namespace RNGOEngine::Core
     {
         if (m_window)
         {
-            m_window->PollEvents(m_eventQueue);
+            m_window->PollWindowEvents(m_eventQueue);
+            m_window->PollKeyboardEvents(m_eventQueue);
+            m_window->PollMouseEvents(m_eventQueue);
         }
     }
 
@@ -68,14 +69,8 @@ namespace RNGOEngine::Core
         if (m_renderer)
         {
             m_renderer->Render(*m_window);
-        }
-    }
-
-    void Engine::SwapBuffers()
-    {
-        if (m_window)
-        {
             m_window->SwapBuffers();
+            
         }
     }
 

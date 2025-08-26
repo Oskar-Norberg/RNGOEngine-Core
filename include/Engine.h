@@ -56,7 +56,6 @@ namespace RNGOEngine::Core
 
     private:
         void Render();
-        void SwapBuffers();
 
     private:
         void PollWindowEvents();

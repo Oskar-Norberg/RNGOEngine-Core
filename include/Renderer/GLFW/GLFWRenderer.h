@@ -4,11 +4,11 @@
 
 #pragma once
 
-#include "Renderer/IRenderer.h"
+#include "Renderer/RenderBase.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-    class GLFWRenderer : public IRenderer
+    class GLFWRenderer : public RenderBase
     {
     public:
         GLFWRenderer();

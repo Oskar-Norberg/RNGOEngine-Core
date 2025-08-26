@@ -32,11 +32,9 @@ namespace RNGOEngine::Core::Window
         glfwTerminate();
     }
 
-    void GLFWWindow::PollEvents(Events::EventQueue& eventQueue)
+    void GLFWWindow::PollWindowEvents(Events::EventQueue& eventQueue)
     {
         glfwPollEvents();
-
-        PollKeyboardEvents(eventQueue);
 
         if (glfwWindowShouldClose(m_window))
         {
@@ -81,5 +79,10 @@ namespace RNGOEngine::Core::Window
         {
             eventQueue.EmplaceEvent<Events::KeyEvent>(keyReleased, Events::KeyAction::Release);
         }
+    }
+
+    void GLFWWindow::PollMouseEvents(Events::EventQueue& eventQueue)
+    {
+        // TODO: Implement mouse events.
     }
 }

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "DrawQueue.h"
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -14,6 +15,7 @@ namespace RNGOEngine::Core::Renderer
         virtual ~IRenderer() = default;
 
     public:
+        virtual void SubmitDrawQueue(DrawQueue drawQueue) = 0;
         virtual void Render(Window::IWindow& window) = 0;
     };
 }

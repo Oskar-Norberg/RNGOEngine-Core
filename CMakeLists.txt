@@ -57,6 +57,8 @@ add_library(${PROJECT_NAME} STATIC
         include/Renderer/IRenderer.h
         include/Renderer/GLFW/GLFWRenderer.h
         src/Renderer/GLFW/GLFWRenderer.cpp
+        include/Renderer/RenderBase.h
+        include/Renderer/DrawQueue.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC include

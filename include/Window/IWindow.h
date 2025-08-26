@@ -15,7 +15,11 @@ namespace RNGOEngine::Core::Window
     public:
         virtual ~IWindow() = default;
 
-        virtual void PollEvents(Events::EventQueue& eventQueue) = 0;
+    public:
+        virtual void PollWindowEvents(Events::EventQueue& eventQueue) = 0;
+        virtual void PollKeyboardEvents(Events::EventQueue& eventQueue) = 0;
+        virtual void PollMouseEvents(Events::EventQueue& eventQueue) = 0;
+        
         virtual void SwapBuffers() = 0;
         virtual void SetName(std::string_view name) = 0;
     };
