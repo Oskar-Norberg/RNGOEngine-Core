@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include <vector>
 
 #include "RenderHandles.h"
@@ -12,7 +13,7 @@ namespace RNGOEngine::Core::Renderer
 
     struct Drawable
     {
-        
+        // TODO: Add transform
         
         MeshHandle mesh;
         ShaderHandle shader;
@@ -20,6 +21,11 @@ namespace RNGOEngine::Core::Renderer
 
     struct DrawQueue
     {
+        // TODO: Camera
+        // TODO: Lights
+        // TODO: Skybox/SceneColor
+        // TODO: Transparents
+        
         std::vector<Drawable> opaqueObjects;
     };
 }
