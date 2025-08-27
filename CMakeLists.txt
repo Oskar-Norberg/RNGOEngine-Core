@@ -61,10 +61,13 @@ add_library(${PROJECT_NAME} STATIC
         include/Renderer/DrawQueue.h
         include/Components/Components.h
         include/Systems/Core/RenderSystem.h
-        include/Renderer/RenderHandles.h
+        include/Renderer/RenderID.h
         include/Utilities/IO/SimpleFileReader/SimpleFileReader.h
         include/AssetManager/AssetManager.h
         src/AssetManager/AssetManager.cpp
+        include/Renderer/Handles/MaterialHandle.h
+        include/Renderer/Uniforms.h
+        src/Renderer/RenderBase.cpp
 )
 
 # OpenGL

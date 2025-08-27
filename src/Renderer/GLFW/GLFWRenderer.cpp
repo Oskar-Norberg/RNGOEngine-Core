@@ -30,8 +30,44 @@ namespace RNGOEngine::Core::Renderer
         // Render Opaques
         for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
         {
-            glUseProgram(opaqueDrawable.shader);
+            const auto& materialSpecification = m_materials[opaqueDrawable.material];
+            const auto shaderID = materialSpecification.shader;
+            glUseProgram(materialSpecification.shader);
             glBindVertexArray(opaqueDrawable.mesh);
+
+            for (const auto& uniformSpecification : materialSpecification.uniforms)
+            {
+                switch (uniformSpecification.type)
+                {
+                    case Bool:
+                        glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), static_cast<int>(uniformSpecification.data.b)); 
+                        break;
+                    case Int:
+                        glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), uniformSpecification.data.b); 
+                        break;
+                    case Float:
+                        glUniform1f(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), uniformSpecification.data.f); 
+                        break;
+                    case Vec2:
+                        glUniform2fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, &uniformSpecification.data.v2[0]); 
+                        break;
+                    case Vec3:
+                        glUniform3fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, &uniformSpecification.data.v3[0]); 
+                        break;
+                    case Vec4:
+                        glUniform4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, &uniformSpecification.data.v4[0]); 
+                        break;
+                    case Mat4:
+                        glUniformMatrix4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, GL_FALSE, &uniformSpecification.data.m4[0][0]); 
+                        break;
+                    case Texture:
+                        
+                        break;
+
+                    default:
+                        break;
+                }
+            }
 
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
@@ -40,7 +76,7 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    MeshHandle GLFWRenderer::CreateMesh(std::span<float> vertices, std::span<unsigned> indices)
+    MeshID GLFWRenderer::CreateMesh(std::span<float> vertices, std::span<unsigned> indices)
     {
         unsigned int VAO, VBO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -55,7 +91,12 @@ namespace RNGOEngine::Core::Renderer
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), indices.data(), GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), static_cast<void*>(nullptr));
+        // Vertex Pos
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void*>(nullptr));
+        // Vertex UV
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
+                              reinterpret_cast<void*>(3 * sizeof(float)));
+
         glEnableVertexAttribArray(0);
 
         m_meshSpecifications.insert(
@@ -69,7 +110,7 @@ namespace RNGOEngine::Core::Renderer
         return VAO;
     }
 
-    ShaderHandle GLFWRenderer::CreateShader(std::string_view vertexSource, std::string_view fragmentSource)
+    ShaderID GLFWRenderer::CreateShader(std::string_view vertexSource, std::string_view fragmentSource)
     {
         //  Compile Vertex Shader
         auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -94,7 +135,7 @@ namespace RNGOEngine::Core::Renderer
         return shaderProgram;
     }
 
-    TextureHandle GLFWRenderer::CreateTexture(unsigned char* data, int width, int height, int nrChannels)
+    TextureID GLFWRenderer::CreateTexture(unsigned char* data, int width, int height, int nrChannels)
     {
         unsigned int textureHandle;
         glGenTextures(1, &textureHandle);
@@ -113,57 +154,24 @@ namespace RNGOEngine::Core::Renderer
         else if (nrChannels == 3)
         {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        }else
+        }
+        else
         {
             assert(false && "Unsupported number of channels in texture");
-            return INVALID_TEXTURE_HANDLE;
+            return INVALID_TEXTURE_ID;
         }
-        
+
         glGenerateMipmap(GL_TEXTURE_2D);
 
         return textureHandle;
     }
 
-    void GLFWRenderer::SetBool(ShaderHandle shader, std::string_view name, bool value)
+    MaterialID GLFWRenderer::CreateMaterial(ShaderID shader)
     {
-        glUseProgram(shader);
-        glUniform1i(glGetUniformLocation(shader, name.data()), static_cast<int>(value));
-    }
+        const auto materialID = m_nextMaterialID++;
+        m_materials[materialID] = MaterialSpecification{.shader = shader, .uniforms = {}};
 
-    void GLFWRenderer::SetInt(ShaderHandle shader, std::string_view name, int value)
-    {
-        glUseProgram(shader);
-        glUniform1i(glGetUniformLocation(shader, name.data()), value);
-    }
-
-    void GLFWRenderer::SetFloat(ShaderHandle shader, std::string_view name, float value)
-    {
-        glUseProgram(shader);
-        glUniform1f(glGetUniformLocation(shader, name.data()), value);
-    }
-
-    void GLFWRenderer::SetVec2(ShaderHandle shader, std::string_view name, const glm::vec2& value)
-    {
-        glUseProgram(shader);
-        glUniform2fv(glGetUniformLocation(shader, name.data()), 1, &value[0]);
-    }
-
-    void GLFWRenderer::SetVec3(ShaderHandle shader, std::string_view name, const glm::vec3& value)
-    {
-        glUseProgram(shader);
-        glUniform3fv(glGetUniformLocation(shader, name.data()), 1, &value[0]);
-    }
-
-    void GLFWRenderer::SetVec4(ShaderHandle shader, std::string_view name, const glm::vec4& value)
-    {
-        glUseProgram(shader);
-        glUniform4fv(glGetUniformLocation(shader, name.data()), 1, &value[0]);
-    }
-
-    void GLFWRenderer::SetMat4(ShaderHandle shader, std::string_view name, const glm::mat4& value)
-    {
-        glUseProgram(shader);
-        glUniformMatrix4fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, &value[0][0]);
+        return materialID;
     }
 
     bool GLFWRenderer::CheckCompilationErrors(unsigned int shader)

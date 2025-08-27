@@ -10,7 +10,7 @@ namespace RNGOEngine::Components
 {
     struct MeshRenderer
     {
-        Core::Renderer::MeshHandle mesh;
-        Core::Renderer::ShaderHandle shader;
+        Core::Renderer::MeshID mesh;
+        Core::Renderer::MaterialID shader;
     };
 }
