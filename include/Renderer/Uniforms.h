@@ -14,6 +14,12 @@ namespace RNGOEngine::Core::Renderer
 {
     enum UniformType { Bool, Int, Float, Vec2, Vec3, Vec4, Mat4, Texture };
 
+    struct TextureSpecification
+    {
+        TextureID texture;
+        int slot;
+    };
+
     union UniformData
     {
         bool b;
@@ -23,7 +29,7 @@ namespace RNGOEngine::Core::Renderer
         glm::vec3 v3;
         glm::vec4 v4;
         glm::mat4 m4;
-        TextureID texture;
+        TextureSpecification texture;
     };
 
     struct UniformSpecification

@@ -40,29 +40,48 @@ namespace RNGOEngine::Core::Renderer
                 switch (uniformSpecification.type)
                 {
                     case Bool:
-                        glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), static_cast<int>(uniformSpecification.data.b)); 
+                        glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
+                                    static_cast<int>(uniformSpecification.data.b));
                         break;
                     case Int:
-                        glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), uniformSpecification.data.b); 
+                        glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
+                                    uniformSpecification.data.b);
                         break;
                     case Float:
-                        glUniform1f(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), uniformSpecification.data.f); 
+                        glUniform1f(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
+                                    uniformSpecification.data.f);
                         break;
                     case Vec2:
-                        glUniform2fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, &uniformSpecification.data.v2[0]); 
+                        glUniform2fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1,
+                                     &uniformSpecification.data.v2[0]);
                         break;
                     case Vec3:
-                        glUniform3fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, &uniformSpecification.data.v3[0]); 
+                        glUniform3fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1,
+                                     &uniformSpecification.data.v3[0]);
                         break;
                     case Vec4:
-                        glUniform4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, &uniformSpecification.data.v4[0]); 
+                        glUniform4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1,
+                                     &uniformSpecification.data.v4[0]);
                         break;
                     case Mat4:
-                        glUniformMatrix4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1, GL_FALSE, &uniformSpecification.data.m4[0][0]); 
+                        glUniformMatrix4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
+                                           1, GL_FALSE, &uniformSpecification.data.m4[0][0]);
                         break;
                     case Texture:
-                        
+                    {
+                        const auto uniformLocation = glGetUniformLocation(
+                            shaderID, uniformSpecification.name.c_str());
+                        if (uniformLocation == -1)
+                        {
+                            assert(false && "Texture Uniform not found in shader.");
+                            break;
+                        }
+
+                        glActiveTexture(GL_TEXTURE0 + uniformSpecification.data.texture.slot);
+                        glBindTexture(GL_TEXTURE_2D, uniformSpecification.data.texture.texture);
+                        glUniform1i(uniformLocation, uniformSpecification.data.texture.slot);
                         break;
+                    }
 
                     default:
                         break;
@@ -93,11 +112,14 @@ namespace RNGOEngine::Core::Renderer
 
         // Vertex Pos
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void*>(nullptr));
+        glEnableVertexAttribArray(0);
+        
         // Vertex UV
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               reinterpret_cast<void*>(3 * sizeof(float)));
+        glEnableVertexAttribArray(1);
+        
 
-        glEnableVertexAttribArray(0);
 
         m_meshSpecifications.insert(
             std::make_pair(VAO, MeshSpecification

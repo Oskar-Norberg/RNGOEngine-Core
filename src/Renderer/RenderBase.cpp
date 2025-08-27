@@ -8,6 +8,12 @@ namespace RNGOEngine::Core::Renderer
 {
     void RenderBase::SetTexture(MaterialID shader, TextureID texture, int slot)
     {
+        // TODO: How can I more elegantly name textures?
+        m_materials[shader].uniforms.emplace_back(
+            "Texture" + std::to_string(slot),
+            UniformType::Texture,
+            UniformData{.texture = {texture, slot}}
+        );
     }
 
     void RenderBase::SetBool(MaterialID shader, std::string_view name, bool value)
