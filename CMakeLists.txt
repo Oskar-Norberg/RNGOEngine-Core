@@ -63,6 +63,8 @@ add_library(${PROJECT_NAME} STATIC
         include/Systems/Core/RenderSystem.h
         include/Renderer/RenderHandles.h
         include/Utilities/IO/SimpleFileReader/SimpleFileReader.h
+        include/AssetManager/AssetManager.h
+        src/AssetManager/AssetManager.cpp
 )
 
 # OpenGL

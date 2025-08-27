@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "AssetManager/AssetManager.h"
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"
 #include "Renderer/IRenderer.h"
@@ -40,23 +41,18 @@ namespace RNGOEngine::Core
 
         void Run();
 
-        // Renderer Helpers
     public:
-        Renderer::MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned> indices) const
+        AssetHandling::AssetManager& GetAssetManager() const
         {
-            return m_renderer->CreateMesh(vertices, indices);
-        }
-
-        Renderer::ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) const
-        {
-            return m_renderer->CreateShader(vertexSource, fragmentSource);
+            return *m_assetManager;
         }
 
     private:
-        bool m_running = true;
+        bool m_running;
 
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
+        std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
 
         std::unique_ptr<Scene> m_currentScene;
         Systems::SystemScheduler m_systems;

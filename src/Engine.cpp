@@ -15,6 +15,11 @@
 namespace RNGOEngine::Core
 {
     Engine::Engine(EngineConfig config)
+        : m_running(true),
+          m_window(nullptr),
+          m_renderer(nullptr),
+          m_assetManager(nullptr),
+          m_currentScene(nullptr)
     {
         if (config == EngineConfig::Headless)
         {
@@ -27,6 +32,8 @@ namespace RNGOEngine::Core
             m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
             m_renderer = std::make_unique<Renderer::GLFWRenderer>();
         }
+
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer);
 
         // Add RenderSystem
         RegisterSystem<Systems::Core::RenderSystem>();
