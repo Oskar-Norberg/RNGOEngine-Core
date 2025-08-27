@@ -9,7 +9,7 @@
 #include <glm/glm.hpp>
 
 #include "DrawQueue.h"
-#include "RenderHandles.h"
+#include "RenderID.h"
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -25,24 +25,27 @@ namespace RNGOEngine::Core::Renderer
         virtual void Render(Window::IWindow& window) = 0;
 
     public:
-        virtual MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned int> indices) = 0;
+        virtual MeshID CreateMesh(std::span<float> vertices, std::span<unsigned int> indices) = 0;
         // TODO: Destruction of meshes and shaders.
 
     public:
         // TODO: Perhaps this should return an std::expected for errors.
-        virtual ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) = 0;
+        virtual ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) = 0;
+        virtual MaterialID CreateMaterial(ShaderID shader) = 0;
 
-        // TODO: Loading of textures.
+    public:
+        virtual TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) = 0;
 
         // Shader Uniforms
     public:
-        virtual void SetBool(ShaderHandle shader, std::string_view name, bool value) = 0;
-        virtual void SetInt(ShaderHandle shader, std::string_view name, int value) = 0;
-        virtual void SetFloat(ShaderHandle shader, std::string_view name, float value) = 0;
-        virtual void SetVec2(ShaderHandle shader, std::string_view name, const glm::vec2& value) = 0;
-        virtual void SetVec3(ShaderHandle shader, std::string_view name, const glm::vec3& value) = 0;
-        virtual void SetVec4(ShaderHandle shader, std::string_view name, const glm::vec4& value) = 0;
-        virtual void SetMat4(ShaderHandle shader, std::string_view name, const glm::mat4& value) = 0;
+        virtual void SetTexture(MaterialID shader, TextureID texture, int slot) = 0;
+        virtual void SetBool(MaterialID shader, std::string_view name, bool value) = 0;
+        virtual void SetInt(MaterialID shader, std::string_view name, int value) = 0;
+        virtual void SetFloat(MaterialID shader, std::string_view name, float value) = 0;
+        virtual void SetVec2(MaterialID shader, std::string_view name, const glm::vec2& value) = 0;
+        virtual void SetVec3(MaterialID shader, std::string_view name, const glm::vec3& value) = 0;
+        virtual void SetVec4(MaterialID shader, std::string_view name, const glm::vec4& value) = 0;
+        virtual void SetMat4(MaterialID shader, std::string_view name, const glm::mat4& value) = 0;
             
     };
 }

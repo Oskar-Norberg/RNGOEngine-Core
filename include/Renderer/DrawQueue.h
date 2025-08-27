@@ -6,7 +6,7 @@
 
 #include <vector>
 
-#include "RenderHandles.h"
+#include "RenderID.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -15,8 +15,8 @@ namespace RNGOEngine::Core::Renderer
     {
         // TODO: Add transform
         
-        MeshHandle mesh;
-        ShaderHandle shader;
+        MeshID mesh;
+        MaterialID material;
     };
 
     struct DrawQueue

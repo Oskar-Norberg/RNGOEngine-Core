@@ -61,10 +61,13 @@ add_library(${PROJECT_NAME} STATIC
         include/Renderer/DrawQueue.h
         include/Components/Components.h
         include/Systems/Core/RenderSystem.h
-        include/Renderer/RenderHandles.h
+        include/Renderer/RenderID.h
         include/Utilities/IO/SimpleFileReader/SimpleFileReader.h
         include/AssetManager/AssetManager.h
         src/AssetManager/AssetManager.cpp
+        include/Renderer/Handles/MaterialHandle.h
+        include/Renderer/Uniforms.h
+        src/Renderer/RenderBase.cpp
 )
 
 # OpenGL
@@ -74,11 +77,17 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glm)
 # Tracy
 target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
 
+# Public include directories
 target_include_directories(${PROJECT_NAME} PUBLIC include
         vendor/entt/include)
 
+# Private include directories
+target_include_directories(${PROJECT_NAME} PRIVATE include
+        vendor/stb_image)
+
 # Include assets in build.
-add_custom_target(CopyAssets
+set(COPY_PROJECT_NAME RNGOEngine_Core-Assets)
+add_custom_target(${COPY_PROJECT_NAME}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
-add_dependencies(${PROJECT_NAME} CopyAssets)
+add_dependencies(${PROJECT_NAME} ${COPY_PROJECT_NAME})
