@@ -9,8 +9,10 @@
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
+#include "Renderer/Null/NullRenderer.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
+#include "Window/Null/NullWindow.h"
 
 namespace RNGOEngine::Core
 {
@@ -23,8 +25,8 @@ namespace RNGOEngine::Core
     {
         if (config == EngineConfig::Headless)
         {
-            // TODO: Add NullRenderer and NullWindow.
-            m_window = nullptr;
+            m_window = std::make_unique<Window::NullWindow>();
+            m_renderer = std::make_unique<Renderer::NullRenderer>();
         }
         else if (config == EngineConfig::GLFW_OpenGL)
         {

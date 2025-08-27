@@ -68,6 +68,8 @@ add_library(${PROJECT_NAME} STATIC
         include/Renderer/Handles/MaterialHandle.h
         include/Renderer/Uniforms.h
         src/Renderer/RenderBase.cpp
+        include/Renderer/Null/NullRenderer.h
+        include/Window/Null/NullWindow.h
 )
 
 # OpenGL
