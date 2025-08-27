@@ -17,8 +17,8 @@ namespace RNGOEngine::Core::Renderer
     public:
         MeshHandle CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
         ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override;
+        TextureHandle CreateTexture(unsigned char* data, int width, int height, int nrChannels) override;
 
-    public:
         void SetBool(ShaderHandle shader, std::string_view name, bool value) override;
         void SetInt(ShaderHandle shader, std::string_view name, int value) override;
         void SetFloat(ShaderHandle shader, std::string_view name, float value) override;

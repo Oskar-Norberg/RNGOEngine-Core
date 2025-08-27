@@ -19,6 +19,8 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::ShaderHandle CreateShader(std::string_view vertexSource,
                                                   std::string_view fragmentSource) const;
 
+        Core::Renderer::TextureHandle CreateTexture(std::string_view texturePath) const;
+
     private:
         Core::Renderer::IRenderer& m_renderer;
     };

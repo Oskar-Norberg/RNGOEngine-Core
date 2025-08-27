@@ -94,6 +94,36 @@ namespace RNGOEngine::Core::Renderer
         return shaderProgram;
     }
 
+    TextureHandle GLFWRenderer::CreateTexture(unsigned char* data, int width, int height, int nrChannels)
+    {
+        unsigned int textureHandle;
+        glGenTextures(1, &textureHandle);
+        glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+        // TODO: These should probably be passed in as parameters.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        if (nrChannels == 4)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        }
+        else if (nrChannels == 3)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        }else
+        {
+            assert(false && "Unsupported number of channels in texture");
+            return INVALID_TEXTURE_HANDLE;
+        }
+        
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        return textureHandle;
+    }
+
     void GLFWRenderer::SetBool(ShaderHandle shader, std::string_view name, bool value)
     {
         glUseProgram(shader);

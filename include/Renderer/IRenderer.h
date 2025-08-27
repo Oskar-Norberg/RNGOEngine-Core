@@ -32,7 +32,8 @@ namespace RNGOEngine::Core::Renderer
         // TODO: Perhaps this should return an std::expected for errors.
         virtual ShaderHandle CreateShader(std::string_view vertexSource, std::string_view fragmentSource) = 0;
 
-        // TODO: Loading of textures.
+    public:
+        virtual TextureHandle CreateTexture(unsigned char* data, int width, int height, int nrChannels) = 0;
 
         // Shader Uniforms
     public:

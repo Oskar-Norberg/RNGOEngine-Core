@@ -74,8 +74,13 @@ target_link_libraries(${PROJECT_NAME} PUBLIC glm)
 # Tracy
 target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
 
+# Public include directories
 target_include_directories(${PROJECT_NAME} PUBLIC include
         vendor/entt/include)
+
+# Private include directories
+target_include_directories(${PROJECT_NAME} PRIVATE include
+        vendor/stb_image)
 
 # Include assets in build.
 add_custom_target(CopyAssets
