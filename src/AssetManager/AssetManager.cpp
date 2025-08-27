@@ -41,6 +41,7 @@ RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::C
 
     if (!data || width <= 0 || height <= 0 || nrChannels <= 0)
     {
+        assert(false && "Failed to load texture");
         return Core::Renderer::INVALID_TEXTURE_ID;
     }
 

@@ -86,7 +86,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE include
         vendor/stb_image)
 
 # Include assets in build.
-add_custom_target(CopyAssets
+set(COPY_PROJECT_NAME RNGOEngine_Core-Assets)
+add_custom_target(${COPY_PROJECT_NAME}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
-add_dependencies(${PROJECT_NAME} CopyAssets)
+add_dependencies(${PROJECT_NAME} ${COPY_PROJECT_NAME})

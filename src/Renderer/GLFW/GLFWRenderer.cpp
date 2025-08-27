@@ -10,6 +10,8 @@
 // TODO: AAAAAAAAAAAAAAAAAAAAA
 #include <cassert>
 
+#include "stb_image.h"
+
 namespace RNGOEngine::Core::Renderer
 {
     GLFWRenderer::GLFWRenderer()
@@ -18,6 +20,9 @@ namespace RNGOEngine::Core::Renderer
         {
             assert(false && "Failed to initialize GLAD");
         }
+
+        // Not 100% sure if this should be done here. But the renderer coordinate system is what decides if a texture needs flipping or not.
+        stbi_set_flip_vertically_on_load(true);
 
         glViewport(0, 0, 800, 600);
     }
@@ -113,13 +118,11 @@ namespace RNGOEngine::Core::Renderer
         // Vertex Pos
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void*>(nullptr));
         glEnableVertexAttribArray(0);
-        
+
         // Vertex UV
         glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
                               reinterpret_cast<void*>(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
-        
-
 
         m_meshSpecifications.insert(
             std::make_pair(VAO, MeshSpecification
