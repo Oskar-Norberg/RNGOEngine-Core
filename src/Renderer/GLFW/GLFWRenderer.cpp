@@ -93,6 +93,9 @@ namespace RNGOEngine::Core::Renderer
                 }
             }
 
+            glUniformMatrix4fv(glGetUniformLocation(shaderID, "Model"), 1, GL_FALSE,
+                               &opaqueDrawable.transform[0][0]);
+
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
             const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
