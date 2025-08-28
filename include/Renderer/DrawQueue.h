@@ -14,7 +14,7 @@ namespace RNGOEngine::Core::Renderer
     struct Drawable
     {
         // TODO: Add transform
-        
+        glm::mat4 transform = glm::mat4(1.0f);
         MeshID mesh;
         MaterialID material;
     };

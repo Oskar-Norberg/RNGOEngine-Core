@@ -21,7 +21,17 @@ namespace RNGOEngine::Systems::Core
             RNGOEngine::Core::Renderer::DrawQueue drawQueue;
             for (const auto& [entity, meshRender] : renderView.each())
             {
-                drawQueue.opaqueObjects.emplace_back(meshRender.mesh, meshRender.shader);
+                if (world.GetRegistry().all_of<Components::Transform>(entity))
+                {
+                    const auto& transform = world.GetRegistry().get<Components::Transform>(entity);
+
+                    drawQueue.opaqueObjects.emplace_back(transform.GetMatrix(), meshRender.mesh,
+                                                         meshRender.shader);
+                }
+                else
+                {
+                    drawQueue.opaqueObjects.emplace_back(meshRender.mesh, meshRender.shader);
+                }
             }
 
             // Submit draw queue to renderer.
