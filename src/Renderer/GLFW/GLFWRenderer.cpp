@@ -97,21 +97,15 @@ namespace RNGOEngine::Core::Renderer
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "Model"), 1, GL_FALSE,
                                &opaqueDrawable.transform.GetMatrix()[0][0]);
 
-            // TODO: These should not be set per object.
-            // TODO: Proper size handling
-            // These should also be cached.
             const auto view = glm::inverse(m_drawQueue.cameraTransform.GetMatrix());
-            const auto projection = glm::perspective(
-                glm::radians(m_drawQueue.camera.fov),
-                800.0f / 600.0f,
-                m_drawQueue.camera.nearPlane,
-                m_drawQueue.camera.farPlane
-            );
 
+            RecalculateProjectionMatrix(m_drawQueue.camera);
+
+            // TODO: These should not be set per object.
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "View"), 1, GL_FALSE,
                                &view[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "Projection"), 1, GL_FALSE,
-                               &projection[0][0]);
+                               &m_projectionMatrix[0][0]);
 
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
@@ -247,5 +241,25 @@ namespace RNGOEngine::Core::Renderer
         }
 
         return true;
+    }
+
+    void GLFWRenderer::RecalculateProjectionMatrix(Components::Camera camera)
+    {
+        if (lastCameraProperties.farPlane == camera.farPlane &&
+            lastCameraProperties.nearPlane == camera.nearPlane &&
+            lastCameraProperties.fov == camera.fov && m_projectionMatrix != glm::mat4(0.0f))
+        {
+            return;
+        }
+
+        // TODO: Proper size handling
+        m_projectionMatrix = glm::perspective(
+            glm::radians(camera.fov),
+            800.0f / 600.0f,
+            camera.nearPlane,
+            camera.farPlane
+        );
+
+        lastCameraProperties = camera;
     }
 }
