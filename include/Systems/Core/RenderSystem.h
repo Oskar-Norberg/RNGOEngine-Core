@@ -25,12 +25,30 @@ namespace RNGOEngine::Systems::Core
                 {
                     const auto& transform = world.GetRegistry().get<Components::Transform>(entity);
 
-                    drawQueue.opaqueObjects.emplace_back(transform.GetMatrix(), meshRender.mesh,
+                    drawQueue.opaqueObjects.emplace_back(transform, meshRender.mesh,
                                                          meshRender.shader);
                 }
                 else
                 {
-                    drawQueue.opaqueObjects.emplace_back(meshRender.mesh, meshRender.shader);
+                    assert(false && "Renderable entity is missing Transform component!");
+                    drawQueue.opaqueObjects.emplace_back(Components::Transform(), meshRender.mesh, meshRender.shader);
+                }
+            }
+
+            const auto cameraView = world.GetRegistry().view<Components::Camera>();
+            for (const auto& [entity, camera] : cameraView.each())
+            {
+                if (world.GetRegistry().all_of<Components::Transform>(entity))
+                {
+                    const auto& transform = world.GetRegistry().get<Components::Transform>(entity);
+
+                    // Copy camera properties
+                    drawQueue.camera = camera;
+                    drawQueue.cameraTransform = transform;
+                }
+                else
+                {
+                    assert(false && "Camera is missing Transform component!");
                 }
             }
 
