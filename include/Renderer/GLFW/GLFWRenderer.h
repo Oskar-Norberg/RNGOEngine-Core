@@ -23,12 +23,6 @@ namespace RNGOEngine::Core::Renderer
         MaterialID CreateMaterial(ShaderID shader) override;
 
     private:
-        bool CheckCompilationErrors(unsigned int shader);
-        bool CheckLinkingErrors(unsigned int program);
-
-    private:
-        MaterialID m_nextMaterialID = 0;
-
         struct MeshSpecification
         {
             unsigned int nrOfVertices;
@@ -36,5 +30,16 @@ namespace RNGOEngine::Core::Renderer
         };
 
         std::unordered_map<MeshID, MeshSpecification> m_meshSpecifications;
+        MaterialID m_nextMaterialID = 0;
+
+        Components::Camera lastCameraProperties;
+        glm::mat4 m_projectionMatrix;
+        
+    private:
+        bool CheckCompilationErrors(unsigned int shader);
+        bool CheckLinkingErrors(unsigned int program);
+
+    private:
+        void RecalculateProjectionMatrix(Components::Camera camera);
     };
 }

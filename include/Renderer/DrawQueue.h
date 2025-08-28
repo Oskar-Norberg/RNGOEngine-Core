@@ -7,25 +7,30 @@
 #include <vector>
 
 #include "RenderID.h"
+#include "Components/Components.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-
     struct Drawable
     {
-        // TODO: Add transform
-        glm::mat4 transform = glm::mat4(1.0f);
+        Components::Transform transform;
         MeshID mesh;
         MaterialID material;
     };
 
     struct DrawQueue
     {
-        // TODO: Camera
+        // Camera Properties
+        Components::Camera camera;
+        Components::Transform cameraTransform;
+
         // TODO: Lights
         // TODO: Skybox/SceneColor
+
+        // Opaque Objects
+        std::vector<Drawable> opaqueObjects;
+
         // TODO: Transparents
         
-        std::vector<Drawable> opaqueObjects;
     };
 }
