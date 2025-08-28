@@ -21,4 +21,10 @@ namespace RNGOEngine::Events
         int key;
         KeyAction action;
     };
+
+    struct MouseEvent
+    {
+        double deltaX;
+        double deltaY;
+    };
 }

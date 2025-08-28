@@ -83,6 +83,18 @@ namespace RNGOEngine::Core::Window
 
     void GLFWWindow::PollMouseEvents(Events::EventQueue& eventQueue)
     {
-        // TODO: Implement mouse events.
+        double mouseX, mouseY;
+        glfwGetCursorPos(m_window, &mouseX, &mouseY);
+
+        double mouseDiffX = mouseX - m_lastMouseX;
+        double mouseDiffY = mouseY - m_lastMouseY;
+
+        if (mouseDiffX != 0 || mouseDiffY != 0)
+        {
+            eventQueue.EmplaceEvent<Events::MouseEvent>(mouseDiffX, mouseDiffY);
+        }
+
+        m_lastMouseX = mouseX;
+        m_lastMouseY = mouseY;
     }
 }
