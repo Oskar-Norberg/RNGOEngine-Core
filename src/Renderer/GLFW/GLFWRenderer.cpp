@@ -24,13 +24,14 @@ namespace RNGOEngine::Core::Renderer
         // Not 100% sure if this should be done here. But the renderer coordinate system is what decides if a texture needs flipping or not.
         stbi_set_flip_vertically_on_load(true);
 
+        glEnable(GL_DEPTH_TEST);
         glViewport(0, 0, 800, 600);
     }
 
     void GLFWRenderer::Render(Window::IWindow& window)
     {
         glClearColor(0.25f, 0.35f, 0.25f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render Opaques
         for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
