@@ -59,6 +59,12 @@ namespace RNGOEngine::Systems::Core
                 drawQueue.ambientLight = ambientLight;
             }
 
+            const auto directionalLightView = world.GetRegistry().view<Components::DirectionalLight>();
+            for (const auto& [entity, directionalLight] : directionalLightView.each())
+            {
+                drawQueue.directionalLight = directionalLight;
+            }
+
             // Submit draw queue to renderer.
             renderer.SubmitDrawQueue(std::move(drawQueue));
         }

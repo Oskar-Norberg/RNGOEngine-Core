@@ -26,7 +26,8 @@ namespace RNGOEngine::Core::Renderer
 
         // Light Properties
         Components::AmbientLight ambientLight;
-        // TODO: DirectionalLight, PointLight, SpotLight.
+        Components::DirectionalLight directionalLight;
+        // TODO: PointLight, SpotLight.
         // TODO: Skybox/SceneColor
 
         // Opaque Objects

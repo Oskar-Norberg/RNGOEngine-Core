@@ -121,6 +121,13 @@ namespace RNGOEngine::Core::Renderer
                              &m_drawQueue.ambientLight.color[0]);
                 glUniform1f(glGetUniformLocation(shaderID, "ambientLight.intensity"),
                             m_drawQueue.ambientLight.intensity);
+
+                glUniform3fv(glGetUniformLocation(shaderID, "directionalLight.color"), 1,
+                             &m_drawQueue.directionalLight.color[0]);
+                glUniform3fv(glGetUniformLocation(shaderID, "directionalLight.direction"), 1,
+                             &m_drawQueue.directionalLight.direction[0]);
+                glUniform1f(glGetUniformLocation(shaderID, "directionalLight.intensity"),
+                            m_drawQueue.directionalLight.intensity);
             }
 
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
@@ -146,13 +153,16 @@ namespace RNGOEngine::Core::Renderer
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), indices.data(), GL_STATIC_DRAW);
 
         // Vertex Pos
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), static_cast<void*>(nullptr));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void*>(nullptr));
         glEnableVertexAttribArray(0);
 
-        // Vertex UV
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                              reinterpret_cast<void*>(3 * sizeof(float)));
+        // Vertex Normal
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
+
+        // Vertex UV
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+        glEnableVertexAttribArray(2);
 
         m_meshSpecifications.insert(
             std::make_pair(VAO, MeshSpecification
