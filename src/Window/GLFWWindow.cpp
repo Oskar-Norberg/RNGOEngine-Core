@@ -69,6 +69,18 @@ namespace RNGOEngine::Core::Window
                 assert(false && "GLFW window user pointer is null.");
             }
         });
+
+        glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods)
+        {
+            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+            {
+                static_cast<GLFWWindow*>(userPtr)->MouseButtonCallback(button, action, mods);
+            }
+            else
+            {
+                assert(false && "GLFW window user pointer is null.");
+            }
+        });
     }
 
     GLFWWindow::~GLFWWindow()
@@ -110,10 +122,16 @@ namespace RNGOEngine::Core::Window
 
     void GLFWWindow::PollMouseEvents(Events::EventQueue& eventQueue)
     {
-        eventQueue.EmplaceEvent<Events::MouseEvent>(m_accumulatedX, m_accumulatedY);
+        eventQueue.EmplaceEvent<Events::MouseMoveEvent>(m_accumulatedX, m_accumulatedY);
 
         m_accumulatedX = 0.0f;
         m_accumulatedY = 0.0f;
+
+        if (!m_mouseButtonEvents.empty())
+        {
+            eventQueue.PushEventMultiple<Events::MouseButtonEvent>(m_mouseButtonEvents);
+            m_mouseButtonEvents.clear();
+        }
     }
 
     bool GLFWWindow::ListenSendEvents(Events::EventQueue& eventQueue)
@@ -131,9 +149,14 @@ namespace RNGOEngine::Core::Window
 
     void GLFWWindow::KeyEventCallback(int key, int scancode, int action, int mods)
     {
+        if (action != GLFW_PRESS && action != GLFW_RELEASE)
+        {
+            return;
+        }
+        
         m_keyEvents.emplace_back(key, action == GLFW_PRESS
-                                          ? Events::KeyAction::Press
-                                          : Events::KeyAction::Release);
+                                          ? Events::ButtonAction::Press
+                                          : Events::ButtonAction::Release);
     }
 
     void GLFWWindow::MouseMoveCallback(double x, double y)
@@ -146,5 +169,17 @@ namespace RNGOEngine::Core::Window
 
         m_lastMouseX = x;
         m_lastMouseY = y;
+    }
+
+    void GLFWWindow::MouseButtonCallback(int button, int action, int mods)
+    {
+        if (action != GLFW_PRESS && action != GLFW_RELEASE)
+        {
+            return;
+        }
+        
+        m_mouseButtonEvents.emplace_back(button, action == GLFW_PRESS
+                                                     ? Events::ButtonAction::Press
+                                                     : Events::ButtonAction::Release);
     }
 }

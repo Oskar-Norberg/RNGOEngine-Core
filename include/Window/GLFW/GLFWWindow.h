@@ -38,10 +38,12 @@ namespace RNGOEngine::Core::Window
 
     private:
         std::vector<Events::KeyEvent> m_keyEvents;
+        std::vector<Events::MouseButtonEvent> m_mouseButtonEvents;
 
     private:
         void WindowSizeCallback(int width, int height);
         void KeyEventCallback(int key, int scancode, int action, int mods);
         void MouseMoveCallback(double x, double y);
+        void MouseButtonCallback(int button, int action, int mods);
     };
 }

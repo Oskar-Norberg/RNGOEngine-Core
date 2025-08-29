@@ -70,6 +70,7 @@ add_library(${PROJECT_NAME} STATIC
         src/Renderer/RenderBase.cpp
         include/Renderer/Null/NullRenderer.h
         include/Window/Null/NullWindow.h
+        include/Data/MouseCodes.h
 )
 
 # OpenGL

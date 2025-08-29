@@ -10,7 +10,7 @@ namespace RNGOEngine::Events
     {
     };
 
-    enum class KeyAction
+    enum class ButtonAction
     {
         Press   = 1 << 0,
         Release = 1 << 1
@@ -19,13 +19,19 @@ namespace RNGOEngine::Events
     struct KeyEvent
     {
         int key;
-        KeyAction action;
+        ButtonAction action;
     };
 
-    struct MouseEvent
+    struct MouseMoveEvent
     {
         double deltaX;
         double deltaY;
+    };
+
+    struct MouseButtonEvent
+    {
+        int button;
+        ButtonAction action;
     };
 
     struct WindowSizeEvent
