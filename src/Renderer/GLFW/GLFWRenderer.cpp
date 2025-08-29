@@ -11,6 +11,7 @@
 #include <cassert>
 
 #include "stb_image.h"
+#include "EventQueue/EngineEvents/EngineEvents.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -28,7 +29,7 @@ namespace RNGOEngine::Core::Renderer
         stbi_set_flip_vertically_on_load(true);
 
         glEnable(GL_DEPTH_TEST);
-        glViewport(0, 0, 800, 600);
+        glViewport(0, 0, viewportWidth, viewportHeight);
     }
 
     void GLFWRenderer::Render(Window::IWindow& window)
@@ -214,6 +215,19 @@ namespace RNGOEngine::Core::Renderer
         m_materials[materialID] = MaterialSpecification{.shader = shader, .uniforms = {}};
 
         return materialID;
+    }
+
+    bool GLFWRenderer::ListenSendEvents(Events::EventQueue& eventQueue)
+    {
+        // Listen to window resize events.
+        const auto windowSizeEvents = eventQueue.GetEvents<Events::WindowSizeEvent>();
+        for (const auto& [x, y] : windowSizeEvents)
+        {
+            glViewport(0, 0, x, y);
+        }
+
+        // No more events to send.
+        return false;
     }
 
     bool GLFWRenderer::CheckCompilationErrors(unsigned int shader)

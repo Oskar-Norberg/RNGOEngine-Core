@@ -22,5 +22,11 @@ namespace RNGOEngine::Core::Window
         
         virtual void SwapBuffers() = 0;
         virtual void SetName(std::string_view name) = 0;
+
+        /// 
+        /// @param eventQueue Engine event queue to send / listen to events from.
+        /// @return True if there are more events to process, false otherwise.
+        /// 
+        virtual bool ListenSendEvents(Events::EventQueue& eventQueue) = 0;
     };
 }

@@ -22,6 +22,11 @@ namespace RNGOEngine::Core::Window
         {
         }
 
+        bool ListenSendEvents(Events::EventQueue& eventQueue) override
+        {
+            return false;
+        }
+
         void SwapBuffers() override
         {
         }

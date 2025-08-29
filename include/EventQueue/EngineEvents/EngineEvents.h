@@ -27,4 +27,9 @@ namespace RNGOEngine::Events
         double deltaX;
         double deltaY;
     };
+
+    struct WindowSizeEvent
+    {
+        int width, height;
+    };
 }

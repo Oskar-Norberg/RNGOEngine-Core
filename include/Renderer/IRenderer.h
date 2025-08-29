@@ -25,6 +25,13 @@ namespace RNGOEngine::Core::Renderer
         virtual void Render(Window::IWindow& window) = 0;
 
     public:
+        /// 
+        /// @param eventQueue Engine event queue to send / listen to events from.
+        /// @return True if there are more events to process, false otherwise.
+        ///
+        virtual bool ListenSendEvents(Events::EventQueue& eventQueue) = 0;
+
+    public:
         virtual MeshID CreateMesh(std::span<float> vertices, std::span<unsigned int> indices) = 0;
         // TODO: Destruction of meshes and shaders.
 

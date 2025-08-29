@@ -13,14 +13,18 @@ namespace RNGOEngine::Core::Renderer
     class GLFWRenderer : public RenderBase
     {
     public:
-        GLFWRenderer();
+        GLFWRenderer(int viewportWidth, int viewportHeight);
         void Render(Window::IWindow& window) override;
+        
 
     public:
         MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
         ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override;
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override;
         MaterialID CreateMaterial(ShaderID shader) override;
+
+    public:
+        bool ListenSendEvents(Events::EventQueue& eventQueue) override;
 
     private:
         struct MeshSpecification

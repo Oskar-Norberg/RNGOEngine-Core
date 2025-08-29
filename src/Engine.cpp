@@ -32,7 +32,7 @@ namespace RNGOEngine::Core
         {
             // TODO: Temporary arbitrary height, width and name.
             m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
-            m_renderer = std::make_unique<Renderer::GLFWRenderer>();
+            m_renderer = std::make_unique<Renderer::GLFWRenderer>(800, 600);
         }
 
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer);
@@ -75,12 +75,19 @@ namespace RNGOEngine::Core
 
     void Engine::PollWindowEvents()
     {
-        if (m_window)
+        m_window->PollWindowEvents(m_eventQueue);
+        m_window->PollKeyboardEvents(m_eventQueue);
+        m_window->PollMouseEvents(m_eventQueue);
+
+        // Listen to events in a loop to allow for event chaining.
+        bool moreEvents;
+        
+        do
         {
-            m_window->PollWindowEvents(m_eventQueue);
-            m_window->PollKeyboardEvents(m_eventQueue);
-            m_window->PollMouseEvents(m_eventQueue);
+            moreEvents = m_window->ListenSendEvents(m_eventQueue);
+            moreEvents = moreEvents || m_renderer->ListenSendEvents(m_eventQueue);
         }
+        while (moreEvents);
     }
 
     void Engine::UpdateSystems(float deltaTime)

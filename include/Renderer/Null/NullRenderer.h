@@ -69,5 +69,10 @@ namespace RNGOEngine::Core::Renderer
         void SetMat4(MaterialID shader, std::string_view name, const glm::mat4& value) override
         {
         }
+
+        bool ListenSendEvents(Events::EventQueue& eventQueue) override
+        {
+            return false;
+        }
     };
 }

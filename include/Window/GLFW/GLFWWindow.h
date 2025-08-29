@@ -20,13 +20,21 @@ namespace RNGOEngine::Core::Window
         void PollKeyboardEvents(Events::EventQueue& eventQueue) override;
         void PollMouseEvents(Events::EventQueue& eventQueue) override;
 
+    public:
+        bool ListenSendEvents(Events::EventQueue& eventQueue) override;
+
         void SwapBuffers() override;
         void SetName(std::string_view name) override;
 
     private:
         GLFWwindow* m_window;
+        int m_width, m_height;
+        bool m_hasPendingResize;
 
     private:
         double m_lastMouseX, m_lastMouseY;
+
+    private:
+        void WindowSizeCallback(GLFWWindow* window, int width, int height);
     };
 }

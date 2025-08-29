@@ -11,6 +11,12 @@
 namespace RNGOEngine::Core::Window
 {
     GLFWWindow::GLFWWindow(int width, int height, std::string_view name)
+        : m_window(nullptr),
+          m_width(width),
+          m_height(height),
+          m_hasPendingResize(false),
+          m_lastMouseX(0.0),
+          m_lastMouseY(0.0)
     {
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -24,6 +30,22 @@ namespace RNGOEngine::Core::Window
 
         // TODO: Not sure this should be done here.
         glfwMakeContextCurrent(m_window);
+        glfwSetWindowUserPointer(m_window, this);
+
+        glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
+        {
+            auto* userPtr = glfwGetWindowUserPointer(glfwWindow);
+
+            if (userPtr)
+            {
+                static_cast<GLFWWindow*>(userPtr)->WindowSizeCallback(
+                    static_cast<GLFWWindow*>(userPtr), width, height);
+            }
+            else
+            {
+                assert(false && "GLFW window user pointer is null.");
+            }
+        });
     }
 
     GLFWWindow::~GLFWWindow()
@@ -39,6 +61,11 @@ namespace RNGOEngine::Core::Window
         if (glfwWindowShouldClose(m_window))
         {
             eventQueue.EmplaceEvent<Events::ExitEvent>();
+        }
+
+        if (m_hasPendingResize)
+        {
+            eventQueue.EmplaceEvent<Events::WindowSizeEvent>(m_width, m_height);
         }
     }
 
@@ -74,7 +101,7 @@ namespace RNGOEngine::Core::Window
         {
             eventQueue.EmplaceEvent<Events::KeyEvent>(keyPressed, Events::KeyAction::Press);
         }
-        
+
         for (const auto keyReleased : keysReleased)
         {
             eventQueue.EmplaceEvent<Events::KeyEvent>(keyReleased, Events::KeyAction::Release);
@@ -96,5 +123,18 @@ namespace RNGOEngine::Core::Window
 
         m_lastMouseX = mouseX;
         m_lastMouseY = mouseY;
+    }
+
+    bool GLFWWindow::ListenSendEvents(Events::EventQueue& eventQueue)
+    {
+        // No events to listen/send yet.
+        return false;
+    }
+
+    void GLFWWindow::WindowSizeCallback(GLFWWindow* window, int width, int height)
+    {
+        m_hasPendingResize = true;
+        m_width = width;
+        m_height = height;
     }
 }
