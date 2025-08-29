@@ -24,7 +24,9 @@ namespace RNGOEngine::Core::Renderer
         Components::Camera camera;
         Components::Transform cameraTransform;
 
-        // TODO: Lights
+        // Light Properties
+        Components::AmbientLight ambientLight;
+        // TODO: DirectionalLight, PointLight, SpotLight.
         // TODO: Skybox/SceneColor
 
         // Opaque Objects

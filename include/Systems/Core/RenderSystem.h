@@ -31,7 +31,8 @@ namespace RNGOEngine::Systems::Core
                 else
                 {
                     assert(false && "Renderable entity is missing Transform component!");
-                    drawQueue.opaqueObjects.emplace_back(Components::Transform(), meshRender.mesh, meshRender.shader);
+                    drawQueue.opaqueObjects.emplace_back(Components::Transform(), meshRender.mesh,
+                                                         meshRender.shader);
                 }
             }
 
@@ -50,6 +51,12 @@ namespace RNGOEngine::Systems::Core
                 {
                     assert(false && "Camera is missing Transform component!");
                 }
+            }
+
+            const auto ambientLightView = world.GetRegistry().view<Components::AmbientLight>();
+            for (const auto& [entity, ambientLight] : ambientLightView.each())
+            {
+                drawQueue.ambientLight = ambientLight;
             }
 
             // Submit draw queue to renderer.

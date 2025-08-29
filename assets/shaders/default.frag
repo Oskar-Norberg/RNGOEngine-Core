@@ -1,5 +1,13 @@
 ﻿#version 330 core
 
+// TODO: This should be in a common include file somehow. Custom shader preprocessor?
+struct AmbientLight 
+{
+    vec3 color;
+    float intensity;
+};
+uniform AmbientLight ambientLight;
+
 in vec2 TexCoord;
 
 out vec4 FragColor;
@@ -7,9 +15,8 @@ out vec4 FragColor;
 uniform vec4 someColor;
 
 uniform sampler2D Texture0;
-uniform sampler2D Texture1;
 
-void main()
+void main() 
 {
-    FragColor = mix(texture(Texture0, TexCoord), texture(Texture1, TexCoord), 0.5f) * someColor;
+    FragColor = texture(Texture0, TexCoord) * ambientLight.intensity * vec4(ambientLight.color, 1.0);
 };

@@ -101,20 +101,32 @@ namespace RNGOEngine::Core::Renderer
             glUniformMatrix4fv(glGetUniformLocation(shaderID, "Model"), 1, GL_FALSE,
                                &opaqueDrawable.transform.GetMatrix()[0][0]);
 
-            const auto view = glm::inverse(m_drawQueue.cameraTransform.GetMatrix());
+            // Camera Properties.
+            {
+                const auto view = glm::inverse(m_drawQueue.cameraTransform.GetMatrix());
 
-            RecalculateProjectionMatrix(m_drawQueue.camera);
+                RecalculateProjectionMatrix(m_drawQueue.camera);
 
-            // TODO: These should not be set per object.
-            glUniformMatrix4fv(glGetUniformLocation(shaderID, "View"), 1, GL_FALSE,
-                               &view[0][0]);
-            glUniformMatrix4fv(glGetUniformLocation(shaderID, "Projection"), 1, GL_FALSE,
-                               &m_projectionMatrix[0][0]);
+                // TODO: These should not be set per object.
+                glUniformMatrix4fv(glGetUniformLocation(shaderID, "View"), 1, GL_FALSE,
+                                   &view[0][0]);
+                glUniformMatrix4fv(glGetUniformLocation(shaderID, "Projection"), 1, GL_FALSE,
+                                   &m_projectionMatrix[0][0]);
+            }
+
+            // Light Properties.
+            {
+                // TODO: Yet another terrible hardcoded uniform path. Also this should be in shared memory.
+                glUniform3fv(glGetUniformLocation(shaderID, "ambientLight.color"), 1,
+                             &m_drawQueue.ambientLight.color[0]);
+                glUniform1f(glGetUniformLocation(shaderID, "ambientLight.intensity"),
+                            m_drawQueue.ambientLight.intensity);
+            }
 
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
             const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
-            glDrawElements(GL_TRIANGLES, meshSpec.nrOfVertices + meshSpec.nrOfIndices, GL_UNSIGNED_INT, 0);
+            glDrawElements(GL_TRIANGLES, meshSpec.nrOfVertices + meshSpec.nrOfIndices, GL_UNSIGNED_INT, nullptr);
         }
     }
 
