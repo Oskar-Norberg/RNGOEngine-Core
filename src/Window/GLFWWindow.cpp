@@ -38,8 +38,21 @@ namespace RNGOEngine::Core::Window
 
             if (userPtr)
             {
-                static_cast<GLFWWindow*>(userPtr)->WindowSizeCallback(
-                    static_cast<GLFWWindow*>(userPtr), width, height);
+                static_cast<GLFWWindow*>(userPtr)->WindowSizeCallback(width, height);
+            }
+            else
+            {
+                assert(false && "GLFW window user pointer is null.");
+            }
+        });
+
+        glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
+        {
+            auto* userPtr = glfwGetWindowUserPointer(glfwWindow);
+
+            if (userPtr)
+            {
+                static_cast<GLFWWindow*>(userPtr)->KeyEventCallback(key, scancode, action, mods);
             }
             else
             {
@@ -81,31 +94,8 @@ namespace RNGOEngine::Core::Window
 
     void GLFWWindow::PollKeyboardEvents(Events::EventQueue& eventQueue)
     {
-        std::vector<int> keysPressed;
-        std::vector<int> keysReleased;
-
-        for (int i = GLFW_KEY_SPACE; i <= GLFW_KEY_MENU; i++)
-        {
-            const auto getKey = glfwGetKey(m_window, i);
-            if (getKey == GLFW_PRESS)
-            {
-                keysPressed.push_back(i);
-            }
-            else if (getKey == GLFW_RELEASE)
-            {
-                keysReleased.push_back(i);
-            }
-        }
-
-        for (const auto keyPressed : keysPressed)
-        {
-            eventQueue.EmplaceEvent<Events::KeyEvent>(keyPressed, Events::KeyAction::Press);
-        }
-
-        for (const auto keyReleased : keysReleased)
-        {
-            eventQueue.EmplaceEvent<Events::KeyEvent>(keyReleased, Events::KeyAction::Release);
-        }
+        eventQueue.PushEventMultiple(m_keyEvents);
+        m_keyEvents.clear();
     }
 
     void GLFWWindow::PollMouseEvents(Events::EventQueue& eventQueue)
@@ -131,10 +121,17 @@ namespace RNGOEngine::Core::Window
         return false;
     }
 
-    void GLFWWindow::WindowSizeCallback(GLFWWindow* window, int width, int height)
+    void GLFWWindow::WindowSizeCallback(int width, int height)
     {
         m_hasPendingResize = true;
         m_width = width;
         m_height = height;
+    }
+
+    void GLFWWindow::KeyEventCallback(int key, int scancode, int action, int mods)
+    {
+        m_keyEvents.emplace_back(key, action == GLFW_PRESS
+                                          ? Events::KeyAction::Press
+                                          : Events::KeyAction::Release);
     }
 }

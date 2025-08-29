@@ -97,11 +97,8 @@ namespace RNGOEngine::Core
 
     void Engine::Render()
     {
-        if (m_renderer)
-        {
             m_renderer->Render(*m_window);
             m_window->SwapBuffers();
-        }
     }
 
     void Engine::PollEngineEvents()

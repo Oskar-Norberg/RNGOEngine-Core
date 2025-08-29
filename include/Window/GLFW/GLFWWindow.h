@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "EventQueue/EngineEvents/EngineEvents.h"
 #include "GLFW/glfw3.h"
 #include "Window/IWindow.h"
 
@@ -35,6 +36,10 @@ namespace RNGOEngine::Core::Window
         double m_lastMouseX, m_lastMouseY;
 
     private:
-        void WindowSizeCallback(GLFWWindow* window, int width, int height);
+        std::vector<Events::KeyEvent> m_keyEvents;
+
+    private:
+        void WindowSizeCallback(int width, int height);
+        void KeyEventCallback(int key, int scancode, int action, int mods);
     };
 }
