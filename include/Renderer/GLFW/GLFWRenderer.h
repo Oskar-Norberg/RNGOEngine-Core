@@ -15,7 +15,6 @@ namespace RNGOEngine::Core::Renderer
     public:
         GLFWRenderer(int viewportWidth, int viewportHeight);
         void Render(Window::IWindow& window) override;
-        
 
     public:
         MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
@@ -39,7 +38,10 @@ namespace RNGOEngine::Core::Renderer
         bool m_isProjectionMatrixDirty;
         Components::Camera m_lastCameraProperties;
         glm::mat4 m_projectionMatrix;
-        
+
+    private:
+        int m_viewportWidth, m_viewportHeight;
+
     private:
         bool CheckCompilationErrors(unsigned int shader);
         bool CheckLinkingErrors(unsigned int program);

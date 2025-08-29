@@ -15,8 +15,11 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    GLFWRenderer::GLFWRenderer(int viewportWidth, int viewportHeight)
-        : m_projectionMatrix(1.0f), m_isProjectionMatrixDirty(true)
+    GLFWRenderer::GLFWRenderer(const int viewportWidth, const int viewportHeight)
+        : m_isProjectionMatrixDirty(true),
+          m_projectionMatrix(),
+          m_viewportWidth(viewportWidth),
+          m_viewportHeight(viewportHeight)
     {
         // TODO: this should be passed in from the engine/window.
         if (!gladLoadGL(glfwGetProcAddress))
@@ -133,7 +136,8 @@ namespace RNGOEngine::Core::Renderer
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
             const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
-            glDrawElements(GL_TRIANGLES, meshSpec.nrOfVertices + meshSpec.nrOfIndices, GL_UNSIGNED_INT, nullptr);
+            glDrawElements(GL_TRIANGLES, meshSpec.nrOfVertices + meshSpec.nrOfIndices, GL_UNSIGNED_INT,
+                           nullptr);
         }
     }
 
@@ -157,11 +161,13 @@ namespace RNGOEngine::Core::Renderer
         glEnableVertexAttribArray(0);
 
         // Vertex Normal
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3 * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              reinterpret_cast<void*>(3 * sizeof(float)));
         glEnableVertexAttribArray(1);
 
         // Vertex UV
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6 * sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+                              reinterpret_cast<void*>(6 * sizeof(float)));
         glEnableVertexAttribArray(2);
 
         m_meshSpecifications.insert(
@@ -246,6 +252,9 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& [x, y] : windowSizeEvents)
         {
             glViewport(0, 0, x, y);
+            m_viewportWidth = x;
+            m_viewportHeight = y;
+            m_isProjectionMatrixDirty = true;
         }
 
         // No more events to send.
@@ -294,10 +303,9 @@ namespace RNGOEngine::Core::Renderer
 
         if (m_isProjectionMatrixDirty)
         {
-            // TODO: Proper size handling
             m_projectionMatrix = glm::perspective(
                 glm::radians(camera.fov),
-                800.0f / 600.0f,
+                static_cast<float>(m_viewportWidth) / static_cast<float>(m_viewportHeight),
                 camera.nearPlane,
                 camera.farPlane
             );
