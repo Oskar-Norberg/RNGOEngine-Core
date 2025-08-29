@@ -15,12 +15,15 @@ namespace RNGOEngine::Core::Window
           m_width(width),
           m_height(height),
           m_hasPendingResize(false),
+          m_accumulatedX(0.0),
+          m_accumulatedY(0.0),
           m_lastMouseX(0.0),
           m_lastMouseY(0.0)
     {
         glfwInit();
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+        // TODO: Hardcoded to OpenGL core profile. Make configurable.
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
         m_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
@@ -28,15 +31,12 @@ namespace RNGOEngine::Core::Window
         // TODO: PLEASE MAKE CUSTOM ENGINE LEVEL ASSERTIONS.
         assert(m_window && "Failed to create GLFW window");
 
-        // TODO: Not sure this should be done here.
         glfwMakeContextCurrent(m_window);
         glfwSetWindowUserPointer(m_window, this);
 
         glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
         {
-            auto* userPtr = glfwGetWindowUserPointer(glfwWindow);
-
-            if (userPtr)
+            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
             {
                 static_cast<GLFWWindow*>(userPtr)->WindowSizeCallback(width, height);
             }
@@ -48,11 +48,21 @@ namespace RNGOEngine::Core::Window
 
         glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
         {
-            auto* userPtr = glfwGetWindowUserPointer(glfwWindow);
-
-            if (userPtr)
+            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
             {
                 static_cast<GLFWWindow*>(userPtr)->KeyEventCallback(key, scancode, action, mods);
+            }
+            else
+            {
+                assert(false && "GLFW window user pointer is null.");
+            }
+        });
+
+        glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double x, double y)
+        {
+            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+            {
+                static_cast<GLFWWindow*>(userPtr)->MouseMoveCallback(x, y);
             }
             else
             {
@@ -100,19 +110,10 @@ namespace RNGOEngine::Core::Window
 
     void GLFWWindow::PollMouseEvents(Events::EventQueue& eventQueue)
     {
-        double mouseX, mouseY;
-        glfwGetCursorPos(m_window, &mouseX, &mouseY);
+        eventQueue.EmplaceEvent<Events::MouseEvent>(m_accumulatedX, m_accumulatedY);
 
-        double mouseDiffX = mouseX - m_lastMouseX;
-        double mouseDiffY = mouseY - m_lastMouseY;
-
-        if (mouseDiffX != 0 || mouseDiffY != 0)
-        {
-            eventQueue.EmplaceEvent<Events::MouseEvent>(mouseDiffX, mouseDiffY);
-        }
-
-        m_lastMouseX = mouseX;
-        m_lastMouseY = mouseY;
+        m_accumulatedX = 0.0f;
+        m_accumulatedY = 0.0f;
     }
 
     bool GLFWWindow::ListenSendEvents(Events::EventQueue& eventQueue)
@@ -133,5 +134,17 @@ namespace RNGOEngine::Core::Window
         m_keyEvents.emplace_back(key, action == GLFW_PRESS
                                           ? Events::KeyAction::Press
                                           : Events::KeyAction::Release);
+    }
+
+    void GLFWWindow::MouseMoveCallback(double x, double y)
+    {
+        if (m_lastMouseX != 0.0 && m_lastMouseY != 0.0)
+        {
+            m_accumulatedX += x - m_lastMouseX;
+            m_accumulatedY += y - m_lastMouseY;
+        }
+
+        m_lastMouseX = x;
+        m_lastMouseY = y;
     }
 }

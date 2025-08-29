@@ -33,6 +33,7 @@ namespace RNGOEngine::Core::Window
         bool m_hasPendingResize;
 
     private:
+        double m_accumulatedX, m_accumulatedY;
         double m_lastMouseX, m_lastMouseY;
 
     private:
@@ -41,5 +42,6 @@ namespace RNGOEngine::Core::Window
     private:
         void WindowSizeCallback(int width, int height);
         void KeyEventCallback(int key, int scancode, int action, int mods);
+        void MouseMoveCallback(double x, double y);
     };
 }
