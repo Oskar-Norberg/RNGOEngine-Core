@@ -32,7 +32,8 @@ namespace RNGOEngine::Core::Renderer
         std::unordered_map<MeshID, MeshSpecification> m_meshSpecifications;
         MaterialID m_nextMaterialID = 0;
 
-        Components::Camera lastCameraProperties;
+        bool m_isProjectionMatrixDirty;
+        Components::Camera m_lastCameraProperties;
         glm::mat4 m_projectionMatrix;
         
     private:

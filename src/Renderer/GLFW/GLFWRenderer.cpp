@@ -14,13 +14,16 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    GLFWRenderer::GLFWRenderer()
+    GLFWRenderer::GLFWRenderer(int viewportWidth, int viewportHeight)
+        : m_projectionMatrix(1.0f), m_isProjectionMatrixDirty(true)
     {
+        // TODO: this should be passed in from the engine/window.
         if (!gladLoadGL(glfwGetProcAddress))
         {
             assert(false && "Failed to initialize GLAD");
         }
 
+        // TODO: This shouldnt be done here. This should be done when the entry point creates a renderer. It should then pass a flip flag to the AssetManager.
         // Not 100% sure if this should be done here. But the renderer coordinate system is what decides if a texture needs flipping or not.
         stbi_set_flip_vertically_on_load(true);
 
@@ -245,21 +248,26 @@ namespace RNGOEngine::Core::Renderer
 
     void GLFWRenderer::RecalculateProjectionMatrix(Components::Camera camera)
     {
-        if (lastCameraProperties.farPlane == camera.farPlane &&
-            lastCameraProperties.nearPlane == camera.nearPlane &&
-            lastCameraProperties.fov == camera.fov && m_projectionMatrix != glm::mat4(0.0f))
+        if (m_lastCameraProperties.farPlane != camera.farPlane ||
+            m_lastCameraProperties.nearPlane != camera.nearPlane ||
+            m_lastCameraProperties.fov != camera.fov
+        )
         {
-            return;
+            m_isProjectionMatrixDirty = true;
         }
 
-        // TODO: Proper size handling
-        m_projectionMatrix = glm::perspective(
-            glm::radians(camera.fov),
-            800.0f / 600.0f,
-            camera.nearPlane,
-            camera.farPlane
-        );
+        if (m_isProjectionMatrixDirty)
+        {
+            // TODO: Proper size handling
+            m_projectionMatrix = glm::perspective(
+                glm::radians(camera.fov),
+                800.0f / 600.0f,
+                camera.nearPlane,
+                camera.farPlane
+            );
 
-        lastCameraProperties = camera;
+            m_lastCameraProperties = camera;
+            m_isProjectionMatrixDirty = false;
+        }
     }
 }
