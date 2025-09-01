@@ -28,5 +28,9 @@ namespace RNGOEngine::Core::Window
         /// @return True if there are more events to process, false otherwise.
         /// 
         virtual bool ListenSendEvents(Events::EventQueue& eventQueue) = 0;
+
+    public:
+        virtual int GetWidth() const = 0;
+        virtual int GetHeight() const = 0;
     };
 }

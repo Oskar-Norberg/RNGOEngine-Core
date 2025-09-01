@@ -81,13 +81,12 @@ namespace RNGOEngine::Core
 
         // Listen to events in a loop to allow for event chaining.
         bool moreEvents;
-        
+
         do
         {
             moreEvents = m_window->ListenSendEvents(m_eventQueue);
             moreEvents = moreEvents || m_renderer->ListenSendEvents(m_eventQueue);
-        }
-        while (moreEvents);
+        } while (moreEvents);
     }
 
     void Engine::UpdateSystems(float deltaTime)
@@ -97,8 +96,13 @@ namespace RNGOEngine::Core
 
     void Engine::Render()
     {
-            m_renderer->Render(*m_window);
-            m_window->SwapBuffers();
+        if (m_window->GetHeight() == 0 || m_window->GetWidth() == 0)
+        {
+            return;
+        }
+        
+        m_renderer->Render(*m_window);
+        m_window->SwapBuffers();
     }
 
     void Engine::PollEngineEvents()

@@ -27,6 +27,16 @@ namespace RNGOEngine::Core::Window
             return false;
         }
 
+        int GetWidth() const override
+        {
+            return 0;
+        }
+
+        int GetHeight() const override
+        {
+            return 0;
+        }
+
         void SwapBuffers() override
         {
         }
