@@ -48,6 +48,12 @@ namespace RNGOEngine::Core::Renderer
             glUseProgram(materialSpecification.shader);
             glBindVertexArray(opaqueDrawable.mesh);
 
+            // TODO: Not sure if this is a great idea.
+            // Default Uniforms.
+            glUniform1f(glGetUniformLocation(shaderID, "specularStrength"), 0.5f);
+            glUniform1i(glGetUniformLocation(shaderID, "shininess"), 32);
+
+
             for (const auto& uniformSpecification : materialSpecification.uniforms)
             {
                 switch (uniformSpecification.type)
@@ -113,8 +119,12 @@ namespace RNGOEngine::Core::Renderer
                 // TODO: These should not be set per object.
                 glUniformMatrix4fv(glGetUniformLocation(shaderID, "View"), 1, GL_FALSE,
                                    &view[0][0]);
+                
                 glUniformMatrix4fv(glGetUniformLocation(shaderID, "Projection"), 1, GL_FALSE,
                                    &m_projectionMatrix[0][0]);
+                
+                glUniform3fv(glGetUniformLocation(shaderID, "viewPosition"), 1,
+                             &m_drawQueue.cameraTransform.position[0]);
             }
 
             // Light Properties.
