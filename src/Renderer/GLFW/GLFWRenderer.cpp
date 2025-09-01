@@ -9,6 +9,7 @@
 
 // TODO: AAAAAAAAAAAAAAAAAAAAA
 #include <cassert>
+#include <format>
 
 #include "stb_image.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
@@ -52,7 +53,6 @@ namespace RNGOEngine::Core::Renderer
             // Default Uniforms.
             glUniform1f(glGetUniformLocation(shaderID, "specularStrength"), 0.5f);
             glUniform1i(glGetUniformLocation(shaderID, "shininess"), 32);
-
 
             for (const auto& uniformSpecification : materialSpecification.uniforms)
             {
@@ -119,10 +119,10 @@ namespace RNGOEngine::Core::Renderer
                 // TODO: These should not be set per object.
                 glUniformMatrix4fv(glGetUniformLocation(shaderID, "View"), 1, GL_FALSE,
                                    &view[0][0]);
-                
+
                 glUniformMatrix4fv(glGetUniformLocation(shaderID, "Projection"), 1, GL_FALSE,
                                    &m_projectionMatrix[0][0]);
-                
+
                 glUniform3fv(glGetUniformLocation(shaderID, "viewPosition"), 1,
                              &m_drawQueue.cameraTransform.position[0]);
             }
@@ -141,6 +141,40 @@ namespace RNGOEngine::Core::Renderer
                              &m_drawQueue.directionalLight.direction[0]);
                 glUniform1f(glGetUniformLocation(shaderID, "directionalLight.intensity"),
                             m_drawQueue.directionalLight.intensity);
+
+                // Point Lights
+                for (size_t i = 0; i < m_drawQueue.pointLightIndex; i++)
+                {
+                    // TODO: This, sucks, ass.
+                    const std::string pointLightBase = std::format("pointLights[{}]", i);
+                    
+                    const auto color = std::format("{}.color", pointLightBase);
+                    glUniform3fv(glGetUniformLocation(shaderID, color.c_str()), 1,
+                                 &m_drawQueue.pointLights[i].color[0]);
+
+                    const auto intensity = std::format("{}.intensity", pointLightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, intensity.c_str()),
+                            m_drawQueue.pointLights[i].intensity);
+
+                    const auto position = std::format("{}.position", pointLightBase);
+                    glUniform3fv(glGetUniformLocation(shaderID, position.c_str()), 1,
+                                 &m_drawQueue.pointLights[i].position[0]);
+
+                    const auto constant = std::format("{}.constant", pointLightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, constant.c_str()),
+                            m_drawQueue.pointLights[i].constant);
+
+                    const auto linear = std::format("{}.linear", pointLightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, linear.c_str()),
+                            m_drawQueue.pointLights[i].linear);
+
+                    const auto quadratic = std::format("{}.quadratic", pointLightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, quadratic.c_str()),
+                            m_drawQueue.pointLights[i].quadratic);
+                }
+
+                glUniform1i(glGetUniformLocation(shaderID, "numPointLights"),
+                            static_cast<int>(m_drawQueue.pointLightIndex));
             }
 
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
@@ -279,6 +313,7 @@ namespace RNGOEngine::Core::Renderer
         glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
         if (!success)
         {
+            glGetShaderInfoLog(shader, 512, NULL, infoLog);
             assert(false && infoLog);
             return false;
         }

@@ -65,6 +65,32 @@ namespace RNGOEngine::Systems::Core
                 drawQueue.directionalLight = directionalLight;
             }
 
+            size_t currentPointLightIndex = 0;
+            
+            const auto pointLightView = world.GetRegistry().view<Components::PointLight>();
+            for (const auto& [entity, pointLight] : pointLightView.each())
+            {
+                glm::vec3 position = world.GetRegistry().all_of<Components::Transform>(entity)
+                                         ? world.GetRegistry().get<Components::Transform>(entity).position
+                                         : glm::vec3(0.0f, 0.0f, 0.0f);
+
+                assert(currentPointLightIndex < RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS &&
+                    "Exceeded maximum number of point lights in scene!"
+                );
+
+                drawQueue.pointLights[currentPointLightIndex++ %
+                                      RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS]
+                    = {
+                        .color = pointLight.color,
+                        .intensity = pointLight.intensity,
+                        .position = position,
+                        .constant = pointLight.constant,
+                        .linear = pointLight.linear,
+                        .quadratic = pointLight.quadratic
+                    };
+            }
+            drawQueue.pointLightIndex = currentPointLightIndex;
+
             // Submit draw queue to renderer.
             renderer.SubmitDrawQueue(std::move(drawQueue));
         }

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.31)
 # Enable / Disable Tracy. Should be disabled in release builds.
 set(TRACY_ENABLE off CACHE BOOL "Enable Tracy profiler" FORCE)
 
-add_compile_options(-O3)
+#add_compile_options(-O3)
 
 set(PROJECT_NAME RNGOEngine_Core)
 project(${PROJECT_NAME})

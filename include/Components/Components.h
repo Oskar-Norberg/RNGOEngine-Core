@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "Renderer/IRenderer.h"
-
 #define GLM_ENABLE_EXPERIMENTAL
 
 #include <glm/glm.hpp>
@@ -56,5 +54,17 @@ namespace RNGOEngine::Components
         glm::vec3 color = {1.0f, 1.0f, 1.0f};
         float intensity = 1.0f;
         glm::vec3 direction = {1.0f, 1.0f, 1.0f};
+    };
+
+    struct PointLight
+    {
+        glm::vec3 color = {1.0f, 1.0f, 1.0f};
+        float intensity = 1.0f;
+
+        // Standard range is 100
+        // https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
+        float constant = 1.0f;
+        float linear = 0.045f;
+        float quadratic = 0.0075f;
     };
 }
