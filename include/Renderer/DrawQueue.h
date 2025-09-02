@@ -23,6 +23,23 @@ namespace RNGOEngine::Core::Renderer
     constexpr auto NR_OF_POINTLIGHTS = 16;
     constexpr auto NR_OF_SPOTLIGHTS = 16;
 
+    struct BackgroundColorData
+    {
+        glm::vec3 color;
+    };
+
+    struct AmbientLightData
+    {
+        glm::vec3 color;
+        float intensity;
+    };
+
+    struct DirectionalLightData
+    {
+        glm::vec3 color;
+        float intensity;
+        glm::vec3 direction;
+    };
 
     struct PointLightData
     {
@@ -31,7 +48,7 @@ namespace RNGOEngine::Core::Renderer
 
         glm::vec3 position;
         float constant;
-        
+
         float linear;
         float quadratic;
     };
@@ -40,13 +57,13 @@ namespace RNGOEngine::Core::Renderer
     {
         glm::vec3 color;
         float intensity;
-        
+
         glm::vec3 position;
         float cutoff;
         glm::vec3 direction;
-        
+
         float outerCutoff;
-        
+
         float constant;
         float linear;
         float quadratic;
@@ -60,16 +77,16 @@ namespace RNGOEngine::Core::Renderer
         Components::Transform cameraTransform;
 
         // Light Properties
-        Components::AmbientLight ambientLight;
-        Components::DirectionalLight directionalLight;
-        
+        AmbientLightData ambientLight;
+        DirectionalLightData directionalLight;
+
         std::array<PointLightData, NR_OF_POINTLIGHTS> pointLights;
         size_t pointLightIndex = 0;
 
         std::array<SpotlightData, NR_OF_POINTLIGHTS> spotlights;
         size_t spotlightIndex = 0;
-        
-        Components::BackgroundColor backgroundColor;
+
+        BackgroundColorData backgroundColor;
 
         // Opaque Objects
         std::vector<Drawable> opaqueObjects;

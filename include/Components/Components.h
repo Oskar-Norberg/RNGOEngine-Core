@@ -43,22 +43,18 @@ namespace RNGOEngine::Components
         float farPlane = 100.0f;
     };
 
-    struct BackgroundColor
+    struct Color
     {
         glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
     };
 
-    struct AmbientLight
+    struct Intensity
     {
-        glm::vec3 color = {1.0f, 1.0f, 1.0f};
         float intensity = 1.0f;
     };
 
-    struct DirectionalLight
+    struct BackgroundColor
     {
-        glm::vec3 color = {1.0f, 1.0f, 1.0f};
-        float intensity = 1.0f;
-        glm::vec3 direction = {1.0f, 1.0f, 1.0f};
     };
 
     struct LightFalloff
@@ -70,16 +66,20 @@ namespace RNGOEngine::Components
         float quadratic = 0.0075f;
     };
 
+    struct AmbientLight
+    {
+    };
+
+    struct DirectionalLight
+    {
+    };
+
     struct PointLight
     {
-        glm::vec3 color = {1.0f, 1.0f, 1.0f};
-        float intensity = 1.0f;
     };
 
     struct Spotlight
     {
-        glm::vec3 color = {1.0f, 1.0f, 1.0f};
-        float intensity = 1.0f;
         float cutOff = glm::cos(glm::radians(10.0f));
         float outerCutOff = glm::cos(glm::radians(12.5f));
     };
