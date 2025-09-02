@@ -74,6 +74,10 @@ namespace RNGOEngine::Systems::Core
                                          ? world.GetRegistry().get<Components::Transform>(entity).position
                                          : glm::vec3(0.0f, 0.0f, 0.0f);
 
+                auto lightFalloff = world.GetRegistry().all_of<Components::LightFalloff>(entity)
+                                       ? world.GetRegistry().get<Components::LightFalloff>(entity)
+                                       : Components::LightFalloff();
+
                 assert(currentPointLightIndex < RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS &&
                     "Exceeded maximum number of point lights in scene!"
                 );
@@ -84,9 +88,9 @@ namespace RNGOEngine::Systems::Core
                         .color = pointLight.color,
                         .intensity = pointLight.intensity,
                         .position = position,
-                        .constant = pointLight.constant,
-                        .linear = pointLight.linear,
-                        .quadratic = pointLight.quadratic
+                        .constant = lightFalloff.constant,
+                        .linear = lightFalloff.linear,
+                        .quadratic = lightFalloff.quadratic
                     };
             }
             drawQueue.pointLightIndex = currentPointLightIndex;
@@ -98,6 +102,10 @@ namespace RNGOEngine::Systems::Core
                 auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
                                      ? world.GetRegistry().get<Components::Transform>(entity)
                                      : Components::Transform();
+
+                auto lightFalloff = world.GetRegistry().all_of<Components::LightFalloff>(entity)
+                                       ? world.GetRegistry().get<Components::LightFalloff>(entity)
+                                       : Components::LightFalloff();
 
                 assert(currentSpotlightIndex < RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS &&
                     "Exceeded maximum number of spotlights in scene!"
@@ -111,9 +119,9 @@ namespace RNGOEngine::Systems::Core
                     .cutoff = spotlight.cutOff,
                     .direction = transform.rotation * glm::vec3(0.0f, 0.0f, -1.0f),
                     .outerCutoff = spotlight.outerCutOff,
-                    .constant = spotlight.constant,
-                    .linear = spotlight.linear,
-                    .quadratic = spotlight.quadratic
+                    .constant = lightFalloff.constant,
+                    .linear = lightFalloff.linear,
+                    .quadratic = lightFalloff.quadratic
                 };
             }
             drawQueue.spotlightIndex = currentSpotlightIndex;
