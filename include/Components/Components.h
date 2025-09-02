@@ -43,6 +43,11 @@ namespace RNGOEngine::Components
         float farPlane = 100.0f;
     };
 
+    struct BackgroundColor
+    {
+        glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+    };
+
     struct AmbientLight
     {
         glm::vec3 color = {1.0f, 1.0f, 1.0f};

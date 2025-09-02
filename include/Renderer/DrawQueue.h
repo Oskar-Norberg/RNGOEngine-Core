@@ -47,7 +47,8 @@ namespace RNGOEngine::Core::Renderer
         std::array<PointLightData, NR_OF_POINTLIGHTS> pointLights;
         size_t pointLightIndex = 0;
         // TODO: SpotLight.
-        // TODO: Skybox/SceneColor
+        
+        Components::BackgroundColor backgroundColor;
 
         // Opaque Objects
         std::vector<Drawable> opaqueObjects;

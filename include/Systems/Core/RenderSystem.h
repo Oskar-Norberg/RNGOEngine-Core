@@ -66,7 +66,7 @@ namespace RNGOEngine::Systems::Core
             }
 
             size_t currentPointLightIndex = 0;
-            
+
             const auto pointLightView = world.GetRegistry().view<Components::PointLight>();
             for (const auto& [entity, pointLight] : pointLightView.each())
             {
@@ -90,6 +90,12 @@ namespace RNGOEngine::Systems::Core
                     };
             }
             drawQueue.pointLightIndex = currentPointLightIndex;
+
+            const auto backgroundColorView = world.GetRegistry().view<Components::BackgroundColor>();
+            for (const auto& [entity, backgroundColor] : backgroundColorView.each())
+            {
+                drawQueue.backgroundColor = backgroundColor;
+            }
 
             // Submit draw queue to renderer.
             renderer.SubmitDrawQueue(std::move(drawQueue));

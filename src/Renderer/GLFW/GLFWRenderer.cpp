@@ -38,7 +38,9 @@ namespace RNGOEngine::Core::Renderer
 
     void GLFWRenderer::Render(Window::IWindow& window)
     {
-        glClearColor(0.25f, 0.35f, 0.25f, 1.0f);
+        // TODO: Ugly. Add something like a squarebracket operator to get color.
+        glClearColor(m_drawQueue.backgroundColor.color.x,
+                     m_drawQueue.backgroundColor.color.y, m_drawQueue.backgroundColor.color.z, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Render Opaques
@@ -147,14 +149,14 @@ namespace RNGOEngine::Core::Renderer
                 {
                     // TODO: This, sucks, ass.
                     const std::string pointLightBase = std::format("pointLights[{}]", i);
-                    
+
                     const auto color = std::format("{}.color", pointLightBase);
                     glUniform3fv(glGetUniformLocation(shaderID, color.c_str()), 1,
                                  &m_drawQueue.pointLights[i].color[0]);
 
                     const auto intensity = std::format("{}.intensity", pointLightBase);
                     glUniform1f(glGetUniformLocation(shaderID, intensity.c_str()),
-                            m_drawQueue.pointLights[i].intensity);
+                                m_drawQueue.pointLights[i].intensity);
 
                     const auto position = std::format("{}.position", pointLightBase);
                     glUniform3fv(glGetUniformLocation(shaderID, position.c_str()), 1,
@@ -162,15 +164,15 @@ namespace RNGOEngine::Core::Renderer
 
                     const auto constant = std::format("{}.constant", pointLightBase);
                     glUniform1f(glGetUniformLocation(shaderID, constant.c_str()),
-                            m_drawQueue.pointLights[i].constant);
+                                m_drawQueue.pointLights[i].constant);
 
                     const auto linear = std::format("{}.linear", pointLightBase);
                     glUniform1f(glGetUniformLocation(shaderID, linear.c_str()),
-                            m_drawQueue.pointLights[i].linear);
+                                m_drawQueue.pointLights[i].linear);
 
                     const auto quadratic = std::format("{}.quadratic", pointLightBase);
                     glUniform1f(glGetUniformLocation(shaderID, quadratic.c_str()),
-                            m_drawQueue.pointLights[i].quadratic);
+                                m_drawQueue.pointLights[i].quadratic);
                 }
 
                 glUniform1i(glGetUniformLocation(shaderID, "numPointLights"),
