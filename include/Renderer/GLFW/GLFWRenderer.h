@@ -36,7 +36,7 @@ namespace RNGOEngine::Core::Renderer
         MaterialID m_nextMaterialID = 0;
 
         bool m_isProjectionMatrixDirty;
-        Components::Camera m_lastCameraProperties;
+        CameraData m_lastCameraProperties;
         glm::mat4 m_projectionMatrix;
 
     private:
@@ -47,6 +47,6 @@ namespace RNGOEngine::Core::Renderer
         bool CheckLinkingErrors(unsigned int program);
 
     private:
-        void RecalculateProjectionMatrix(Components::Camera camera);
+        void RecalculateProjectionMatrix(CameraData camera);
     };
 }

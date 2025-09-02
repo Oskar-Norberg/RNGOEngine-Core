@@ -114,7 +114,7 @@ namespace RNGOEngine::Core::Renderer
 
             // Camera Properties.
             {
-                const auto view = glm::inverse(m_drawQueue.cameraTransform.GetMatrix());
+                const auto view = glm::inverse(m_drawQueue.camera.transform.GetMatrix());
 
                 RecalculateProjectionMatrix(m_drawQueue.camera);
 
@@ -126,7 +126,7 @@ namespace RNGOEngine::Core::Renderer
                                    &m_projectionMatrix[0][0]);
 
                 glUniform3fv(glGetUniformLocation(shaderID, "viewPosition"), 1,
-                             &m_drawQueue.cameraTransform.position[0]);
+                             &m_drawQueue.camera.transform.position[0]);
             }
 
             // Light Properties.
@@ -383,7 +383,7 @@ namespace RNGOEngine::Core::Renderer
         return true;
     }
 
-    void GLFWRenderer::RecalculateProjectionMatrix(Components::Camera camera)
+    void GLFWRenderer::RecalculateProjectionMatrix(CameraData camera)
     {
         if (m_lastCameraProperties.farPlane != camera.farPlane ||
             m_lastCameraProperties.nearPlane != camera.nearPlane ||

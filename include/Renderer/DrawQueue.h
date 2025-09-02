@@ -23,6 +23,15 @@ namespace RNGOEngine::Core::Renderer
     constexpr auto NR_OF_POINTLIGHTS = 16;
     constexpr auto NR_OF_SPOTLIGHTS = 16;
 
+    struct CameraData
+    {
+        Components::Transform transform;
+        
+        float fov;
+        float nearPlane;
+        float farPlane;
+    };
+
     struct BackgroundColorData
     {
         glm::vec3 color;
@@ -72,9 +81,7 @@ namespace RNGOEngine::Core::Renderer
     struct DrawQueue
     {
         // Camera Properties
-        // TODO: Combine these into CameraData.
-        Components::Camera camera;
-        Components::Transform cameraTransform;
+        CameraData camera;
 
         // Light Properties
         AmbientLightData ambientLight;

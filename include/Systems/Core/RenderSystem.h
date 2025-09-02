@@ -40,18 +40,17 @@ namespace RNGOEngine::Systems::Core
             const auto cameraView = world.GetRegistry().view<Components::Camera>();
             for (const auto& [entity, camera] : cameraView.each())
             {
-                if (world.GetRegistry().all_of<Components::Transform>(entity))
-                {
-                    const auto& transform = world.GetRegistry().get<Components::Transform>(entity);
+                const auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
+                                           ? world.GetRegistry().get<Components::Transform>(entity)
+                                           : Components::Transform();
 
-                    // Copy camera properties
-                    drawQueue.camera = camera;
-                    drawQueue.cameraTransform = transform;
-                }
-                else
-                {
-                    assert(false && "Camera is missing Transform component!");
-                }
+                // Copy camera properties
+                drawQueue.camera = {
+                    .transform = transform,
+                    .fov = camera.fov,
+                    .nearPlane = camera.nearPlane,
+                    .farPlane = camera.farPlane
+                };
             }
 
             const auto ambientLightView = world.GetRegistry().view<Components::AmbientLight>();
@@ -176,8 +175,8 @@ namespace RNGOEngine::Systems::Core
             for (const auto entity : backgroundColorView)
             {
                 const auto& color = world.GetRegistry().all_of<Components::Color>(entity)
-                                         ? world.GetRegistry().get<Components::Color>(entity).color
-                                         : glm::vec3(0.0f, 0.0f, 0.0f);
+                                        ? world.GetRegistry().get<Components::Color>(entity).color
+                                        : glm::vec3(0.0f, 0.0f, 0.0f);
                 drawQueue.backgroundColor = {color};
             }
 
