@@ -100,7 +100,7 @@ namespace RNGOEngine::Core
         {
             return;
         }
-        
+
         m_renderer->Render(*m_window);
         m_window->SwapBuffers();
     }

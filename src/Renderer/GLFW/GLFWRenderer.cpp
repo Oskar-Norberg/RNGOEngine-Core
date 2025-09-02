@@ -177,6 +177,51 @@ namespace RNGOEngine::Core::Renderer
 
                 glUniform1i(glGetUniformLocation(shaderID, "numPointLights"),
                             static_cast<int>(m_drawQueue.pointLightIndex));
+
+                // Spotlights
+                for (size_t i = 0; i < m_drawQueue.spotlightIndex; i++)
+                {
+                    const std::string spotlightBase = std::format("spotlights[{}]", i);
+
+                    const auto color = std::format("{}.color", spotlightBase);
+                    glUniform3fv(glGetUniformLocation(shaderID, color.c_str()), 1,
+                                 &m_drawQueue.spotlights[i].color[0]);
+
+                    const auto intensity = std::format("{}.intensity", spotlightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, intensity.c_str()),
+                                m_drawQueue.spotlights[i].intensity);
+
+                    const auto position = std::format("{}.position", spotlightBase);
+                    glUniform3fv(glGetUniformLocation(shaderID, position.c_str()), 1,
+                                 &m_drawQueue.spotlights[i].position[0]);
+
+                    const auto cutoff = std::format("{}.cutoff", spotlightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, cutoff.c_str()),
+                                m_drawQueue.spotlights[i].cutoff);
+
+                    const auto direction = std::format("{}.direction", spotlightBase);
+                    glUniform3fv(glGetUniformLocation(shaderID, direction.c_str()), 1,
+                                 &m_drawQueue.spotlights[i].direction[0]);
+
+                    const auto outerCutoff = std::format("{}.outerCutoff", spotlightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, outerCutoff.c_str()),
+                                m_drawQueue.spotlights[i].outerCutoff);
+
+                    const auto constant = std::format("{}.constant", spotlightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, constant.c_str()),
+                                m_drawQueue.spotlights[i].constant);
+
+                    const auto linear = std::format("{}.linear", spotlightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, linear.c_str()),
+                                m_drawQueue.spotlights[i].linear);
+
+                    const auto quadratic = std::format("{}.quadratic", spotlightBase);
+                    glUniform1f(glGetUniformLocation(shaderID, quadratic.c_str()),
+                                m_drawQueue.spotlights[i].quadratic);
+                }
+
+                glUniform1i(glGetUniformLocation(shaderID, "numSpotlights"),
+                            static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");

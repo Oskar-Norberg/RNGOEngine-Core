@@ -6,6 +6,7 @@
 
 #include "Systems/ISystem.h"
 #include "Components/Components.h"
+#include "Renderer/DrawQueue.h"
 #include "World/World.h"
 
 namespace RNGOEngine::Systems::Core
@@ -66,7 +67,6 @@ namespace RNGOEngine::Systems::Core
             }
 
             size_t currentPointLightIndex = 0;
-
             const auto pointLightView = world.GetRegistry().view<Components::PointLight>();
             for (const auto& [entity, pointLight] : pointLightView.each())
             {
@@ -90,6 +90,33 @@ namespace RNGOEngine::Systems::Core
                     };
             }
             drawQueue.pointLightIndex = currentPointLightIndex;
+
+            size_t currentSpotlightIndex = 0;
+            const auto spotlightView = world.GetRegistry().view<Components::Spotlight>();
+            for (const auto& [entity, spotlight] : spotlightView.each())
+            {
+                auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
+                                     ? world.GetRegistry().get<Components::Transform>(entity)
+                                     : Components::Transform();
+
+                assert(currentSpotlightIndex < RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS &&
+                    "Exceeded maximum number of spotlights in scene!"
+                );
+
+                drawQueue.spotlights[currentSpotlightIndex++ % RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS] =
+                {
+                    .color = spotlight.color,
+                    .intensity = spotlight.intensity,
+                    .position = transform.position,
+                    .cutoff = spotlight.cutOff,
+                    .direction = transform.rotation * glm::vec3(0.0f, 0.0f, -1.0f),
+                    .outerCutoff = spotlight.outerCutOff,
+                    .constant = spotlight.constant,
+                    .linear = spotlight.linear,
+                    .quadratic = spotlight.quadratic
+                };
+            }
+            drawQueue.spotlightIndex = currentSpotlightIndex;
 
             const auto backgroundColorView = world.GetRegistry().view<Components::BackgroundColor>();
             for (const auto& [entity, backgroundColor] : backgroundColorView.each())

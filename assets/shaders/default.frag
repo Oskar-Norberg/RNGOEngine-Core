@@ -21,6 +21,17 @@ struct PointLight
     float linear;
     float quadratic;
 };
+struct Spotlight{
+    vec3 color;
+    float intensity;
+    vec3 position;
+    float cutoff;
+    vec3 direction;
+    float outerCutoff;
+    float constant;
+    float linear;
+    float quadratic;
+};
 
 in vec3 FragPos;
 in vec2 TexCoord;
@@ -34,6 +45,9 @@ uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[16];
 uniform int numPointLights;
 
+uniform Spotlight spotlights[16];
+uniform int numSpotlights;
+
 uniform vec3 viewPosition;
 
 uniform float specularStrength;
@@ -46,6 +60,8 @@ float GetDiffuseDot(vec3 lightDirection, vec3 objectNormal);
 float GetSpecularDot(vec3 lightDirection, vec3 objectNormal, vec3 viewDir);
 
 vec4 GetAmbient(AmbientLight light);
+
+float GetAttenuation(float distance, float constant, float linear, float quadratic);
 
 void main()
 {
@@ -68,19 +84,42 @@ void main()
     for (int i = 0; i < numPointLights; i++) 
     {
         float distance = length(pointLights[i].position - FragPos);
-        float attenuation = 1.0 / (pointLights[i].constant + pointLights[i].linear * distance + pointLights[i].quadratic * (distance * distance));
+        float attenuation = GetAttenuation(distance, pointLights[i].constant, pointLights[i].linear, pointLights[i].quadratic);
         
         vec3 pointLightDir = normalize(pointLights[i].position - FragPos);
-        pointLightDiffuse += GetDiffuseDot(pointLightDir, normal) * pointLights[i].intensity * vec4(pointLights[i].color, 1.0) * attenuation;
+        pointLightDiffuse += max(GetDiffuseDot(pointLightDir, normal) * pointLights[i].intensity * vec4(pointLights[i].color, 1.0) * attenuation, 0.0);
         
         // Specular
         vec3 pointLightViewDir = normalize(viewPosition - FragPos);
         float pointLightSpecDot = GetSpecularDot(pointLightDir, normal, pointLightViewDir);
-        pointLightSpecular += pow(pointLightSpecDot, shininess) * specularStrength * pointLights[i].intensity * attenuation;
+        pointLightSpecular += max(pow(pointLightSpecDot, shininess) * specularStrength * pointLights[i].intensity * attenuation, 0.0);
+    }
+    
+    // Spotlights
+    vec4 spotlightDiffuse = vec4(0.0);
+    float spotlightSpecular = 0.0;
+    for (int i = 0; i < numSpotlights; i++)
+    {
+        vec3 spotlightDir = normalize(spotlights[i].position - FragPos);
+
+        float theta = dot(spotlightDir, normalize(-spotlights[i].direction));
+        float epsilon = spotlights[i].cutoff - spotlights[i].outerCutoff;
+        float intensity = clamp((theta - spotlights[i].outerCutoff) / epsilon, 0.0, 1.0);
+
+        float distance = length(spotlights[i].position - FragPos);
+        float attenuation = GetAttenuation(distance, spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic);
+
+        // Diffuse
+        spotlightDiffuse += max(GetDiffuseDot(spotlightDir, normal) * attenuation * intensity * spotlights[i].intensity * vec4(spotlights[i].color, 1.0), 0.0);
+
+        // Specular
+        vec3 spotlightViewDir = normalize(viewPosition - FragPos);
+        float spotlightSpecDot = GetSpecularDot(spotlightDir, normal, spotlightViewDir);
+        spotlightSpecular += max(pow(spotlightSpecDot, shininess) * specularStrength * spotlights[i].intensity * attenuation * intensity, 0.0);
     }
 
-    vec4 diffuse = directionalDiffuse + pointLightDiffuse;
-    float specular = directionalSpecular + pointLightSpecular;
+    vec4 diffuse = directionalDiffuse + pointLightDiffuse + spotlightDiffuse;
+    float specular = directionalSpecular + pointLightSpecular + spotlightSpecular;
     
     FragColor = texture(Texture0, TexCoord) * (ambient + diffuse + specular);
 };
@@ -99,4 +138,9 @@ float GetSpecularDot(vec3 lightDirection, vec3 objectNormal, vec3 viewDir)
 vec4 GetAmbient(AmbientLight light)
 {
     return vec4(light.color, 1.0) * light.intensity;
+}
+
+float GetAttenuation(float distance, float constant, float linear, float quadratic)
+{
+    return 1.0 / (constant + linear * distance + quadratic * (distance * distance));
 }

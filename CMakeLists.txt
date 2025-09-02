@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 4.0.2)
 
 # Enable / Disable Tracy. Should be disabled in release builds.
 set(TRACY_ENABLE off CACHE BOOL "Enable Tracy profiler" FORCE)
