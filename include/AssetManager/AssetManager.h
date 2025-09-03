@@ -6,6 +6,7 @@
 
 #include "Renderer/IRenderer.h"
 #include "Renderer/Handles/MaterialHandle.h"
+#include "Shader/ShaderPreprocessor.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -24,5 +25,6 @@ namespace RNGOEngine::AssetHandling
 
     private:
         Core::Renderer::IRenderer& m_renderer;
+        ShaderPreProcessor::ShaderPreProcessor shaderPreprocessor;
     };
 }

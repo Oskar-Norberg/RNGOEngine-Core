@@ -71,6 +71,8 @@ add_library(${PROJECT_NAME} STATIC
         include/Renderer/Null/NullRenderer.h
         include/Window/Null/NullWindow.h
         include/Data/MouseCodes.h
+        include/Shader/ShaderPreprocessor.h
+        src/Shader/ShaderPreprocessor.cpp
 )
 
 # OpenGL

@@ -42,10 +42,10 @@ out vec4 FragColor;
 uniform AmbientLight ambientLight;
 uniform DirectionalLight directionalLight;
 // TODO: Ugly hardcoded limit.
-uniform PointLight pointLights[16];
+uniform PointLight pointLights[NR_OF_SPOTLIGHTS];
 uniform int numPointLights;
 
-uniform Spotlight spotlights[16];
+uniform Spotlight spotlights[NR_OF_SPOTLIGHTS];
 uniform int numSpotlights;
 
 uniform vec3 viewPosition;

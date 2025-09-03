@@ -11,6 +11,9 @@
 RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer& renderer)
     : m_renderer(renderer)
 {
+    shaderPreprocessor.AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
+    shaderPreprocessor.AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
+
 }
 
 RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::CreateMesh(
@@ -22,7 +25,10 @@ RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::Crea
 RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManager::CreateMaterial(
     std::string_view vertexSource, std::string_view fragmentSource)
 {
-    const auto shaderID = m_renderer.CreateShader(vertexSource, fragmentSource);
+    const auto processedVertexSource = shaderPreprocessor.Parse(vertexSource);
+    const auto processedFragmentSource = shaderPreprocessor.Parse(fragmentSource);
+    
+    const auto shaderID = m_renderer.CreateShader(processedVertexSource, processedFragmentSource);
     
     if (shaderID == Core::Renderer::INVALID_SHADER_ID)
     {
