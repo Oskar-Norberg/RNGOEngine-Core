@@ -63,7 +63,7 @@ namespace RNGOEngine::Core
         void UpdateSystems(float deltaTime);
 
     private:
-        void Render();
+        void Render() const;
 
     private:
         void PollWindowEvents();

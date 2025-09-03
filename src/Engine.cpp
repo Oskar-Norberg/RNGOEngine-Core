@@ -16,13 +16,15 @@
 
 namespace RNGOEngine::Core
 {
-    Engine::Engine(EngineConfig config)
+    Engine::Engine(const EngineConfig config)
         : m_running(true),
           m_window(nullptr),
           m_renderer(nullptr),
           m_assetManager(nullptr),
           m_currentScene(nullptr)
     {
+        bool doFlipTexturesVertically = false;
+
         if (config == EngineConfig::Headless)
         {
             m_window = std::make_unique<Window::NullWindow>();
@@ -33,9 +35,10 @@ namespace RNGOEngine::Core
             // TODO: Temporary arbitrary height, width and name.
             m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
             m_renderer = std::make_unique<Renderer::GLFWRenderer>(800, 600);
+            doFlipTexturesVertically = true;
         }
 
-        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer);
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
 
         // Add RenderSystem
         RegisterSystem<Systems::Core::RenderSystem>();
@@ -89,12 +92,12 @@ namespace RNGOEngine::Core
         } while (moreEvents);
     }
 
-    void Engine::UpdateSystems(float deltaTime)
+    void Engine::UpdateSystems(const float deltaTime)
     {
         m_systems.Update(m_eventQueue, *m_renderer, m_currentScene->world, deltaTime);
     }
 
-    void Engine::Render()
+    void Engine::Render() const
     {
         if (m_window->GetHeight() == 0 || m_window->GetWidth() == 0)
         {

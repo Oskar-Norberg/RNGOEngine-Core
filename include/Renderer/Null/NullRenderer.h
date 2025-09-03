@@ -23,12 +23,17 @@ namespace RNGOEngine::Core::Renderer
             return INVALID_MESH_ID;
         }
 
-        ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override
+        ShaderID CreateShader(std::string_view source, ShaderType type) override
         {
             return INVALID_SHADER_ID;
         }
 
-        MaterialID CreateMaterial(ShaderID shader) override
+        ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override
+        {
+            return INVALID_SHADER_PROGRAM_ID;
+        }
+
+        MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override
         {
             return INVALID_MATERIAL_ID;
         }

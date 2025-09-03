@@ -18,11 +18,11 @@ namespace RNGOEngine::Core::Renderer
 
     public:
         MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
-        ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override;
+        ShaderID CreateShader(std::string_view source, ShaderType type) override;
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override;
-        MaterialID CreateMaterial(ShaderID shader) override;
+        MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override;
+        ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override;
 
-    public:
         bool ListenSendEvents(Events::EventQueue& eventQueue) override;
 
     private:

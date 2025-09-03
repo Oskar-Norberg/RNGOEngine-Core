@@ -71,6 +71,16 @@ add_library(${PROJECT_NAME} STATIC
         include/Renderer/Null/NullRenderer.h
         include/Window/Null/NullWindow.h
         include/Data/MouseCodes.h
+        include/Shader/ShaderPreprocessor.h
+        src/Shader/ShaderPreprocessor.cpp
+        include/AssetManager/AssetFileFetcher.h
+        src/AssetManager/AssetFileFetcher.cpp
+        include/AssetManager/AssetLoaders/TextureLoader.h
+        src/AssetManager/AssetLoaders/TextureLoader.cpp
+        include/AssetManager/AssetLoaders/ShaderLoader.h
+        src/AssetManager/AssetLoaders/ShaderLoader.cpp
+        include/AssetManager/AssetLoaders/MaterialLoader.h
+        src/AssetManager/AssetLoaders/MaterialLoader.cpp
 )
 
 # OpenGL
@@ -93,4 +103,24 @@ set(COPY_PROJECT_NAME RNGOEngine_Core-Assets)
 add_custom_target(${COPY_PROJECT_NAME}
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
+
+# Define engine root path for assets.
+set(ENGINE_ASSETS_DIR "${CMAKE_CURRENT_BINARY_DIR}/assets")
+
+set(ENGINE_SHADERS_DIR "${ENGINE_ASSETS_DIR}/shaders")
+set(ENGINE_SHADER_INCLUDE_DIR "${ENGINE_SHADERS_DIR}/include")
+
+set(ENGINE_MODELS_DIR "${ENGINE_ASSETS_DIR}/models")
+set(ENGINE_TEXTURES_DIR "${ENGINE_ASSETS_DIR}/textures")
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+        ENGINE_ASSETS_DIR="${ENGINE_ASSETS_DIR}"
+        
+        ENGINE_SHADERS_DIR="${ENGINE_SHADERS_DIR}"
+        ENGINE_SHADER_INCLUDE_DIR="${ENGINE_SHADER_INCLUDE_DIR}"
+        
+        ENGINE_MODELS_DIR="${ENGINE_MODELS_DIR}"
+        ENGINE_TEXTURES_DIR="${ENGINE_TEXTURES_DIR}"
+)
+
 add_dependencies(${PROJECT_NAME} ${COPY_PROJECT_NAME})
