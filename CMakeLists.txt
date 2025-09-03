@@ -75,6 +75,8 @@ add_library(${PROJECT_NAME} STATIC
         src/Shader/ShaderPreprocessor.cpp
         include/AssetManager/AssetFileFetcher.h
         src/AssetManager/AssetFileFetcher.cpp
+        include/AssetManager/AssetLoaders/TextureLoader.h
+        src/AssetManager/AssetLoaders/TextureLoader.cpp
 )
 
 # OpenGL
