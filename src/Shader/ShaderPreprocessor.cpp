@@ -6,6 +6,7 @@
 
 #include <cassert>
 
+#include "Renderer/DrawQueue.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 
 #ifndef ENGINE_SHADERS_DIR
@@ -14,15 +15,24 @@
 
 namespace RNGOEngine::ShaderPreProcessor
 {
-    ShaderPreProcessor::ShaderPreProcessor()
+    ShaderPreProcessor::ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher)
+        : m_assetFetcher(assetFetcher)
     {
-        m_includeDirectories.emplace_back(ENGINE_SHADERS_DIR);
-        m_includeDirectories.emplace_back(std::filesystem::path(ENGINE_SHADERS_DIR).append("includes"));
+        AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
+        AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
     }
 
-    std::string ShaderPreProcessor::Parse(const std::string_view source) const
+    std::string ShaderPreProcessor::Parse(const std::filesystem::path& source) const
     {
-        std::string processedSource(source);
+        const auto foundPath = m_assetFetcher.GetShaderPath(source);
+
+        if (!foundPath.has_value())
+        {
+            assert(false && "Shader not found.");
+            return {};
+        }
+        
+        std::string processedSource = Utilities::IO::ReadFile(foundPath.value());
 
         ParseTokens(processedSource);
         ParseIncludes(processedSource);
@@ -86,14 +96,17 @@ namespace RNGOEngine::ShaderPreProcessor
                 includeEndIt - includeBeginIt - 1
             );
 
-            const auto includeFile = TryOpenInclude(std::string(includePath));
+            const auto includeFilePath = m_assetFetcher.GetShaderPath(includePath);
 
-            assert(includeFile.has_value() && "Failed to open include file.");
+            assert(includeFilePath.has_value() && "Failed to open include file.");
 
-            if (includeFile.has_value())
+            if (includeFilePath.has_value())
             {
-                source.replace(it, endLineIt - it + 1, includeFile.value());
-                source.insert(it + includeFile.value().size(), "\n");
+                // TODO: Pass a file reader?
+                const auto includeFile = Utilities::IO::ReadFile(includeFilePath.value());
+                
+                source.replace(it, endLineIt - it + 1, includeFile);
+                source.insert(it + includeFile.size(), "\n");
             }
         }
     }
@@ -119,27 +132,5 @@ namespace RNGOEngine::ShaderPreProcessor
                 break;
             }
         }
-    }
-
-    std::optional<std::string> ShaderPreProcessor::TryOpenInclude(const std::string& includePath) const
-    {
-        // First try relative to current working directory.
-        if (Utilities::IO::FileExists(includePath))
-        {
-            return Utilities::IO::ReadFile(includePath);
-        }
-
-        for (const auto& includeDirectory : m_includeDirectories)
-        {
-            // TODO: Look into using a joined view instead of copying the string.
-            const std::filesystem::path path = includeDirectory / includePath;
-
-            if (Utilities::IO::FileExists(path))
-            {
-                return Utilities::IO::ReadFile(path);
-            }
-        }
-
-        return std::nullopt;
     }
 }

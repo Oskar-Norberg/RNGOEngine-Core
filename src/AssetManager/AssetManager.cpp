@@ -7,12 +7,16 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-
 RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer& renderer)
-    : m_renderer(renderer)
+    : m_renderer(renderer), shaderPreprocessor(m_assetFileFetcher)
 {
-    shaderPreprocessor.AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
-    shaderPreprocessor.AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
+    AddAssetPath(ENGINE_ASSETS_DIR, All);
+
+    AddAssetPath(ENGINE_SHADERS_DIR, Shader);
+    AddAssetPath(ENGINE_SHADER_INCLUDE_DIR, Shader);
+
+    AddAssetPath(ENGINE_MODELS_DIR, Mesh);
+    AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
 }
 
 RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::CreateMesh(
@@ -22,10 +26,10 @@ RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::Crea
 }
 
 RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManager::CreateMaterial(
-    std::string_view vertexSource, std::string_view fragmentSource)
+    const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
 {
-    const auto processedVertexSource = shaderPreprocessor.Parse(vertexSource);
-    const auto processedFragmentSource = shaderPreprocessor.Parse(fragmentSource);
+    const auto processedVertexSource = shaderPreprocessor.Parse(vertexSourcePath);
+    const auto processedFragmentSource = shaderPreprocessor.Parse(fragmentSourcePath);
 
     const auto shaderID = m_renderer.CreateShader(processedVertexSource, processedFragmentSource);
 
@@ -41,8 +45,16 @@ RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManag
 RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::CreateTexture(
     std::string_view texturePath)
 {
+    const auto foundPath = m_assetFileFetcher.GetTexturePath(texturePath);
+
+    if (!foundPath.has_value())
+    {
+        assert(false && "Texture not found.");
+        return Core::Renderer::INVALID_TEXTURE_ID;
+    }
+
     int width, height, nrChannels;
-    unsigned char* data = stbi_load(texturePath.data(), &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load(foundPath.value().string().data(), &width, &height, &nrChannels, 0);
 
     if (!data || width <= 0 || height <= 0 || nrChannels <= 0)
     {
@@ -50,8 +62,35 @@ RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::C
         return Core::Renderer::INVALID_TEXTURE_ID;
     }
 
-    auto textureHandle = m_renderer.CreateTexture(data, width, height, nrChannels);
+    const auto textureHandle = m_renderer.CreateTexture(data, width, height, nrChannels);
     stbi_image_free(data);
 
     return textureHandle;
+}
+
+void RNGOEngine::AssetHandling::AssetManager::AddAssetPath(
+    const std::filesystem::path& path, AssetPathType type)
+{
+    switch (type)
+    {
+        case All:
+            m_assetFileFetcher.AddAssetPath(path);
+            break;
+
+        case Shader:
+            m_assetFileFetcher.AddShaderPath(path);
+            break;
+
+        case Texture:
+            m_assetFileFetcher.AddTexturePath(path);
+            break;
+
+        case Mesh:
+            m_assetFileFetcher.AddMeshPath(path);
+            break;
+
+        default:
+            assert(false && "Unsupported asset path type");
+            break;
+    }
 }
