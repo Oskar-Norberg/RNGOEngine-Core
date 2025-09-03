@@ -7,25 +7,25 @@
 #include <cassert>
 #include <stack>
 
+#include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
+
 namespace RNGOEngine::ShaderPreProcessor
 {
-    std::string ShaderPreProcessor::Parse(std::string_view source)
+    ShaderPreProcessor::ShaderPreProcessor()
+    {
+    }
+
+    std::string ShaderPreProcessor::Parse(const std::string_view source)
     {
         std::string processedSource(source);
 
-        for (const auto& token : m_tokens)
-        {
-            const auto it = source.find(token.first);
-            if (it != std::string::npos)
-            {
-                token.second(token.first, processedSource);
-            }
-        }
+        ParseTokens(processedSource);
+        ParseIncludes(processedSource);
 
         return processedSource;
     }
 
-    void ShaderPreProcessor::AddDefinition(std::string_view name, std::string_view value)
+    void ShaderPreProcessor::AddDefinition(const std::string_view name, const std::string_view value)
     {
         m_definitions[std::string(name)] = std::string(value);
         m_tokens[std::string(name)] = [this](const std::string& token, std::string& source)
@@ -34,13 +34,59 @@ namespace RNGOEngine::ShaderPreProcessor
         };
     }
 
-    void ShaderPreProcessor::RemoveDefinition(std::string_view name)
+    void ShaderPreProcessor::RemoveDefinition(const std::string_view name)
     {
-        const auto it = m_definitions.find(std::string(name));
-
-        if (it != m_definitions.end())
+        if (const auto it = m_definitions.find(std::string(name)); it != m_definitions.end())
         {
             m_definitions.erase(it);
+        }
+    }
+
+    void ShaderPreProcessor::ParseTokens(std::string& source) const
+    {
+        for (const auto& token : m_tokens)
+        {
+            const auto it = source.find(token.first);
+            if (it != std::string::npos)
+            {
+                token.second(token.first, source);
+            }
+        }
+    }
+
+    void ShaderPreProcessor::ParseIncludes(std::string& source) const
+    {
+        while (true)
+        {
+            const auto it = source.find(INCLUDE_DIRECTIVE);
+
+            if (it == std::string::npos)
+            {
+                break;
+            }
+
+            // Only supports diamond bracket includes for now.
+            const auto endLineIt = source.find('\n', it);
+            const auto includeBeginIt = source.find('<', it);
+            const auto includeEndIt = source.find('>', includeBeginIt);
+
+            if (includeBeginIt > endLineIt || includeEndIt > endLineIt)
+            {
+                assert(false && "Malformed include directive.");
+                break;
+            }
+
+            std::string_view includePath = std::string_view(
+                source.data() + includeBeginIt + 1,
+                includeEndIt - includeBeginIt - 1
+            );
+
+            // Ugly string copy
+            const auto includedFile = Utilities::IO::ReadFile(
+                "vendor/RNGOEngine-Core/assets/shaders/includes/" + std::string(includePath));
+
+            source.replace(it, endLineIt - it + 1, includedFile);
+            source.insert(it + includedFile.size(), "\n");
         }
     }
 

@@ -13,7 +13,6 @@ RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer&
 {
     shaderPreprocessor.AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
     shaderPreprocessor.AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
-
 }
 
 RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::CreateMesh(
