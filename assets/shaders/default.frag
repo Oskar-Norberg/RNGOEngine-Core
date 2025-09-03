@@ -24,4 +24,3 @@ void main()
     
     FragColor = texture(Texture0, TexCoord) * (lightAccumulation.ambient + lightAccumulation.diffuse + vec4(vec3(lightAccumulation.specular), 1.0));
 };
-
