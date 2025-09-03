@@ -5,17 +5,22 @@
 #include "Shader/ShaderPreprocessor.h"
 
 #include <cassert>
-#include <stack>
 
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
+
+#ifndef ENGINE_SHADERS_DIR
+    #error "ENGINE_SHADERS_DIR is not defined."
+#endif
 
 namespace RNGOEngine::ShaderPreProcessor
 {
     ShaderPreProcessor::ShaderPreProcessor()
     {
+        m_includeDirectories.emplace_back(ENGINE_SHADERS_DIR);
+        m_includeDirectories.emplace_back(std::filesystem::path(ENGINE_SHADERS_DIR).append("includes"));
     }
 
-    std::string ShaderPreProcessor::Parse(const std::string_view source)
+    std::string ShaderPreProcessor::Parse(const std::string_view source) const
     {
         std::string processedSource(source);
 
@@ -81,12 +86,15 @@ namespace RNGOEngine::ShaderPreProcessor
                 includeEndIt - includeBeginIt - 1
             );
 
-            // Ugly string copy
-            const auto includedFile = Utilities::IO::ReadFile(
-                "vendor/RNGOEngine-Core/assets/shaders/includes/" + std::string(includePath));
+            const auto includeFile = TryOpenInclude(std::string(includePath));
 
-            source.replace(it, endLineIt - it + 1, includedFile);
-            source.insert(it + includedFile.size(), "\n");
+            assert(includeFile.has_value() && "Failed to open include file.");
+
+            if (includeFile.has_value())
+            {
+                source.replace(it, endLineIt - it + 1, includeFile.value());
+                source.insert(it + includeFile.value().size(), "\n");
+            }
         }
     }
 
@@ -111,5 +119,27 @@ namespace RNGOEngine::ShaderPreProcessor
                 break;
             }
         }
+    }
+
+    std::optional<std::string> ShaderPreProcessor::TryOpenInclude(const std::string& includePath) const
+    {
+        // First try relative to current working directory.
+        if (Utilities::IO::FileExists(includePath))
+        {
+            return Utilities::IO::ReadFile(includePath);
+        }
+
+        for (const auto& includeDirectory : m_includeDirectories)
+        {
+            // TODO: Look into using a joined view instead of copying the string.
+            const std::filesystem::path path = includeDirectory / includePath;
+
+            if (Utilities::IO::FileExists(path))
+            {
+                return Utilities::IO::ReadFile(path);
+            }
+        }
+
+        return std::nullopt;
     }
 }

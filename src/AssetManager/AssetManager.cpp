@@ -26,9 +26,9 @@ RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManag
 {
     const auto processedVertexSource = shaderPreprocessor.Parse(vertexSource);
     const auto processedFragmentSource = shaderPreprocessor.Parse(fragmentSource);
-    
+
     const auto shaderID = m_renderer.CreateShader(processedVertexSource, processedFragmentSource);
-    
+
     if (shaderID == Core::Renderer::INVALID_SHADER_ID)
     {
         return Core::Renderer::MaterialHandle(Core::Renderer::INVALID_MATERIAL_ID, m_renderer);
