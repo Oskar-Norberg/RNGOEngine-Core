@@ -1,0 +1,146 @@
+﻿// --- Structs ---
+struct AmbientLight
+{
+    vec3 color;
+    float intensity;
+};
+
+struct DirectionalLight
+{
+    vec3 color;
+    float intensity;
+    vec3 direction;
+};
+
+struct PointLight
+{
+    vec3 color;
+    float intensity;
+    vec3 position;
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+struct Spotlight
+{
+    vec3 color;
+    float intensity;
+    vec3 position;
+    float cutoff;
+    vec3 direction;
+    float outerCutoff;
+    float constant;
+    float linear;
+    float quadratic;
+};
+
+struct LightAccumulation
+{
+    vec4 ambient;
+    vec4 diffuse;
+    float specular;
+};
+// --- End of Structs ---
+
+
+
+
+// --- Light Variables ---
+// TODO: These should not be be set per object, but in a global uniform block.
+uniform AmbientLight ambientLight;
+uniform DirectionalLight directionalLight;
+
+uniform PointLight pointLights[NR_OF_SPOTLIGHTS];
+uniform int numPointLights;
+
+uniform Spotlight spotlights[NR_OF_SPOTLIGHTS];
+uniform int numSpotlights;
+// --- End of Light Variables ---
+
+// --- Function Definitions ---
+float GetDiffuseDot(vec3 lightDirection, vec3 objectNormal)
+{
+    return max(dot(objectNormal, lightDirection), 0.0);
+}
+
+float GetSpecularDot(vec3 lightDirection, vec3 objectNormal, vec3 viewDir)
+{
+    vec3 reflectDir = reflect(-lightDirection, objectNormal);
+    return max(dot(viewDir, reflectDir), 0.0);
+}
+
+vec4 GetAmbient(AmbientLight light)
+{
+    return vec4(light.color, 1.0) * light.intensity;
+}
+
+float GetAttenuation(float distance, float constant, float linear, float quadratic)
+{
+    return 1.0 / (constant + linear * distance + quadratic * (distance * distance));
+}
+
+LightAccumulation GetLight(vec3 fragPos, vec3 normal, float specularStrength, int shininess, vec3 viewPosition)
+{
+    // Ambient Light
+    vec4 ambient = GetAmbient(ambientLight);
+
+    // Directional Light
+    vec4 directionalDiffuse = GetDiffuseDot(directionalLight.direction, normal) * directionalLight.intensity * vec4(directionalLight.color, 1.0);
+    // Directional Light Specular
+    vec3 directionalLightDir = normalize(directionalLight.direction);
+    vec3 directionalLightViewDir = normalize(viewPosition - fragPos);
+    float directionalSpecDot = GetSpecularDot(directionalLightDir, normal, directionalLightViewDir);
+    float directionalSpecular = pow(directionalSpecDot, shininess) * specularStrength * directionalLight.intensity;
+
+    // Point Lights
+    vec4 pointLightDiffuse = vec4(0.0);
+    float pointLightSpecular = 0.0;
+    for (int i = 0; i < numPointLights; i++)
+    {
+        float distance = length(pointLights[i].position - fragPos);
+        float attenuation = GetAttenuation(distance, pointLights[i].constant, pointLights[i].linear, pointLights[i].quadratic);
+
+        vec3 pointLightDir = normalize(pointLights[i].position - fragPos);
+        pointLightDiffuse += max(GetDiffuseDot(pointLightDir, normal) * pointLights[i].intensity * vec4(pointLights[i].color, 1.0) * attenuation, 0.0);
+
+        // Specular
+        vec3 pointLightViewDir = normalize(viewPosition - fragPos);
+        float pointLightSpecDot = GetSpecularDot(pointLightDir, normal, pointLightViewDir);
+        pointLightSpecular += max(pow(pointLightSpecDot, shininess) * specularStrength * pointLights[i].intensity * attenuation, 0.0);
+    }
+
+    // Spotlights
+    vec4 spotlightDiffuse = vec4(0.0);
+    float spotlightSpecular = 0.0;
+    for (int i = 0; i < numSpotlights; i++)
+    {
+        vec3 spotlightDir = normalize(spotlights[i].position - fragPos);
+
+        float theta = dot(spotlightDir, normalize(-spotlights[i].direction));
+        float epsilon = spotlights[i].cutoff - spotlights[i].outerCutoff;
+        float intensity = clamp((theta - spotlights[i].outerCutoff) / epsilon, 0.0, 1.0);
+
+        float distance = length(spotlights[i].position - fragPos);
+        float attenuation = GetAttenuation(distance, spotlights[i].constant, spotlights[i].linear, spotlights[i].quadratic);
+
+        // Diffuse
+        spotlightDiffuse += max(GetDiffuseDot(spotlightDir, normal) * attenuation * intensity * spotlights[i].intensity * vec4(spotlights[i].color, 1.0), 0.0);
+
+        // Specular
+        vec3 spotlightViewDir = normalize(viewPosition - fragPos);
+        float spotlightSpecDot = GetSpecularDot(spotlightDir, normal, spotlightViewDir);
+        spotlightSpecular += max(pow(spotlightSpecDot, shininess) * specularStrength * spotlights[i].intensity * attenuation * intensity, 0.0);
+    }
+
+    vec4 diffuse = directionalDiffuse + pointLightDiffuse + spotlightDiffuse;
+    float specular = directionalSpecular + pointLightSpecular + spotlightSpecular;
+    
+    LightAccumulation lightAccumulation;
+    lightAccumulation.ambient = ambient;
+    lightAccumulation.diffuse = diffuse;
+    lightAccumulation.specular = specular;
+    
+    return lightAccumulation;
+}
+// --- End of Definitions ---

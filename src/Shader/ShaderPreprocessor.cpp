@@ -34,8 +34,8 @@ namespace RNGOEngine::Shaders
         
         std::string processedSource = Utilities::IO::ReadFile(foundPath.value());
 
-        ParseTokens(processedSource);
         ParseIncludes(processedSource);
+        ParseTokens(processedSource);
 
         return processedSource;
     }
