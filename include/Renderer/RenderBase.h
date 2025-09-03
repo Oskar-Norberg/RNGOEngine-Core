@@ -19,13 +19,15 @@ namespace RNGOEngine::Core::Renderer
 
         void Render(Window::IWindow& window) override = 0;
 
-    public:
-        MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override = 0;
-        MaterialID CreateMaterial(ShaderID shader) override = 0;
-        TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override = 0;
-        ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override = 0;
+        bool ListenSendEvents(Events::EventQueue& eventQueue) override = 0;
 
     public:
+        MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override = 0;
+        MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override = 0;
+        TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override = 0;
+        ShaderID CreateShader(std::string_view source, ShaderType type) override = 0;
+        ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override = 0;
+
         void SetTexture(MaterialID shader, TextureID texture, int slot) final;
         void SetBool(MaterialID shader, std::string_view name, bool value) final;
         void SetInt(MaterialID shader, std::string_view name, int value) final;

@@ -13,7 +13,7 @@
     #error "ENGINE_SHADERS_DIR is not defined."
 #endif
 
-namespace RNGOEngine::ShaderPreProcessor
+namespace RNGOEngine::Shaders
 {
     ShaderPreProcessor::ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher)
         : m_assetFetcher(assetFetcher)

@@ -14,6 +14,8 @@
 
 namespace RNGOEngine::Core::Renderer
 {
+    enum ShaderType { Vertex, Fragment };
+
     // TODO: Add resizing methods.
     class IRenderer
     {
@@ -37,8 +39,9 @@ namespace RNGOEngine::Core::Renderer
 
     public:
         // TODO: Perhaps this should return an std::expected for errors.
-        virtual ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) = 0;
-        virtual MaterialID CreateMaterial(ShaderID shader) = 0;
+        virtual ShaderID CreateShader(std::string_view source, ShaderType type) = 0;
+        virtual ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) = 0;
+        virtual MaterialID CreateMaterial(ShaderProgramID shaderProgramID) = 0;
 
     public:
         virtual TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) = 0;
@@ -53,6 +56,5 @@ namespace RNGOEngine::Core::Renderer
         virtual void SetVec3(MaterialID shader, std::string_view name, const glm::vec3& value) = 0;
         virtual void SetVec4(MaterialID shader, std::string_view name, const glm::vec4& value) = 0;
         virtual void SetMat4(MaterialID shader, std::string_view name, const glm::mat4& value) = 0;
-            
     };
 }

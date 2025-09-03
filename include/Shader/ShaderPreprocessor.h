@@ -13,7 +13,7 @@
 
 #include "AssetManager/AssetFileFetcher.h"
 
-namespace RNGOEngine::ShaderPreProcessor
+namespace RNGOEngine::Shaders
 {
     constexpr auto INCLUDE_DIRECTIVE = "#include";
     

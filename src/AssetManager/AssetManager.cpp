@@ -4,11 +4,12 @@
 
 #include "AssetManager/AssetManager.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
-RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer& renderer)
-    : m_renderer(renderer), shaderPreprocessor(m_assetFileFetcher)
+RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
+                                                      bool doFlipTexturesVertically)
+    : m_renderer(renderer),
+      m_textureLoader(renderer, m_assetFileFetcher, doFlipTexturesVertically),
+      m_shaderLoader(renderer, m_assetFileFetcher),
+      m_materialLoader(renderer)
 {
     AddAssetPath(ENGINE_ASSETS_DIR, All);
 
@@ -28,44 +29,22 @@ RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::Crea
 RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManager::CreateMaterial(
     const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
 {
-    const auto processedVertexSource = shaderPreprocessor.Parse(vertexSourcePath);
-    const auto processedFragmentSource = shaderPreprocessor.Parse(fragmentSourcePath);
+    // TODO: Caching
+    const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath, Core::Renderer::Vertex);
+    const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath, Core::Renderer::Fragment);
 
-    const auto shaderID = m_renderer.CreateShader(processedVertexSource, processedFragmentSource);
+    const auto programID = m_shaderLoader.CreateShaderProgram(vertexShaderID, fragmentShaderID);
+    const auto materialID = m_renderer.CreateMaterial(programID);
 
-    if (shaderID == Core::Renderer::INVALID_SHADER_ID)
-    {
-        return Core::Renderer::MaterialHandle(Core::Renderer::INVALID_MATERIAL_ID, m_renderer);
-    }
-
-    const auto materialID = m_renderer.CreateMaterial(shaderID);
     return Core::Renderer::MaterialHandle(materialID, m_renderer);
 }
 
-RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::CreateTexture(
+RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::LoadTexture(
     std::string_view texturePath)
 {
-    const auto foundPath = m_assetFileFetcher.GetTexturePath(texturePath);
+    // TODO: Caching
 
-    if (!foundPath.has_value())
-    {
-        assert(false && "Texture not found.");
-        return Core::Renderer::INVALID_TEXTURE_ID;
-    }
-
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load(foundPath.value().string().data(), &width, &height, &nrChannels, 0);
-
-    if (!data || width <= 0 || height <= 0 || nrChannels <= 0)
-    {
-        assert(false && "Failed to load texture");
-        return Core::Renderer::INVALID_TEXTURE_ID;
-    }
-
-    const auto textureHandle = m_renderer.CreateTexture(data, width, height, nrChannels);
-    stbi_image_free(data);
-
-    return textureHandle;
+    return m_textureLoader.LoadTexture(texturePath);
 }
 
 void RNGOEngine::AssetHandling::AssetManager::AddAssetPath(

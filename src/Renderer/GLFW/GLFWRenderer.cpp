@@ -11,7 +11,6 @@
 #include <cassert>
 #include <format>
 
-#include "stb_image.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -27,10 +26,6 @@ namespace RNGOEngine::Core::Renderer
         {
             assert(false && "Failed to initialize GLAD");
         }
-
-        // TODO: This shouldnt be done here. This should be done when the entry point creates a renderer. It should then pass a flip flag to the AssetManager.
-        // Not 100% sure if this should be done here. But the renderer coordinate system is what decides if a texture needs flipping or not.
-        stbi_set_flip_vertically_on_load(true);
 
         glEnable(GL_DEPTH_TEST);
         glViewport(0, 0, viewportWidth, viewportHeight);
@@ -272,29 +267,16 @@ namespace RNGOEngine::Core::Renderer
         return VAO;
     }
 
-    ShaderID GLFWRenderer::CreateShader(std::string_view vertexSource, std::string_view fragmentSource)
+    ShaderID GLFWRenderer::CreateShader(std::string_view source, ShaderType type)
     {
-        //  Compile Vertex Shader
-        auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
-        const char* vertexSourcePtr = vertexSource.data();
-        glShaderSource(vertexShader, 1, &vertexSourcePtr, nullptr);
-        glCompileShader(vertexShader);
-        CheckCompilationErrors(vertexShader);
+        const auto shaderType = type == Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
+        const auto shaderID = glCreateShader(shaderType);
+        const char* sourcePtr = source.data();
+        glShaderSource(shaderID, 1, &sourcePtr, nullptr);
+        glCompileShader(shaderID);
+        CheckCompilationErrors(shaderID);
 
-        // Compile Fragment Shader
-        auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-        const char* fragmentSourcePtr = fragmentSource.data();
-        glShaderSource(fragmentShader, 1, &fragmentSourcePtr, nullptr);
-        glCompileShader(fragmentShader);
-        CheckCompilationErrors(fragmentShader);
-
-        auto shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexShader);
-        glAttachShader(shaderProgram, fragmentShader);
-        glLinkProgram(shaderProgram);
-        CheckLinkingErrors(shaderProgram);
-
-        return shaderProgram;
+        return shaderID;
     }
 
     TextureID GLFWRenderer::CreateTexture(unsigned char* data, int width, int height, int nrChannels)
@@ -328,12 +310,23 @@ namespace RNGOEngine::Core::Renderer
         return textureHandle;
     }
 
-    MaterialID GLFWRenderer::CreateMaterial(ShaderID shader)
+    MaterialID GLFWRenderer::CreateMaterial(ShaderProgramID shaderProgramID)
     {
         const auto materialID = m_nextMaterialID++;
-        m_materials[materialID] = MaterialSpecification{.shader = shader, .uniforms = {}};
+        m_materials[materialID] = MaterialSpecification{.shader = shaderProgramID, .uniforms = {}};
 
         return materialID;
+    }
+
+    ShaderProgramID GLFWRenderer::CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader)
+    {
+        const auto shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+        CheckLinkingErrors(shaderProgram);
+
+        return shaderProgram;
     }
 
     bool GLFWRenderer::ListenSendEvents(Events::EventQueue& eventQueue)
