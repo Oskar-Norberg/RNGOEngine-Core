@@ -4,13 +4,23 @@
 
 #include "Shader/ShaderPreprocessor.h"
 
+#include <cassert>
 #include <stack>
 
 namespace RNGOEngine::ShaderPreProcessor
 {
     std::string ShaderPreProcessor::Parse(std::string_view source)
     {
-        std::string processedSource = ParseForDefinitions(std::string(source));
+        std::string processedSource(source);
+
+        for (const auto& token : m_tokens)
+        {
+            const auto it = source.find(token.first);
+            if (it != std::string::npos)
+            {
+                token.second(token.first, processedSource);
+            }
+        }
 
         return processedSource;
     }
@@ -18,6 +28,10 @@ namespace RNGOEngine::ShaderPreProcessor
     void ShaderPreProcessor::AddDefinition(std::string_view name, std::string_view value)
     {
         m_definitions[std::string(name)] = std::string(value);
+        m_tokens[std::string(name)] = [this](const std::string& token, std::string& source)
+        {
+            ParseForDefinitions(token, source);
+        };
     }
 
     void ShaderPreProcessor::RemoveDefinition(std::string_view name)
@@ -30,25 +44,26 @@ namespace RNGOEngine::ShaderPreProcessor
         }
     }
 
-    std::string ShaderPreProcessor::ParseForDefinitions(const std::string source) const
+    void ShaderPreProcessor::ParseForDefinitions(const std::string& token, std::string& source) const
     {
-        std::string processedSource = source;
+        const auto tokenIt = m_definitions.find(token);
 
-        for (const auto& [key, value] : m_definitions)
+        if (tokenIt == m_definitions.end())
         {
-            while (true)
-            {
-                if (const auto it = processedSource.find(key); it != std::string::npos)
-                {
-                    processedSource.replace(it, key.length(), value);
-                }
-                else
-                {
-                    break;
-                }
-            }
+            assert(false && "Token does not exist in definitions.");
+            return;
         }
 
-        return processedSource;
+        while (true)
+        {
+            if (const auto it = source.find(token); it != std::string::npos)
+            {
+                source.replace(it, token.length(), tokenIt->second);
+            }
+            else
+            {
+                break;
+            }
+        }
     }
 }
