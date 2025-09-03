@@ -5,12 +5,13 @@
 #include "Shader/ShaderPreprocessor.h"
 
 #include <cassert>
+#include <unordered_set>
 
 #include "Renderer/DrawQueue.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 
 #ifndef ENGINE_SHADERS_DIR
-    #error "ENGINE_SHADERS_DIR is not defined."
+#error "ENGINE_SHADERS_DIR is not defined."
 #endif
 
 namespace RNGOEngine::Shaders
@@ -31,7 +32,7 @@ namespace RNGOEngine::Shaders
             assert(false && "Shader not found.");
             return {};
         }
-        
+
         std::string processedSource = Utilities::IO::ReadFile(foundPath.value());
 
         ParseIncludes(processedSource);
@@ -71,6 +72,8 @@ namespace RNGOEngine::Shaders
 
     void ShaderPreProcessor::ParseIncludes(std::string& source) const
     {
+        std::unordered_set<std::string> includedFiles;
+
         while (true)
         {
             const auto it = source.find(INCLUDE_DIRECTIVE);
@@ -96,17 +99,27 @@ namespace RNGOEngine::Shaders
                 includeEndIt - includeBeginIt - 1
             );
 
-            const auto includeFilePath = m_assetFetcher.GetShaderPath(includePath);
-
-            assert(includeFilePath.has_value() && "Failed to open include file.");
-
-            if (includeFilePath.has_value())
+            if (includedFiles.contains(std::string(includePath)))
             {
-                // TODO: Pass a file reader?
-                const auto includeFile = Utilities::IO::ReadFile(includeFilePath.value());
-                
-                source.replace(it, endLineIt - it + 1, includeFile);
-                source.insert(it + includeFile.size(), "\n");
+                // Delete the include directive.
+                source.replace(it, endLineIt - it + 1, "");
+            }
+            else
+            {
+                includedFiles.insert(std::string(includePath));
+
+                const auto includeFilePath = m_assetFetcher.GetShaderPath(includePath);
+
+                assert(includeFilePath.has_value() && "Failed to open include file.");
+
+                if (includeFilePath.has_value())
+                {
+                    // TODO: Pass a file reader?
+                    const auto includeFile = Utilities::IO::ReadFile(includeFilePath.value());
+
+                    source.replace(it, endLineIt - it + 1, includeFile);
+                    source.insert(it + includeFile.size(), "\n");
+                }
             }
         }
     }
