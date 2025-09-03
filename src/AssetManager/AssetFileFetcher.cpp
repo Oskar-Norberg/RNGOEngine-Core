@@ -31,7 +31,7 @@ namespace RNGOEngine::AssetHandling
         // First try relative to current working directory.
         if (Utilities::IO::FileExists(path))
         {
-            return Utilities::IO::ReadFile(path);
+            return path;
         }
 
         for (const auto& includeDirectory : searchPaths)
