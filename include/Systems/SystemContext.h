@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "EventQueue/EventQueue.h"
 #include "ResourceMapper.h"
 #include "Utilities/JobSystem/JobSystem.h"
 

@@ -1,7 +1,3 @@
-//
-// Created by Oskar.Norberg on 2025-06-17.
-//
-
 #pragma once
 
 #include <memory>
@@ -10,12 +6,7 @@
 #include "ISystem.h"
 #include "SystemContext.h"
 #include "Concepts/Concepts.h"
-
-namespace RNGOEngine::Core
-{
-    class Engine;
-    class World;
-}
+#include "EventQueue/EventQueue.h"
 
 namespace RNGOEngine::Systems
 {
@@ -34,7 +25,11 @@ namespace RNGOEngine::Systems
     {
     public:
         ~SystemScheduler();
-        void Update(Events::EventQueue& eventQueue, Core::Renderer::IRenderer& renderer, Core::World& world, float deltaTime);
+
+        void Update(Events::EventQueue& eventQueue,
+                    RNGOEngine::Core::Renderer::IRenderer& renderer,
+                    RNGOEngine::Core::World& world,
+                    float deltaTime);
 
         template<Concepts::DerivedFrom<ISystem> T, typename... Args>
         void RegisterSystem(Args&&... args)
@@ -44,7 +39,6 @@ namespace RNGOEngine::Systems
 
     private:
         std::vector<ScheduledSystem> m_systems;
-
         SystemContext m_context;
 
         void InitializeSystems();

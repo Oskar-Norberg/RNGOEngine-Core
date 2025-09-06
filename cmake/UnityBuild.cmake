@@ -1,0 +1,3 @@
+if (UNITY_BUILD)
+    set_target_properties(${CORE_PROJECT_NAME} PROPERTIES UNITY_BUILD ON)
+endif ()

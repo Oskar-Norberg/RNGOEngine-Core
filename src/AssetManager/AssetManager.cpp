@@ -2,7 +2,13 @@
 // Created by Oskar.Norberg on 2025-08-27.
 //
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include "AssetManager/AssetManager.h"
+
+#include "Renderer/IRenderer.h"
 
 RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
                                                       bool doFlipTexturesVertically)
@@ -23,6 +29,7 @@ RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer&
 RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::CreateMesh(
     std::span<float> vertices, std::span<unsigned int> indices)
 {
+    Assimp::Importer importer;
     return m_renderer.CreateMesh(vertices, indices);
 }
 

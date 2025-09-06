@@ -17,6 +17,7 @@ namespace RNGOEngine::Systems::Core
         void Update(RNGOEngine::Core::World& world, SystemContext& context, Events::EventQueue& eventQueue,
                     RNGOEngine::Core::Renderer::IRenderer& renderer) override
         {
+            // TODO: Consider splitting up either into functions or separate systems. LightGatherer, OpaqueMeshGatherer, RenderSubmitter etc.
             const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
 
             RNGOEngine::Core::Renderer::DrawQueue drawQueue;

@@ -3,6 +3,7 @@
 //
 
 #include "AssetManager/AssetLoaders/MaterialLoader.h"
+#include "Renderer/IRenderer.h"
 
 namespace RNGOEngine::AssetHandling
 {

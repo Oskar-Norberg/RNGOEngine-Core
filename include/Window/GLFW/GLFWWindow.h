@@ -5,8 +5,9 @@
 #pragma once
 
 #include "EventQueue/EngineEvents/EngineEvents.h"
-#include "GLFW/glfw3.h"
 #include "Window/IWindow.h"
+
+class GLFWwindow;
 
 namespace RNGOEngine::Core::Window
 {

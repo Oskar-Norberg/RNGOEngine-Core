@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::Core::Window
