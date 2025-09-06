@@ -20,8 +20,9 @@ CPMAddPackage(
         "BUILD_SHARED_LIBS OFF"
 )
 
-
-CPMAddPackage("gh:wolfpld/tracy@0.12.2")
+if (RNGOENGINE_TRACY_ENABLE)
+    CPMAddPackage("gh:wolfpld/tracy@0.12.2")
+endif ()
 CPMAddPackage("gh:skypjack/entt@3.15.0")
 
 add_subdirectory(./vendor/glad)

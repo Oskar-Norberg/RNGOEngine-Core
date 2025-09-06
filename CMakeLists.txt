@@ -3,8 +3,8 @@ set(CMAKE_CXX_STANDARD 20)
 set(CORE_PROJECT_NAME RNGOEngine_Core)
 project(${CORE_PROJECT_NAME})
 
-option(TRACY_ENABLE "Enable Tracy profiler" OFF)
-option(UNITY_BUILD "Enable Unity builds" OFF)
+option(RNGOENGINE_TRACY_ENABLE "Enable Tracy profiler" OFF)
+option(RNGOENGINE_UNITY_BUILD "Enable Unity builds" OFF)
 
 # Build Preferences
 include(cmake/EnableCCache.cmake)
