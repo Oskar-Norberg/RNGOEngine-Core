@@ -15,15 +15,14 @@ namespace RNGOEngine::Core::Renderer
     public:
         GLFWRenderer(int viewportWidth, int viewportHeight);
         void Render(Window::IWindow& window) override;
-        
 
     public:
         MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
-        ShaderID CreateShader(std::string_view vertexSource, std::string_view fragmentSource) override;
+        ShaderID CreateShader(std::string_view source, ShaderType type) override;
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override;
-        MaterialID CreateMaterial(ShaderID shader) override;
+        MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override;
+        ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override;
 
-    public:
         bool ListenSendEvents(Events::EventQueue& eventQueue) override;
 
     private:
@@ -37,14 +36,17 @@ namespace RNGOEngine::Core::Renderer
         MaterialID m_nextMaterialID = 0;
 
         bool m_isProjectionMatrixDirty;
-        Components::Camera m_lastCameraProperties;
+        CameraData m_lastCameraProperties;
         glm::mat4 m_projectionMatrix;
-        
+
+    private:
+        int m_viewportWidth, m_viewportHeight;
+
     private:
         bool CheckCompilationErrors(unsigned int shader);
         bool CheckLinkingErrors(unsigned int program);
 
     private:
-        void RecalculateProjectionMatrix(Components::Camera camera);
+        void RecalculateProjectionMatrix(CameraData camera);
     };
 }

@@ -5,8 +5,9 @@
 #pragma once
 
 #include "EventQueue/EngineEvents/EngineEvents.h"
-#include "GLFW/glfw3.h"
 #include "Window/IWindow.h"
+
+class GLFWwindow;
 
 namespace RNGOEngine::Core::Window
 {
@@ -26,6 +27,17 @@ namespace RNGOEngine::Core::Window
 
         void SwapBuffers() override;
         void SetName(std::string_view name) override;
+
+    public:
+        int GetWidth() const override
+        {
+            return m_width;
+        }
+
+        int GetHeight() const override
+        {
+            return m_height;
+        }
 
     private:
         GLFWwindow* m_window;

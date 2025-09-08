@@ -4,6 +4,7 @@
 
 // TODO: much badness
 #include <cassert>
+#include <GLFW/glfw3.h>
 
 #include "Window/GLFW/GLFWWindow.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"

@@ -4,7 +4,7 @@
 
 #pragma once
 
-#ifdef TRACY_ENABLE
+#ifdef RNGOENGINE_TRACY_ENABLE
 
 #include <tracy/Tracy.hpp>
 

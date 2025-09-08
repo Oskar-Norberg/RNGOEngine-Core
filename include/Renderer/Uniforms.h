@@ -41,7 +41,8 @@ namespace RNGOEngine::Core::Renderer
 
     struct MaterialSpecification
     {
-        ShaderID shader;
+        ShaderProgramID shader;
+        
         // Consider stack allocated array with max size?
         std::vector<UniformSpecification> uniforms;
     };
