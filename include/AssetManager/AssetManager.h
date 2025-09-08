@@ -7,9 +7,18 @@
 #include "AssetLoaders/MaterialLoader.h"
 #include "AssetLoaders/ShaderLoader.h"
 #include "AssetLoaders/TextureLoader.h"
-#include "Renderer/IRenderer.h"
 #include "Renderer/Handles/MaterialHandle.h"
-#include "Shader/ShaderPreprocessor.h"
+
+namespace RNGOEngine
+{
+    namespace Core
+    {
+        namespace Renderer
+        {
+            class IRenderer;
+        }
+    }
+}
 
 namespace RNGOEngine::AssetHandling
 {

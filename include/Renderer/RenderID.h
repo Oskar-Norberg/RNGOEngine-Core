@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <limits>
+
 namespace RNGOEngine::Core::Renderer
 {
     using MeshID = unsigned int;

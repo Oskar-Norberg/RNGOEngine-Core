@@ -1,24 +1,22 @@
-//
-// Created by Oskar.Norberg on 2025-06-17.
-//
-
 #include "Systems/SystemScheduler.h"
 
 #include <iostream>
 
-#include "Engine.h"
 #include "Profiling/Profiling.h"
 #include "Systems/SystemContext.h"
+#include "World/World.h"
 
 namespace RNGOEngine::Systems
 {
     SystemScheduler::~SystemScheduler()
     {
-        // TODO: The engine should explicitly call Initialize and terminate.
         TerminateSystems();
     }
 
-    void SystemScheduler::Update(Events::EventQueue& eventQueue, Core::Renderer::IRenderer& renderer, Core::World& world, float deltaTime)
+    void SystemScheduler::Update(Events::EventQueue& eventQueue,
+                                 RNGOEngine::Core::Renderer::IRenderer& renderer,
+                                 RNGOEngine::Core::World& world,
+                                 float deltaTime)
     {
         m_context.deltaTime = deltaTime;
 
@@ -28,7 +26,6 @@ namespace RNGOEngine::Systems
         {
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_VIEW(system->GetName());
-        
             system->Update(world, m_context, eventQueue, renderer);
         }
 
@@ -40,7 +37,6 @@ namespace RNGOEngine::Systems
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("SystemScheduler::InitializeSystems");
 
-        // TODO: O(n) polling each frame.
         for (auto& system : m_systems)
         {
             if (!system.initialized)

@@ -4,8 +4,18 @@
 
 #pragma once
 
-#include "Renderer/IRenderer.h"
 #include "Renderer/Handles/MaterialHandle.h"
+
+namespace RNGOEngine
+{
+    namespace Core
+    {
+        namespace Renderer
+        {
+            class IRenderer;
+        }
+    }
+}
 
 namespace RNGOEngine::AssetHandling
 {
