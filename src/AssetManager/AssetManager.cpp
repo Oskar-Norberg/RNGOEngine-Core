@@ -26,12 +26,12 @@ RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer&
     AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
 }
 
-RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::CreateMesh(
-    std::span<float> vertices, std::span<unsigned int> indices)
+RNGOEngine::Core::Renderer::ModelID RNGOEngine::AssetHandling::AssetManager::LoadModel(
+    const std::filesystem::path& modelPath)
 {
-    Assimp::Importer importer;
-    return m_renderer.CreateMesh(vertices, indices);
+    return m_modelLoader.LoadModel(modelPath);
 }
+
 
 RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManager::CreateMaterial(
     const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)

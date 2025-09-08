@@ -17,7 +17,7 @@ namespace RNGOEngine::Core::Renderer
         void Render(Window::IWindow& window) override;
 
     public:
-        MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
+        MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override;
         ShaderID CreateShader(std::string_view source, ShaderType type) override;
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override;
         MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override;

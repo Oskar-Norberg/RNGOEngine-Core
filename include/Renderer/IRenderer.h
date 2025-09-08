@@ -12,6 +12,11 @@
 #include "RenderID.h"
 #include "Window/IWindow.h"
 
+namespace RNGOEngine::Data::Rendering
+{
+    struct MeshData;
+}
+
 namespace RNGOEngine::Core::Renderer
 {
     enum ShaderType { Vertex, Fragment };
@@ -34,7 +39,7 @@ namespace RNGOEngine::Core::Renderer
         virtual bool ListenSendEvents(Events::EventQueue& eventQueue) = 0;
 
     public:
-        virtual MeshID CreateMesh(std::span<float> vertices, std::span<unsigned int> indices) = 0;
+        virtual MeshID CreateMesh(const Data::Rendering::MeshData& meshData) = 0;
         // TODO: Destruction of meshes and shaders.
 
     public:

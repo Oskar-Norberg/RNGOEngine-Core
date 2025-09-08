@@ -18,7 +18,7 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        MeshID CreateMesh(std::span<float> vertices, std::span<unsigned int> indices) override
+        MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override
         {
             return INVALID_MESH_ID;
         }

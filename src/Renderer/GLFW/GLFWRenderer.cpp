@@ -11,6 +11,7 @@
 #include <cassert>
 #include <format>
 
+#include "Data/MeshData.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -227,7 +228,7 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    MeshID GLFWRenderer::CreateMesh(std::span<float> vertices, std::span<unsigned> indices)
+    MeshID GLFWRenderer::CreateMesh(const Data::Rendering::MeshData& meshData)
     {
         unsigned int VAO, VBO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -237,10 +238,12 @@ namespace RNGOEngine::Core::Renderer
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Vertex), meshData.vertices.data(),
+                     GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(Data::Rendering::Index),
+                     meshData.indices.data(), GL_STATIC_DRAW);
 
         // Vertex Pos
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void*>(nullptr));
@@ -259,13 +262,53 @@ namespace RNGOEngine::Core::Renderer
         m_meshSpecifications.insert(
             std::make_pair(VAO, MeshSpecification
                            {
-                               .nrOfVertices = static_cast<unsigned int>(vertices.size() / 3),
-                               .nrOfIndices = static_cast<unsigned int>(indices.size() / 3)
+                               .nrOfVertices = static_cast<unsigned int>(meshData.vertices.size() / 3),
+                               .nrOfIndices = static_cast<unsigned int>(meshData.indices.size() / 3)
                            }
             ));
 
         return VAO;
     }
+
+    // MeshID GLFWRenderer::CreateMesh(std::span<float> vertices, std::span<unsigned> indices)
+    // {
+    //     unsigned int VAO, VBO, EBO;
+    //     glGenVertexArrays(1, &VAO);
+    //     glGenBuffers(1, &VBO);
+    //     glGenBuffers(1, &EBO);
+    //
+    //     glBindVertexArray(VAO);
+    //
+    //     glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    //     glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), vertices.data(), GL_STATIC_DRAW);
+    //
+    //     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    //     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), indices.data(), GL_STATIC_DRAW);
+    //
+    //     // Vertex Pos
+    //     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void*>(nullptr));
+    //     glEnableVertexAttribArray(0);
+    //
+    //     // Vertex Normal
+    //     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+    //                           reinterpret_cast<void*>(3 * sizeof(float)));
+    //     glEnableVertexAttribArray(1);
+    //
+    //     // Vertex UV
+    //     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
+    //                           reinterpret_cast<void*>(6 * sizeof(float)));
+    //     glEnableVertexAttribArray(2);
+    //
+    //     m_meshSpecifications.insert(
+    //         std::make_pair(VAO, MeshSpecification
+    //                        {
+    //                            .nrOfVertices = static_cast<unsigned int>(vertices.size() / 3),
+    //                            .nrOfIndices = static_cast<unsigned int>(indices.size() / 3)
+    //                        }
+    //         ));
+    //
+    //     return VAO;
+    // }
 
     ShaderID GLFWRenderer::CreateShader(std::string_view source, ShaderType type)
     {

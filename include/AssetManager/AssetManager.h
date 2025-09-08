@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AssetLoaders/MaterialLoader.h"
+#include "AssetLoaders/ModelLoader.h"
 #include "AssetLoaders/ShaderLoader.h"
 #include "AssetLoaders/TextureLoader.h"
 #include "Renderer/Handles/MaterialHandle.h"
@@ -29,7 +30,7 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit AssetManager(Core::Renderer::IRenderer& renderer, bool doFlipTexturesVertically);
 
-        Core::Renderer::MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices);
+        Core::Renderer::ModelID LoadModel(const std::filesystem::path& modelPath);
 
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
                                                       const std::filesystem::path& fragmentSourcePath);
@@ -44,7 +45,8 @@ namespace RNGOEngine::AssetHandling
         AssetFileFetcher m_assetFileFetcher;
         
         TextureLoader m_textureLoader;
-        
+
+        ModelLoader m_modelLoader;
         ShaderLoader m_shaderLoader;
         MaterialLoader m_materialLoader;
     };

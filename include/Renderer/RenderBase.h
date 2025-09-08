@@ -22,7 +22,7 @@ namespace RNGOEngine::Core::Renderer
         bool ListenSendEvents(Events::EventQueue& eventQueue) override = 0;
 
     public:
-        MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override = 0;
+        MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override = 0;
         MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override = 0;
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override = 0;
         ShaderID CreateShader(std::string_view source, ShaderType type) override = 0;
