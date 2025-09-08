@@ -10,6 +10,7 @@
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
+#include "Systems/SystemContext.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
@@ -94,7 +95,13 @@ namespace RNGOEngine::Core
 
     void Engine::UpdateSystems(const float deltaTime)
     {
-        m_systems.Update(m_eventQueue, *m_renderer, m_currentScene->world, deltaTime);
+        m_context.deltaTime = deltaTime;
+
+        // These don't need to be set every frame. But alas.
+        m_context.eventQueue = &m_eventQueue;
+        m_context.renderer = m_renderer.get();
+        
+        m_systems.Update(m_currentScene->world, m_context);
     }
 
     void Engine::Render() const

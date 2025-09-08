@@ -13,6 +13,7 @@
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
 #include "Scene/Scene.h"
+#include "Systems/SystemContext.h"
 
 namespace RNGOEngine::Core
 {
@@ -55,7 +56,9 @@ namespace RNGOEngine::Core
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
 
         std::unique_ptr<Scene> m_currentScene;
+        
         Systems::SystemScheduler m_systems;
+        Systems::SystemContext m_context;
 
         Events::EventQueue m_eventQueue;
 

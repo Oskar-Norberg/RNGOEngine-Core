@@ -14,8 +14,7 @@ namespace RNGOEngine::Systems::Core
     class RenderSystem : public ISystem
     {
     public:
-        void Update(RNGOEngine::Core::World& world, SystemContext& context, Events::EventQueue& eventQueue,
-                    RNGOEngine::Core::Renderer::IRenderer& renderer) override
+        void Update(RNGOEngine::Core::World& world, SystemContext& context) override
         {
             // TODO: Consider splitting up either into functions or separate systems. LightGatherer, OpaqueMeshGatherer, RenderSubmitter etc.
             const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
@@ -27,14 +26,16 @@ namespace RNGOEngine::Systems::Core
                 {
                     const auto& transform = world.GetRegistry().get<Components::Transform>(entity);
 
-                    drawQueue.opaqueObjects.emplace_back(transform, meshRender.mesh,
-                                                         meshRender.shader);
+                    
+                    
+                    // drawQueue.opaqueObjects.emplace_back(transform, meshRender.mesh,
+                    //                                      meshRender.shader);
                 }
                 else
                 {
                     assert(false && "Renderable entity is missing Transform component!");
-                    drawQueue.opaqueObjects.emplace_back(Components::Transform(), meshRender.mesh,
-                                                         meshRender.shader);
+                    // drawQueue.opaqueObjects.emplace_back(Components::Transform(), meshRender.mesh,
+                    //                                      meshRender.shader);
                 }
             }
 
@@ -182,7 +183,7 @@ namespace RNGOEngine::Systems::Core
             }
 
             // Submit draw queue to renderer.
-            renderer.SubmitDrawQueue(std::move(drawQueue));
+            // renderer.SubmitDrawQueue(std::move(drawQueue));
         }
     };
 }

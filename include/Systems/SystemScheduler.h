@@ -4,9 +4,20 @@
 #include <vector>
 
 #include "ISystem.h"
-#include "SystemContext.h"
 #include "Concepts/Concepts.h"
-#include "EventQueue/EventQueue.h"
+
+namespace RNGOEngine
+{
+    namespace Core
+    {
+        class World;
+    }
+
+    namespace Systems
+    {
+        struct SystemContext;
+    }
+}
 
 namespace RNGOEngine::Systems
 {
@@ -26,10 +37,7 @@ namespace RNGOEngine::Systems
     public:
         ~SystemScheduler();
 
-        void Update(Events::EventQueue& eventQueue,
-                    RNGOEngine::Core::Renderer::IRenderer& renderer,
-                    RNGOEngine::Core::World& world,
-                    float deltaTime);
+        void Update(Core::World& world, SystemContext& context);
 
         template<Concepts::DerivedFrom<ISystem> T, typename... Args>
         void RegisterSystem(Args&&... args)
@@ -39,9 +47,8 @@ namespace RNGOEngine::Systems
 
     private:
         std::vector<ScheduledSystem> m_systems;
-        SystemContext m_context;
 
-        void InitializeSystems();
+        void InitializeSystems(SystemContext& context);
         void TerminateSystems();
     };
 }
