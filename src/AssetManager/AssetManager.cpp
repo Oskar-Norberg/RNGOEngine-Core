@@ -14,6 +14,7 @@ RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer&
                                                       bool doFlipTexturesVertically)
     : m_renderer(renderer),
       m_textureLoader(renderer, m_assetFileFetcher, doFlipTexturesVertically),
+      m_modelLoader(renderer, doFlipTexturesVertically),
       m_shaderLoader(renderer, m_assetFileFetcher),
       m_materialLoader(renderer)
 {
@@ -26,12 +27,16 @@ RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer&
     AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
 }
 
-RNGOEngine::Core::Renderer::ModelID RNGOEngine::AssetHandling::AssetManager::LoadModel(
+RNGOEngine::AssetHandling::ModelID RNGOEngine::AssetHandling::AssetManager::LoadModel(
     const std::filesystem::path& modelPath)
 {
-    return m_modelLoader.LoadModel(modelPath);
-}
+    // TODO: Caching? Just check if manager has a model with the same path?
 
+    const auto meshIDs = m_modelLoader.LoadModel(modelPath);
+    const auto modelID = m_modelManager.CreateModel(meshIDs);
+
+    return modelID;
+}
 
 RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManager::CreateMaterial(
     const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
@@ -47,7 +52,7 @@ RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManag
 }
 
 RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::LoadTexture(
-    std::string_view texturePath)
+    const std::string_view texturePath)
 {
     // TODO: Caching
 

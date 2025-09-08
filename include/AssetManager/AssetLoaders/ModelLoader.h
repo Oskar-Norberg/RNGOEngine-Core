@@ -22,14 +22,15 @@ namespace RNGOEngine::AssetHandling
     class ModelLoader
     {
     public:
-        explicit ModelLoader(Core::Renderer::IRenderer& renderer);
+        explicit ModelLoader(Core::Renderer::IRenderer& renderer, bool doflipUVs);
 
-        Core::Renderer::ModelID LoadModel(const std::filesystem::path& modelPath);
+        std::vector<Core::Renderer::MeshID> LoadModel(const std::filesystem::path& modelPath);
 
     private:
         Data::Rendering::MeshData ProcessMesh(const aiMesh* mesh, const aiScene* scene);
 
     private:
         Core::Renderer::IRenderer& m_renderer;
+        bool m_doFlipUVs;
     };
 }

@@ -16,7 +16,12 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    Core::Renderer::ModelID ModelLoader::LoadModel(const std::filesystem::path& modelPath)
+    ModelLoader::ModelLoader(Core::Renderer::IRenderer& renderer, bool doflipUVs)
+        : m_renderer(renderer), m_doFlipUVs(doflipUVs)
+    {
+    }
+
+    std::vector<Core::Renderer::MeshID> ModelLoader::LoadModel(const std::filesystem::path& modelPath)
     {
         Assimp::Importer importer;
 
@@ -59,7 +64,7 @@ namespace RNGOEngine::AssetHandling
             meshIDs.emplace_back(m_renderer.CreateMesh(mesh));
         }
 
-        
+        return meshIDs;
     }
 
     Data::Rendering::MeshData ModelLoader::ProcessMesh(const aiMesh* mesh, const aiScene* scene)

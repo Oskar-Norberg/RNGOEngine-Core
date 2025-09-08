@@ -9,7 +9,6 @@
 namespace RNGOEngine::Core::Renderer
 {
     using MeshID = unsigned int;
-    using ModelID = unsigned int;
 
     using ShaderID = unsigned int;
     using ShaderProgramID = unsigned int;
@@ -18,7 +17,6 @@ namespace RNGOEngine::Core::Renderer
     using TextureID = unsigned int;
 
     constexpr auto INVALID_MESH_ID = std::numeric_limits<MeshID>::max();
-    constexpr auto INVALID_MODEL_ID = std::numeric_limits<ModelID>::max();
 
     constexpr auto INVALID_SHADER_ID = std::numeric_limits<ShaderID>::max();
     constexpr auto INVALID_SHADER_PROGRAM_ID = std::numeric_limits<ShaderProgramID>::max();
