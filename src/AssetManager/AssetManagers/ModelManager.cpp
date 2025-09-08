@@ -14,15 +14,13 @@ namespace RNGOEngine::AssetHandling
         return m_nextModelID++;
     }
 
-    const ModelData& ModelManager::GetModel(const ModelID id) const
+    std::optional<std::reference_wrapper<const ModelData>> ModelManager::GetModel(const ModelID id) const
     {
-        if (!m_models.contains(id))
-        {
-            assert(false && "Model ID does not exist");
-            // TODO: Add like an error static model like source engine or something.
-            // Undefined behaviour currently
+        if (const auto it = m_models.find(id); it != m_models.end()) {
+            return std::cref(it->second);
         }
 
-        return m_models.at(id);
+        assert(false && "Model ID not found");
+        return std::nullopt;
     }
 }

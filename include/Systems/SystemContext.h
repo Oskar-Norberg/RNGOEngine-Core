@@ -14,6 +14,11 @@ namespace RNGOEngine
         class EventQueue;
     }
 
+    namespace AssetHandling
+    {
+        class AssetManager;
+    }
+
     namespace Core
     {
         namespace Renderer
@@ -36,6 +41,7 @@ namespace RNGOEngine::Systems
 
         // TODO: Ugly pointer bonanza over here
         Events::EventQueue* eventQueue;
+        AssetHandling::AssetManager* assetManager;
         Core::Renderer::IRenderer* renderer;
     };
 }

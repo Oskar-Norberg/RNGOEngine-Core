@@ -58,7 +58,7 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
 # Include assets in build.
 set(COPY_PROJECT_NAME RNGOEngine_Core-Assets)
 add_custom_target(${COPY_PROJECT_NAME}
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
 )
 
 add_dependencies(${PROJECT_NAME} ${COPY_PROJECT_NAME})

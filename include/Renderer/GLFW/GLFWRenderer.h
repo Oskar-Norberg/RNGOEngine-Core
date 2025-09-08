@@ -32,6 +32,7 @@ namespace RNGOEngine::Core::Renderer
             unsigned int nrOfIndices;
         };
 
+        // TODO: Move to RenderBase?
         std::unordered_map<MeshID, MeshSpecification> m_meshSpecifications;
         MaterialID m_nextMaterialID = 0;
 

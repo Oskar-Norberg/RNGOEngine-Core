@@ -22,20 +22,19 @@ namespace RNGOEngine::Systems::Core
             RNGOEngine::Core::Renderer::DrawQueue drawQueue;
             for (const auto& [entity, meshRender] : renderView.each())
             {
-                if (world.GetRegistry().all_of<Components::Transform>(entity))
-                {
-                    const auto& transform = world.GetRegistry().get<Components::Transform>(entity);
+                const auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
+                                           ? world.GetRegistry().get<Components::Transform>(entity)
+                                           : Components::Transform();
 
-                    
-                    
-                    // drawQueue.opaqueObjects.emplace_back(transform, meshRender.mesh,
-                    //                                      meshRender.shader);
-                }
-                else
+                const auto modelData = context.assetManager->GetModel(meshRender.modelID);
+                if (!modelData.has_value())
                 {
-                    assert(false && "Renderable entity is missing Transform component!");
-                    // drawQueue.opaqueObjects.emplace_back(Components::Transform(), meshRender.mesh,
-                    //                                      meshRender.shader);
+                    continue;
+                }
+                
+                for (const auto& meshID : modelData->get().meshes)
+                {
+                    drawQueue.opaqueObjects.emplace_back(transform, meshID, meshRender.shader);
                 }
             }
 
@@ -183,7 +182,7 @@ namespace RNGOEngine::Systems::Core
             }
 
             // Submit draw queue to renderer.
-            // renderer.SubmitDrawQueue(std::move(drawQueue));
+            context.renderer->SubmitDrawQueue(std::move(drawQueue));
         }
     };
 }

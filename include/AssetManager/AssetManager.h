@@ -32,12 +32,19 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit AssetManager(Core::Renderer::IRenderer& renderer, bool doFlipTexturesVertically);
 
+        // Models
+    public:
         ModelID LoadModel(const std::filesystem::path& modelPath);
 
-        Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
-                                                      const std::filesystem::path& fragmentSourcePath);
+        // TODO: This is internal API to the RenderSystem. This should probably not be public.
+        std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id) const;
 
-        Core::Renderer::TextureID LoadTexture(std::string_view texturePath);
+    public:
+
+        Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
+                                                      const std::filesystem::path& fragmentSourcePath) const;
+
+        Core::Renderer::TextureID LoadTexture(std::string_view texturePath) const;
 
     public:
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);

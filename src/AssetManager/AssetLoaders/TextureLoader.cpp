@@ -18,6 +18,7 @@ namespace RNGOEngine::AssetHandling
 
     Core::Renderer::TextureID TextureLoader::LoadTexture(const std::filesystem::path& path) const
     {
+        // TODO: Move this to the AssetManager. The TextureLoader should not fetch the path.
         const auto foundPath = m_fileFetcher.GetTexturePath(path);
 
         if (!foundPath.has_value())

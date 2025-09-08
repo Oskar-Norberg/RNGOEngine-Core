@@ -19,7 +19,7 @@ namespace RNGOEngine::Data::Rendering
 
 namespace RNGOEngine::Core::Renderer
 {
-    enum ShaderType { Vertex, Fragment };
+    enum class ShaderType { Vertex, Fragment };
 
     // TODO: Add resizing methods.
     class IRenderer

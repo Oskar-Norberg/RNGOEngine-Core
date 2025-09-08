@@ -12,7 +12,7 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    enum UniformType { Bool, Int, Float, Vec2, Vec3, Vec4, Mat4, Texture };
+    enum class UniformType { Bool, Int, Float, Vec2, Vec3, Vec4, Mat4, Texture };
 
     struct TextureSpecification
     {

@@ -25,11 +25,14 @@ namespace RNGOEngine::AssetHandling
     {
         Assimp::Importer importer;
 
-        const auto* scene = importer.ReadFile(modelPath.string(), aiProcess_Triangulate | aiProcess_FlipUVs);
+        const auto flags = aiProcess_Triangulate | (m_doFlipUVs ? aiProcess_FlipUVs : 0);
+        const auto* scene = importer.ReadFile(modelPath.string(), flags);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
             assert(false && "Failed to load model");
+            // TODO: Better error handling
+            return {};
         }
 
         std::vector<Data::Rendering::MeshData> meshes;
@@ -41,8 +44,6 @@ namespace RNGOEngine::AssetHandling
         {
             const auto* node = nodeStack.top();
             nodeStack.pop();
-
-            Data::Rendering::MeshData meshData;
 
             // Enqueue Children
             for (size_t i = 0; i < node->mNumChildren; ++i)
@@ -71,19 +72,36 @@ namespace RNGOEngine::AssetHandling
     {
         Data::Rendering::MeshData meshData;
 
-        for (int i = 0; i < mesh->mNumVertices; ++i)
+        // Vertex Data
+        for (size_t i = 0; i < mesh->mNumVertices; ++i)
         {
             Data::Rendering::Vertex vertex;
-            
-            vertex.position = {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
-            vertex.normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
 
-            const bool hasTextureCoords = mesh->HasTextureCoords(i);
+            // Positions
+            vertex.position = {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
+
+            // Normals
+            if (mesh->HasNormals())
+            {
+                vertex.normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
+            }
+
+            const bool hasTextureCoords = mesh->HasTextureCoords(0);
             vertex.texCoord = hasTextureCoords
                                   ? glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y)
                                   : glm::vec2(0.0f, 0.0f);
 
             meshData.vertices.emplace_back(vertex);
+        }
+
+        for (size_t i = 0; i < mesh->mNumFaces; ++i)
+        {
+            const auto* face = &mesh->mFaces[i];
+            
+            for (size_t j = 0; j < face->mNumIndices; ++j)
+            {
+                meshData.indices.emplace_back(face->mIndices[j]);
+            }
         }
 
         return meshData;

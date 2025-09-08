@@ -5,6 +5,7 @@
 #pragma once
 
 #include <limits>
+#include <optional>
 #include <unordered_map>
 #include <vector>
 
@@ -25,7 +26,7 @@ namespace RNGOEngine::AssetHandling
     {
     public:
         ModelID CreateModel(std::vector<Core::Renderer::MeshID> meshes);
-        const ModelData& GetModel(ModelID id) const;
+        std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id) const;
 
     private:
         std::unordered_map<ModelID, ModelData> m_models;

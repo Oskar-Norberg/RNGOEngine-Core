@@ -58,8 +58,7 @@ namespace RNGOEngine::Core
         while (m_running)
         {
             float deltaTime = std::chrono::duration<float>(
-                std::chrono::high_resolution_clock::now() - lastFrame
-            ).count();
+                std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
             PollWindowEvents();
@@ -99,9 +98,12 @@ namespace RNGOEngine::Core
 
         // These don't need to be set every frame. But alas.
         m_context.eventQueue = &m_eventQueue;
+        m_context.assetManager = m_assetManager.get();
         m_context.renderer = m_renderer.get();
-        
+
         m_systems.Update(m_currentScene->world, m_context);
+
+        m_context.resourceMapper.ClearTransientResources();
     }
 
     void Engine::Render() const
