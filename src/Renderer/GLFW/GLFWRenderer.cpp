@@ -11,6 +11,7 @@
 #include <cassert>
 #include <format>
 
+#include "AssetManager/AssetManagers/MaterialManager.h"
 #include "Data/MeshData.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 
@@ -32,7 +33,7 @@ namespace RNGOEngine::Core::Renderer
         glViewport(0, 0, viewportWidth, viewportHeight);
     }
 
-    void GLFWRenderer::Render(Window::IWindow& window)
+    void GLFWRenderer::Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager)
     {
         // TODO: Ugly. Add something like a squarebracket operator to get color.
         glClearColor(m_drawQueue.backgroundColor.color.x,
@@ -42,7 +43,7 @@ namespace RNGOEngine::Core::Renderer
         // Render Opaques
         for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
         {
-            const auto& materialSpecification = m_materials[opaqueDrawable.material];
+            const auto& materialSpecification = materialManager.GetMaterial(opaqueDrawable.material);
             const auto shaderID = materialSpecification.shader;
             glUseProgram(materialSpecification.shader);
             glBindVertexArray(opaqueDrawable.mesh);
@@ -318,14 +319,6 @@ namespace RNGOEngine::Core::Renderer
         glGenerateMipmap(GL_TEXTURE_2D);
 
         return textureHandle;
-    }
-
-    MaterialID GLFWRenderer::CreateMaterial(ShaderProgramID shaderProgramID)
-    {
-        const auto materialID = m_nextMaterialID++;
-        m_materials[materialID] = MaterialSpecification{.shader = shaderProgramID, .uniforms = {}};
-
-        return materialID;
     }
 
     ShaderProgramID GLFWRenderer::CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader)

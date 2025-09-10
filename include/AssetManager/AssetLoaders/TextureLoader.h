@@ -15,6 +15,7 @@ namespace RNGOEngine::AssetHandling::TextureLoader
         unsigned int height;
         unsigned int nrChannels;
 
+        std::filesystem::path path;
         unsigned char* data;
     };
     

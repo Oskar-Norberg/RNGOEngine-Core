@@ -14,7 +14,7 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        void Render(Window::IWindow& window) override
+        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager) override
         {
         }
 
@@ -33,48 +33,11 @@ namespace RNGOEngine::Core::Renderer
             return INVALID_SHADER_PROGRAM_ID;
         }
 
-        MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override
-        {
-            return INVALID_MATERIAL_ID;
-        }
-
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override
         {
             return INVALID_TEXTURE_ID;
         }
-
-        void SetTexture(MaterialID shader, TextureID texture, int slot) override
-        {
-        }
-
-        void SetBool(MaterialID shader, std::string_view name, bool value) override
-        {
-        }
-
-        void SetInt(MaterialID shader, std::string_view name, int value) override
-        {
-        }
-
-        void SetFloat(MaterialID shader, std::string_view name, float value) override
-        {
-        }
-
-        void SetVec2(MaterialID shader, std::string_view name, const glm::vec2& value) override
-        {
-        }
-
-        void SetVec3(MaterialID shader, std::string_view name, const glm::vec3& value) override
-        {
-        }
-
-        void SetVec4(MaterialID shader, std::string_view name, const glm::vec4& value) override
-        {
-        }
-
-        void SetMat4(MaterialID shader, std::string_view name, const glm::mat4& value) override
-        {
-        }
-
+        
         bool ListenSendEvents(Events::EventQueue& eventQueue) override
         {
             return false;

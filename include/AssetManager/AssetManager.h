@@ -6,10 +6,10 @@
 
 #include "AssetManager/AssetManagers/ModelManager.h"
 
-#include "AssetLoaders/MaterialLoader.h"
 #include "AssetLoaders/ModelLoader.h"
 #include "AssetLoaders/ShaderLoader.h"
 #include "AssetLoaders/TextureLoader.h"
+#include "AssetManagers/MaterialManager.h"
 #include "AssetManagers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
 
@@ -36,9 +36,7 @@ namespace RNGOEngine::AssetHandling
         // Models
     public:
         ModelID LoadModel(const std::filesystem::path& modelPath);
-
-        // TODO: This is internal API to the RenderSystem. This should probably not be public.
-        std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id);
+    
 
     public:
 
@@ -50,15 +48,25 @@ namespace RNGOEngine::AssetHandling
     public:
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);
 
+    public:
+        // TODO: This is internal API to the RenderSystem. This should probably not be public.
+        std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id) const;
+        std::optional<Core::Renderer::TextureID> GetTexture(Core::Renderer::TextureID id) const;
+
+    public:
+        const MaterialManager& GetMaterialManager() const { return m_materialManager; }
+        const ModelManager& GetModelManager() const { return m_modelManager; }
+        const TextureManager& GetTextureManager() const { return m_textureManager; }
+        
     private:
         Core::Renderer::IRenderer& m_renderer;
         AssetFileFetcher m_assetFileFetcher;
 
-        ModelManager m_modelManager;
-        TextureManager m_textureManager;
-        
         ModelLoader m_modelLoader;
         ShaderLoader m_shaderLoader;
-        MaterialLoader m_materialLoader;
+
+        MaterialManager m_materialManager;
+        ModelManager m_modelManager;
+        TextureManager m_textureManager;
     };
 }

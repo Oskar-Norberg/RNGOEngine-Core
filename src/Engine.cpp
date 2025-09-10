@@ -113,7 +113,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        m_renderer->Render(*m_window);
+        m_renderer->Render(*m_window, m_assetManager->GetMaterialManager());
         m_window->SwapBuffers();
     }
 

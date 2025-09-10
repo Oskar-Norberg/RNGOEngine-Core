@@ -2,10 +2,6 @@
 // Created by Oskar.Norberg on 2025-08-27.
 //
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "AssetManager/AssetManager.h"
 
 #include "Renderer/IRenderer.h"
@@ -17,8 +13,7 @@ namespace RNGOEngine::AssetHandling
         : m_renderer(renderer),
           m_textureManager(renderer),
           m_modelLoader(renderer, doFlipTexturesVertically),
-          m_shaderLoader(renderer, m_assetFileFetcher),
-          m_materialLoader(renderer)
+          m_shaderLoader(renderer, m_assetFileFetcher)
     {
         AddAssetPath(ENGINE_ASSETS_DIR, All);
 
@@ -46,9 +41,14 @@ namespace RNGOEngine::AssetHandling
         return modelID;
     }
 
-    std::optional<std::reference_wrapper<const ModelData>> AssetManager::GetModel(const ModelID id)
+    std::optional<std::reference_wrapper<const ModelData>> AssetManager::GetModel(const ModelID id) const
     {
         return m_modelManager.GetModel(id);
+    }
+
+    std::optional<Core::Renderer::TextureID> AssetManager::GetTexture(const Core::Renderer::TextureID id) const
+    {
+        return m_textureManager.GetTexture(id);
     }
 
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
@@ -59,9 +59,9 @@ namespace RNGOEngine::AssetHandling
         const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath, Core::Renderer::ShaderType::Fragment);
 
         const auto programID = m_shaderLoader.CreateShaderProgram(vertexShaderID, fragmentShaderID);
-        const auto materialID = m_renderer.CreateMaterial(programID);
+        const auto materialID = m_materialManager.CreateMaterial(programID);
 
-        return Core::Renderer::MaterialHandle(materialID, m_renderer);
+        return Core::Renderer::MaterialHandle(materialID, m_materialManager);
     }
 
     Core::Renderer::TextureID AssetManager::LoadTexture(
@@ -73,6 +73,12 @@ namespace RNGOEngine::AssetHandling
             assert(false && "Texture not found!");
             // I think the IVNALID_TEXTURE_ID Should be handled through the TextureManager.
             return Core::Renderer::INVALID_TEXTURE_ID;
+        }
+
+        const auto isAlreadyLoaded = m_textureManager.GetTextureIfLoaded(fullPath.value());
+        if (isAlreadyLoaded.has_value())
+        {
+            return isAlreadyLoaded.value();
         }
         
         const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
