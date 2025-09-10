@@ -35,8 +35,14 @@ namespace RNGOEngine::AssetHandling
             return INVALID_MODEL_ID;
         }
 
+        const auto modelAlreadyLoaded = m_modelManager.GetModelIDIfLoaded(fullPath.value());
+        if (modelAlreadyLoaded.has_value())
+        {
+            return modelAlreadyLoaded.value();
+        }
+
         const auto meshIDs = m_modelLoader.LoadModel(fullPath.value());
-        const auto modelID = m_modelManager.CreateModel(meshIDs);
+        const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshIDs);
 
         return modelID;
     }

@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include <limits>
 #include <optional>
 #include <unordered_map>
@@ -25,11 +26,14 @@ namespace RNGOEngine::AssetHandling
     class ModelManager
     {
     public:
-        ModelID CreateModel(std::vector<Core::Renderer::MeshID> meshes);
+        ModelID CreateModel(const std::filesystem::path& path, std::vector<Core::Renderer::MeshID> meshes);
+
+        std::optional<ModelID> GetModelIDIfLoaded(const std::filesystem::path& path);
         std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id) const;
 
     private:
         std::unordered_map<ModelID, ModelData> m_models;
+        std::unordered_map<std::filesystem::path, ModelID> m_loadedModelPaths;
 
     private:
         ModelID m_nextModelID = 0;
