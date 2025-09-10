@@ -9,8 +9,7 @@
 namespace RNGOEngine::AssetHandling
 {
     TextureManager::TextureManager(Core::Renderer::IRenderer& renderer)
-        : m_nextTextureID(0),
-          m_renderer(renderer)
+        : m_renderer(renderer)
     {
     }
 
@@ -32,13 +31,12 @@ namespace RNGOEngine::AssetHandling
 
     Core::Renderer::TextureID TextureManager::CreateTexture(const TextureLoader::TextureHandle texture)
     {
-        m_nextTextureID++;
-        
         m_textures.emplace_back(m_renderer.CreateTexture(texture.data->data, texture.data->width,
                                                          texture.data->height,
                                                          texture.data->nrChannels));
-        
-        m_loadedTexturePaths[texture.data->path] = m_nextTextureID - 1;
-        return m_textures[m_nextTextureID - 1];
+
+        const size_t prevSize = m_textures.size() - 1;
+        m_loadedTexturePaths[texture.data->path] = prevSize;
+        return m_textures[prevSize];
     }
 }

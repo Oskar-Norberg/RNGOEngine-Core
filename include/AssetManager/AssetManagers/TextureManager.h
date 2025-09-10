@@ -39,9 +39,6 @@ namespace RNGOEngine::AssetHandling
         std::vector<Core::Renderer::TextureID> m_textures;
 
     private:
-        Core::Renderer::TextureID m_nextTextureID;
-        
-    private:
         Core::Renderer::IRenderer& m_renderer;
     };
 }
