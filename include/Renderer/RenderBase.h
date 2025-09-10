@@ -17,7 +17,8 @@ namespace RNGOEngine::Core::Renderer
             m_drawQueue = drawQueue;
         }
 
-        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager) override = 0;
+        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
+                    const AssetHandling::TextureManager& textureManager) override = 0;
 
         bool ListenSendEvents(Events::EventQueue& eventQueue) override = 0;
 
@@ -26,7 +27,7 @@ namespace RNGOEngine::Core::Renderer
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override = 0;
         ShaderID CreateShader(std::string_view source, ShaderType type) override = 0;
         ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override = 0;
-        
+
         DrawQueue m_drawQueue;
     };
 }

@@ -12,6 +12,7 @@
 #include <format>
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetManager/AssetManagers/TextureManager.h"
 #include "Data/MeshData.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 
@@ -33,7 +34,8 @@ namespace RNGOEngine::Core::Renderer
         glViewport(0, 0, viewportWidth, viewportHeight);
     }
 
-    void GLFWRenderer::Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager)
+    void GLFWRenderer::Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
+                              const AssetHandling::TextureManager& textureManager)
     {
         // TODO: Ugly. Add something like a squarebracket operator to get color.
         glClearColor(m_drawQueue.backgroundColor.color.x,
@@ -95,8 +97,10 @@ namespace RNGOEngine::Core::Renderer
                             break;
                         }
 
+                        const auto textureID = textureManager.GetTexture(
+                            uniformSpecification.data.texture.texture);
                         glActiveTexture(GL_TEXTURE0 + uniformSpecification.data.texture.slot);
-                        glBindTexture(GL_TEXTURE_2D, uniformSpecification.data.texture.texture);
+                        glBindTexture(GL_TEXTURE_2D, textureID);
                         glUniform1i(uniformLocation, uniformSpecification.data.texture.slot);
                         break;
                     }

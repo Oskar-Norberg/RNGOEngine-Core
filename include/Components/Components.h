@@ -17,7 +17,7 @@ namespace RNGOEngine::Components
     struct MeshRenderer
     {
         AssetHandling::ModelID modelID;
-        Core::Renderer::MaterialID shader;
+        Core::Renderer::MaterialID materialID;
     };
 
     struct Transform

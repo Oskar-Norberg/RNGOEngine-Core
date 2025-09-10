@@ -34,7 +34,7 @@ namespace RNGOEngine::Systems::Core
                 
                 for (const auto& meshID : modelData->get().meshes)
                 {
-                    drawQueue.opaqueObjects.emplace_back(transform, meshID, meshRender.shader);
+                    drawQueue.opaqueObjects.emplace_back(transform, meshID, meshRender.materialID);
                 }
             }
 

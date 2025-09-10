@@ -14,7 +14,8 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager) override
+        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
+                    const AssetHandling::TextureManager& textureManager) override
         {
         }
 
@@ -37,7 +38,7 @@ namespace RNGOEngine::Core::Renderer
         {
             return INVALID_TEXTURE_ID;
         }
-        
+
         bool ListenSendEvents(Events::EventQueue& eventQueue) override
         {
             return false;

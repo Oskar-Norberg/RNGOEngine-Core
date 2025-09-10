@@ -37,6 +37,6 @@ namespace RNGOEngine::AssetHandling
 
         const size_t prevSize = m_textures.size() - 1;
         m_loadedTexturePaths[texture.data->path] = prevSize;
-        return m_textures[prevSize];
+        return prevSize;
     }
 }
