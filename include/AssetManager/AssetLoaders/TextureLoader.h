@@ -4,20 +4,32 @@
 
 #pragma once
 
-#include "AssetManager/AssetFileFetcher.h"
-#include "Renderer/IRenderer.h"
+#include <expected>
+#include <filesystem>
 
-namespace RNGOEngine::AssetHandling
+namespace RNGOEngine::AssetHandling::TextureLoader
 {
-    class TextureLoader
+    struct TextureData
     {
-    public:
-        TextureLoader(Core::Renderer::IRenderer& renderer, const AssetFileFetcher& fileFetcher, bool doFlipVertically = true);
+        unsigned int width;
+        unsigned int height;
+        unsigned int nrChannels;
 
-        Core::Renderer::TextureID LoadTexture(const std::filesystem::path& path) const;
-
-    private:
-        Core::Renderer::IRenderer& m_renderer;
-        const AssetFileFetcher& m_fileFetcher;
+        unsigned char* data;
     };
+    
+    struct TextureHandle
+    {
+        // TODO: This should probably be wrapped in a smart pointer with a custom deletor.
+        TextureData* data;
+    };
+
+    enum class TextureLoadingError
+    {
+        FileNotFound,
+        FailedToLoad,
+    };
+
+    std::expected<TextureHandle, TextureLoadingError> LoadTexture(const std::filesystem::path& path);
+    void FreeTexture(TextureHandle texture);
 }

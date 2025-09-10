@@ -15,7 +15,7 @@ namespace RNGOEngine::AssetHandling
     AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
                                const bool doFlipTexturesVertically)
         : m_renderer(renderer),
-          m_textureLoader(renderer, m_assetFileFetcher, doFlipTexturesVertically),
+          m_textureManager(renderer),
           m_modelLoader(renderer, doFlipTexturesVertically),
           m_shaderLoader(renderer, m_assetFileFetcher),
           m_materialLoader(renderer)
@@ -46,13 +46,13 @@ namespace RNGOEngine::AssetHandling
         return modelID;
     }
 
-    std::optional<std::reference_wrapper<const ModelData>> AssetManager::GetModel(const ModelID id) const
+    std::optional<std::reference_wrapper<const ModelData>> AssetManager::GetModel(const ModelID id)
     {
         return m_modelManager.GetModel(id);
     }
 
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
-        const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath) const
+        const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
         // TODO: Caching
         const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath, Core::Renderer::ShaderType::Vertex);
@@ -65,11 +65,34 @@ namespace RNGOEngine::AssetHandling
     }
 
     Core::Renderer::TextureID AssetManager::LoadTexture(
-        const std::string_view texturePath) const
+        const std::string_view texturePath)
     {
-        // TODO: Caching
+        const auto fullPath = m_assetFileFetcher.GetTexturePath(texturePath);
+        if (!fullPath.has_value())
+        {
+            assert(false && "Texture not found!");
+            // I think the IVNALID_TEXTURE_ID Should be handled through the TextureManager.
+            return Core::Renderer::INVALID_TEXTURE_ID;
+        }
+        
+        const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
+        if (!textureHandle)
+        {
+            switch (textureHandle.error())
+            {
+                case TextureLoader::TextureLoadingError::FileNotFound:
+                    assert(false && "Texture not found");
+                    return INVALID_MODEL_ID;
+                case TextureLoader::TextureLoadingError::FailedToLoad:
+                    assert(false && "Failed to load texture");
+                    return INVALID_MODEL_ID;
+            }
+        }
 
-        return m_textureLoader.LoadTexture(texturePath);
+        const auto textureID = m_textureManager.CreateTexture(textureHandle.value());
+        TextureLoader::FreeTexture(textureHandle.value());
+
+        return textureID;
     }
 
     void AssetManager::AddAssetPath(
