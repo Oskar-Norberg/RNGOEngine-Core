@@ -10,18 +10,17 @@
 #include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/RenderID.h"
 
-namespace RNGOEngine::Core::Renderer
+namespace RNGOEngine
 {
-    class IRenderer;
-}
-
-namespace Core
-{
-    namespace Renderer
+    namespace Core
     {
-        class IRenderer;
+        namespace Renderer
+        {
+            class IRenderer;
+        }
     }
 }
+
 
 namespace RNGOEngine::AssetHandling
 {
