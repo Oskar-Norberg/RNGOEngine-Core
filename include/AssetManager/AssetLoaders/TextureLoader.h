@@ -27,6 +27,7 @@ namespace RNGOEngine::AssetHandling::TextureLoader
 
     enum class TextureLoadingError
     {
+        None,
         FileNotFound,
         FailedToLoad,
     };

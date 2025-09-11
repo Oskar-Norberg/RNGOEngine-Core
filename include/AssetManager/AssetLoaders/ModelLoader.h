@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <expected>
 #include <filesystem>
 
 #include "Data/MeshData.h"
@@ -17,20 +18,28 @@ namespace RNGOEngine::Core::Renderer
     class IRenderer;
 }
 
-namespace RNGOEngine::AssetHandling
+namespace RNGOEngine::AssetHandling::ModelLoading
 {
-    class ModelLoader
+    struct ModelData
     {
-    public:
-        explicit ModelLoader(Core::Renderer::IRenderer& renderer, bool doflipUVs);
-
-        std::vector<Core::Renderer::MeshID> LoadModel(const std::filesystem::path& modelPath);
-
-    private:
-        Data::Rendering::MeshData ProcessMesh(const aiMesh* mesh, const aiScene* scene);
-
-    private:
-        Core::Renderer::IRenderer& m_renderer;
-        bool m_doFlipUVs;
+        std::vector<Data::Rendering::MeshData> meshes;
     };
+
+    struct ModelHandle
+    {
+        // TODO: Again, this should probably be a smart pointer.
+        ModelData* data;
+    };
+
+    enum class ModelLoadingError
+    {
+        None,
+        FileNotFound,
+        FailedToLoad,
+        NoMeshesFound,
+        UnsupportedFormat,
+    };
+    
+    std::expected<ModelHandle, ModelLoadingError> LoadModel(const std::filesystem::path& modelPath, bool doFlipUVs);
+    void UnloadModel(ModelHandle handle);
 }

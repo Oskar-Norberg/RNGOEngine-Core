@@ -14,61 +14,10 @@
 #include "Data/MeshData.h"
 #include "Renderer/IRenderer.h"
 
-namespace RNGOEngine::AssetHandling
+namespace RNGOEngine::AssetHandling::ModelLoading
 {
-    ModelLoader::ModelLoader(Core::Renderer::IRenderer& renderer, bool doflipUVs)
-        : m_renderer(renderer), m_doFlipUVs(doflipUVs)
-    {
-    }
-
-    std::vector<Core::Renderer::MeshID> ModelLoader::LoadModel(const std::filesystem::path& modelPath)
-    {
-        Assimp::Importer importer;
-
-        const auto flags = aiProcess_Triangulate | (m_doFlipUVs ? aiProcess_FlipUVs : 0);
-        const auto* scene = importer.ReadFile(modelPath.string(), flags);
-
-        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-        {
-            assert(false && "Failed to load model");
-            // TODO: Better error handling
-            return {};
-        }
-
-        std::vector<Data::Rendering::MeshData> meshes;
-
-        std::stack<aiNode*> nodeStack;
-        nodeStack.push(scene->mRootNode);
-
-        while (!nodeStack.empty())
-        {
-            const auto* node = nodeStack.top();
-            nodeStack.pop();
-
-            // Enqueue Children
-            for (size_t i = 0; i < node->mNumChildren; ++i)
-            {
-                nodeStack.push(node->mChildren[i]);
-            }
-
-            // Process Meshes.
-            for (size_t i = 0; i < node->mNumMeshes; ++i)
-            {
-                meshes.emplace_back(ProcessMesh(scene->mMeshes[node->mMeshes[i]], scene));
-            }
-        }
-
-        std::vector<Core::Renderer::MeshID> meshIDs;
-        meshIDs.reserve(meshes.size());
-        for (const auto& mesh : meshes)
-        {
-            meshIDs.emplace_back(m_renderer.CreateMesh(mesh));
-        }
-
-        return meshIDs;
-    }
-
-    Data::Rendering::MeshData ModelLoader::ProcessMesh(const aiMesh* mesh, const aiScene* scene)
+    // Make this static to this specific cpp file. No need to expose it in the header.
+    static Data::Rendering::MeshData ProcessMesh(const aiMesh* mesh, const aiScene* scene)
     {
         Data::Rendering::MeshData meshData;
 
@@ -97,7 +46,7 @@ namespace RNGOEngine::AssetHandling
         for (size_t i = 0; i < mesh->mNumFaces; ++i)
         {
             const auto* face = &mesh->mFaces[i];
-            
+
             for (size_t j = 0; j < face->mNumIndices; ++j)
             {
                 meshData.indices.emplace_back(face->mIndices[j]);
@@ -105,5 +54,57 @@ namespace RNGOEngine::AssetHandling
         }
 
         return meshData;
+    }
+
+    std::expected<ModelHandle, ModelLoadingError> LoadModel(const std::filesystem::path& modelPath,
+                                                            const bool doFlipUVs)
+    {
+        Assimp::Importer importer;
+
+        const auto flags = aiProcess_Triangulate | (doFlipUVs ? aiProcess_FlipUVs : 0);
+        const auto* scene = importer.ReadFile(modelPath.string(), flags);
+
+        if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
+        {
+            assert(false && "Failed to load model");
+            return std::unexpected(ModelLoadingError::FailedToLoad);
+        }
+
+        auto* modelData = new ModelData();
+        modelData->meshes.reserve(scene->mNumMeshes);
+
+        std::stack<aiNode*> nodeStack;
+        nodeStack.push(scene->mRootNode);
+
+        while (!nodeStack.empty())
+        {
+            const auto* node = nodeStack.top();
+            nodeStack.pop();
+
+            // Enqueue Children
+            for (size_t i = 0; i < node->mNumChildren; ++i)
+            {
+                nodeStack.push(node->mChildren[i]);
+            }
+
+            // Process Meshes.
+            for (size_t i = 0; i < node->mNumMeshes; ++i)
+            {
+                modelData->meshes.emplace_back(ProcessMesh(scene->mMeshes[node->mMeshes[i]], scene));
+            }
+        }
+
+        if (modelData->meshes.empty())
+        {
+            delete modelData;
+            return std::unexpected(ModelLoadingError::NoMeshesFound);
+        }
+
+        return ModelHandle{modelData};
+    }
+
+    void UnloadModel(const ModelHandle handle)
+    {
+        delete handle.data;
     }
 }

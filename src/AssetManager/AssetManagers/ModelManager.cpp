@@ -6,12 +6,27 @@
 
 #include <cassert>
 
+#include "Renderer/IRenderer.h"
+
 namespace RNGOEngine::AssetHandling
 {
-    ModelID ModelManager::CreateModel(const std::filesystem::path& path,
-                                      std::vector<Core::Renderer::MeshID> meshes)
+    ModelManager::ModelManager(Core::Renderer::IRenderer& renderer)
+        : m_renderer(renderer)
     {
-        m_models[m_nextModelID] = ModelData{std::move(meshes)};
+    }
+
+    ModelID ModelManager::CreateModel(const std::filesystem::path& path,
+                                      ModelLoading::ModelHandle modelHandle)
+    {
+        std::vector<Core::Renderer::MeshID> meshIDs;
+        meshIDs.reserve(modelHandle.data->meshes.size());
+
+        for (const auto& mesh : modelHandle.data->meshes)
+        {
+            meshIDs.emplace_back(m_renderer.CreateMesh(mesh));
+        }
+
+        m_models[m_nextModelID] = ModelData{meshIDs};
         m_loadedModelPaths[path] = m_nextModelID;
 
         return m_nextModelID++;

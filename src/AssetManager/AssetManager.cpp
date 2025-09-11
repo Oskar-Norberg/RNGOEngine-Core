@@ -10,10 +10,11 @@ namespace RNGOEngine::AssetHandling
 {
     AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
                                const bool doFlipTexturesVertically)
-        : m_renderer(renderer),
-          m_textureManager(renderer),
-          m_modelLoader(renderer, doFlipTexturesVertically),
-          m_shaderLoader(renderer, m_assetFileFetcher)
+        : m_doFlipTexturesVertically(doFlipTexturesVertically),
+          m_renderer(renderer),
+          m_shaderLoader(renderer, m_assetFileFetcher),
+          m_modelManager(renderer),
+          m_textureManager(renderer)
     {
         AddAssetPath(ENGINE_ASSETS_DIR, All);
 
@@ -41,8 +42,27 @@ namespace RNGOEngine::AssetHandling
             return modelAlreadyLoaded.value();
         }
 
-        const auto meshIDs = m_modelLoader.LoadModel(fullPath.value());
-        const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshIDs);
+        const auto meshHandle = ModelLoading::LoadModel(fullPath.value(), m_doFlipTexturesVertically);
+
+        if (!meshHandle.has_value())
+        {
+            switch (meshHandle.error())
+            {
+                case ModelLoading::ModelLoadingError::FileNotFound:
+                    assert(false && "Model not found!");
+                    break;
+                case ModelLoading::ModelLoadingError::FailedToLoad:
+                    assert(false && "Model could not be loaded!");
+                    break;
+                case ModelLoading::ModelLoadingError::NoMeshesFound:
+                    assert(false && "Model has no valid meshes!");
+                    break;
+                case ModelLoading::ModelLoadingError::UnsupportedFormat:
+                    assert(false && "Unsupported model format!");
+                    break;
+            }
+        }
+        const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
 
         return modelID;
     }
@@ -52,7 +72,8 @@ namespace RNGOEngine::AssetHandling
         return m_modelManager.GetModel(id);
     }
 
-    std::optional<Core::Renderer::TextureID> AssetManager::GetTexture(const Core::Renderer::TextureID id) const
+    std::optional<Core::Renderer::TextureID> AssetManager::GetTexture(
+        const Core::Renderer::TextureID id) const
     {
         return m_textureManager.GetTexture(id);
     }
@@ -61,8 +82,10 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
         // TODO: Caching
-        const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath, Core::Renderer::ShaderType::Vertex);
-        const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath, Core::Renderer::ShaderType::Fragment);
+        const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath,
+                                                              Core::Renderer::ShaderType::Vertex);
+        const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath,
+                                                                Core::Renderer::ShaderType::Fragment);
 
         const auto programID = m_shaderLoader.CreateShaderProgram(vertexShaderID, fragmentShaderID);
         const auto materialID = m_materialManager.CreateMaterial(programID);
@@ -86,7 +109,7 @@ namespace RNGOEngine::AssetHandling
         {
             return isAlreadyLoaded.value();
         }
-        
+
         const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
         if (!textureHandle)
         {

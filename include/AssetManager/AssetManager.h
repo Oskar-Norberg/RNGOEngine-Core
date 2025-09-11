@@ -59,10 +59,12 @@ namespace RNGOEngine::AssetHandling
         const TextureManager& GetTextureManager() const { return m_textureManager; }
         
     private:
+        bool m_doFlipTexturesVertically;
+        
+    private:
         Core::Renderer::IRenderer& m_renderer;
         AssetFileFetcher m_assetFileFetcher;
 
-        ModelLoader m_modelLoader;
         ShaderLoader m_shaderLoader;
 
         MaterialManager m_materialManager;
