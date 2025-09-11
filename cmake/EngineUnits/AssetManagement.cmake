@@ -18,6 +18,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         src/AssetManager/AssetManagers/TextureManager.cpp
         include/AssetManager/AssetManagers/MaterialManager.h
         src/AssetManager/AssetManagers/MaterialManager.cpp
+        include/AssetManager/AssetManagers/ShaderManager.h
+        src/AssetManager/AssetManagers/ShaderManager.cpp
 )
 target_include_directories(${ASSET_MANAGER_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC ${RENDERING_PROJECT_NAME} assimp stb_image)

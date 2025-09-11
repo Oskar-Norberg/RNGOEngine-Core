@@ -12,7 +12,8 @@ namespace RNGOEngine::AssetHandling
                                const bool doFlipTexturesVertically)
         : m_doFlipTexturesVertically(doFlipTexturesVertically),
           m_renderer(renderer),
-          m_shaderLoader(renderer, m_assetFileFetcher),
+          m_shaderLoader(m_assetFileFetcher),
+          m_shaderManager(renderer),
           m_modelManager(renderer),
           m_textureManager(renderer)
     {
@@ -28,7 +29,6 @@ namespace RNGOEngine::AssetHandling
     ModelID AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
-        // TODO: Caching? Just check if manager has a model with the same path?
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
         if (!fullPath.has_value())
         {
@@ -36,10 +36,9 @@ namespace RNGOEngine::AssetHandling
             return INVALID_MODEL_ID;
         }
 
-        const auto modelAlreadyLoaded = m_modelManager.GetModelIDIfLoaded(fullPath.value());
-        if (modelAlreadyLoaded.has_value())
+        if (m_modelCache.Contains(fullPath.value()))
         {
-            return modelAlreadyLoaded.value();
+            return m_modelCache.Get(fullPath.value());
         }
 
         const auto meshHandle = ModelLoading::LoadModel(fullPath.value(), m_doFlipTexturesVertically);
@@ -50,19 +49,22 @@ namespace RNGOEngine::AssetHandling
             {
                 case ModelLoading::ModelLoadingError::FileNotFound:
                     assert(false && "Model not found!");
-                    break;
                 case ModelLoading::ModelLoadingError::FailedToLoad:
                     assert(false && "Model could not be loaded!");
-                    break;
                 case ModelLoading::ModelLoadingError::NoMeshesFound:
                     assert(false && "Model has no valid meshes!");
-                    break;
                 case ModelLoading::ModelLoadingError::UnsupportedFormat:
                     assert(false && "Unsupported model format!");
-                    break;
+                default:
+                    assert(false && "Model loading failed!");
             }
+
+            return INVALID_MODEL_ID;
         }
         const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
+
+        ModelLoading::UnloadModel(meshHandle.value());
+        m_modelCache.Insert(fullPath.value(), modelID);
 
         return modelID;
     }
@@ -78,18 +80,83 @@ namespace RNGOEngine::AssetHandling
         return m_textureManager.GetTexture(id);
     }
 
+    // TODO: This is the most ass function in the entire engine.
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
-        // TODO: Caching
-        const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath,
-                                                              Core::Renderer::ShaderType::Vertex);
-        const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath,
-                                                                Core::Renderer::ShaderType::Fragment);
+        Core::Renderer::ShaderProgramID shaderProgramID = Core::Renderer::INVALID_SHADER_PROGRAM_ID;
 
-        const auto programID = m_shaderLoader.CreateShaderProgram(vertexShaderID, fragmentShaderID);
-        const auto materialID = m_materialManager.CreateMaterial(programID);
+        if (m_shaderProgramCache.Contains(std::make_pair(vertexSourcePath, fragmentSourcePath)))
+        {
+            shaderProgramID = m_shaderProgramCache.Get(std::make_pair(vertexSourcePath, fragmentSourcePath));
+        }
+        else
+        {
+            auto vertexShaderID = Core::Renderer::INVALID_SHADER_ID;
+            auto fragmentShaderID = Core::Renderer::INVALID_SHADER_ID;
 
+            if (m_shaderCache.Contains(vertexSourcePath))
+            {
+                vertexShaderID = m_shaderCache.Get(vertexSourcePath);
+            }
+
+            if (m_shaderCache.Contains(fragmentSourcePath))
+            {
+                fragmentShaderID = m_shaderCache.Get(fragmentSourcePath);
+            }
+
+            if (vertexShaderID == Core::Renderer::INVALID_SHADER_ID)
+            {
+                const auto vertexShaderString = m_shaderLoader.LoadShader(vertexSourcePath);
+
+                const auto vertID = m_shaderManager.CreateShader(vertexShaderString,
+                                                                 Core::Renderer::ShaderType::Vertex);
+
+                if (vertID.has_value())
+                {
+                    vertexShaderID = vertID.value();
+                }
+                else
+                {
+                    assert(false && "Failed to create vertex shader!");
+                }
+            }
+
+            if (fragmentShaderID == Core::Renderer::INVALID_SHADER_ID)
+            {
+                const auto fragmentShaderString = m_shaderLoader.LoadShader(fragmentSourcePath);
+
+                const auto fragmentID = m_shaderManager.CreateShader(fragmentShaderString,
+                                                                     Core::Renderer::ShaderType::Fragment);
+
+                if (fragmentID.has_value())
+                {
+                    fragmentShaderID = fragmentID.value();
+                }
+                else
+                {
+                    assert(false && "Failed to create fragment shader!");
+                }
+            }
+
+            m_shaderCache.Insert(vertexSourcePath, vertexShaderID);
+            m_shaderCache.Insert(fragmentSourcePath, fragmentShaderID);
+
+            const auto shaderProgram = m_shaderManager.CreateShaderProgram(vertexShaderID, fragmentShaderID);
+            if (shaderProgram.has_value())
+            {
+                shaderProgramID = shaderProgram.value();
+
+                m_shaderProgramCache.Insert(std::make_pair(vertexSourcePath, fragmentSourcePath),
+                                            shaderProgramID);
+            }
+            else
+            {
+                assert(false && "Failed to create shader program!");
+            }
+        }
+
+        const auto materialID = m_materialManager.CreateMaterial(shaderProgramID);
         return Core::Renderer::MaterialHandle(materialID, m_materialManager);
     }
 
@@ -104,10 +171,9 @@ namespace RNGOEngine::AssetHandling
             return Core::Renderer::INVALID_TEXTURE_ID;
         }
 
-        const auto isAlreadyLoaded = m_textureManager.GetTextureIfLoaded(fullPath.value());
-        if (isAlreadyLoaded.has_value())
+        if (m_textureCache.Contains(fullPath.value()))
         {
-            return isAlreadyLoaded.value();
+            return m_textureCache.Get(fullPath.value());
         }
 
         const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
@@ -126,6 +192,8 @@ namespace RNGOEngine::AssetHandling
 
         const auto textureID = m_textureManager.CreateTexture(textureHandle.value());
         TextureLoader::FreeTexture(textureHandle.value());
+
+        m_textureCache.Insert(fullPath.value(), textureID);
 
         return textureID;
     }

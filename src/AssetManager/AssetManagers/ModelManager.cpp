@@ -27,29 +27,19 @@ namespace RNGOEngine::AssetHandling
         }
 
         m_models[m_nextModelID] = ModelData{meshIDs};
-        m_loadedModelPaths[path] = m_nextModelID;
 
         return m_nextModelID++;
     }
 
-    std::optional<ModelID> ModelManager::GetModelIDIfLoaded(const std::filesystem::path& path)
+    const ModelData& ModelManager::GetModel(const ModelID id) const
     {
-        if (const auto it = m_loadedModelPaths.find(path); it != m_loadedModelPaths.end())
+        if (const auto it = m_models.find(id); it != m_models.end())
         {
             return it->second;
         }
 
-        return std::nullopt;
-    }
-
-    std::optional<std::reference_wrapper<const ModelData>> ModelManager::GetModel(const ModelID id) const
-    {
-        if (const auto it = m_models.find(id); it != m_models.end())
-        {
-            return std::cref(it->second);
-        }
-
-        assert(false && "Model ID not found");
-        return std::nullopt;
+        // Return a default model?
+        assert(false && "Tried to get a model that doesn't exist.");
+        return m_models.at(0);
     }
 }

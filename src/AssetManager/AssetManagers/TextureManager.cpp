@@ -13,20 +13,9 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    Core::Renderer::TextureID TextureManager::GetTexture(Core::Renderer::TextureID id) const
+    Core::Renderer::TextureID TextureManager::GetTexture(const Core::Renderer::TextureID id) const
     {
         return m_textures[id];
-    }
-
-    std::optional<Core::Renderer::TextureID> TextureManager::GetTextureIfLoaded(
-        const std::filesystem::path& path) const
-    {
-        if (const auto it = m_loadedTexturePaths.find(path); it != m_loadedTexturePaths.end())
-        {
-            return it->second;
-        }
-
-        return std::nullopt;
     }
 
     Core::Renderer::TextureID TextureManager::CreateTexture(const TextureLoader::TextureHandle texture)
@@ -35,8 +24,6 @@ namespace RNGOEngine::AssetHandling
                                                          texture.data->height,
                                                          texture.data->nrChannels));
 
-        const size_t prevSize = m_textures.size() - 1;
-        m_loadedTexturePaths[texture.data->path] = prevSize;
-        return prevSize;
+        return m_textures.size() - 1;
     }
 }

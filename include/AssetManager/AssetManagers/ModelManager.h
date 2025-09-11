@@ -38,16 +38,13 @@ namespace RNGOEngine::AssetHandling
     class ModelManager
     {
     public:
-        ModelManager(Core::Renderer::IRenderer& renderer);
+        explicit ModelManager(Core::Renderer::IRenderer& renderer);
 
         ModelID CreateModel(const std::filesystem::path& path, ModelLoading::ModelHandle modelHandle);
-
-        std::optional<ModelID> GetModelIDIfLoaded(const std::filesystem::path& path);
-        std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id) const;
+        const ModelData& GetModel(ModelID id) const;
 
     private:
         std::unordered_map<ModelID, ModelData> m_models;
-        std::unordered_map<std::filesystem::path, ModelID> m_loadedModelPaths;
 
     private:
         Core::Renderer::IRenderer& m_renderer;
