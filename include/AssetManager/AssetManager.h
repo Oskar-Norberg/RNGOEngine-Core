@@ -72,7 +72,8 @@ namespace RNGOEngine::AssetHandling
 
         Utilities::AssetCache<std::filesystem::path, ModelID> m_modelCache;
         ModelManager m_modelManager;
-        
+
+        Utilities::AssetCache<std::filesystem::path, ModelID> m_textureCache;
         TextureManager m_textureManager;
         MaterialManager m_materialManager;
 

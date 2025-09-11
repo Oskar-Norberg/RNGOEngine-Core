@@ -29,7 +29,6 @@ namespace RNGOEngine::AssetHandling
     ModelID AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
-        
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
         if (!fullPath.has_value())
         {
@@ -125,10 +124,9 @@ namespace RNGOEngine::AssetHandling
             return Core::Renderer::INVALID_TEXTURE_ID;
         }
 
-        const auto isAlreadyLoaded = m_textureManager.GetTextureIfLoaded(fullPath.value());
-        if (isAlreadyLoaded.has_value())
+        if (m_textureCache.Contains(fullPath.value()))
         {
-            return isAlreadyLoaded.value();
+            return m_textureCache.Get(fullPath.value());
         }
 
         const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
@@ -147,6 +145,8 @@ namespace RNGOEngine::AssetHandling
 
         const auto textureID = m_textureManager.CreateTexture(textureHandle.value());
         TextureLoader::FreeTexture(textureHandle.value());
+
+        m_textureCache.Insert(fullPath.value(), textureID);
 
         return textureID;
     }
