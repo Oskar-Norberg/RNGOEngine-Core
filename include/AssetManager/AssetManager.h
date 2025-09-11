@@ -67,6 +67,7 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::IRenderer& m_renderer;
         AssetFileFetcher m_assetFileFetcher;
 
+        Utilities::AssetCache<std::filesystem::path, Core::Renderer::ShaderID> m_shaderCache;
         ShaderLoader m_shaderLoader;
         ShaderManager m_shaderManager;
 
