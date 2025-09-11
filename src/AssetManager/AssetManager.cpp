@@ -62,6 +62,8 @@ namespace RNGOEngine::AssetHandling
             return INVALID_MODEL_ID;
         }
         const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
+
+        ModelLoading::UnloadModel(meshHandle.value());
         m_modelCache.Insert(fullPath.value(), modelID);
 
         return modelID;
