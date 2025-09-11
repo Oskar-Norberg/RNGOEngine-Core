@@ -10,6 +10,7 @@
 #include "AssetLoaders/ShaderLoader.h"
 #include "AssetLoaders/TextureLoader.h"
 #include "AssetManagers/MaterialManager.h"
+#include "AssetManagers/ShaderManager.h"
 #include "AssetManagers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
 
@@ -67,6 +68,7 @@ namespace RNGOEngine::AssetHandling
 
         ShaderLoader m_shaderLoader;
 
+        ShaderManager m_shaderManager;
         MaterialManager m_materialManager;
         ModelManager m_modelManager;
         TextureManager m_textureManager;

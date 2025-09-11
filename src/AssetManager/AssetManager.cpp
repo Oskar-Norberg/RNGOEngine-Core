@@ -12,7 +12,8 @@ namespace RNGOEngine::AssetHandling
                                const bool doFlipTexturesVertically)
         : m_doFlipTexturesVertically(doFlipTexturesVertically),
           m_renderer(renderer),
-          m_shaderLoader(renderer, m_assetFileFetcher),
+          m_shaderLoader(m_assetFileFetcher),
+          m_shaderManager(renderer),
           m_modelManager(renderer),
           m_textureManager(renderer)
     {
@@ -50,17 +51,17 @@ namespace RNGOEngine::AssetHandling
             {
                 case ModelLoading::ModelLoadingError::FileNotFound:
                     assert(false && "Model not found!");
-                    break;
                 case ModelLoading::ModelLoadingError::FailedToLoad:
                     assert(false && "Model could not be loaded!");
-                    break;
                 case ModelLoading::ModelLoadingError::NoMeshesFound:
                     assert(false && "Model has no valid meshes!");
-                    break;
                 case ModelLoading::ModelLoadingError::UnsupportedFormat:
                     assert(false && "Unsupported model format!");
-                    break;
+                default:
+                    assert("Model loading failed!");
             }
+
+            return INVALID_MODEL_ID;
         }
         const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
 
@@ -82,13 +83,33 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
         // TODO: Caching
-        const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath,
-                                                              Core::Renderer::ShaderType::Vertex);
-        const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath,
-                                                                Core::Renderer::ShaderType::Fragment);
+        const auto vertexShaderString = m_shaderLoader.LoadShader(vertexSourcePath);
+        const auto fragmentShaderString = m_shaderLoader.LoadShader(fragmentSourcePath);
 
-        const auto programID = m_shaderLoader.CreateShaderProgram(vertexShaderID, fragmentShaderID);
-        const auto materialID = m_materialManager.CreateMaterial(programID);
+        const auto vertID = m_shaderManager.CreateShader(vertexShaderString,
+                                                         Core::Renderer::ShaderType::Vertex);
+        const auto fragID = m_shaderManager.CreateShader(fragmentShaderString,
+                                                         Core::Renderer::ShaderType::Fragment);
+
+        if (!vertID.has_value())
+        {
+            assert(false && "Failed to create vertex shader!");
+            return Core::Renderer::MaterialHandle{Core::Renderer::INVALID_MATERIAL_ID, m_materialManager};
+        }
+        if (!fragID.has_value())
+        {
+            assert(false && "Failed to create fragment shader!");
+            return Core::Renderer::MaterialHandle{Core::Renderer::INVALID_MATERIAL_ID, m_materialManager};
+        }
+
+        const auto programID = m_shaderManager.CreateShaderProgram(vertID.value(), fragID.value());
+        if (!programID.has_value())
+        {
+            assert(false && "Failed to create shader program!");
+            return Core::Renderer::MaterialHandle{Core::Renderer::INVALID_MATERIAL_ID, m_materialManager};
+        }
+
+        const auto materialID = m_materialManager.CreateMaterial(programID.value());
 
         return Core::Renderer::MaterialHandle(materialID, m_materialManager);
     }

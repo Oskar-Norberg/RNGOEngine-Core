@@ -19,7 +19,7 @@ namespace RNGOEngine::Shaders
     class ShaderPreProcessor
     {
     public:
-        ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher);
+        explicit ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher);
         std::string Parse(const std::filesystem::path& source) const;
 
         void AddDefinition(std::string_view name, std::string_view value);
