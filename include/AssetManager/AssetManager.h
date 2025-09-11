@@ -51,8 +51,8 @@ namespace RNGOEngine::AssetHandling
 
     public:
         // TODO: This is internal API to the RenderSystem. This should probably not be public.
-        std::optional<std::reference_wrapper<const ModelData>> GetModel(ModelID id) const;
-        std::optional<Core::Renderer::TextureID> GetTexture(Core::Renderer::TextureID id) const;
+        const ModelData& GetModel(ModelID id) const;
+        Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
 
     public:
         const MaterialManager& GetMaterialManager() const

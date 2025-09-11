@@ -26,13 +26,9 @@ namespace RNGOEngine::Systems::Core
                                            ? world.GetRegistry().get<Components::Transform>(entity)
                                            : Components::Transform();
 
-                const auto modelData = context.assetManager->GetModel(meshRender.modelID);
-                if (!modelData.has_value())
-                {
-                    continue;
-                }
+                const auto& modelData = context.assetManager->GetModel(meshRender.modelID);
                 
-                for (const auto& meshID : modelData->get().meshes)
+                for (const auto& meshID : modelData.meshes)
                 {
                     drawQueue.opaqueObjects.emplace_back(transform, meshID, meshRender.materialID);
                 }

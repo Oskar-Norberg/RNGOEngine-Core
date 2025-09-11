@@ -69,13 +69,12 @@ namespace RNGOEngine::AssetHandling
         return modelID;
     }
 
-    std::optional<std::reference_wrapper<const ModelData>> AssetManager::GetModel(const ModelID id) const
+    const ModelData& AssetManager::GetModel(const ModelID id) const
     {
         return m_modelManager.GetModel(id);
     }
 
-    std::optional<Core::Renderer::TextureID> AssetManager::GetTexture(
-        const Core::Renderer::TextureID id) const
+    Core::Renderer::TextureID AssetManager::GetTexture(const Core::Renderer::TextureID id) const
     {
         return m_textureManager.GetTexture(id);
     }
