@@ -29,7 +29,7 @@ namespace RNGOEngine::AssetHandling
     ModelID AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
-        // TODO: Caching? Just check if manager has a model with the same path?
+        
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
         if (!fullPath.has_value())
         {
@@ -37,10 +37,9 @@ namespace RNGOEngine::AssetHandling
             return INVALID_MODEL_ID;
         }
 
-        const auto modelAlreadyLoaded = m_modelManager.GetModelIDIfLoaded(fullPath.value());
-        if (modelAlreadyLoaded.has_value())
+        if (m_modelCache.Contains(fullPath.value()))
         {
-            return modelAlreadyLoaded.value();
+            return m_modelCache.Get(fullPath.value());
         }
 
         const auto meshHandle = ModelLoading::LoadModel(fullPath.value(), m_doFlipTexturesVertically);
@@ -58,12 +57,13 @@ namespace RNGOEngine::AssetHandling
                 case ModelLoading::ModelLoadingError::UnsupportedFormat:
                     assert(false && "Unsupported model format!");
                 default:
-                    assert("Model loading failed!");
+                    assert(false && "Model loading failed!");
             }
 
             return INVALID_MODEL_ID;
         }
         const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
+        m_modelCache.Insert(fullPath.value(), modelID);
 
         return modelID;
     }
