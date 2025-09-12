@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <unordered_map>
 #include <vector>
 
 #include "AssetManager/AssetLoaders/TextureLoader.h"
@@ -20,7 +19,6 @@ namespace RNGOEngine
         }
     }
 }
-
 
 namespace RNGOEngine::AssetHandling
 {

@@ -23,20 +23,30 @@ namespace RNGOEngine::Shaders
         AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
     }
 
-    std::string ShaderPreProcessor::Parse(const std::filesystem::path& source) const
+    std::expected<std::string, ShaderPreProcessingError> ShaderPreProcessor::Parse(
+        const std::filesystem::path& source) const
     {
         const auto foundPath = m_assetFetcher.GetShaderPath(source);
 
         if (!foundPath.has_value())
         {
             assert(false && "Shader not found.");
-            return {};
+            return std::unexpected(ShaderPreProcessingError::FileNotFound);
         }
 
         std::string processedSource = Utilities::IO::ReadFile(foundPath.value());
 
-        ParseIncludes(processedSource);
-        ParseTokens(processedSource);
+        const auto includeError = ParseIncludes(processedSource);
+        if (includeError != ShaderPreProcessingError::None)
+        {
+            return std::unexpected(includeError);
+        }
+
+        const auto tokenError = ParseTokens(processedSource);
+        if (tokenError != ShaderPreProcessingError::None)
+        {
+            return std::unexpected(tokenError);
+        }
 
         return processedSource;
     }
@@ -46,7 +56,7 @@ namespace RNGOEngine::Shaders
         m_definitions[std::string(name)] = std::string(value);
         m_tokens[std::string(name)] = [this](const std::string& token, std::string& source)
         {
-            ParseForDefinitions(token, source);
+            return ParseForDefinitions(token, source);
         };
     }
 
@@ -58,19 +68,26 @@ namespace RNGOEngine::Shaders
         }
     }
 
-    void ShaderPreProcessor::ParseTokens(std::string& source) const
+    ShaderPreProcessingError ShaderPreProcessor::ParseTokens(std::string& source) const
     {
         for (const auto& token : m_tokens)
         {
             const auto it = source.find(token.first);
             if (it != std::string::npos)
             {
-                token.second(token.first, source);
+                const auto errorCode = token.second(token.first, source);
+
+                if (errorCode != ShaderPreProcessingError::None)
+                {
+                    return errorCode;
+                }
             }
         }
+
+        return ShaderPreProcessingError::None;
     }
 
-    void ShaderPreProcessor::ParseIncludes(std::string& source) const
+    ShaderPreProcessingError ShaderPreProcessor::ParseIncludes(std::string& source) const
     {
         std::unordered_set<std::string> includedFiles;
 
@@ -91,7 +108,7 @@ namespace RNGOEngine::Shaders
             if (includeBeginIt > endLineIt || includeEndIt > endLineIt)
             {
                 assert(false && "Malformed include directive.");
-                break;
+                return ShaderPreProcessingError::MalformedInclude;
             }
 
             std::string_view includePath = std::string_view(
@@ -110,7 +127,11 @@ namespace RNGOEngine::Shaders
 
                 const auto includeFilePath = m_assetFetcher.GetShaderPath(includePath);
 
-                assert(includeFilePath.has_value() && "Failed to open include file.");
+                if (!includeFilePath.has_value())
+                {
+                    assert(false && "Failed to open include file.");
+                    return ShaderPreProcessingError::FileNotFound;
+                }
 
                 if (includeFilePath.has_value())
                 {
@@ -122,16 +143,19 @@ namespace RNGOEngine::Shaders
                 }
             }
         }
+
+        return ShaderPreProcessingError::None;
     }
 
-    void ShaderPreProcessor::ParseForDefinitions(const std::string& token, std::string& source) const
+    ShaderPreProcessingError ShaderPreProcessor::ParseForDefinitions(
+        const std::string& token, std::string& source) const
     {
         const auto tokenIt = m_definitions.find(token);
 
         if (tokenIt == m_definitions.end())
         {
             assert(false && "Token does not exist in definitions.");
-            return;
+            return ShaderPreProcessingError::TokenNotFound;
         }
 
         while (true)
@@ -145,5 +169,7 @@ namespace RNGOEngine::Shaders
                 break;
             }
         }
+
+        return ShaderPreProcessingError::None;
     }
 }

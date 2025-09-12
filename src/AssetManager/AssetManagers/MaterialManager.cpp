@@ -24,6 +24,7 @@ namespace RNGOEngine::AssetHandling
         return std::ref(m_materials[id]);
     }
 
+    // TODO: Should this maybe not be optional?
     std::optional<std::reference_wrapper<const Core::Renderer::MaterialSpecification>> MaterialManager::
     TryGetMaterial(Core::Renderer::MaterialID id) const
     {

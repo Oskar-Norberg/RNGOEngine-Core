@@ -108,16 +108,23 @@ namespace RNGOEngine::AssetHandling
             {
                 const auto vertexShaderString = m_shaderLoader.LoadShader(vertexSourcePath);
 
-                const auto vertID = m_shaderManager.CreateShader(vertexShaderString,
-                                                                 Core::Renderer::ShaderType::Vertex);
-
-                if (vertID.has_value())
+                if (vertexShaderString.has_value())
                 {
-                    vertexShaderID = vertID.value();
+                    const auto vertID = m_shaderManager.CreateShader(vertexShaderString.value(),
+                                                                     Core::Renderer::ShaderType::Vertex);
+
+                    if (vertID.has_value())
+                    {
+                        vertexShaderID = vertID.value();
+                    }
+                    else
+                    {
+                        assert(false && "Failed to create vertex shader!");
+                    }
                 }
                 else
                 {
-                    assert(false && "Failed to create vertex shader!");
+                    assert(false && "Shader could not be loaded");
                 }
             }
 
@@ -125,16 +132,23 @@ namespace RNGOEngine::AssetHandling
             {
                 const auto fragmentShaderString = m_shaderLoader.LoadShader(fragmentSourcePath);
 
-                const auto fragmentID = m_shaderManager.CreateShader(fragmentShaderString,
+                if (fragmentShaderString.has_value())
+                {
+                    const auto fragID = m_shaderManager.CreateShader(fragmentShaderString.value(),
                                                                      Core::Renderer::ShaderType::Fragment);
 
-                if (fragmentID.has_value())
-                {
-                    fragmentShaderID = fragmentID.value();
+                    if (fragID.has_value())
+                    {
+                        fragmentShaderID = fragID.value();
+                    }
+                    else
+                    {
+                        assert(false && "Failed to create fragment shader!");
+                    }
                 }
                 else
                 {
-                    assert(false && "Failed to create fragment shader!");
+                    assert(false && "Shader could not be loaded");
                 }
             }
 

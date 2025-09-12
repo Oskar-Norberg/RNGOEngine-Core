@@ -6,7 +6,6 @@
 
 #include <filesystem>
 #include <limits>
-#include <optional>
 #include <unordered_map>
 #include <vector>
 
