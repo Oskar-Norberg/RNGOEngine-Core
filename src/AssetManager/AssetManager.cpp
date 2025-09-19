@@ -79,11 +79,10 @@ namespace RNGOEngine::AssetHandling
         return m_textureManager.GetTexture(id);
     }
 
-    // TODO: This is the most ass function in the entire engine.
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
-        Core::Renderer::ShaderProgramID shaderProgramID = Core::Renderer::INVALID_SHADER_PROGRAM_ID;
+        auto shaderProgramID = Core::Renderer::INVALID_SHADER_PROGRAM_ID;
 
         if (m_shaderProgramCache.Contains(std::make_pair(vertexSourcePath, fragmentSourcePath)))
         {
@@ -91,69 +90,43 @@ namespace RNGOEngine::AssetHandling
         }
         else
         {
-            auto vertexShaderID = Core::Renderer::INVALID_SHADER_ID;
-            auto fragmentShaderID = Core::Renderer::INVALID_SHADER_ID;
-
-            if (m_shaderCache.Contains(vertexSourcePath))
+            const auto loadCompileAndCacheShader = [this](const std::filesystem::path& shaderSourcePath,
+                                                     const Core::Renderer::ShaderType type)
             {
-                vertexShaderID = m_shaderCache.Get(vertexSourcePath);
-            }
-
-            if (m_shaderCache.Contains(fragmentSourcePath))
-            {
-                fragmentShaderID = m_shaderCache.Get(fragmentSourcePath);
-            }
-
-            if (vertexShaderID == Core::Renderer::INVALID_SHADER_ID)
-            {
-                const auto vertexShaderString = m_shaderLoader.LoadShader(vertexSourcePath);
-
-                if (vertexShaderString.has_value())
+                if (m_shaderCache.Contains(shaderSourcePath))
                 {
-                    const auto vertID = m_shaderManager.CreateShader(vertexShaderString.value(),
-                                                                     Core::Renderer::ShaderType::Vertex);
+                    return m_shaderCache.Get(shaderSourcePath);
+                }
 
-                    if (vertID.has_value())
+                const auto shaderString = m_shaderLoader.LoadShader(shaderSourcePath);
+
+                if (shaderString.has_value())
+                {
+                    const auto shaderID = m_shaderManager.CreateShader(
+                        shaderString.value(),
+                        type);
+
+                    if (shaderID.has_value())
                     {
-                        vertexShaderID = vertID.value();
+                        m_shaderCache.Insert(shaderSourcePath, shaderID.value());
+
+                        return shaderID.value();
                     }
-                    else
-                    {
-                        assert(false && "Failed to create vertex shader!");
-                    }
+
+                    assert(false && "Failed to create shader!");
                 }
                 else
                 {
                     assert(false && "Shader could not be loaded");
                 }
-            }
 
-            if (fragmentShaderID == Core::Renderer::INVALID_SHADER_ID)
-            {
-                const auto fragmentShaderString = m_shaderLoader.LoadShader(fragmentSourcePath);
+                return Core::Renderer::INVALID_SHADER_ID;
+            };
 
-                if (fragmentShaderString.has_value())
-                {
-                    const auto fragID = m_shaderManager.CreateShader(fragmentShaderString.value(),
-                                                                     Core::Renderer::ShaderType::Fragment);
-
-                    if (fragID.has_value())
-                    {
-                        fragmentShaderID = fragID.value();
-                    }
-                    else
-                    {
-                        assert(false && "Failed to create fragment shader!");
-                    }
-                }
-                else
-                {
-                    assert(false && "Shader could not be loaded");
-                }
-            }
-
-            m_shaderCache.Insert(vertexSourcePath, vertexShaderID);
-            m_shaderCache.Insert(fragmentSourcePath, fragmentShaderID);
+            const auto vertexShaderID = loadCompileAndCacheShader(vertexSourcePath,
+                                                             Core::Renderer::ShaderType::Vertex);
+            const auto fragmentShaderID = loadCompileAndCacheShader(fragmentSourcePath,
+                                                               Core::Renderer::ShaderType::Fragment);
 
             const auto shaderProgram = m_shaderManager.CreateShaderProgram(vertexShaderID, fragmentShaderID);
             if (shaderProgram.has_value())

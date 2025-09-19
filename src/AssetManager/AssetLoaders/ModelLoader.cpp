@@ -61,7 +61,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
     {
         Assimp::Importer importer;
 
-        const auto flags = aiProcess_Triangulate | (doFlipUVs ? aiProcess_FlipUVs : 0);
+        const auto flags = aiProcess_Triangulate | (doFlipUVs ? aiProcess_FlipUVs : 0) | aiProcess_GenNormals;
         const auto* scene = importer.ReadFile(modelPath.string(), flags);
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
