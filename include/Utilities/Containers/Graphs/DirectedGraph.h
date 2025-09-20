@@ -30,10 +30,10 @@ namespace RNGOEngine::Containers::Graphs
         std::pmr::unordered_map<VertexPtr, std::pmr::unordered_set<VertexPtr>> edges;
 
         /// 
-    /// @param node Starting node.
-    /// @param visited Set of visited nodes.
-    /// @param callback Callback function to call when a node is visited.
-    ///
+        /// @param node Starting node.
+        /// @param visited Set of visited nodes.
+        /// @param callback Callback function to call when a node is visited.
+        ///
         void dfs(VertexPtr node, std::pmr::unordered_set<VertexPtr>& visited,
                  std::function<void(VertexPtr)> callback);
     };

@@ -4,10 +4,17 @@
 
 #pragma once
 
-#include "AssetLoaders/MaterialLoader.h"
+#include "AssetManager/AssetManagers/ModelManager.h"
+
+#include "AssetLoaders/ModelLoader.h"
 #include "AssetLoaders/ShaderLoader.h"
 #include "AssetLoaders/TextureLoader.h"
+#include "AssetManagers/MaterialManager.h"
+#include "AssetManagers/ShaderManager.h"
+#include "AssetManagers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
+#include "Utilities/AssetCache/AssetCache.h"
+#include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine
 {
@@ -29,8 +36,11 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit AssetManager(Core::Renderer::IRenderer& renderer, bool doFlipTexturesVertically);
 
-        Core::Renderer::MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices);
+        // Models
+    public:
+        ModelID LoadModel(const std::filesystem::path& modelPath);
 
+    public:
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
                                                       const std::filesystem::path& fragmentSourcePath);
 
@@ -39,13 +49,45 @@ namespace RNGOEngine::AssetHandling
     public:
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);
 
+    public:
+        // TODO: This is internal API to the RenderSystem. This should probably not be public.
+        const ModelData& GetModel(ModelID id) const;
+        Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
+
+    public:
+        const MaterialManager& GetMaterialManager() const
+        {
+            return m_materialManager;
+        }
+
+        const ModelManager& GetModelManager() const
+        {
+            return m_modelManager;
+        }
+
+        const TextureManager& GetTextureManager() const
+        {
+            return m_textureManager;
+        }
+
+    private:
+        bool m_doFlipTexturesVertically;
+
     private:
         Core::Renderer::IRenderer& m_renderer;
         AssetFileFetcher m_assetFileFetcher;
-        
-        TextureLoader m_textureLoader;
-        
+
+        Utilities::AssetCache<std::filesystem::path, Core::Renderer::ShaderID> m_shaderCache;
+        Utilities::AssetCache<std::pair<std::filesystem::path, std::filesystem::path>,
+                              Core::Renderer::ShaderID, Utilities::Hash::PairHash> m_shaderProgramCache;
         ShaderLoader m_shaderLoader;
-        MaterialLoader m_materialLoader;
+        ShaderManager m_shaderManager;
+
+        Utilities::AssetCache<std::filesystem::path, ModelID> m_modelCache;
+        ModelManager m_modelManager;
+
+        Utilities::AssetCache<std::filesystem::path, ModelID> m_textureCache;
+        TextureManager m_textureManager;
+        MaterialManager m_materialManager;
     };
 }

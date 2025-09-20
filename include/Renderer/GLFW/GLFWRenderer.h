@@ -14,13 +14,13 @@ namespace RNGOEngine::Core::Renderer
     {
     public:
         GLFWRenderer(int viewportWidth, int viewportHeight);
-        void Render(Window::IWindow& window) override;
+        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
+                    const AssetHandling::TextureManager& textureManager) override;
 
     public:
-        MeshID CreateMesh(std::span<float> vertices, std::span<unsigned> indices) override;
+        MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override;
         ShaderID CreateShader(std::string_view source, ShaderType type) override;
         TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override;
-        MaterialID CreateMaterial(ShaderProgramID shaderProgramID) override;
         ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override;
 
         bool ListenSendEvents(Events::EventQueue& eventQueue) override;
@@ -32,6 +32,7 @@ namespace RNGOEngine::Core::Renderer
             unsigned int nrOfIndices;
         };
 
+        // TODO: Move to RenderBase?
         std::unordered_map<MeshID, MeshSpecification> m_meshSpecifications;
         MaterialID m_nextMaterialID = 0;
 

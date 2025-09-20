@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <expected>
 #include <filesystem>
 #include <functional>
 #include <string>
@@ -15,25 +16,36 @@
 namespace RNGOEngine::Shaders
 {
     constexpr auto INCLUDE_DIRECTIVE = "#include";
-    
+
+    enum class ShaderPreProcessingError
+    {
+        None,
+        FileNotFound,
+        MalformedInclude,
+        TokenNotFound,
+    };
+
     class ShaderPreProcessor
     {
     public:
-        ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher);
-        std::string Parse(const std::filesystem::path& source) const;
+        explicit ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher);
+        std::expected<std::string, ShaderPreProcessingError> Parse(const std::filesystem::path& source) const;
 
         void AddDefinition(std::string_view name, std::string_view value);
         void RemoveDefinition(std::string_view name);
 
     private:
-        void ParseTokens(std::string& source) const;
-        void ParseIncludes(std::string& source) const;
-        
-        void ParseForDefinitions(const std::string& token, std::string& source) const;
+        ShaderPreProcessingError ParseTokens(std::string& source) const;
+        ShaderPreProcessingError ParseIncludes(std::string& source) const;
 
     private:
-        // Map of token to a function to process that token. Function takes in a const ref to the token and a ref to string to mutate.
-        std::unordered_map<std::string, std::function<void(const std::string&, std::string&)>> m_tokens;
+        ShaderPreProcessingError ParseForDefinitions(const std::string& token, std::string& source) const;
+
+    private:
+        // Map of token to a function to process that token.
+        // Function takes in a reference to the full source, and a reference to the token string.
+        // Function returns a ShaderPreProcessingError.
+        std::unordered_map<std::string, std::function<ShaderPreProcessingError(const std::string&, std::string&)>> m_tokens;
         std::unordered_map<std::string, std::string> m_definitions;
 
         std::vector<std::filesystem::path> m_includeDirectories;

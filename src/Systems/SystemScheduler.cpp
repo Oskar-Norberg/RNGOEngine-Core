@@ -13,26 +13,20 @@ namespace RNGOEngine::Systems
         TerminateSystems();
     }
 
-    void SystemScheduler::Update(Events::EventQueue& eventQueue,
-                                 RNGOEngine::Core::Renderer::IRenderer& renderer,
-                                 RNGOEngine::Core::World& world,
-                                 float deltaTime)
+    void SystemScheduler::Update(Core::World& world, SystemContext& context)
     {
-        m_context.deltaTime = deltaTime;
+        InitializeSystems(context);
 
-        InitializeSystems();
-
-        for (auto& system : m_systems)
+        for (const auto& system : m_systems)
         {
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_VIEW(system->GetName());
-            system->Update(world, m_context, eventQueue, renderer);
+            
+            system->Update(world, context);
         }
-
-        m_context.resourceMapper.ClearTransientResources();
     }
 
-    void SystemScheduler::InitializeSystems()
+    void SystemScheduler::InitializeSystems(SystemContext& context)
     {
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("SystemScheduler::InitializeSystems");
@@ -41,7 +35,7 @@ namespace RNGOEngine::Systems
         {
             if (!system.initialized)
             {
-                system->Initialize(m_context);
+                system->Initialize(context);
                 system.initialized = true;
             }
         }

@@ -19,7 +19,6 @@ namespace RNGOEngine::Core::Renderer
         MaterialID material;
     };
 
-    // This is hard to reach from the GLSL shader part
     constexpr auto NR_OF_POINTLIGHTS = 16;
     constexpr auto NR_OF_SPOTLIGHTS = 16;
 

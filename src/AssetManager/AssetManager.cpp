@@ -2,81 +2,212 @@
 // Created by Oskar.Norberg on 2025-08-27.
 //
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include "AssetManager/AssetManager.h"
 
 #include "Renderer/IRenderer.h"
 
-RNGOEngine::AssetHandling::AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
-                                                      bool doFlipTexturesVertically)
-    : m_renderer(renderer),
-      m_textureLoader(renderer, m_assetFileFetcher, doFlipTexturesVertically),
-      m_shaderLoader(renderer, m_assetFileFetcher),
-      m_materialLoader(renderer)
+namespace RNGOEngine::AssetHandling
 {
-    AddAssetPath(ENGINE_ASSETS_DIR, All);
-
-    AddAssetPath(ENGINE_SHADERS_DIR, Shader);
-    AddAssetPath(ENGINE_SHADER_INCLUDE_DIR, Shader);
-
-    AddAssetPath(ENGINE_MODELS_DIR, Mesh);
-    AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
-}
-
-RNGOEngine::Core::Renderer::MeshID RNGOEngine::AssetHandling::AssetManager::CreateMesh(
-    std::span<float> vertices, std::span<unsigned int> indices)
-{
-    Assimp::Importer importer;
-    return m_renderer.CreateMesh(vertices, indices);
-}
-
-RNGOEngine::Core::Renderer::MaterialHandle RNGOEngine::AssetHandling::AssetManager::CreateMaterial(
-    const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
-{
-    // TODO: Caching
-    const auto vertexShaderID = m_shaderLoader.LoadShader(vertexSourcePath, Core::Renderer::Vertex);
-    const auto fragmentShaderID = m_shaderLoader.LoadShader(fragmentSourcePath, Core::Renderer::Fragment);
-
-    const auto programID = m_shaderLoader.CreateShaderProgram(vertexShaderID, fragmentShaderID);
-    const auto materialID = m_renderer.CreateMaterial(programID);
-
-    return Core::Renderer::MaterialHandle(materialID, m_renderer);
-}
-
-RNGOEngine::Core::Renderer::TextureID RNGOEngine::AssetHandling::AssetManager::LoadTexture(
-    std::string_view texturePath)
-{
-    // TODO: Caching
-
-    return m_textureLoader.LoadTexture(texturePath);
-}
-
-void RNGOEngine::AssetHandling::AssetManager::AddAssetPath(
-    const std::filesystem::path& path, AssetPathType type)
-{
-    switch (type)
+    AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
+                               const bool doFlipTexturesVertically)
+        : m_doFlipTexturesVertically(doFlipTexturesVertically),
+          m_renderer(renderer),
+          m_shaderLoader(m_assetFileFetcher),
+          m_shaderManager(renderer),
+          m_modelManager(renderer),
+          m_textureManager(renderer)
     {
-        case All:
-            m_assetFileFetcher.AddAssetPath(path);
-            break;
+        AddAssetPath(ENGINE_ASSETS_DIR, All);
 
-        case Shader:
-            m_assetFileFetcher.AddShaderPath(path);
-            break;
+        AddAssetPath(ENGINE_SHADERS_DIR, Shader);
+        AddAssetPath(ENGINE_SHADER_INCLUDE_DIR, Shader);
 
-        case Texture:
-            m_assetFileFetcher.AddTexturePath(path);
-            break;
+        AddAssetPath(ENGINE_MODELS_DIR, Mesh);
+        AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
+    }
 
-        case Mesh:
-            m_assetFileFetcher.AddMeshPath(path);
-            break;
+    ModelID AssetManager::LoadModel(
+        const std::filesystem::path& modelPath)
+    {
+        const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
+        if (!fullPath.has_value())
+        {
+            assert(false && "Model not found!");
+            return INVALID_MODEL_ID;
+        }
 
-        default:
-            assert(false && "Unsupported asset path type");
-            break;
+        if (m_modelCache.Contains(fullPath.value()))
+        {
+            return m_modelCache.Get(fullPath.value());
+        }
+
+        const auto meshHandle = ModelLoading::LoadModel(fullPath.value(), m_doFlipTexturesVertically);
+
+        if (!meshHandle.has_value())
+        {
+            switch (meshHandle.error())
+            {
+                case ModelLoading::ModelLoadingError::FileNotFound:
+                    assert(false && "Model not found!");
+                case ModelLoading::ModelLoadingError::FailedToLoad:
+                    assert(false && "Model could not be loaded!");
+                case ModelLoading::ModelLoadingError::NoMeshesFound:
+                    assert(false && "Model has no valid meshes!");
+                case ModelLoading::ModelLoadingError::UnsupportedFormat:
+                    assert(false && "Unsupported model format!");
+                default:
+                    assert(false && "Model loading failed!");
+            }
+
+            return INVALID_MODEL_ID;
+        }
+        const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
+
+        ModelLoading::UnloadModel(meshHandle.value());
+        m_modelCache.Insert(fullPath.value(), modelID);
+
+        return modelID;
+    }
+
+    const ModelData& AssetManager::GetModel(const ModelID id) const
+    {
+        return m_modelManager.GetModel(id);
+    }
+
+    Core::Renderer::TextureID AssetManager::GetTexture(const Core::Renderer::TextureID id) const
+    {
+        return m_textureManager.GetTexture(id);
+    }
+
+    Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
+        const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
+    {
+        auto shaderProgramID = Core::Renderer::INVALID_SHADER_PROGRAM_ID;
+
+        if (m_shaderProgramCache.Contains(std::make_pair(vertexSourcePath, fragmentSourcePath)))
+        {
+            shaderProgramID = m_shaderProgramCache.Get(std::make_pair(vertexSourcePath, fragmentSourcePath));
+        }
+        else
+        {
+            const auto loadCompileAndCacheShader = [this](const std::filesystem::path& shaderSourcePath,
+                                                     const Core::Renderer::ShaderType type)
+            {
+                if (m_shaderCache.Contains(shaderSourcePath))
+                {
+                    return m_shaderCache.Get(shaderSourcePath);
+                }
+
+                const auto shaderString = m_shaderLoader.LoadShader(shaderSourcePath);
+
+                if (shaderString.has_value())
+                {
+                    const auto shaderID = m_shaderManager.CreateShader(
+                        shaderString.value(),
+                        type);
+
+                    if (shaderID.has_value())
+                    {
+                        m_shaderCache.Insert(shaderSourcePath, shaderID.value());
+
+                        return shaderID.value();
+                    }
+
+                    assert(false && "Failed to create shader!");
+                }
+                else
+                {
+                    assert(false && "Shader could not be loaded");
+                }
+
+                return Core::Renderer::INVALID_SHADER_ID;
+            };
+
+            const auto vertexShaderID = loadCompileAndCacheShader(vertexSourcePath,
+                                                             Core::Renderer::ShaderType::Vertex);
+            const auto fragmentShaderID = loadCompileAndCacheShader(fragmentSourcePath,
+                                                               Core::Renderer::ShaderType::Fragment);
+
+            const auto shaderProgram = m_shaderManager.CreateShaderProgram(vertexShaderID, fragmentShaderID);
+            if (shaderProgram.has_value())
+            {
+                shaderProgramID = shaderProgram.value();
+
+                m_shaderProgramCache.Insert(std::make_pair(vertexSourcePath, fragmentSourcePath),
+                                            shaderProgramID);
+            }
+            else
+            {
+                assert(false && "Failed to create shader program!");
+            }
+        }
+
+        const auto materialID = m_materialManager.CreateMaterial(shaderProgramID);
+        return Core::Renderer::MaterialHandle(materialID, m_materialManager);
+    }
+
+    Core::Renderer::TextureID AssetManager::LoadTexture(
+        const std::string_view texturePath)
+    {
+        const auto fullPath = m_assetFileFetcher.GetTexturePath(texturePath);
+        if (!fullPath.has_value())
+        {
+            assert(false && "Texture not found!");
+            // I think the IVNALID_TEXTURE_ID Should be handled through the TextureManager.
+            return Core::Renderer::INVALID_TEXTURE_ID;
+        }
+
+        if (m_textureCache.Contains(fullPath.value()))
+        {
+            return m_textureCache.Get(fullPath.value());
+        }
+
+        const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
+        if (!textureHandle)
+        {
+            switch (textureHandle.error())
+            {
+                case TextureLoader::TextureLoadingError::FileNotFound:
+                    assert(false && "Texture not found");
+                    return INVALID_MODEL_ID;
+                case TextureLoader::TextureLoadingError::FailedToLoad:
+                    assert(false && "Failed to load texture");
+                    return INVALID_MODEL_ID;
+            }
+        }
+
+        const auto textureID = m_textureManager.CreateTexture(textureHandle.value());
+        TextureLoader::FreeTexture(textureHandle.value());
+
+        m_textureCache.Insert(fullPath.value(), textureID);
+
+        return textureID;
+    }
+
+    void AssetManager::AddAssetPath(
+        const std::filesystem::path& path, const AssetPathType type)
+    {
+        switch (type)
+        {
+            case All:
+                m_assetFileFetcher.AddAssetPath(path);
+                break;
+
+            case Shader:
+                m_assetFileFetcher.AddShaderPath(path);
+                break;
+
+            case Texture:
+                m_assetFileFetcher.AddTexturePath(path);
+                break;
+
+            case Mesh:
+                m_assetFileFetcher.AddMeshPath(path);
+                break;
+
+            default:
+                assert(false && "Unsupported asset path type");
+                break;
+        }
     }
 }

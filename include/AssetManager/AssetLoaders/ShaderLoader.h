@@ -13,18 +13,14 @@ namespace RNGOEngine::AssetHandling
     class ShaderLoader
     {
     public:
-        ShaderLoader(Core::Renderer::IRenderer& renderer, AssetFileFetcher& assetFetcher)
-            : shaderPreprocessor(assetFetcher), m_renderer(renderer), m_assetFileFetcher(assetFetcher)
+        explicit ShaderLoader(const AssetFileFetcher& assetFetcher)
+            : shaderPreprocessor(assetFetcher)
         {
         }
 
-        Core::Renderer::ShaderID LoadShader(const std::filesystem::path& path, Core::Renderer::ShaderType type) const;
-        Core::Renderer::ShaderProgramID CreateShaderProgram(Core::Renderer::ShaderID vertex, Core::Renderer::ShaderID fragment) const;
+        std::expected<std::string, Shaders::ShaderPreProcessingError> LoadShader(const std::filesystem::path& path) const;
 
     private:
         Shaders::ShaderPreProcessor shaderPreprocessor;
-
-        Core::Renderer::IRenderer& m_renderer;
-        AssetFileFetcher& m_assetFileFetcher;
     };
 }

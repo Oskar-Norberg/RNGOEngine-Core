@@ -6,8 +6,6 @@
 
 #include <string_view>
 
-#include "EventQueue/EventQueue.h"
-
 namespace RNGOEngine
 {
     namespace Core
@@ -37,8 +35,7 @@ namespace RNGOEngine::Systems
         {
         }
 
-        virtual void Update(Core::World& world, SystemContext& context, Events::EventQueue& eventQueue,
-                            Core::Renderer::IRenderer& renderer)
+        virtual void Update(Core::World& world, SystemContext& context)
         {
         }
 

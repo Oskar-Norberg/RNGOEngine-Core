@@ -11,6 +11,9 @@
 #include <cassert>
 #include <format>
 
+#include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetManager/AssetManagers/TextureManager.h"
+#include "Data/MeshData.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -31,7 +34,8 @@ namespace RNGOEngine::Core::Renderer
         glViewport(0, 0, viewportWidth, viewportHeight);
     }
 
-    void GLFWRenderer::Render(Window::IWindow& window)
+    void GLFWRenderer::Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
+                              const AssetHandling::TextureManager& textureManager)
     {
         // TODO: Ugly. Add something like a squarebracket operator to get color.
         glClearColor(m_drawQueue.backgroundColor.color.x,
@@ -41,7 +45,7 @@ namespace RNGOEngine::Core::Renderer
         // Render Opaques
         for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
         {
-            const auto& materialSpecification = m_materials[opaqueDrawable.material];
+            const auto& materialSpecification = materialManager.GetMaterial(opaqueDrawable.material);
             const auto shaderID = materialSpecification.shader;
             glUseProgram(materialSpecification.shader);
             glBindVertexArray(opaqueDrawable.mesh);
@@ -55,35 +59,35 @@ namespace RNGOEngine::Core::Renderer
             {
                 switch (uniformSpecification.type)
                 {
-                    case Bool:
+                    case UniformType::Bool:
                         glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
                                     static_cast<int>(uniformSpecification.data.b));
                         break;
-                    case Int:
+                    case UniformType::Int:
                         glUniform1i(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
                                     uniformSpecification.data.b);
                         break;
-                    case Float:
+                    case UniformType::Float:
                         glUniform1f(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
                                     uniformSpecification.data.f);
                         break;
-                    case Vec2:
+                    case UniformType::Vec2:
                         glUniform2fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1,
                                      &uniformSpecification.data.v2[0]);
                         break;
-                    case Vec3:
+                    case UniformType::Vec3:
                         glUniform3fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1,
                                      &uniformSpecification.data.v3[0]);
                         break;
-                    case Vec4:
+                    case UniformType::Vec4:
                         glUniform4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()), 1,
                                      &uniformSpecification.data.v4[0]);
                         break;
-                    case Mat4:
+                    case UniformType::Mat4:
                         glUniformMatrix4fv(glGetUniformLocation(shaderID, uniformSpecification.name.c_str()),
                                            1, GL_FALSE, &uniformSpecification.data.m4[0][0]);
                         break;
-                    case Texture:
+                    case UniformType::Texture:
                     {
                         const auto uniformLocation = glGetUniformLocation(
                             shaderID, uniformSpecification.name.c_str());
@@ -93,8 +97,10 @@ namespace RNGOEngine::Core::Renderer
                             break;
                         }
 
+                        const auto textureID = textureManager.GetTexture(
+                            uniformSpecification.data.texture.texture);
                         glActiveTexture(GL_TEXTURE0 + uniformSpecification.data.texture.slot);
-                        glBindTexture(GL_TEXTURE_2D, uniformSpecification.data.texture.texture);
+                        glBindTexture(GL_TEXTURE_2D, textureID);
                         glUniform1i(uniformLocation, uniformSpecification.data.texture.slot);
                         break;
                     }
@@ -222,12 +228,13 @@ namespace RNGOEngine::Core::Renderer
             assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
             const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
-            glDrawElements(GL_TRIANGLES, meshSpec.nrOfVertices + meshSpec.nrOfIndices, GL_UNSIGNED_INT,
+
+            glDrawElements(GL_TRIANGLES, meshSpec.nrOfIndices, GL_UNSIGNED_INT,
                            nullptr);
         }
     }
 
-    MeshID GLFWRenderer::CreateMesh(std::span<float> vertices, std::span<unsigned> indices)
+    MeshID GLFWRenderer::CreateMesh(const Data::Rendering::MeshData& meshData)
     {
         unsigned int VAO, VBO, EBO;
         glGenVertexArrays(1, &VAO);
@@ -237,39 +244,47 @@ namespace RNGOEngine::Core::Renderer
         glBindVertexArray(VAO);
 
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices.size_bytes(), vertices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Data::Rendering::Vertex),
+                     meshData.vertices.data(),
+                     GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size_bytes(), indices.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(Data::Rendering::Index),
+                     meshData.indices.data(), GL_STATIC_DRAW);
 
         // Vertex Pos
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void*>(nullptr));
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Data::Rendering::Vertex),
+                              reinterpret_cast<void*>(offsetof(Data::Rendering::Vertex, position)));
         glEnableVertexAttribArray(0);
 
         // Vertex Normal
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              reinterpret_cast<void*>(3 * sizeof(float)));
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Data::Rendering::Vertex),
+                              reinterpret_cast<void*>(offsetof(Data::Rendering::Vertex, normal)));
         glEnableVertexAttribArray(1);
 
         // Vertex UV
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float),
-                              reinterpret_cast<void*>(6 * sizeof(float)));
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Data::Rendering::Vertex),
+                              reinterpret_cast<void*>(offsetof(Data::Rendering::Vertex, texCoord)));
         glEnableVertexAttribArray(2);
 
         m_meshSpecifications.insert(
             std::make_pair(VAO, MeshSpecification
                            {
-                               .nrOfVertices = static_cast<unsigned int>(vertices.size() / 3),
-                               .nrOfIndices = static_cast<unsigned int>(indices.size() / 3)
+                               .nrOfVertices = static_cast<unsigned int>(meshData.vertices.size()),
+                               .nrOfIndices = static_cast<unsigned int>(meshData.indices.size())
                            }
             ));
+
+        glBindVertexArray(0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         return VAO;
     }
 
     ShaderID GLFWRenderer::CreateShader(std::string_view source, ShaderType type)
     {
-        const auto shaderType = type == Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
+        const auto shaderType = type == ShaderType::Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
         const auto shaderID = glCreateShader(shaderType);
         const char* sourcePtr = source.data();
         glShaderSource(shaderID, 1, &sourcePtr, nullptr);
@@ -308,14 +323,6 @@ namespace RNGOEngine::Core::Renderer
         glGenerateMipmap(GL_TEXTURE_2D);
 
         return textureHandle;
-    }
-
-    MaterialID GLFWRenderer::CreateMaterial(ShaderProgramID shaderProgramID)
-    {
-        const auto materialID = m_nextMaterialID++;
-        m_materials[materialID] = MaterialSpecification{.shader = shaderProgramID, .uniforms = {}};
-
-        return materialID;
     }
 
     ShaderProgramID GLFWRenderer::CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader)
@@ -366,9 +373,10 @@ namespace RNGOEngine::Core::Renderer
         int success;
         char infoLog[512];
 
-        glGetShaderiv(program, GL_LINK_STATUS, &success);
+        glGetProgramiv(program, GL_LINK_STATUS, &success);
         if (!success)
         {
+            glGetProgramInfoLog(program, 512, nullptr, infoLog);
             assert(false && infoLog);
             return false;
         }

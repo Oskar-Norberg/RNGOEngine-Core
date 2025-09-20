@@ -10,6 +10,7 @@
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
+#include "Systems/SystemContext.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
@@ -57,8 +58,7 @@ namespace RNGOEngine::Core
         while (m_running)
         {
             float deltaTime = std::chrono::duration<float>(
-                std::chrono::high_resolution_clock::now() - lastFrame
-            ).count();
+                std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
             PollWindowEvents();
@@ -94,7 +94,16 @@ namespace RNGOEngine::Core
 
     void Engine::UpdateSystems(const float deltaTime)
     {
-        m_systems.Update(m_eventQueue, *m_renderer, m_currentScene->world, deltaTime);
+        m_context.deltaTime = deltaTime;
+
+        // These don't need to be set every frame. But alas.
+        m_context.eventQueue = &m_eventQueue;
+        m_context.assetManager = m_assetManager.get();
+        m_context.renderer = m_renderer.get();
+
+        m_systems.Update(m_currentScene->world, m_context);
+
+        m_context.resourceMapper.ClearTransientResources();
     }
 
     void Engine::Render() const
@@ -104,7 +113,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        m_renderer->Render(*m_window);
+        m_renderer->Render(*m_window, m_assetManager->GetMaterialManager(), m_assetManager->GetTextureManager());
         m_window->SwapBuffers();
     }
 
