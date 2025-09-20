@@ -6,14 +6,22 @@
 
 #include <string_view>
 
-namespace RNGOEngine::Systems
+namespace RNGOEngine
 {
-    struct SystemContext;
-}
+    namespace Core
+    {
+        namespace Renderer
+        {
+            class IRenderer;
+        }
 
-namespace RNGOEngine::Core
-{
-    class World;
+        class World;
+    }
+
+    namespace Systems
+    {
+        struct SystemContext;
+    }
 }
 
 namespace RNGOEngine::Systems

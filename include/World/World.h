@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <entt.hpp>
+#include <entt/entt.hpp>
 
 namespace RNGOEngine::Core
 {

@@ -7,7 +7,6 @@
 #include <chrono>
 #include <string>
 
-
 namespace RNGOEngine::Benchmarking
 {
     enum StopwatchPrecision

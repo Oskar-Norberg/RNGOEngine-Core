@@ -1,63 +1,65 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.24)
+set(CMAKE_CXX_STANDARD 23)
+set(CORE_PROJECT_NAME RNGOEngine_Core)
+project(${CORE_PROJECT_NAME})
 
-# Enable / Disable Tracy. Should be disabled in release builds.
-set(TRACY_ENABLE off CACHE BOOL "Enable Tracy profiler" FORCE)
+option(RNGOENGINE_TRACY_ENABLE "Enable Tracy profiler" OFF)
+option(RNGOENGINE_UNITY_BUILD "Enable Unity builds" OFF)
 
-add_compile_options(-O3)
+# Build Preferences
+include(cmake/EnableCCache.cmake)
+include(cmake/UnityBuild.cmake)
 
-set(PROJECT_NAME RNGOEngine_Core)
-project(${PROJECT_NAME})
+# Dependencies
+include(cmake/CPM.cmake)
+include(cmake/Dependencies.cmake)
 
-set(CMAKE_CXX_STANDARD 20)
+# Engine Units
+include(cmake/EngineUnits/Containers.cmake)
+include(cmake/EngineUnits/Scene.cmake)
+include(cmake/EngineUnits/Systems.cmake)
+include(cmake/EngineUnits/Threading.cmake)
+include(cmake/EngineUnits/Rendering.cmake)
+include(cmake/EngineUnits/Windowing.cmake)
+include(cmake/EngineUnits/Math.cmake)
+include(cmake/EngineUnits/Data.cmake)
+include(cmake/EngineUnits/AssetManagement.cmake)
+include(cmake/EngineUnits/Utilities.cmake)
+include(cmake/EngineUnits/Events.cmake)
+include(cmake/EngineUnits/Components.cmake)
 
-add_subdirectory(vendor/tracy)
-add_subdirectory(vendor/glfw-fetcher)
-add_subdirectory(vendor/glad)
-add_subdirectory(vendor/glm)
+# Testing
+include(cmake/Testing.cmake)
 
-set(DO_TESTS off CACHE BOOL "Enable tests" FORCE)
-
-if (DO_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif ()
-
-add_library(${PROJECT_NAME} STATIC
+# Engine Core / Entry Point
+add_library(${CORE_PROJECT_NAME} STATIC
         include/Engine.h
-        include/Scene/Scene.h
         src/Engine.cpp
-        include/Systems/ISystem.h
-        include/Systems/SystemContext.h
-        include/Systems/ResourceMap.h
-        include/World/World.h
-        src/World/World.cpp
-        include/Systems/SystemScheduler.h
-        src/Systems/SystemScheduler.cpp
-        include/Utilities/Containers/Graphs/DirectedGraph.h
-        include/Systems/ResourceMapper.h
-        include/EventQueue/EventQueue.h
-        include/EventQueue/EngineEvents/EngineEvents.h
-        include/Utilities/Containers/QuadTree/QuadTree.h
-        include/Utilities/Containers/QuadTree/QuadTree.tpp
-        include/Benchmarking/STDOUTStopwatch.h
-        include/Profiling/Profiling.h
-        include/Math/Point.h
-        include/Math/BoundingBox.h
-        include/Utilities/ThreadPool/ThreadPool.h
-        include/Utilities/ThreadPool/ThreadPool.tpp
-        src/Utilities/ThreadPool.cpp
-        include/Utilities/JobSystem/JobSystem.h
-        include/Utilities/JobSystem/JobSystem.tpp
-        include/Utilities/JobSystem/Handle/JobHandle.h
-        include/Utilities/JobSystem/Handle/JobHandle.tpp
+)
+target_precompile_headers(${CORE_PROJECT_NAME} PRIVATE include/PCH/PCH.h)
+target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
+
+target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
+        ${SYSTEM_PROJECT_NAME}
+        ${JOBS_PROJECT_NAME}
+        ${RENDERING_PROJECT_NAME}
+        ${WINDOWING_PROJECT_NAME}
+        ${CONTAINERS_PROJECT_NAME}
+        ${MATH_PROJECT_NAME}
+        ${DATA_PROJECT_NAME}
+        ${ASSET_MANAGER_PROJECT_NAME}
+        ${UTILITIES_PROJECT_NAME}
+        ${EVENTS_PROJECT_NAME}
+        ${SCENE_PROJECT_NAME}
+        ${COMPONENT_PROJECT_NAME}
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC include
-        vendor/entt/include)
+# Include assets in build.
+set(COPY_PROJECT_NAME RNGOEngine_Core-Assets)
+add_custom_target(${COPY_PROJECT_NAME}
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
+)
 
-# OpenGL
-target_link_libraries(${PROJECT_NAME} PUBLIC glfw glad)
-# GLM
-target_link_libraries(${PROJECT_NAME} PRIVATE glm)
-# Tracy
-target_link_libraries(${PROJECT_NAME} PUBLIC Tracy::TracyClient)
+add_dependencies(${CORE_PROJECT_NAME} ${COPY_PROJECT_NAME})
+
+target_compile_features(${CORE_PROJECT_NAME} PUBLIC cxx_std_23)

@@ -1,20 +1,22 @@
-//
-// Created by Oskar.Norberg on 2025-06-17.
-//
-
 #pragma once
 
 #include <memory>
 #include <vector>
 
 #include "ISystem.h"
-#include "SystemContext.h"
 #include "Concepts/Concepts.h"
 
-namespace RNGOEngine::Core
+namespace RNGOEngine
 {
-    class Engine;
-    class World;
+    namespace Core
+    {
+        class World;
+    }
+
+    namespace Systems
+    {
+        struct SystemContext;
+    }
 }
 
 namespace RNGOEngine::Systems
@@ -34,7 +36,8 @@ namespace RNGOEngine::Systems
     {
     public:
         ~SystemScheduler();
-        void Update(Core::Engine& engine, Core::World& world, float deltaTime);
+
+        void Update(Core::World& world, SystemContext& context);
 
         template<Concepts::DerivedFrom<ISystem> T, typename... Args>
         void RegisterSystem(Args&&... args)
@@ -45,11 +48,7 @@ namespace RNGOEngine::Systems
     private:
         std::vector<ScheduledSystem> m_systems;
 
-        SystemContext m_context;
-
-        void InitializeSystems();
+        void InitializeSystems(SystemContext& context);
         void TerminateSystems();
-
-        void PollEngineEvents(Core::Engine& engine, Events::EventQueue& eventQueue);
     };
 }

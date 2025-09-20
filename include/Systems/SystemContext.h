@@ -4,9 +4,29 @@
 
 #pragma once
 
-#include "EventQueue/EventQueue.h"
 #include "ResourceMapper.h"
 #include "Utilities/JobSystem/JobSystem.h"
+
+namespace RNGOEngine
+{
+    namespace Events
+    {
+        class EventQueue;
+    }
+
+    namespace AssetHandling
+    {
+        class AssetManager;
+    }
+
+    namespace Core
+    {
+        namespace Renderer
+        {
+            class IRenderer;
+        }
+    }
+}
 
 namespace RNGOEngine::Systems
 {
@@ -15,8 +35,13 @@ namespace RNGOEngine::Systems
         // Should be a time-span, but for now we use a float.
         float deltaTime = 0.0f;
 
-        Events::EventQueue eventQueue;
+        // TODO: This should probably not be owned by the SystemContext.
         Resources::ResourceMapper resourceMapper;
         Utilities::JobSystem jobSystem;
+
+        // TODO: Ugly pointer bonanza over here
+        Events::EventQueue* eventQueue;
+        AssetHandling::AssetManager* assetManager;
+        Core::Renderer::IRenderer* renderer;
     };
 }

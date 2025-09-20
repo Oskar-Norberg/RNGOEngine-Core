@@ -6,7 +6,7 @@ BreakBeforeBraces: Allman
 IndentWidth: 4
 AccessModifierOffset: -4
 
-ColumnLimit: 130
+ColumnLimit: 110
 
 DerivePointerAlignment: false
 PointerAlignment: Left
