@@ -34,10 +34,10 @@ namespace RNGOEngine::Core
             m_currentScene = std::make_unique<T>();
         }
 
-        template<Concepts::DerivedFrom<Systems::ISystem> T, typename... Args>
+        template<Concepts::DerivedFrom<Systems::IGameSystem> T, typename... Args>
         void RegisterSystem(Args&&... args)
         {
-            m_systems.RegisterSystem<T>(std::forward<Args>(args)...);
+            m_gameSystems.RegisterSystem<T>(std::forward<Args>(args)...);
         }
 
         void Run();
@@ -56,14 +56,18 @@ namespace RNGOEngine::Core
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
 
         std::unique_ptr<Scene> m_currentScene;
-        
-        Systems::SystemScheduler m_systems;
-        Systems::SystemContext m_context;
+
+        Systems::SystemContext m_gameContext;
+        Systems::SystemScheduler<Systems::SystemContext> m_gameSystems;
+
+        Systems::EngineSystemContext m_engineContext;
+        Systems::SystemScheduler<Systems::EngineSystemContext> m_engineSystems;
 
         Events::EventQueue m_eventQueue;
 
     private:
-        void UpdateSystems(float deltaTime);
+        void UpdateEngineSystems(float deltaTime);
+        void UpdateGameSystems(float deltaTime);
 
     private:
         void Render() const;
@@ -72,5 +76,8 @@ namespace RNGOEngine::Core
         void PollWindowEvents();
         void PollEngineEvents();
         void ClearEvents();
+
+    private:
+        void AddEngineSystems();
     };
 }

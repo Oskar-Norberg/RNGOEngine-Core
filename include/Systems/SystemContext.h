@@ -30,6 +30,22 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Systems
 {
+    struct EngineSystemContext
+    {
+        // Should be a time-span, but for now we use a float.
+        float deltaTime = 0.0f;
+
+        // TODO: This should probably not be owned by the SystemContext.
+        Resources::ResourceMapper resourceMapper;
+        // TODO: Please move this out of here, this needs to be a pointer.
+        Utilities::JobSystem jobSystem;
+
+        // TODO: Ugly pointer bonanza over here
+        Events::EventQueue* eventQueue;
+        AssetHandling::AssetManager* assetManager;
+        Core::Renderer::IRenderer* renderer;
+    };
+    
     struct SystemContext
     {
         // Should be a time-span, but for now we use a float.
@@ -42,6 +58,5 @@ namespace RNGOEngine::Systems
         // TODO: Ugly pointer bonanza over here
         Events::EventQueue* eventQueue;
         AssetHandling::AssetManager* assetManager;
-        Core::Renderer::IRenderer* renderer;
     };
 }

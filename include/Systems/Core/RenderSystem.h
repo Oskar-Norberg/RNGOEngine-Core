@@ -11,10 +11,10 @@
 
 namespace RNGOEngine::Systems::Core
 {
-    class RenderSystem : public ISystem
+    class RenderSystem : public EngineSystem
     {
     public:
-        void Update(RNGOEngine::Core::World& world, SystemContext& context) override
+        void Update(RNGOEngine::Core::World& world, EngineSystemContext& context) override
         {
             // TODO: Consider splitting up either into functions or separate systems. LightGatherer, OpaqueMeshGatherer, RenderSubmitter etc.
             const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
