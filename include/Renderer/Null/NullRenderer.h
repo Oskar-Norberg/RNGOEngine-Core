@@ -14,8 +14,7 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
-                    const AssetHandling::TextureManager& textureManager) override
+        void Render(Window::IWindow& window) override
         {
         }
 

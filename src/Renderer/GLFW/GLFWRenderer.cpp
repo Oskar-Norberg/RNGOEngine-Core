@@ -34,8 +34,7 @@ namespace RNGOEngine::Core::Renderer
         glViewport(0, 0, viewportWidth, viewportHeight);
     }
 
-    void GLFWRenderer::Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
-                              const AssetHandling::TextureManager& textureManager)
+    void GLFWRenderer::Render(Window::IWindow& window)
     {
         // TODO: Ugly. Add something like a squarebracket operator to get color.
         glClearColor(m_drawQueue.backgroundColor.color.x,
@@ -45,9 +44,9 @@ namespace RNGOEngine::Core::Renderer
         // Render Opaques
         for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
         {
-            const auto& materialSpecification = materialManager.GetMaterial(opaqueDrawable.material);
-            const auto shaderID = materialSpecification.shader;
-            glUseProgram(materialSpecification.shader);
+            const auto shaderID = opaqueDrawable.material.shader;
+            
+            glUseProgram(opaqueDrawable.material.shader);
             glBindVertexArray(opaqueDrawable.mesh);
 
             // TODO: Not sure if this is a great idea.
@@ -55,7 +54,7 @@ namespace RNGOEngine::Core::Renderer
             glUniform1f(glGetUniformLocation(shaderID, "specularStrength"), 0.5f);
             glUniform1i(glGetUniformLocation(shaderID, "shininess"), 32);
 
-            for (const auto& uniformSpecification : materialSpecification.uniforms)
+            for (const auto& uniformSpecification : opaqueDrawable.material.uniforms)
             {
                 switch (uniformSpecification.type)
                 {
@@ -97,10 +96,8 @@ namespace RNGOEngine::Core::Renderer
                             break;
                         }
 
-                        const auto textureID = textureManager.GetTexture(
-                            uniformSpecification.data.texture.texture);
                         glActiveTexture(GL_TEXTURE0 + uniformSpecification.data.texture.slot);
-                        glBindTexture(GL_TEXTURE_2D, textureID);
+                        glBindTexture(GL_TEXTURE_2D, uniformSpecification.data.texture.texture);
                         glUniform1i(uniformLocation, uniformSpecification.data.texture.slot);
                         break;
                     }

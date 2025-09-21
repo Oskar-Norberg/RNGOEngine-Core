@@ -126,7 +126,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        m_renderer->Render(*m_window, m_assetManager->GetMaterialManager(), m_assetManager->GetTextureManager());
+        m_renderer->Render(*m_window);
         m_window->SwapBuffers();
     }
 

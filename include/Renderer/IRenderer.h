@@ -38,8 +38,7 @@ namespace RNGOEngine::Core::Renderer
 
     public:
         virtual void SubmitDrawQueue(DrawQueue drawQueue) = 0;
-        virtual void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
-                            const AssetHandling::TextureManager& textureManager) = 0;
+        virtual void Render(Window::IWindow& window) = 0;
 
     public:
         /// 

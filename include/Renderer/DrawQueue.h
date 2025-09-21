@@ -8,19 +8,20 @@
 #include <vector>
 
 #include "RenderID.h"
+#include "Uniforms.h"
 #include "Components/Components.h"
 
 namespace RNGOEngine::Core::Renderer
 {
+    constexpr auto NR_OF_POINTLIGHTS = 16;
+    constexpr auto NR_OF_SPOTLIGHTS = 16;
+    
     struct Drawable
     {
         Components::Transform transform;
         MeshID mesh;
-        MaterialID material;
+        MaterialSpecification material;
     };
-
-    constexpr auto NR_OF_POINTLIGHTS = 16;
-    constexpr auto NR_OF_SPOTLIGHTS = 16;
 
     struct CameraData
     {

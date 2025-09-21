@@ -17,8 +17,7 @@ namespace RNGOEngine::Core::Renderer
             m_drawQueue = drawQueue;
         }
 
-        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
-                    const AssetHandling::TextureManager& textureManager) override = 0;
+        void Render(Window::IWindow& window) override = 0;
 
         bool ListenSendEvents(Events::EventQueue& eventQueue) override = 0;
 

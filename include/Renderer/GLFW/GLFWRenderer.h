@@ -14,8 +14,7 @@ namespace RNGOEngine::Core::Renderer
     {
     public:
         GLFWRenderer(int viewportWidth, int viewportHeight);
-        void Render(Window::IWindow& window, const AssetHandling::MaterialManager& materialManager,
-                    const AssetHandling::TextureManager& textureManager) override;
+        void Render(Window::IWindow& window) override;
 
     public:
         MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override;
