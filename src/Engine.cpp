@@ -42,7 +42,7 @@ namespace RNGOEngine::Core
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
 
         // Add RenderSystem
-        RegisterSystem<Systems::Core::RenderSystem>();
+        AddEngineSystems();
     }
 
     void Engine::Run()
@@ -63,7 +63,8 @@ namespace RNGOEngine::Core
 
             PollWindowEvents();
 
-            UpdateSystems(deltaTime);
+            UpdateEngineSystems(deltaTime);
+            UpdateGameSystems(deltaTime);
 
             Render();
 
@@ -92,18 +93,30 @@ namespace RNGOEngine::Core
         } while (moreEvents);
     }
 
-    void Engine::UpdateSystems(const float deltaTime)
+    void Engine::UpdateEngineSystems(float deltaTime)
     {
-        m_context.deltaTime = deltaTime;
+        m_engineContext.deltaTime = deltaTime;
+
+        m_engineContext.assetManager = m_assetManager.get();
+        m_engineContext.eventQueue = &m_eventQueue;
+        m_engineContext.renderer = m_renderer.get();
+
+        m_engineSystems.Update(m_currentScene->world, m_engineContext);
+        
+        m_engineContext.resourceMapper.ClearTransientResources();
+    }
+
+    void Engine::UpdateGameSystems(const float deltaTime)
+    {
+        m_gameContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
-        m_context.eventQueue = &m_eventQueue;
-        m_context.assetManager = m_assetManager.get();
-        m_context.renderer = m_renderer.get();
+        m_gameContext.eventQueue = &m_eventQueue;
+        m_gameContext.assetManager = m_assetManager.get();
 
-        m_systems.Update(m_currentScene->world, m_context);
+        m_gameSystems.Update(m_currentScene->world, m_gameContext);
 
-        m_context.resourceMapper.ClearTransientResources();
+        m_gameContext.resourceMapper.ClearTransientResources();
     }
 
     void Engine::Render() const
@@ -128,5 +141,10 @@ namespace RNGOEngine::Core
     void Engine::ClearEvents()
     {
         m_eventQueue.Clear();
+    }
+
+    void Engine::AddEngineSystems()
+    {
+        m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
     }
 }

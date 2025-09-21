@@ -20,26 +20,29 @@ namespace RNGOEngine
 
     namespace Systems
     {
+        struct EngineSystemContext;
         struct SystemContext;
     }
 }
 
 namespace RNGOEngine::Systems
 {
+    // TODO: Find a way to not expose this to the user. They should only use the derived IGameSystem.
+    template<typename TSystemContext>
     class ISystem
     {
     public:
         virtual ~ISystem() = default;
 
-        virtual void Initialize(SystemContext& context)
+        virtual void Initialize(Core::World& world, TSystemContext& context)
         {
         }
 
-        virtual void Update(Core::World& world, SystemContext& context)
+        virtual void Update(Core::World& world, TSystemContext& context)
         {
         }
 
-        virtual void Exit()
+        virtual void Exit(Core::World& world, TSystemContext& context)
         {
         }
 
@@ -50,5 +53,13 @@ namespace RNGOEngine::Systems
 
     protected:
         std::string_view m_debugName;
+    };
+
+    class EngineSystem : public ISystem<EngineSystemContext>
+    {
+    };
+
+    class IGameSystem : public ISystem<SystemContext>
+    {
     };
 }

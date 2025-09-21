@@ -12,43 +12,40 @@ namespace RNGOEngine
     {
         class World;
     }
-
-    namespace Systems
-    {
-        struct SystemContext;
-    }
 }
 
 namespace RNGOEngine::Systems
 {
+    template<typename TSystemContext>
     struct ScheduledSystem
     {
-        std::unique_ptr<ISystem> system = nullptr;
+        std::unique_ptr<ISystem<TSystemContext>> system = nullptr;
         bool initialized = false;
 
-        ISystem* operator->() const
+        ISystem<TSystemContext>* operator->() const
         {
             return system.get();
         }
     };
 
+    template<typename TSystemContext>
     class SystemScheduler
     {
     public:
-        ~SystemScheduler();
+        void Terminate(Core::World& world, TSystemContext& context);
 
-        void Update(Core::World& world, SystemContext& context);
+        void Update(Core::World& world, TSystemContext& context);
 
-        template<Concepts::DerivedFrom<ISystem> T, typename... Args>
-        void RegisterSystem(Args&&... args)
-        {
-            m_systems.emplace_back(ScheduledSystem{std::make_unique<T>(std::forward<Args>(args)...)});
-        }
+        template<Concepts::DerivedFrom<ISystem<TSystemContext>> T, typename... Args>
+        void RegisterSystem(Args&&... args);
 
     private:
-        std::vector<ScheduledSystem> m_systems;
+        std::vector<ScheduledSystem<TSystemContext>> m_systems;
 
-        void InitializeSystems(SystemContext& context);
-        void TerminateSystems();
+        void InitializeSystems(Core::World& world, TSystemContext& context);
     };
+
+    
+
+#include "SystemScheduler.tpp"
 }
