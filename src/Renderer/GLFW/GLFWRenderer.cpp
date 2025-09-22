@@ -20,6 +20,7 @@ namespace RNGOEngine::Core::Renderer
 {
     GLFWRenderer::GLFWRenderer(const int viewportWidth, const int viewportHeight)
         : m_isProjectionMatrixDirty(true),
+          m_lastCameraProperties(),
           m_projectionMatrix(),
           m_viewportWidth(viewportWidth),
           m_viewportHeight(viewportHeight)
@@ -45,7 +46,7 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawable : m_drawQueue.opaqueObjects)
         {
             const auto shaderID = opaqueDrawable.material.shader;
-            
+
             glUseProgram(opaqueDrawable.material.shader);
             glBindVertexArray(opaqueDrawable.mesh);
 

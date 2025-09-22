@@ -26,6 +26,7 @@ namespace RNGOEngine::Core::Window
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
         // TODO: Hardcoded to OpenGL core profile. Make configurable.
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+        glfwSwapInterval(0);
 
         m_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
 

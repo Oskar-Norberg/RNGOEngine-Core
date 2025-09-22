@@ -57,6 +57,8 @@ namespace RNGOEngine::Core
 
         while (m_running)
         {
+            RNGO_ZONE_SCOPE;
+            RNGO_ZONE_NAME_C("Engine::Run - Main Loop");
             float deltaTime = std::chrono::duration<float>(
                 std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
@@ -95,6 +97,9 @@ namespace RNGOEngine::Core
 
     void Engine::UpdateEngineSystems(float deltaTime)
     {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("Engine::UpdateEngineSystems");
+        
         m_engineContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
@@ -110,6 +115,9 @@ namespace RNGOEngine::Core
 
     void Engine::UpdateGameSystems(const float deltaTime)
     {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("Engine::UpdateGameSystems");
+        
         m_gameContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
@@ -124,6 +132,9 @@ namespace RNGOEngine::Core
 
     void Engine::Render() const
     {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("Engine::Render");
+        
         if (m_window->GetHeight() == 0 || m_window->GetWidth() == 0)
         {
             return;

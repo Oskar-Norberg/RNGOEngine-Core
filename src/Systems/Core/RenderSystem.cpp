@@ -8,10 +8,15 @@
 #include "Systems/SystemContext.h"
 #include "World/World.h"
 
+#include "Profiling/Profiling.h"
+
 namespace RNGOEngine::Systems::Core
 {
     void RenderSystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
     {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("RenderSystem::Update");
+        
         EngineSystem::Update(world, context);
 
         RNGOEngine::Core::Renderer::DrawQueue drawQueue;
