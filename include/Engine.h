@@ -14,6 +14,7 @@
 #include "Systems/SystemScheduler.h"
 #include "Scene/Scene.h"
 #include "Systems/SystemContext.h"
+#include "Utilities/JobSystem/JobSystem.h"
 
 namespace RNGOEngine::Core
 {
@@ -54,6 +55,7 @@ namespace RNGOEngine::Core
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
+        Utilities::JobSystem m_jobSystem;
 
         std::unique_ptr<Scene> m_currentScene;
 

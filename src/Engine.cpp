@@ -97,6 +97,8 @@ namespace RNGOEngine::Core
     {
         m_engineContext.deltaTime = deltaTime;
 
+        // These don't need to be set every frame. But alas.
+        m_engineContext.jobSystem = &m_jobSystem;
         m_engineContext.assetManager = m_assetManager.get();
         m_engineContext.eventQueue = &m_eventQueue;
         m_engineContext.renderer = m_renderer.get();
@@ -111,6 +113,7 @@ namespace RNGOEngine::Core
         m_gameContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
+        m_gameContext.jobSystem = &m_jobSystem;
         m_gameContext.eventQueue = &m_eventQueue;
         m_gameContext.assetManager = m_assetManager.get();
 
