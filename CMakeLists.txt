@@ -4,6 +4,9 @@ set(CORE_PROJECT_NAME RNGOEngine_Core)
 project(${CORE_PROJECT_NAME})
 
 option(RNGOENGINE_TRACY_ENABLE "Enable Tracy profiler" OFF)
+if (RNGOENGINE_TRACY_ENABLE)
+    add_compile_definitions(RNGOENGINE_TRACY_ENABLE)
+endif ()
 option(RNGOENGINE_UNITY_BUILD "Enable Unity builds" OFF)
 
 # Build Preferences
@@ -15,17 +18,21 @@ include(cmake/CPM.cmake)
 include(cmake/Dependencies.cmake)
 
 # Engine Units
+include(cmake/EngineUnits/Data.cmake)
+include(cmake/EngineUnits/Profiling.cmake)
+include(cmake/EngineUnits/Utilities.cmake)
 include(cmake/EngineUnits/Containers.cmake)
+include(cmake/EngineUnits/Math.cmake)
+include(cmake/EngineUnits/Events.cmake)
+
 include(cmake/EngineUnits/Scene.cmake)
 include(cmake/EngineUnits/Systems.cmake)
 include(cmake/EngineUnits/Threading.cmake)
-include(cmake/EngineUnits/Rendering.cmake)
+
 include(cmake/EngineUnits/Windowing.cmake)
-include(cmake/EngineUnits/Math.cmake)
-include(cmake/EngineUnits/Data.cmake)
+include(cmake/EngineUnits/Rendering.cmake)
+
 include(cmake/EngineUnits/AssetManagement.cmake)
-include(cmake/EngineUnits/Utilities.cmake)
-include(cmake/EngineUnits/Events.cmake)
 include(cmake/EngineUnits/Components.cmake)
 
 # Testing
@@ -40,17 +47,21 @@ target_precompile_headers(${CORE_PROJECT_NAME} PRIVATE include/PCH/PCH.h)
 target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
 
 target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
-        ${SYSTEM_PROJECT_NAME}
-        ${JOBS_PROJECT_NAME}
-        ${RENDERING_PROJECT_NAME}
-        ${WINDOWING_PROJECT_NAME}
+        ${DATA_PROJECT_NAME}
+        ${PROFILING_PROJECT_NAME}
+        ${UTILITIES_PROJECT_NAME}
         ${CONTAINERS_PROJECT_NAME}
         ${MATH_PROJECT_NAME}
-        ${DATA_PROJECT_NAME}
-        ${ASSET_MANAGER_PROJECT_NAME}
-        ${UTILITIES_PROJECT_NAME}
         ${EVENTS_PROJECT_NAME}
+
         ${SCENE_PROJECT_NAME}
+        ${SYSTEM_PROJECT_NAME}
+        ${JOBS_PROJECT_NAME}
+
+        ${WINDOWING_PROJECT_NAME}
+        ${RENDERING_PROJECT_NAME}
+
+        ${ASSET_MANAGER_PROJECT_NAME}
         ${COMPONENT_PROJECT_NAME}
 )
 

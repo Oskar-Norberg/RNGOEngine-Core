@@ -17,3 +17,4 @@ add_library(${RENDERING_PROJECT_NAME} STATIC
 target_include_directories(${RENDERING_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RENDERING_PROJECT_NAME} PUBLIC glm)
 target_link_libraries(${RENDERING_PROJECT_NAME} PRIVATE ${SCENE_PROJECT_NAME} ${SYSTEM_PROJECT_NAME} glad glfw)
+target_link_libraries(${RENDERING_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_NAME})
