@@ -13,6 +13,7 @@
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
 #include "Scene/Scene.h"
+#include "Scene/SceneManager/SceneManager.h"
 #include "Systems/SystemContext.h"
 #include "Utilities/JobSystem/JobSystem.h"
 
@@ -32,7 +33,7 @@ namespace RNGOEngine::Core
         template<Concepts::DerivedFrom<Scene> T>
         void LoadScene()
         {
-            m_currentScene = std::make_unique<T>();
+            m_sceneManager.LoadScene<T>();
         }
 
         template<Concepts::DerivedFrom<Systems::IGameSystem> T, typename... Args>
@@ -56,9 +57,8 @@ namespace RNGOEngine::Core
         std::unique_ptr<Renderer::IRenderer> m_renderer;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
-
-        std::unique_ptr<Scene> m_currentScene;
-
+        SceneManager m_sceneManager;
+        
         Systems::SystemContext m_gameContext;
         Systems::SystemScheduler<Systems::SystemContext> m_gameSystems;
 

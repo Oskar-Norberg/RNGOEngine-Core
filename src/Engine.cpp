@@ -21,8 +21,7 @@ namespace RNGOEngine::Core
         : m_running(true),
           m_window(nullptr),
           m_renderer(nullptr),
-          m_assetManager(nullptr),
-          m_currentScene(nullptr)
+          m_assetManager(nullptr)
     {
         bool doFlipTexturesVertically = false;
 
@@ -47,21 +46,19 @@ namespace RNGOEngine::Core
 
     void Engine::Run()
     {
-        // TODO: Shitty solution, one engine = one scene.
-        // TODO: pleaes fix
-        // TODO: fix please
-        assert(m_currentScene && "No scene loaded!");
-        m_currentScene->Initialize(*this);
-
         auto lastFrame = std::chrono::high_resolution_clock::now();
 
         while (m_running)
         {
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_C("Engine::Run - Main Loop");
+            
             float deltaTime = std::chrono::duration<float>(
                 std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
+
+            m_sceneManager.SwitchToPendingScene(*this);
+            assert(m_sceneManager.GetCurrentScene() && "No scene loaded.");
 
             PollWindowEvents();
 
@@ -73,10 +70,9 @@ namespace RNGOEngine::Core
             PollEngineEvents();
             ClearEvents();
 
+
             RNGO_FRAME_MARK;
         }
-
-        m_currentScene->Exit(*this);
     }
 
     void Engine::PollWindowEvents()
@@ -103,12 +99,13 @@ namespace RNGOEngine::Core
         m_engineContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
+        m_engineContext.sceneManager = &m_sceneManager;
         m_engineContext.jobSystem = &m_jobSystem;
         m_engineContext.assetManager = m_assetManager.get();
         m_engineContext.eventQueue = &m_eventQueue;
         m_engineContext.renderer = m_renderer.get();
 
-        m_engineSystems.Update(m_currentScene->world, m_engineContext);
+        m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineContext);
         
         m_engineContext.resourceMapper.ClearTransientResources();
     }
@@ -121,11 +118,12 @@ namespace RNGOEngine::Core
         m_gameContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
+        m_gameContext.sceneManager = &m_sceneManager;
         m_gameContext.jobSystem = &m_jobSystem;
         m_gameContext.eventQueue = &m_eventQueue;
         m_gameContext.assetManager = m_assetManager.get();
 
-        m_gameSystems.Update(m_currentScene->world, m_gameContext);
+        m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameContext);
 
         m_gameContext.resourceMapper.ClearTransientResources();
     }
