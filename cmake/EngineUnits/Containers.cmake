@@ -1,3 +1,4 @@
+# TODO: QuadTree 100% depends on Math, add it as dependency.
 set(CONTAINERS_PROJECT_NAME RNGOEngine_Containers)
 add_library(${CONTAINERS_PROJECT_NAME} INTERFACE
         include/Utilities/Containers/Graphs/DirectedGraph.h
