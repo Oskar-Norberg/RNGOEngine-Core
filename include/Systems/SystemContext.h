@@ -25,6 +25,8 @@ namespace RNGOEngine
 
     namespace Core
     {
+        class SceneManager;
+        
         namespace Renderer
         {
             class IRenderer;
@@ -44,6 +46,7 @@ namespace RNGOEngine::Systems
         // TODO: Please move this out of here, this needs to be a pointer.
 
         // TODO: Ugly pointer bonanza over here
+        RNGOEngine::Core::SceneManager* sceneManager = nullptr;
         Utilities::JobSystem* jobSystem = nullptr;
         Events::EventQueue* eventQueue = nullptr;
         AssetHandling::AssetManager* assetManager = nullptr;
@@ -59,6 +62,7 @@ namespace RNGOEngine::Systems
         Resources::ResourceMapper resourceMapper;
 
         // TODO: Ugly pointer bonanza over here
+        RNGOEngine::Core::SceneManager* sceneManager = nullptr;
         Utilities::JobSystem* jobSystem = nullptr;
         Events::EventQueue* eventQueue = nullptr;
         AssetHandling::AssetManager* assetManager = nullptr;
