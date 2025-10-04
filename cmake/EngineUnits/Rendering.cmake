@@ -9,6 +9,7 @@ add_library(${RENDERING_PROJECT_NAME} STATIC
         include/Renderer/Uniforms.h
         include/Renderer/GLFW/GLFWRenderer.h
         src/Renderer/GLFW/GLFWRenderer.cpp
+        
         include/Renderer/Null/NullRenderer.h
 
         include/Systems/Core/RenderSystem.h

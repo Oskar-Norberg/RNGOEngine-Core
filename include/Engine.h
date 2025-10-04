@@ -58,6 +58,7 @@ namespace RNGOEngine::Core
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;
+        InputManager m_inputManager;
         
         Systems::SystemContext m_gameContext;
         Systems::SystemScheduler<Systems::SystemContext> m_gameSystems;
