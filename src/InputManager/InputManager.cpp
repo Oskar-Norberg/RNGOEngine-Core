@@ -20,6 +20,21 @@ namespace RNGOEngine::Core
         return {m_deltaX, m_deltaY};
     }
 
+    bool InputManager::IsMouseButtonDown(const int button) const
+    {
+        return m_currentlyPressedMouseButtons.contains(button);
+    }
+
+    bool InputManager::WasMouseButtonPressedThisFrame(const int button) const
+    {
+        return m_mouseButtonsPressedThisFrame.contains(button);
+    }
+
+    bool InputManager::WasMouseButtonReleasedThisFrame(const int button) const
+    {
+        return m_mouseButtonsReleasedThisFrame.contains(button);
+    }
+
     void InputManager::UpdateKeyboard(const Events::EventQueue& eventQueue)
     {
         m_keysPressedThisFrame.clear();

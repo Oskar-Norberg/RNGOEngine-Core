@@ -20,7 +20,18 @@ namespace RNGOEngine::Core
     public:
         void Update(const Events::EventQueue& eventQueue);
 
+        // Mouse Movement
+    public:
         MouseDelta GetMouseDelta() const;
+
+        // Mouse Buttons
+    public:
+        bool IsMouseButtonDown(int button) const;
+        bool WasMouseButtonPressedThisFrame(int button) const;
+        bool WasMouseButtonReleasedThisFrame(int button) const;
+
+        // Keyboard Keys
+    public:
 
     private:
         std::unordered_set<int> m_currentlyPressedKeys;
