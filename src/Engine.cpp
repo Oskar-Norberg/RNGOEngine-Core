@@ -18,7 +18,7 @@
 
 namespace RNGOEngine::Core
 {
-    Engine::Engine(const EngineConfig config)
+    Engine::Engine(const EngineConfig& config)
         : m_running(true),
           m_window(nullptr),
           m_renderer(nullptr),
@@ -45,6 +45,10 @@ namespace RNGOEngine::Core
         }
 
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
+        for (const auto& [path, type] : config.assetPaths)
+        {
+            m_assetManager->AddAssetPath(path, type);
+        }
 
         AddEngineSystems();
     }

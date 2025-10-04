@@ -25,19 +25,20 @@ namespace RNGOEngine::Core
         GLFW_OpenGL,
     };
 
-    // TODO: Should EngineConfig contain asset paths?
     struct EngineConfig
     {
         RenderType renderType = RenderType::Headless;
         size_t width = 800;
         size_t height = 600;
         std::string name = "RNGOEngine";
+
+        std::vector<std::pair<std::filesystem::path, AssetHandling::AssetPathType>> assetPaths;
     };
 
     class Engine
     {
     public:
-        explicit Engine(EngineConfig config);
+        explicit Engine(const EngineConfig& config);
 
         template<Concepts::DerivedFrom<Scene> T>
         void LoadScene()
