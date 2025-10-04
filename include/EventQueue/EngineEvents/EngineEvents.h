@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Data/MouseModes.h"
+
 namespace RNGOEngine::Events
 {
     struct ExitEvent
@@ -32,6 +34,11 @@ namespace RNGOEngine::Events
     {
         int button;
         ButtonAction action;
+    };
+
+    struct MouseModeEvent
+    {
+        Data::Mouse::MouseMode mode;
     };
 
     struct WindowSizeEvent

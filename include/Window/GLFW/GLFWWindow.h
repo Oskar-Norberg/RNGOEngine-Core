@@ -24,6 +24,7 @@ namespace RNGOEngine::Core::Window
 
     public:
         bool ListenSendEvents(Events::EventQueue& eventQueue) override;
+        void PollGameEvents(Events::EventQueue& eventQueue) override;
 
         void SwapBuffers() override;
         void SetName(std::string_view name) override;

@@ -35,6 +35,7 @@ namespace RNGOEngine::Core
         bool IsKeyDown(int key) const;
         bool WasKeyPressedThisFrame(int key) const;
         bool WasKeyReleasedThisFrame(int key) const;
+        
 
     private:
         std::unordered_set<int> m_currentlyPressedKeys;

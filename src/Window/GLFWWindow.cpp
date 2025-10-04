@@ -142,6 +142,31 @@ namespace RNGOEngine::Core::Window
         return false;
     }
 
+    void GLFWWindow::PollGameEvents(Events::EventQueue& eventQueue)
+    {
+        const auto mouseModeEvents = eventQueue.GetEvents<Events::MouseModeEvent>();
+        for (const auto& [mouseMode] : mouseModeEvents)
+        {
+            switch (mouseMode)
+            {
+                case Data::Mouse::MouseMode::Normal:
+                    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    break;
+                    
+                case Data::Mouse::MouseMode::Hidden:
+                    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+                    break;
+                    
+                case Data::Mouse::MouseMode::Locked:
+                    glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    break;
+                    
+                default:
+                    break;
+            }
+        }
+    }
+
     void GLFWWindow::WindowSizeCallback(int width, int height)
     {
         m_hasPendingResize = true;

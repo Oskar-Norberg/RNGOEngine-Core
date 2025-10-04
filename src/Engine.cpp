@@ -68,6 +68,7 @@ namespace RNGOEngine::Core
 
             Render();
 
+            PollGameEvents();
             PollEngineEvents();
             ClearEvents();
 
@@ -81,7 +82,7 @@ namespace RNGOEngine::Core
         m_window->PollWindowEvents(m_eventQueue);
         m_window->PollKeyboardEvents(m_eventQueue);
         m_window->PollMouseEvents(m_eventQueue);
-
+        
         // Listen to events in a loop to allow for event chaining.
         bool moreEvents;
 
@@ -145,6 +146,11 @@ namespace RNGOEngine::Core
 
         m_renderer->Render(*m_window);
         m_window->SwapBuffers();
+    }
+
+    void Engine::PollGameEvents()
+    {
+        m_window->PollGameEvents(m_eventQueue);
     }
 
     void Engine::PollEngineEvents()

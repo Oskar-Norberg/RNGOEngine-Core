@@ -28,6 +28,10 @@ namespace RNGOEngine::Core::Window
             return false;
         }
 
+        void PollGameEvents(Events::EventQueue& eventQueue) override
+        {
+        }
+
         int GetWidth() const override
         {
             return 0;

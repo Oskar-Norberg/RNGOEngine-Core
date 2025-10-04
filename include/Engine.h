@@ -77,6 +77,7 @@ namespace RNGOEngine::Core
 
     private:
         void PollWindowEvents();
+        void PollGameEvents();
         void PollEngineEvents();
         void ClearEvents();
 
