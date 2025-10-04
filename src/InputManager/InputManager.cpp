@@ -35,6 +35,21 @@ namespace RNGOEngine::Core
         return m_mouseButtonsReleasedThisFrame.contains(button);
     }
 
+    bool InputManager::IsKeyDown(const int key) const
+    {
+        return m_currentlyPressedKeys.contains(key);
+    }
+
+    bool InputManager::WasKeyPressedThisFrame(const int key) const
+    {
+        return m_keysPressedThisFrame.contains(key);
+    }
+
+    bool InputManager::WasKeyReleasedThisFrame(const int key) const
+    {
+        return  m_keysReleasedThisFrame.contains(key);
+    }
+
     void InputManager::UpdateKeyboard(const Events::EventQueue& eventQueue)
     {
         m_keysPressedThisFrame.clear();
