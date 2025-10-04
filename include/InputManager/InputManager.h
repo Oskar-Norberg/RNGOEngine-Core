@@ -4,8 +4,10 @@
 
 #pragma once
 
+#include <optional>
 #include <unordered_set>
 
+#include "Data/MouseModes.h"
 #include "EventQueue/EventQueue.h"
 
 namespace RNGOEngine::Core
@@ -19,6 +21,7 @@ namespace RNGOEngine::Core
     {
     public:
         void Update(const Events::EventQueue& eventQueue);
+        void GetPendingChanges(Events::EventQueue& eventQueue);
 
         // Mouse Movement
     public:
@@ -35,6 +38,10 @@ namespace RNGOEngine::Core
         bool IsKeyDown(int key) const;
         bool WasKeyPressedThisFrame(int key) const;
         bool WasKeyReleasedThisFrame(int key) const;
+
+        // Mouse Mode
+    public:
+        void SetMouseMode(Data::Mouse::MouseMode mode);
         
 
     private:
@@ -50,6 +57,9 @@ namespace RNGOEngine::Core
     private:
         double m_deltaX = 0.0;
         double m_deltaY = 0.0;
+
+    private:
+        std::optional<Data::Mouse::MouseMode> m_pendingMouseMode = std::nullopt;
 
     private:
         void UpdateKeyboard(const Events::EventQueue& eventQueue);

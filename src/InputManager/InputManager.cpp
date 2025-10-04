@@ -15,6 +15,15 @@ namespace RNGOEngine::Core
         UpdateMouseMovement(eventQueue);
     }
 
+    void InputManager::GetPendingChanges(Events::EventQueue& eventQueue)
+    {
+        if (m_pendingMouseMode.has_value())
+        {
+            eventQueue.EmplaceEvent<Events::MouseModeEvent>(m_pendingMouseMode.value());
+            m_pendingMouseMode.reset();
+        }
+    }
+
     MouseDelta InputManager::GetMouseDelta() const
     {
         return {m_deltaX, m_deltaY};
@@ -47,7 +56,12 @@ namespace RNGOEngine::Core
 
     bool InputManager::WasKeyReleasedThisFrame(const int key) const
     {
-        return  m_keysReleasedThisFrame.contains(key);
+        return m_keysReleasedThisFrame.contains(key);
+    }
+
+    void InputManager::SetMouseMode(const Data::Mouse::MouseMode mode)
+    {
+        m_pendingMouseMode = mode;
     }
 
     void InputManager::UpdateKeyboard(const Events::EventQueue& eventQueue)

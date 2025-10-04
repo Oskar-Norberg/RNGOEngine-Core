@@ -150,6 +150,7 @@ namespace RNGOEngine::Core
 
     void Engine::PollGameEvents()
     {
+        m_inputManager.GetPendingChanges(m_eventQueue);
         m_window->PollGameEvents(m_eventQueue);
     }
 
