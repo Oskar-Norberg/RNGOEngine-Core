@@ -19,10 +19,19 @@
 
 namespace RNGOEngine::Core
 {
-    enum EngineConfig
+    enum class RenderType
     {
         Headless,
         GLFW_OpenGL,
+    };
+
+    // TODO: Should EngineConfig contain asset paths?
+    struct EngineConfig
+    {
+        RenderType renderType = RenderType::Headless;
+        size_t width = 800;
+        size_t height = 600;
+        std::string name = "RNGOEngine";
     };
 
     class Engine

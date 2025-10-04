@@ -26,22 +26,26 @@ namespace RNGOEngine::Core
     {
         bool doFlipTexturesVertically = false;
 
-        if (config == EngineConfig::Headless)
+        switch (config.renderType)
         {
-            m_window = std::make_unique<Window::NullWindow>();
-            m_renderer = std::make_unique<Renderer::NullRenderer>();
-        }
-        else if (config == EngineConfig::GLFW_OpenGL)
-        {
-            // TODO: Temporary arbitrary height, width and name. Make a config struct.
-            m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
-            m_renderer = std::make_unique<Renderer::GLFWRenderer>(800, 600);
-            doFlipTexturesVertically = true;
+            case RenderType::GLFW_OpenGL:
+            {
+                m_window = std::make_unique<Window::GLFWWindow>(config.width, config.height, config.name);
+                m_renderer = std::make_unique<Renderer::GLFWRenderer>(config.width, config.height);
+                doFlipTexturesVertically = true;
+                break;
+            }
+            case RenderType::Headless:
+            default:
+            {
+                m_window = std::make_unique<Window::NullWindow>();
+                m_renderer = std::make_unique<Renderer::NullRenderer>();
+                break;
+            }
         }
 
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
 
-        // Add RenderSystem
         AddEngineSystems();
     }
 
@@ -53,7 +57,7 @@ namespace RNGOEngine::Core
         {
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_C("Engine::Run - Main Loop");
-            
+
             float deltaTime = std::chrono::duration<float>(
                 std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
@@ -73,7 +77,6 @@ namespace RNGOEngine::Core
             PollEngineEvents();
             ClearEvents();
 
-
             RNGO_FRAME_MARK;
         }
     }
@@ -83,7 +86,7 @@ namespace RNGOEngine::Core
         m_window->PollWindowEvents(m_eventQueue);
         m_window->PollKeyboardEvents(m_eventQueue);
         m_window->PollMouseEvents(m_eventQueue);
-        
+
         // Listen to events in a loop to allow for event chaining.
         bool moreEvents;
 
@@ -100,7 +103,7 @@ namespace RNGOEngine::Core
     {
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("Engine::UpdateEngineSystems");
-        
+
         m_engineContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
@@ -112,7 +115,7 @@ namespace RNGOEngine::Core
         m_engineContext.renderer = m_renderer.get();
 
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineContext);
-        
+
         m_engineContext.resourceMapper.ClearTransientResources();
     }
 
@@ -120,7 +123,7 @@ namespace RNGOEngine::Core
     {
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("Engine::UpdateGameSystems");
-        
+
         m_gameContext.deltaTime = deltaTime;
 
         // These don't need to be set every frame. But alas.
@@ -139,7 +142,7 @@ namespace RNGOEngine::Core
     {
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("Engine::Render");
-        
+
         if (m_window->GetHeight() == 0 || m_window->GetWidth() == 0)
         {
             return;

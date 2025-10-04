@@ -56,6 +56,7 @@ namespace RNGOEngine::Core::Renderer
         virtual ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) = 0;
 
     public:
+        // TODO: Make this take a TextureHandle instead.
         virtual TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) = 0;
     };
 }
