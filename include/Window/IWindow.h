@@ -29,6 +29,8 @@ namespace RNGOEngine::Core::Window
         /// 
         virtual bool ListenSendEvents(Events::EventQueue& eventQueue) = 0;
 
+        virtual void PollGameEvents(Events::EventQueue& eventQueue) = 0;
+
     public:
         virtual int GetWidth() const = 0;
         virtual int GetHeight() const = 0;

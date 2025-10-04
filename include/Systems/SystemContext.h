@@ -5,6 +5,7 @@
 #pragma once
 
 #include "ResourceMapper.h"
+#include "InputManager/InputManager.h"
 
 namespace RNGOEngine
 {
@@ -26,6 +27,7 @@ namespace RNGOEngine
     namespace Core
     {
         class SceneManager;
+        class InputManager;
         
         namespace Renderer
         {
@@ -47,6 +49,7 @@ namespace RNGOEngine::Systems
 
         // TODO: Ugly pointer bonanza over here
         RNGOEngine::Core::SceneManager* sceneManager = nullptr;
+        RNGOEngine::Core::InputManager* inputManager = nullptr;
         Utilities::JobSystem* jobSystem = nullptr;
         Events::EventQueue* eventQueue = nullptr;
         AssetHandling::AssetManager* assetManager = nullptr;
@@ -63,6 +66,7 @@ namespace RNGOEngine::Systems
 
         // TODO: Ugly pointer bonanza over here
         RNGOEngine::Core::SceneManager* sceneManager = nullptr;
+        RNGOEngine::Core::InputManager* inputManager = nullptr;
         Utilities::JobSystem* jobSystem = nullptr;
         Events::EventQueue* eventQueue = nullptr;
         AssetHandling::AssetManager* assetManager = nullptr;

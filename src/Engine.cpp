@@ -57,6 +57,7 @@ namespace RNGOEngine::Core
                 std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
+            // TODO: Make a load pending scene function instead. Keep implementation details out of game loop.
             m_sceneManager.SwitchToPendingScene(*this);
             assert(m_sceneManager.GetCurrentScene() && "No scene loaded.");
 
@@ -67,6 +68,7 @@ namespace RNGOEngine::Core
 
             Render();
 
+            PollGameEvents();
             PollEngineEvents();
             ClearEvents();
 
@@ -80,7 +82,7 @@ namespace RNGOEngine::Core
         m_window->PollWindowEvents(m_eventQueue);
         m_window->PollKeyboardEvents(m_eventQueue);
         m_window->PollMouseEvents(m_eventQueue);
-
+        
         // Listen to events in a loop to allow for event chaining.
         bool moreEvents;
 
@@ -89,6 +91,8 @@ namespace RNGOEngine::Core
             moreEvents = m_window->ListenSendEvents(m_eventQueue);
             moreEvents = moreEvents || m_renderer->ListenSendEvents(m_eventQueue);
         } while (moreEvents);
+
+        m_inputManager.Update(m_eventQueue);
     }
 
     void Engine::UpdateEngineSystems(float deltaTime)
@@ -100,6 +104,7 @@ namespace RNGOEngine::Core
 
         // These don't need to be set every frame. But alas.
         m_engineContext.sceneManager = &m_sceneManager;
+        m_engineContext.inputManager = &m_inputManager;
         m_engineContext.jobSystem = &m_jobSystem;
         m_engineContext.assetManager = m_assetManager.get();
         m_engineContext.eventQueue = &m_eventQueue;
@@ -119,6 +124,7 @@ namespace RNGOEngine::Core
 
         // These don't need to be set every frame. But alas.
         m_gameContext.sceneManager = &m_sceneManager;
+        m_gameContext.inputManager = &m_inputManager;
         m_gameContext.jobSystem = &m_jobSystem;
         m_gameContext.eventQueue = &m_eventQueue;
         m_gameContext.assetManager = m_assetManager.get();
@@ -140,6 +146,12 @@ namespace RNGOEngine::Core
 
         m_renderer->Render(*m_window);
         m_window->SwapBuffers();
+    }
+
+    void Engine::PollGameEvents()
+    {
+        m_inputManager.GetPendingChanges(m_eventQueue);
+        m_window->PollGameEvents(m_eventQueue);
     }
 
     void Engine::PollEngineEvents()
