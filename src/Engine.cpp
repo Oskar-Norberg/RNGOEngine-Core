@@ -57,6 +57,7 @@ namespace RNGOEngine::Core
                 std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
+            // TODO: Make a load pending scene function instead. Keep implementation details out of game loop.
             m_sceneManager.SwitchToPendingScene(*this);
             assert(m_sceneManager.GetCurrentScene() && "No scene loaded.");
 
@@ -89,6 +90,8 @@ namespace RNGOEngine::Core
             moreEvents = m_window->ListenSendEvents(m_eventQueue);
             moreEvents = moreEvents || m_renderer->ListenSendEvents(m_eventQueue);
         } while (moreEvents);
+
+        m_inputManager.Update(m_eventQueue);
     }
 
     void Engine::UpdateEngineSystems(float deltaTime)
