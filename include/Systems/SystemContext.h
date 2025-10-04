@@ -45,7 +45,6 @@ namespace RNGOEngine::Systems
 
         // TODO: This should probably not be owned by the SystemContext.
         Resources::ResourceMapper resourceMapper;
-        // TODO: Please move this out of here, this needs to be a pointer.
 
         // TODO: Ugly pointer bonanza over here
         RNGOEngine::Core::SceneManager* sceneManager = nullptr;

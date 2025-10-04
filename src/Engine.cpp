@@ -12,6 +12,7 @@
 #include "Renderer/Null/NullRenderer.h"
 #include "Systems/SystemContext.h"
 #include "Systems/Core/RenderSystem.h"
+#include "Utilities/RNGOAsserts.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
 
@@ -32,7 +33,7 @@ namespace RNGOEngine::Core
         }
         else if (config == EngineConfig::GLFW_OpenGL)
         {
-            // TODO: Temporary arbitrary height, width and name.
+            // TODO: Temporary arbitrary height, width and name. Make a config struct.
             m_window = std::make_unique<Window::GLFWWindow>(800, 600, "RNGOEngine");
             m_renderer = std::make_unique<Renderer::GLFWRenderer>(800, 600);
             doFlipTexturesVertically = true;
@@ -59,7 +60,7 @@ namespace RNGOEngine::Core
 
             // TODO: Make a load pending scene function instead. Keep implementation details out of game loop.
             m_sceneManager.SwitchToPendingScene(*this);
-            assert(m_sceneManager.GetCurrentScene() && "No scene loaded.");
+            RNGO_ASSERT(m_sceneManager.GetCurrentScene() && "No scene loaded.");
 
             PollWindowEvents();
 

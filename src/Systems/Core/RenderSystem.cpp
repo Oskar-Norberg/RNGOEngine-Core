@@ -9,6 +9,7 @@
 #include "World/World.h"
 
 #include "Profiling/Profiling.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Systems::Core
 {
@@ -168,7 +169,7 @@ namespace RNGOEngine::Systems::Core
                                        ? world.GetRegistry().get<Components::Intensity>(entity).intensity
                                        : 1.0f;
 
-            assert(currentPointLightIndex < RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS &&
+            RNGO_ASSERT(currentPointLightIndex < RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS &&
                 "Exceeded maximum number of point lights in scene!"
             );
 
@@ -209,7 +210,7 @@ namespace RNGOEngine::Systems::Core
                                        ? world.GetRegistry().get<Components::Intensity>(entity).intensity
                                        : 1.0f;
 
-            assert(currentSpotlightIndex < RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS &&
+            RNGO_ASSERT(currentSpotlightIndex < RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS &&
                 "Exceeded maximum number of spotlights in scene!"
             );
 

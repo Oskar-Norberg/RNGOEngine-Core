@@ -7,6 +7,8 @@
 #include <future>
 #include <optional>
 
+#include "Utilities/RNGOAsserts.h"
+
 namespace RNGOEngine::Utilities
 {
     // TODO: Rework these into "thin" handles that only store a JobID and a pointer to the JobSystem.

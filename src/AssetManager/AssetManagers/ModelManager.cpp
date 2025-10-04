@@ -4,9 +4,8 @@
 
 #include "AssetManager/AssetManagers/ModelManager.h"
 
-#include <cassert>
-
 #include "Renderer/IRenderer.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -39,7 +38,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Return a default model?
-        assert(false && "Tried to get a model that doesn't exist.");
+        RNGO_ASSERT(false && "Tried to get a model that doesn't exist.");
         return m_models.at(0);
     }
 }

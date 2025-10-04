@@ -4,10 +4,10 @@
 
 #include "Shader/ShaderPreprocessor.h"
 
-#include <cassert>
 #include <unordered_set>
 
 #include "Renderer/DrawQueue.h"
+#include "Utilities/RNGOAsserts.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 
 #ifndef ENGINE_SHADERS_DIR
@@ -30,7 +30,7 @@ namespace RNGOEngine::Shaders
 
         if (!foundPath.has_value())
         {
-            assert(false && "Shader not found.");
+            RNGO_ASSERT(false && "Shader not found.");
             return std::unexpected(ShaderPreProcessingError::FileNotFound);
         }
 
@@ -107,7 +107,7 @@ namespace RNGOEngine::Shaders
 
             if (includeBeginIt > endLineIt || includeEndIt > endLineIt)
             {
-                assert(false && "Malformed include directive.");
+                RNGO_ASSERT(false && "Malformed include directive.");
                 return ShaderPreProcessingError::MalformedInclude;
             }
 
@@ -129,7 +129,7 @@ namespace RNGOEngine::Shaders
 
                 if (!includeFilePath.has_value())
                 {
-                    assert(false && "Failed to open include file.");
+                    RNGO_ASSERT(false && "Failed to open include file.");
                     return ShaderPreProcessingError::FileNotFound;
                 }
 
@@ -154,7 +154,7 @@ namespace RNGOEngine::Shaders
 
         if (tokenIt == m_definitions.end())
         {
-            assert(false && "Token does not exist in definitions.");
+            RNGO_ASSERT(false && "Token does not exist in definitions.");
             return ShaderPreProcessingError::TokenNotFound;
         }
 

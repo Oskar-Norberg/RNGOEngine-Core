@@ -5,6 +5,7 @@
 #include "AssetManager/AssetManager.h"
 
 #include "Renderer/IRenderer.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -32,7 +33,7 @@ namespace RNGOEngine::AssetHandling
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
         if (!fullPath.has_value())
         {
-            assert(false && "Model not found!");
+            RNGO_ASSERT(false && "Model not found!");
             return INVALID_MODEL_ID;
         }
 
@@ -48,15 +49,15 @@ namespace RNGOEngine::AssetHandling
             switch (meshHandle.error())
             {
                 case ModelLoading::ModelLoadingError::FileNotFound:
-                    assert(false && "Model not found!");
+                    RNGO_ASSERT(false && "Model not found!");
                 case ModelLoading::ModelLoadingError::FailedToLoad:
-                    assert(false && "Model could not be loaded!");
+                    RNGO_ASSERT(false && "Model could not be loaded!");
                 case ModelLoading::ModelLoadingError::NoMeshesFound:
-                    assert(false && "Model has no valid meshes!");
+                    RNGO_ASSERT(false && "Model has no valid meshes!");
                 case ModelLoading::ModelLoadingError::UnsupportedFormat:
-                    assert(false && "Unsupported model format!");
+                    RNGO_ASSERT(false && "Unsupported model format!");
                 default:
-                    assert(false && "Model loading failed!");
+                    RNGO_ASSERT(false && "Model loading failed!");
             }
 
             return INVALID_MODEL_ID;
@@ -113,11 +114,11 @@ namespace RNGOEngine::AssetHandling
                         return shaderID.value();
                     }
 
-                    assert(false && "Failed to create shader!");
+                    RNGO_ASSERT(false && "Failed to create shader!");
                 }
                 else
                 {
-                    assert(false && "Shader could not be loaded");
+                    RNGO_ASSERT(false && "Shader could not be loaded");
                 }
 
                 return Core::Renderer::INVALID_SHADER_ID;
@@ -138,7 +139,7 @@ namespace RNGOEngine::AssetHandling
             }
             else
             {
-                assert(false && "Failed to create shader program!");
+                RNGO_ASSERT(false && "Failed to create shader program!");
             }
         }
 
@@ -152,7 +153,7 @@ namespace RNGOEngine::AssetHandling
         const auto fullPath = m_assetFileFetcher.GetTexturePath(texturePath);
         if (!fullPath.has_value())
         {
-            assert(false && "Texture not found!");
+            RNGO_ASSERT(false && "Texture not found!");
             // I think the IVNALID_TEXTURE_ID Should be handled through the TextureManager.
             return Core::Renderer::INVALID_TEXTURE_ID;
         }
@@ -168,10 +169,10 @@ namespace RNGOEngine::AssetHandling
             switch (textureHandle.error())
             {
                 case TextureLoader::TextureLoadingError::FileNotFound:
-                    assert(false && "Texture not found");
+                    RNGO_ASSERT(false && "Texture not found");
                     return INVALID_MODEL_ID;
                 case TextureLoader::TextureLoadingError::FailedToLoad:
-                    assert(false && "Failed to load texture");
+                    RNGO_ASSERT(false && "Failed to load texture");
                     return INVALID_MODEL_ID;
             }
         }
@@ -206,7 +207,7 @@ namespace RNGOEngine::AssetHandling
                 break;
 
             default:
-                assert(false && "Unsupported asset path type");
+                RNGO_ASSERT(false && "Unsupported asset path type");
                 break;
         }
     }

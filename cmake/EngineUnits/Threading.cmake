@@ -9,4 +9,4 @@ add_library(${JOBS_PROJECT_NAME} STATIC
         include/Utilities/JobSystem/Handle/JobHandle.tpp
 )
 target_include_directories(${JOBS_PROJECT_NAME} PUBLIC include)
-target_link_libraries(${JOBS_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_NAME})
+target_link_libraries(${JOBS_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_NAME} ${UTILITIES_PROJECT_NAME})

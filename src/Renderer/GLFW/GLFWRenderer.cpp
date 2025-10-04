@@ -7,14 +7,13 @@
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
-// TODO: AAAAAAAAAAAAAAAAAAAAA
-#include <cassert>
 #include <format>
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
 #include "AssetManager/AssetManagers/TextureManager.h"
 #include "Data/MeshData.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -28,7 +27,7 @@ namespace RNGOEngine::Core::Renderer
         // TODO: this should be passed in from the engine/window.
         if (!gladLoadGL(glfwGetProcAddress))
         {
-            assert(false && "Failed to initialize GLAD");
+            RNGO_ASSERT(false && "Failed to initialize GLAD");
         }
 
         glEnable(GL_DEPTH_TEST);
@@ -93,7 +92,7 @@ namespace RNGOEngine::Core::Renderer
                             shaderID, uniformSpecification.name.c_str());
                         if (uniformLocation == -1)
                         {
-                            assert(false && "Texture Uniform not found in shader.");
+                            RNGO_ASSERT(false && "Texture Uniform not found in shader.");
                             break;
                         }
 
@@ -223,7 +222,7 @@ namespace RNGOEngine::Core::Renderer
                             static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
-            assert(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
+            RNGO_ASSERT(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
             const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
 
@@ -314,7 +313,7 @@ namespace RNGOEngine::Core::Renderer
         }
         else
         {
-            assert(false && "Unsupported number of channels in texture");
+            RNGO_ASSERT(false && "Unsupported number of channels in texture");
             return INVALID_TEXTURE_ID;
         }
 
@@ -359,7 +358,7 @@ namespace RNGOEngine::Core::Renderer
         if (!success)
         {
             glGetShaderInfoLog(shader, 512, NULL, infoLog);
-            assert(false && infoLog);
+            RNGO_ASSERT(false && infoLog);
             return false;
         }
 
@@ -375,7 +374,7 @@ namespace RNGOEngine::Core::Renderer
         if (!success)
         {
             glGetProgramInfoLog(program, 512, nullptr, infoLog);
-            assert(false && infoLog);
+            RNGO_ASSERT(false && infoLog);
             return false;
         }
 

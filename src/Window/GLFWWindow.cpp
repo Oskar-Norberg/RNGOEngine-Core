@@ -2,12 +2,11 @@
 // Created by Oskar.Norberg on 2025-08-25.
 //
 
-// TODO: much badness
-#include <cassert>
 #include <GLFW/glfw3.h>
 
 #include "Window/GLFW/GLFWWindow.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Core::Window
 {
@@ -31,7 +30,7 @@ namespace RNGOEngine::Core::Window
         m_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
 
         // TODO: PLEASE MAKE CUSTOM ENGINE LEVEL ASSERTIONS.
-        assert(m_window && "Failed to create GLFW window");
+        RNGO_ASSERT(m_window && "Failed to create GLFW window");
 
         glfwMakeContextCurrent(m_window);
         glfwSetWindowUserPointer(m_window, this);
@@ -44,7 +43,7 @@ namespace RNGOEngine::Core::Window
             }
             else
             {
-                assert(false && "GLFW window user pointer is null.");
+                RNGO_ASSERT(false && "GLFW window user pointer is null.");
             }
         });
 
@@ -56,7 +55,7 @@ namespace RNGOEngine::Core::Window
             }
             else
             {
-                assert(false && "GLFW window user pointer is null.");
+                RNGO_ASSERT(false && "GLFW window user pointer is null.");
             }
         });
 
@@ -68,7 +67,7 @@ namespace RNGOEngine::Core::Window
             }
             else
             {
-                assert(false && "GLFW window user pointer is null.");
+                RNGO_ASSERT(false && "GLFW window user pointer is null.");
             }
         });
 
@@ -80,7 +79,7 @@ namespace RNGOEngine::Core::Window
             }
             else
             {
-                assert(false && "GLFW window user pointer is null.");
+                RNGO_ASSERT(false && "GLFW window user pointer is null.");
             }
         });
     }

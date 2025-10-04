@@ -7,6 +7,8 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "Utilities/RNGOAsserts.h"
+
 namespace RNGOEngine::AssetHandling::TextureLoader
 {
     std::expected<TextureHandle, TextureLoadingError> LoadTexture(
@@ -17,7 +19,7 @@ namespace RNGOEngine::AssetHandling::TextureLoader
         
         if (!data || width <= 0 || height <= 0 || nrChannels <= 0)
         {
-            assert(false && "Failed to load texture");
+            RNGO_ASSERT(false && "Failed to load texture");
             return std::unexpected(TextureLoadingError::FailedToLoad);
         }
 

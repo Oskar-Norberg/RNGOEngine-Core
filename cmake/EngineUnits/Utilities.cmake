@@ -4,6 +4,7 @@ add_library(${UTILITIES_PROJECT_NAME} INTERFACE
         include/Benchmarking/STDOUTStopwatch.h
         include/Utilities/AssetCache/AssetCache.h
         include/Utilities/AssetCache/AssetCache.tpp
+        include/Utilities/RNGOAsserts.h
 )
 target_include_directories(${UTILITIES_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${UTILITIES_PROJECT_NAME} INTERFACE ${PROFILING_PROJECT_NAME})

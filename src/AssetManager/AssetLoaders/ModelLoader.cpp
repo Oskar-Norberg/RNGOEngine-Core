@@ -8,11 +8,11 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include <cassert>
 #include <stack>
 
 #include "Data/MeshData.h"
 #include "Renderer/IRenderer.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling::ModelLoading
 {
@@ -66,7 +66,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
 
         if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
         {
-            assert(false && "Failed to load model");
+            RNGO_ASSERT(false && "Failed to load model");
             return std::unexpected(ModelLoadingError::FailedToLoad);
         }
 
