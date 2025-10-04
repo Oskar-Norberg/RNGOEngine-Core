@@ -11,7 +11,7 @@
 
 namespace RNGOEngine::AssetHandling::TextureLoader
 {
-    std::expected<TextureHandle, TextureLoadingError> LoadTexture(
+    std::expected<Textures::TextureHandle, TextureLoadingError> LoadTexture(
         const std::filesystem::path& path)
     {
         int width, height, nrChannels;
@@ -23,7 +23,7 @@ namespace RNGOEngine::AssetHandling::TextureLoader
             return std::unexpected(TextureLoadingError::FailedToLoad);
         }
 
-        return TextureHandle{new TextureData{
+        return Textures::TextureHandle{new Textures::TextureData{
                 static_cast<unsigned int>(width),
                 static_cast<unsigned int>(height),
                 static_cast<unsigned int>(nrChannels),
@@ -33,7 +33,7 @@ namespace RNGOEngine::AssetHandling::TextureLoader
         };
     }
 
-    void FreeTexture(const TextureHandle texture)
+    void FreeTexture(const Textures::TextureHandle texture)
     {
         stbi_image_free(texture.data->data);
         delete texture.data;

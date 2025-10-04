@@ -8,6 +8,7 @@
 
 #include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/RenderID.h"
+#include "Renderer/Handles/TextureHandle.h"
 
 namespace RNGOEngine
 {
@@ -28,7 +29,7 @@ namespace RNGOEngine::AssetHandling
         explicit TextureManager(Core::Renderer::IRenderer& renderer);
 
         Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
-        Core::Renderer::TextureID CreateTexture(TextureLoader::TextureHandle texture);
+        Core::Renderer::TextureID CreateTexture(Textures::TextureHandle texture);
 
     private:
         std::vector<Core::Renderer::TextureID> m_textures;

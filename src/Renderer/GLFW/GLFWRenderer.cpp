@@ -291,11 +291,11 @@ namespace RNGOEngine::Core::Renderer
         return shaderID;
     }
 
-    TextureID GLFWRenderer::CreateTexture(unsigned char* data, int width, int height, int nrChannels)
+    TextureID GLFWRenderer::CreateTexture(const AssetHandling::Textures::TextureHandle textureHandle)
     {
-        unsigned int textureHandle;
-        glGenTextures(1, &textureHandle);
-        glBindTexture(GL_TEXTURE_2D, textureHandle);
+        unsigned int gpuTextureHandle;
+        glGenTextures(1, &gpuTextureHandle);
+        glBindTexture(GL_TEXTURE_2D, gpuTextureHandle);
 
         // TODO: These should probably be passed in as parameters.
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -303,13 +303,14 @@ namespace RNGOEngine::Core::Renderer
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        if (nrChannels == 4)
+        const auto* textureData = textureHandle.data;
+        if (textureData->nrChannels == 4)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureData->width, textureData->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData->data);
         }
-        else if (nrChannels == 3)
+        else if (textureData->nrChannels == 3)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData->width, textureData->height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData->data);
         }
         else
         {
@@ -319,7 +320,7 @@ namespace RNGOEngine::Core::Renderer
 
         glGenerateMipmap(GL_TEXTURE_2D);
 
-        return textureHandle;
+        return gpuTextureHandle;
     }
 
     ShaderProgramID GLFWRenderer::CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader)

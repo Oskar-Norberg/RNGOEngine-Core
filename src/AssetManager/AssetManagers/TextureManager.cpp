@@ -18,11 +18,9 @@ namespace RNGOEngine::AssetHandling
         return m_textures[id];
     }
 
-    Core::Renderer::TextureID TextureManager::CreateTexture(const TextureLoader::TextureHandle texture)
+    Core::Renderer::TextureID TextureManager::CreateTexture(const Textures::TextureHandle texture)
     {
-        m_textures.emplace_back(m_renderer.CreateTexture(texture.data->data, texture.data->width,
-                                                         texture.data->height,
-                                                         texture.data->nrChannels));
+        m_textures.emplace_back(m_renderer.CreateTexture(texture));
 
         return m_textures.size() - 1;
     }

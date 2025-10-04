@@ -9,6 +9,7 @@
 
 #include "DrawQueue.h"
 #include "RenderID.h"
+#include "Handles/TextureHandle.h"
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::AssetHandling
@@ -56,7 +57,6 @@ namespace RNGOEngine::Core::Renderer
         virtual ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) = 0;
 
     public:
-        // TODO: Make this take a TextureHandle instead.
-        virtual TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) = 0;
+        virtual TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) = 0;
     };
 }

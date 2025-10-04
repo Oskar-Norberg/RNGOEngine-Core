@@ -23,7 +23,7 @@ namespace RNGOEngine::Core::Renderer
 
     public:
         MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override = 0;
-        TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override = 0;
+        TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override = 0;
         ShaderID CreateShader(std::string_view source, ShaderType type) override = 0;
         ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override = 0;
 

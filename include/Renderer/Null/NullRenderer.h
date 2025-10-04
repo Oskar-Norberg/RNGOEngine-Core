@@ -33,7 +33,7 @@ namespace RNGOEngine::Core::Renderer
             return INVALID_SHADER_PROGRAM_ID;
         }
 
-        TextureID CreateTexture(unsigned char* data, int width, int height, int nrChannels) override
+        TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override
         {
             return INVALID_TEXTURE_ID;
         }
