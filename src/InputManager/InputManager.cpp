@@ -15,6 +15,11 @@ namespace RNGOEngine::Core
         UpdateMouseMovement(eventQueue);
     }
 
+    MouseDelta InputManager::GetMouseDelta() const
+    {
+        return {m_deltaX, m_deltaY};
+    }
+
     void InputManager::UpdateKeyboard(const Events::EventQueue& eventQueue)
     {
         m_keysPressedThisFrame.clear();
@@ -77,7 +82,7 @@ namespace RNGOEngine::Core
     {
         m_deltaX = 0.0;
         m_deltaY = 0.0;
-        
+
         const auto mouseMoveEvents = eventQueue.GetEvents<Events::MouseMoveEvent>();
         for (const auto& [deltaX, deltaY] : mouseMoveEvents)
         {

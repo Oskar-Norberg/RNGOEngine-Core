@@ -20,6 +20,8 @@ namespace RNGOEngine::Core
     public:
         void Update(const Events::EventQueue& eventQueue);
 
+        MouseDelta GetMouseDelta() const;
+
     private:
         std::unordered_set<int> m_currentlyPressedKeys;
         std::unordered_set<int> m_currentlyPressedMouseButtons;
