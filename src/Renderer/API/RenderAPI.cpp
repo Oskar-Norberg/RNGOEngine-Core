@@ -2,9 +2,12 @@
 // Created by ringo on 2025-10-05.
 //
 
+#include <format>
+
 #include "Renderer/API/RenderAPI.h"
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetManager/AssetManagers/TextureManager.h"
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/RNGOAsserts.h"
@@ -60,6 +63,8 @@ namespace RNGOEngine::Core::Renderer
                 "Model", std::span<const float, 16>(glm::value_ptr(opaqueDrawCall.transform.GetMatrix()),
                                                     16));
 
+            // Camera Settings
+            // Yes. This is set per object right now. Yes, it is terrible.
             {
                 const auto view = glm::inverse(m_drawQueue.camera.transform.GetMatrix());
                 const auto projectionMatrix = glm::perspective(
@@ -81,6 +86,86 @@ namespace RNGOEngine::Core::Renderer
                 // TODO: Not only are the variable names hardcoded, but they also don't follow the same conventions.
                 m_renderer.SetVec3("viewPosition",
                                    std::span<const float, 3>(&camera.transform.position[0], 3));
+            }
+
+            // Lights
+            // And again, set per object. Terrible.
+            {
+                // TODO: Yet another terrible hardcoded uniform path. Also this should be in shared memory.
+                m_renderer.SetVec3("ambientLight.color",
+                                   std::span<const float, 3>(&m_drawQueue.ambientLight.color[0], 3));
+                m_renderer.SetFloat("ambientLight.intensity", m_drawQueue.ambientLight.intensity);
+
+                m_renderer.SetVec3("directionalLight.color",
+                                   std::span<const float, 3>(&m_drawQueue.directionalLight.color[0], 3));
+                m_renderer.SetVec3("directionalLight.direction",
+                                   std::span<const float, 3>(&m_drawQueue.directionalLight.direction[0], 3));
+                m_renderer.SetFloat("directionalLight.intensity", m_drawQueue.directionalLight.intensity);
+
+                // Point Lights
+                for (size_t i = 0; i < m_drawQueue.pointLightIndex; i++)
+                {
+                    // TODO: This, sucks, ass.
+                    const std::string pointLightBase = std::format("pointLights[{}]", i);
+
+                    const auto color = std::format("{}.color", pointLightBase);
+                    m_renderer.SetVec3(color.c_str(),
+                                       std::span<const float, 3>(&m_drawQueue.pointLights[i].color[0], 3));
+
+                    const auto intensity = std::format("{}.intensity", pointLightBase);
+                    m_renderer.SetFloat(intensity.c_str(), m_drawQueue.pointLights[i].intensity);
+
+                    const auto position = std::format("{}.position", pointLightBase);
+                    m_renderer.SetVec3(position.c_str(),
+                                       std::span<const float, 3>(&m_drawQueue.pointLights[i].position[0], 3));
+
+                    const auto constant = std::format("{}.constant", pointLightBase);
+                    m_renderer.SetFloat(constant.c_str(), m_drawQueue.pointLights[i].constant);
+
+                    const auto linear = std::format("{}.linear", pointLightBase);
+                    m_renderer.SetFloat(linear.c_str(), m_drawQueue.pointLights[i].linear);
+
+                    const auto quadratic = std::format("{}.quadratic", pointLightBase);
+                    m_renderer.SetFloat(quadratic.c_str(), m_drawQueue.pointLights[i].quadratic);
+                }
+                m_renderer.SetInt("numPointLights", static_cast<int>(m_drawQueue.pointLightIndex));
+
+                // Spotlights
+                for (size_t i = 0; i < m_drawQueue.spotlightIndex; i++)
+                {
+                    const std::string spotlightBase = std::format("spotlights[{}]", i);
+
+                    const auto color = std::format("{}.color", spotlightBase);
+                    m_renderer.SetVec3(color.c_str(),
+                                       std::span<const float, 3>(&m_drawQueue.spotlights[i].color[0], 3));
+
+                    const auto intensity = std::format("{}.intensity", spotlightBase);
+                    m_renderer.SetFloat(intensity.c_str(), m_drawQueue.spotlights[i].intensity);
+
+                    const auto position = std::format("{}.position", spotlightBase);
+                    m_renderer.SetVec3(position.c_str(),
+                                       std::span<const float, 3>(&m_drawQueue.spotlights[i].position[0], 3));
+
+                    const auto cutoff = std::format("{}.cutoff", spotlightBase);
+                    m_renderer.SetFloat(cutoff.c_str(), m_drawQueue.spotlights[i].cutoff);
+
+                    const auto direction = std::format("{}.direction", spotlightBase);
+                    m_renderer.SetVec3(direction.c_str(),
+                   std::span<const float, 3>(&m_drawQueue.spotlights[i].direction[0], 3));
+
+                    const auto outerCutoff = std::format("{}.outerCutoff", spotlightBase);
+                    m_renderer.SetFloat(outerCutoff.c_str(), m_drawQueue.spotlights[i].outerCutoff);
+
+                    const auto constant = std::format("{}.constant", spotlightBase);
+                    m_renderer.SetFloat(constant.c_str(), m_drawQueue.spotlights[i].constant);
+
+                    const auto linear = std::format("{}.linear", spotlightBase);
+                    m_renderer.SetFloat(linear.c_str(), m_drawQueue.spotlights[i].linear);
+
+                    const auto quadratic = std::format("{}.quadratic", spotlightBase);
+                    m_renderer.SetFloat(quadratic.c_str(), m_drawQueue.spotlights[i].quadratic);
+                }
+                m_renderer.SetInt("numSpotlights", static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
             for (const auto& [name, type, data] : materialSpecification.uniforms)
