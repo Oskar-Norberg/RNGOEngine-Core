@@ -139,7 +139,12 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override
+        void SetTexture(std::string_view name, TextureID texture, unsigned slot) override
+        {
+        }
+
+        TextureID CreateTexture(unsigned width, unsigned height, unsigned nrChannels,
+                                std::span<const std::byte> data) override
         {
             return INVALID_TEXTURE_ID;
         }

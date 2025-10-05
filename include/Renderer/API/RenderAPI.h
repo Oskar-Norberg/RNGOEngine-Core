@@ -28,8 +28,7 @@ namespace RNGOEngine
 
     namespace AssetHandling
     {
-    class TextureManager;
-        
+        class TextureManager;
         class MaterialManager;
     }
 }

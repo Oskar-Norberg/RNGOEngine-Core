@@ -109,8 +109,11 @@ namespace RNGOEngine::Core::Renderer
                         m_renderer.SetMat4(name, std::span<const float, 16>(glm::value_ptr(data.m4), 16));
                         break;
                     case UniformType::Texture:
-                        // TODO:
-                        break;
+                    {
+                        const auto textureHandle = m_textureManager.GetTexture(data.texture.texture);
+                        m_renderer.SetTexture(name, textureHandle, data.texture.slot);
+                    }
+                    break;
                     default:
                         RNGO_ASSERT(false && "Unknown uniform type.");
                         break;

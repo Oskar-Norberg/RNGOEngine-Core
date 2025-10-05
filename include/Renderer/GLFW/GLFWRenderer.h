@@ -10,11 +10,12 @@
 
 namespace RNGOEngine::Core::Renderer
 {
+    // TODO: This class should be called OpenGLRenderer, whoops.
     class GLFWRenderer : public IRenderer
     {
     public:
         GLFWRenderer();
-        
+
     public:
         void SetViewPortSize(int width, int height) override;
         void SetClearColor(float r, float g, float b, float a) override;
@@ -57,8 +58,11 @@ namespace RNGOEngine::Core::Renderer
         void SetMat2(std::string_view name, std::span<const float, 4> value) override;
         void SetMat3(std::string_view name, std::span<const float, 9> value) override;
         void SetMat4(std::string_view name, std::span<const float, 16> value) override;
+        void SetTexture(std::string_view name, TextureID texture, unsigned slot) override;
 
-        TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override;
+    public:
+        TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels,
+                                std::span<const std::byte> data) override;
         void DestroyTexture(TextureID texture) override;
     };
 }

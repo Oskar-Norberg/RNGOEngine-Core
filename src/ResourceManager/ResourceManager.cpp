@@ -101,6 +101,12 @@ namespace RNGOEngine::Resources
     Core::Renderer::TextureID ResourceManager::CreateTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
-        return m_renderer.CreateTexture(textureHandle);
+        const auto* data = textureHandle.data;
+        const auto width = data->width;
+        const auto height = data->height;
+        const auto nrChannels = data->nrChannels;
+        const auto textureData = std::as_bytes(
+            std::span<const unsigned char>(data->data, width * height * nrChannels));
+        return m_renderer.CreateTexture(width, height, nrChannels, textureData);
     }
 }

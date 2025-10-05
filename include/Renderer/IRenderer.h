@@ -91,12 +91,12 @@ namespace RNGOEngine::Core::Renderer
         virtual void SetMat2(std::string_view name, std::span<const float, 4> value) = 0;
         virtual void SetMat3(std::string_view name, std::span<const float, 9> value) = 0;
         virtual void SetMat4(std::string_view name, std::span<const float, 16> value) = 0;
+        virtual void SetTexture(std::string_view name, TextureID texture, unsigned int slot) = 0;
 
         // Create texture
     public:
         // TODO: Assumes 2D texture.
-        // TODO: Pass raw data instead of handle. TextureHandles should be used at a higher level.
-        virtual TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) = 0;
+        virtual TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels, std::span<const std::byte> data) = 0;
 
         // Destroy texture
     public:

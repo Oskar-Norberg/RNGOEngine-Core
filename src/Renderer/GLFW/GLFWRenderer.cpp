@@ -228,14 +228,60 @@ namespace RNGOEngine::Core::Renderer
         glUniformMatrix4fv(glGetUniformLocation(currentProgram, name.data()), 1, GL_FALSE, value.data());
     }
 
-    TextureID GLFWRenderer::CreateTexture(AssetHandling::Textures::TextureHandle textureHandle)
+    void GLFWRenderer::SetTexture(const std::string_view name, const TextureID texture, const unsigned slot)
     {
-        // TODO:
-        return INVALID_TEXTURE_ID;
+        GLint currentProgram = 0;
+        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
+
+        const auto uniformLocation = glGetUniformLocation(
+            currentProgram, name.data());
+        if (uniformLocation == -1)
+        {
+            RNGO_ASSERT(false && "Texture Uniform not found in shader.");
+            return;
+        }
+
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glUniform1i(uniformLocation, slot);
     }
 
-    void GLFWRenderer::DestroyTexture(TextureID texture)
+    TextureID GLFWRenderer::CreateTexture(const unsigned int width, const unsigned int height,
+                                          const unsigned int nrChannels,
+                                          const std::span<const std::byte> data)
     {
-        // TODO:
+        unsigned int textureHandle;
+        glGenTextures(1, &textureHandle);
+        glBindTexture(GL_TEXTURE_2D, textureHandle);
+
+        // TODO: These should probably be passed in as parameters.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        const auto* textureData = data.data();
+        if (nrChannels == 4)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+        }
+        else if (nrChannels == 3)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
+        }
+        else
+        {
+            RNGO_ASSERT(false && "Unsupported number of channels in texture");
+            return INVALID_TEXTURE_ID;
+        }
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        return textureHandle;
+    }
+
+    void GLFWRenderer::DestroyTexture(const TextureID texture)
+    {
+        glDeleteTextures(1, &texture);
     }
 }
