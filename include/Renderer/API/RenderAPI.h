@@ -41,7 +41,9 @@ namespace RNGOEngine::Core::Renderer
         explicit RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
                            const AssetHandling::ModelManager& modelManager,
                            const AssetHandling::MaterialManager& materialManager,
-                           const AssetHandling::TextureManager& textureManager);
+                           const AssetHandling::TextureManager& textureManager,
+                           int width,
+                           int height);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
         void Render(Window::IWindow& window) const;
@@ -61,5 +63,8 @@ namespace RNGOEngine::Core::Renderer
         const AssetHandling::ModelManager& m_modelManager;
         const AssetHandling::MaterialManager& m_materialManager;
         const AssetHandling::TextureManager& m_textureManager;
+
+    private:
+        int m_width, m_height;
     };
 }

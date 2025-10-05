@@ -8,6 +8,8 @@
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
 #include "AssetManager/AssetManagers/TextureManager.h"
+#include "EventQueue/EventQueue.h"
+#include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/RNGOAsserts.h"
@@ -19,14 +21,19 @@ namespace RNGOEngine::Core::Renderer
     RenderAPI::RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
                          const AssetHandling::ModelManager& modelManager,
                          const AssetHandling::MaterialManager& materialManager,
-                         const AssetHandling::TextureManager& textureManager)
+                         const AssetHandling::TextureManager& textureManager,
+                         const int width,
+                         const int height)
         : m_renderer(renderer),
           m_drawQueue(),
           m_resourceManager(resourceManager),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
-          m_textureManager(textureManager)
+          m_textureManager(textureManager),
+          m_width(width),
+          m_height(height)
     {
+        m_renderer.SetViewPortSize(width, height);
     }
 
     void RenderAPI::SubmitDrawQueue(DrawQueue&& drawQueue)
@@ -69,8 +76,7 @@ namespace RNGOEngine::Core::Renderer
                 const auto view = glm::inverse(m_drawQueue.camera.transform.GetMatrix());
                 const auto projectionMatrix = glm::perspective(
                     glm::radians(camera.fov),
-                    // TODO: SET UP CORRECT VIEWPORT SIZES AND EVENT HANDLING
-                    static_cast<float>(800) / static_cast<float>(600),
+                    static_cast<float>(m_width) / static_cast<float>(m_height),
                     camera.nearPlane,
                     camera.farPlane
                 );
@@ -151,7 +157,7 @@ namespace RNGOEngine::Core::Renderer
 
                     const auto direction = std::format("{}.direction", spotlightBase);
                     m_renderer.SetVec3(direction.c_str(),
-                   std::span<const float, 3>(&m_drawQueue.spotlights[i].direction[0], 3));
+                                       std::span<const float, 3>(&m_drawQueue.spotlights[i].direction[0], 3));
 
                     const auto outerCutoff = std::format("{}.outerCutoff", spotlightBase);
                     m_renderer.SetFloat(outerCutoff.c_str(), m_drawQueue.spotlights[i].outerCutoff);
@@ -219,7 +225,14 @@ namespace RNGOEngine::Core::Renderer
 
     bool RenderAPI::ListenSendEvents(Events::EventQueue& eventQueue)
     {
-        // TODO:
+        const auto resizeEvents = eventQueue.GetEvents<Events::WindowSizeEvent>();
+        for (const auto& [width, height] : resizeEvents)
+        {
+            m_width = width;
+            m_height = height;
+            m_renderer.SetViewPortSize(width, height);
+        }
+
         return false;
     }
 }

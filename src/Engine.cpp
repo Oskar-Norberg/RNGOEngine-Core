@@ -59,7 +59,8 @@ namespace RNGOEngine::Core
             *m_resourceManager,
             m_assetManager->GetModelManager(),
             m_assetManager->GetMaterialManager(),
-            m_assetManager->GetTextureManager()
+            m_assetManager->GetTextureManager(),
+            config.width, config.height
         );
 
         AddEngineSystems();
