@@ -17,7 +17,17 @@ namespace RNGOEngine::Core::Renderer
         void Render(Window::IWindow& window) override;
 
     public:
-        MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override;
+        VAO CreateVAO() override;
+        VBO CreateVBO(size_t size) override;
+        EBO CreateEBO(size_t size) override;
+        void BindVBOToVAO(VAO vao, VBO vbo) override;
+        void BindEBOToVAO(VAO vao, EBO ebo) override;
+        void SetAttributePointer(VAO vao, unsigned index, int size, size_t stride, size_t offset) override;
+        void BufferVBOData(VBO vbo, std::span<std::byte> data, bool isDynamic) override;
+        void BufferEBOData(EBO ebo, std::span<std::byte> data, bool isDynamic) override;
+        void DestroyVAO(VAO vao) override;
+        void DestroyVBO(VBO vbo) override;
+        void DestroyEBO(EBO ebo) override;
         ShaderID CreateShader(std::string_view source, ShaderType type) override;
         TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override;
         ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) override;

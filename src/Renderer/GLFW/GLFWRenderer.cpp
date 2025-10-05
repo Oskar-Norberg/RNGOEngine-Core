@@ -222,7 +222,8 @@ namespace RNGOEngine::Core::Renderer
                             static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
-            RNGO_ASSERT(m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
+            RNGO_ASSERT(
+                m_meshSpecifications.contains(opaqueDrawable.mesh) && "Mesh not found in specifications");
 
             const auto& meshSpec = m_meshSpecifications[opaqueDrawable.mesh];
 
@@ -231,52 +232,81 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    MeshID GLFWRenderer::CreateMesh(const Data::Rendering::MeshData& meshData)
+    // TODO: Calling the typedef VAO and then having a variable called VAO is confusing.
+    VAO GLFWRenderer::CreateVAO()
     {
-        unsigned int VAO, VBO, EBO;
-        glGenVertexArrays(1, &VAO);
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
+        unsigned int vao;
+        glGenVertexArrays(1, &vao);
+        return vao;
+    }
 
-        glBindVertexArray(VAO);
+    VBO GLFWRenderer::CreateVBO(size_t size)
+    {
+        unsigned int vbo;
+        glGenBuffers(1, &vbo);
+        return vbo;
+    }
 
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, meshData.vertices.size() * sizeof(Data::Rendering::Vertex),
-                     meshData.vertices.data(),
-                     GL_STATIC_DRAW);
+    EBO GLFWRenderer::CreateEBO(size_t size)
+    {
+        unsigned int ebo;
+        glGenBuffers(1, &ebo);
+        return ebo;
+    }
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, meshData.indices.size() * sizeof(Data::Rendering::Index),
-                     meshData.indices.data(), GL_STATIC_DRAW);
+    void GLFWRenderer::BindVBOToVAO(const VAO vao, const VBO vbo)
+    {
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    }
 
-        // Vertex Pos
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Data::Rendering::Vertex),
-                              reinterpret_cast<void*>(offsetof(Data::Rendering::Vertex, position)));
-        glEnableVertexAttribArray(0);
+    void GLFWRenderer::BindEBOToVAO(const VAO vao, const EBO ebo)
+    {
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-        // Vertex Normal
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Data::Rendering::Vertex),
-                              reinterpret_cast<void*>(offsetof(Data::Rendering::Vertex, normal)));
-        glEnableVertexAttribArray(1);
+        // TODO: Bind to 0?
+    }
 
-        // Vertex UV
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Data::Rendering::Vertex),
-                              reinterpret_cast<void*>(offsetof(Data::Rendering::Vertex, texCoord)));
-        glEnableVertexAttribArray(2);
+    void GLFWRenderer::SetAttributePointer(const VAO vao, const unsigned index, const int size,
+                                           const size_t stride, const size_t offset)
+    {
+        glBindVertexArray(vao);
+        glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(offset));
+        glEnableVertexAttribArray(index);
+    }
 
-        m_meshSpecifications.insert(
-            std::make_pair(VAO, MeshSpecification
-                           {
-                               .nrOfVertices = static_cast<unsigned int>(meshData.vertices.size()),
-                               .nrOfIndices = static_cast<unsigned int>(meshData.indices.size())
-                           }
-            ));
-
+    void GLFWRenderer::BufferVBOData(const VBO vbo, const std::span<std::byte> data, const bool isDynamic)
+    {
         glBindVertexArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        
+        const auto usage = isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, data.size_bytes(), data.data(), usage);
+    }
 
-        return VAO;
+    void GLFWRenderer::BufferEBOData(EBO ebo, std::span<std::byte> data, bool isDynamic)
+    {
+        glBindVertexArray(0);
+        const auto usage = isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size_bytes(),
+                     data.data(), usage);
+    }
+
+    void GLFWRenderer::DestroyVAO(const VAO vao)
+    {
+        glDeleteVertexArrays(1, &vao);
+    }
+
+    void GLFWRenderer::DestroyVBO(const VBO vbo)
+    {
+        glDeleteBuffers(1, &vbo);
+    }
+
+    void GLFWRenderer::DestroyEBO(const EBO ebo)
+    {
+        glDeleteBuffers(1, &ebo);
     }
 
     ShaderID GLFWRenderer::CreateShader(std::string_view source, ShaderType type)
@@ -306,11 +336,13 @@ namespace RNGOEngine::Core::Renderer
         const auto* textureData = textureHandle.data;
         if (textureData->nrChannels == 4)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureData->width, textureData->height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData->data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, textureData->width, textureData->height, 0, GL_RGBA,
+                         GL_UNSIGNED_BYTE, textureData->data);
         }
         else if (textureData->nrChannels == 3)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData->width, textureData->height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData->data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureData->width, textureData->height, 0, GL_RGB,
+                         GL_UNSIGNED_BYTE, textureData->data);
         }
         else
         {
