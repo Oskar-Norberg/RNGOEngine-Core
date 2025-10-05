@@ -21,6 +21,8 @@ namespace RNGOEngine::Core::Renderer
     constexpr auto INVALID_EBO = std::numeric_limits<EBO>::max();
 
     // Shaders
+    enum class ShaderType { Vertex, Fragment };
+    
     using ShaderID = unsigned int;
     using ShaderProgramID = unsigned int;
     using TextureID = unsigned int;
