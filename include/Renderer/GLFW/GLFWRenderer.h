@@ -6,12 +6,15 @@
 
 #include <string>
 
-#include "Renderer/RenderBase.h"
+#include "Renderer/IRenderer.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-    class GLFWRenderer : public RenderBase
+    class GLFWRenderer : public IRenderer
     {
+    public:
+        GLFWRenderer();
+        
     public:
         void SetViewPortSize(int width, int height) override;
         void SetClearColor(float r, float g, float b, float a) override;
@@ -34,8 +37,8 @@ namespace RNGOEngine::Core::Renderer
 
     public:
         void SetAttributePointer(unsigned index, int size, size_t stride, size_t offset) override;
-        void BufferVBOData(std::span<std::byte> data, bool isDynamic) override;
-        void BufferEBOData(std::span<std::byte> data, bool isDynamic) override;
+        void BufferVBOData(std::span<const std::byte> data, bool isDynamic) override;
+        void BufferEBOData(std::span<const std::byte> data, bool isDynamic) override;
 
     public:
         ShaderID CreateShader(std::string_view source, ShaderType type) override;

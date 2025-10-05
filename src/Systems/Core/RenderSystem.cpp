@@ -9,6 +9,7 @@
 #include "World/World.h"
 
 #include "Profiling/Profiling.h"
+#include "Renderer/API/RenderAPI.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Systems::Core
@@ -42,15 +43,7 @@ namespace RNGOEngine::Systems::Core
                                        ? world.GetRegistry().get<Components::Transform>(entity)
                                        : Components::Transform();
 
-            const auto& modelData = context.assetManager->GetModel(meshRender.modelID);
-            const auto& nonResolvedMaterial = context.assetManager->GetMaterialManager().GetMaterial(
-                meshRender.materialID);
-            const auto resolvedMaterial = GetResolvedMaterial(nonResolvedMaterial, context);
-
-            for (const auto& mesh : modelData.meshes)
-            {
-                drawQueue.opaqueObjects.emplace_back(transform, mesh, resolvedMaterial);
-            }
+            drawQueue.opaqueObjects.emplace_back(transform, meshRender.modelID, meshRender.materialID);
         }
     }
 
@@ -228,37 +221,5 @@ namespace RNGOEngine::Systems::Core
             };
         }
         drawQueue.spotlightIndex = currentSpotlightIndex;
-    }
-
-    RNGOEngine::Core::Renderer::MaterialSpecification RenderSystem::GetResolvedMaterial(
-        const RNGOEngine::Core::Renderer::MaterialSpecification& materialSpec, EngineSystemContext& context)
-    {
-        RNGOEngine::Core::Renderer::MaterialSpecification resolvedMaterial;
-        resolvedMaterial.shader = materialSpec.shader;
-
-        for (const auto& [name, type, data] : materialSpec.uniforms)
-        {
-            if (type == RNGOEngine::Core::Renderer::UniformType::Texture)
-            {
-                const auto resolvedTextureID = context.assetManager->GetTextureManager().GetTexture(
-                    data.texture.texture);
-                resolvedMaterial.uniforms.emplace_back(
-                    name,
-                    RNGOEngine::Core::Renderer::UniformType::Texture,
-                    RNGOEngine::Core::Renderer::UniformData{
-                        .texture = {resolvedTextureID, data.texture.slot}}
-                );
-            }
-            else
-            {
-                resolvedMaterial.uniforms.emplace_back(
-                    name,
-                    type,
-                    data
-                );
-            }
-        }
-
-        return resolvedMaterial;
     }
 }

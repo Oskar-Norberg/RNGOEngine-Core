@@ -10,6 +10,7 @@
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"
 #include "Renderer/IRenderer.h"
+#include "Renderer/API/RenderAPI.h"
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
 #include "Scene/Scene.h"
@@ -65,6 +66,7 @@ namespace RNGOEngine::Core
 
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
+        std::unique_ptr<Renderer::RenderAPI> m_rendererAPI;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;

@@ -10,17 +10,24 @@ namespace RNGOEngine::Core::Renderer
     class NullRenderer : public IRenderer
     {
     public:
-        void SubmitDrawQueue(DrawQueue drawQueue) override
+        void SetViewPortSize(int width, int height) override
         {
         }
 
-        void Render(Window::IWindow& window) override
+        void SetClearColor(float r, float g, float b, float a) override
         {
         }
 
-        bool ListenSendEvents(Events::EventQueue& eventQueue) override
+        void ClearColor() override
         {
-            return false;
+        }
+
+        void ClearDepth() override
+        {
+        }
+
+        void DrawElement(size_t numIndices) override
+        {
         }
 
         VAO CreateVAO() override
@@ -28,34 +35,14 @@ namespace RNGOEngine::Core::Renderer
             return INVALID_VAO;
         }
 
-        VBO CreateVBO(size_t size) override
+        VBO CreateVBO() override
         {
             return INVALID_VBO;
         }
 
-        EBO CreateEBO(size_t size) override
+        EBO CreateEBO() override
         {
             return INVALID_EBO;
-        }
-
-        void BindVBOToVAO(VAO vao, VBO vbo) override
-        {
-        }
-
-        void BindEBOToVAO(VAO vao, EBO ebo) override
-        {
-        }
-
-        void SetAttributePointer(VAO vao, unsigned index, int size, size_t stride, size_t offset) override
-        {
-        }
-
-        void BufferVBOData(VBO vbo, std::span<std::byte> data, bool isDynamic) override
-        {
-        }
-
-        void BufferEBOData(EBO ebo, std::span<std::byte> data, bool isDynamic) override
-        {
         }
 
         void DestroyVAO(VAO vao) override
@@ -70,6 +57,30 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
+        void BindToVAO(VAO vao) override
+        {
+        }
+
+        void BindToVBO(VBO vbo) override
+        {
+        }
+
+        void BindToEBO(EBO ebo) override
+        {
+        }
+
+        void SetAttributePointer(unsigned index, int size, size_t stride, size_t offset) override
+        {
+        }
+
+        void BufferVBOData(std::span<const std::byte> data, bool isDynamic) override
+        {
+        }
+
+        void BufferEBOData(std::span<const std::byte> data, bool isDynamic) override
+        {
+        }
+
         ShaderID CreateShader(std::string_view source, ShaderType type) override
         {
             return INVALID_SHADER_ID;
@@ -80,9 +91,61 @@ namespace RNGOEngine::Core::Renderer
             return INVALID_SHADER_PROGRAM_ID;
         }
 
+        void DestroyShader(ShaderID shader) override
+        {
+        }
+
+        void DestroyShaderProgram(ShaderProgramID program) override
+        {
+        }
+
+        void BindShaderProgram(ShaderProgramID program) override
+        {
+        }
+
+        void SetBool(std::string_view name, bool value) override
+        {
+        }
+
+        void SetInt(std::string_view name, int value) override
+        {
+        }
+
+        void SetFloat(std::string_view name, float value) override
+        {
+        }
+
+        void SetVec2(std::string_view name, std::span<const float, 2> value) override
+        {
+        }
+
+        void SetVec3(std::string_view name, std::span<const float, 3> value) override
+        {
+        }
+
+        void SetVec4(std::string_view name, std::span<const float, 4> value) override
+        {
+        }
+
+        void SetMat2(std::string_view name, std::span<const float, 4> value) override
+        {
+        }
+
+        void SetMat3(std::string_view name, std::span<const float, 9> value) override
+        {
+        }
+
+        void SetMat4(std::string_view name, std::span<const float, 16> value) override
+        {
+        }
+
         TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override
         {
             return INVALID_TEXTURE_ID;
+        }
+
+        void DestroyTexture(TextureID texture) override
+        {
         }
     };
 }

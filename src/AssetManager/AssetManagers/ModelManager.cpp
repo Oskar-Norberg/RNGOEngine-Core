@@ -17,15 +17,45 @@ namespace RNGOEngine::AssetHandling
     ModelID ModelManager::CreateModel(const std::filesystem::path& path,
                                       ModelLoading::ModelHandle modelHandle)
     {
-        std::vector<Core::Renderer::MeshID> meshIDs;
-        meshIDs.reserve(modelHandle.data->meshes.size());
+        ModelData modelData;
+        modelData.meshes.reserve(modelHandle.data->meshes.size());
 
-        for (const auto& mesh : modelHandle.data->meshes)
+        for (const auto& [vertices, indices] : modelHandle.data->meshes)
         {
-            meshIDs.emplace_back(m_renderer.CreateMesh(mesh));
+            // TODO: Move this to a resource manager facade.
+            // TODO: These VBOs and EBOs will leak.
+            const auto VAO = m_renderer.CreateVAO();
+            const auto VBO = m_renderer.CreateVBO();
+            const auto EBO = m_renderer.CreateEBO();
+
+            m_renderer.BindToVAO(VAO);
+            m_renderer.BindToVBO(VBO);
+
+            m_renderer.SetAttributePointer(0, 3, sizeof(Data::Rendering::Vertex),
+                                           offsetof(Data::Rendering::Vertex, position));
+            m_renderer.SetAttributePointer(1, 3, sizeof(Data::Rendering::Vertex),
+                                           offsetof(Data::Rendering::Vertex, normal));
+            m_renderer.SetAttributePointer(2, 2, sizeof(Data::Rendering::Vertex),
+                                           offsetof(Data::Rendering::Vertex, texCoord));
+
+            m_renderer.BufferVBOData(
+                std::span(
+                    reinterpret_cast<const std::byte*>(vertices.data()),
+                    vertices.size() * sizeof(Data::Rendering::Vertex)
+                ),
+                false
+            );
+
+            m_renderer.BindToEBO(EBO);
+            m_renderer.BufferEBOData(std::span(
+                                         reinterpret_cast<const std::byte*>(indices.data()),
+                                         indices.size() * sizeof(Data::Rendering::Index)
+                                     ), false);
+
+            modelData.meshes.emplace_back(VAO, indices.size());
         }
 
-        m_models[m_nextModelID] = ModelData{meshIDs};
+        m_models[m_nextModelID] = modelData;
 
         return m_nextModelID++;
     }

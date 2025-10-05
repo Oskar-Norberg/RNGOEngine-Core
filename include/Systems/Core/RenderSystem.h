@@ -33,10 +33,5 @@ namespace RNGOEngine::Systems::Core
                                RNGOEngine::Core::Renderer::DrawQueue& drawQueue);
         void GatherSpotLights(RNGOEngine::Core::World& world, EngineSystemContext& context,
                               RNGOEngine::Core::Renderer::DrawQueue& drawQueue);
-
-    private:
-        RNGOEngine::Core::Renderer::MaterialSpecification GetResolvedMaterial(
-            const RNGOEngine::Core::Renderer::MaterialSpecification& materialSpec,
-            EngineSystemContext& context);
     };
 }

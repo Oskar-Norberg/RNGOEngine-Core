@@ -16,6 +16,17 @@
 
 namespace RNGOEngine::Core::Renderer
 {
+    GLFWRenderer::GLFWRenderer()
+    {
+        // TODO: Hardcoded to glfw.
+        if (!gladLoadGL(glfwGetProcAddress))
+        {
+            RNGO_ASSERT(false && "Failed to initialize GLAD");
+        }
+
+        glEnable(GL_DEPTH_TEST);
+    }
+
     void GLFWRenderer::SetViewPortSize(const int width, const int height)
     {
         glViewport(0, 0, width, height);
@@ -100,14 +111,14 @@ namespace RNGOEngine::Core::Renderer
         glEnableVertexAttribArray(index);
     }
 
-    void GLFWRenderer::BufferVBOData(const std::span<std::byte> data, const bool isDynamic)
+    void GLFWRenderer::BufferVBOData(const std::span<const std::byte> data, const bool isDynamic)
     {
         const auto usage = isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
         // TODO: Scary cast.
         glBufferData(GL_ARRAY_BUFFER, data.size_bytes(), data.data(), usage);
     }
 
-    void GLFWRenderer::BufferEBOData(const std::span<std::byte> data, const bool isDynamic)
+    void GLFWRenderer::BufferEBOData(const std::span<const std::byte> data, const bool isDynamic)
     {
         const auto usage = isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
         // TODO: Scary cast.

@@ -60,8 +60,8 @@ namespace RNGOEngine::Core::Renderer
         // Buffer Data
     public:
         // TODO: Currently does not support subdata.
-        virtual void BufferVBOData(std::span<std::byte> data, bool isDynamic) = 0;
-        virtual void BufferEBOData(std::span<std::byte> data, bool isDynamic) = 0;
+        virtual void BufferVBOData(std::span<const std::byte> data, bool isDynamic) = 0;
+        virtual void BufferEBOData(std::span<const std::byte> data, bool isDynamic) = 0;
 
         // Creation of shaders
     public:

@@ -11,10 +11,9 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    // TODO: can these be const?
-    RenderAPI::RenderAPI(IRenderer& renderer, AssetHandling::ModelManager& modelManager,
-                         AssetHandling::MaterialManager& materialManager,
-                         AssetHandling::TextureManager& textureManager)
+    RenderAPI::RenderAPI(IRenderer& renderer, const AssetHandling::ModelManager& modelManager,
+                         const AssetHandling::MaterialManager& materialManager,
+                         const AssetHandling::TextureManager& textureManager)
         : m_renderer(renderer),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
@@ -42,11 +41,9 @@ namespace RNGOEngine::Core::Renderer
         // Opaques
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
-            const auto& modelData = m_modelManager.GetModel(opaqueDrawCall.mesh);
-            m_renderer.BindToVAO(opaqueDrawCall.mesh);
             const auto materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
-
             m_renderer.BindShaderProgram(materialSpecification.shader);
+
             for (const auto& [name, type, data] : materialSpecification.uniforms)
             {
                 switch (type)
@@ -79,32 +76,43 @@ namespace RNGOEngine::Core::Renderer
                         RNGO_ASSERT(false && "Unknown uniform type.");
                         break;
                 }
-            }
 
-            for (const auto& [meshID, nrOfIndices] : modelData.meshes)
-            {
-                m_renderer.DrawElement(nrOfIndices);
+                const auto& modelData = m_modelManager.GetModel(opaqueDrawCall.modelID);
+
+                for (const auto& [meshID, nrOfIndices] : modelData.meshes)
+                {
+                    // TODO: Should probably not assume the meshID is the VAO.
+                    // Fetch it from either a resource manager or the ModelManager
+                    m_renderer.BindToVAO(meshID);
+                    m_renderer.DrawElement(nrOfIndices);
+                }
             }
         }
     }
 
     bool RenderAPI::ListenSendEvents(Events::EventQueue& eventQueue)
     {
+        // TODO:
+        return false;
     }
 
     MeshID RenderAPI::CreateMesh(const Data::Rendering::MeshData& meshData)
     {
+        return INVALID_MESH_ID;
     }
 
     ShaderID RenderAPI::CreateShader(std::string_view source, ShaderType type)
     {
+        return INVALID_SHADER_ID;
     }
 
     ShaderProgramID RenderAPI::CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader)
     {
+        return INVALID_SHADER_PROGRAM_ID;
     }
 
     TextureID RenderAPI::CreateTexture(AssetHandling::Textures::TextureHandle textureHandle)
     {
+        return INVALID_TEXTURE_ID;
     }
 }

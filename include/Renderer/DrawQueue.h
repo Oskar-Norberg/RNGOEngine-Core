@@ -19,7 +19,7 @@ namespace RNGOEngine::Core::Renderer
     struct Drawable
     {
         Components::Transform transform;
-        MeshID mesh;
+        AssetHandling::ModelID modelID;
         MaterialID material;
     };
 

@@ -31,7 +31,7 @@ namespace RNGOEngine::Core
             case RenderType::GLFW_OpenGL:
             {
                 m_window = std::make_unique<Window::GLFWWindow>(config.width, config.height, config.name);
-                m_renderer = std::make_unique<Renderer::GLFWRenderer>(config.width, config.height);
+                m_renderer = std::make_unique<Renderer::GLFWRenderer>();
                 doFlipTexturesVertically = true;
                 break;
             }
@@ -44,6 +44,12 @@ namespace RNGOEngine::Core
             }
         }
 
+        m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
+            *m_renderer,
+            m_assetManager->GetModelManager(),
+            m_assetManager->GetMaterialManager(),
+            m_assetManager->GetTextureManager()
+        );
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
         for (const auto& [path, type] : config.assetPaths)
         {
@@ -97,7 +103,7 @@ namespace RNGOEngine::Core
         do
         {
             moreEvents = m_window->ListenSendEvents(m_eventQueue);
-            moreEvents = moreEvents || m_renderer->ListenSendEvents(m_eventQueue);
+            moreEvents = moreEvents || m_rendererAPI->ListenSendEvents(m_eventQueue);
         } while (moreEvents);
 
         m_inputManager.Update(m_eventQueue);
@@ -116,7 +122,7 @@ namespace RNGOEngine::Core
         m_engineContext.jobSystem = &m_jobSystem;
         m_engineContext.assetManager = m_assetManager.get();
         m_engineContext.eventQueue = &m_eventQueue;
-        m_engineContext.renderer = m_renderer.get();
+        m_engineContext.renderer = m_rendererAPI.get();
 
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineContext);
 
@@ -152,7 +158,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        m_renderer->Render(*m_window);
+        m_rendererAPI->Render(*m_window);
         m_window->SwapBuffers();
     }
 

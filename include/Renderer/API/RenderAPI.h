@@ -40,9 +40,9 @@ namespace RNGOEngine::Core::Renderer
     class RenderAPI
     {
     public:
-        explicit RenderAPI(IRenderer& renderer, AssetHandling::ModelManager& modelManager,
-                           AssetHandling::MaterialManager& materialManager,
-                           AssetHandling::TextureManager& textureManager);
+        explicit RenderAPI(IRenderer& renderer, const AssetHandling::ModelManager& modelManager,
+                           const AssetHandling::MaterialManager& materialManager,
+                           const AssetHandling::TextureManager& textureManager);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
         void Render(Window::IWindow& window);
@@ -68,9 +68,9 @@ namespace RNGOEngine::Core::Renderer
 
     private:
         IRenderer& m_renderer;
-        AssetHandling::ModelManager& m_modelManager;
-        AssetHandling::MaterialManager& m_materialManager;
-        AssetHandling::TextureManager& m_textureManager;
+        const AssetHandling::ModelManager& m_modelManager;
+        const AssetHandling::MaterialManager& m_materialManager;
+        const AssetHandling::TextureManager& m_textureManager;
         DrawQueue m_drawQueue;
     };
 }
