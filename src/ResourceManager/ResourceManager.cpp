@@ -31,22 +31,13 @@ namespace RNGOEngine::Resources
             m_renderer.SetAttributePointer(2, 2, sizeof(Data::Rendering::Vertex),
                                            offsetof(Data::Rendering::Vertex, texCoord));
 
-            m_renderer.BufferVBOData(
-                std::span(
-                    reinterpret_cast<const std::byte*>(meshData.vertices.data()),
-                    meshData.vertices.size() * sizeof(Data::Rendering::Vertex)
-                ),
-                false
-            );
+            m_renderer.BufferVBOData(std::as_bytes(std::span(meshData.vertices)), false);
         }
 
         // EBO Data
         {
             m_renderer.BindToEBO(EBO);
-            m_renderer.BufferEBOData(std::span(
-                                         reinterpret_cast<const std::byte*>(meshData.indices.data()),
-                                         meshData.indices.size() * sizeof(Data::Rendering::Index)
-                                     ), false);
+            m_renderer.BufferEBOData(std::as_bytes(std::span(meshData.indices)), false);
         }
 
         m_meshes.emplace_back(VAO, VBO, EBO, meshData.indices.size());

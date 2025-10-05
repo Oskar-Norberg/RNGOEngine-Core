@@ -6,17 +6,20 @@
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
 #include "Renderer/IRenderer.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Utilities/RNGOAsserts.h"
 
 #include "glm/gtc/type_ptr.inl"
 
 namespace RNGOEngine::Core::Renderer
 {
-    RenderAPI::RenderAPI(IRenderer& renderer, const AssetHandling::ModelManager& modelManager,
+    RenderAPI::RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
+                         const AssetHandling::ModelManager& modelManager,
                          const AssetHandling::MaterialManager& materialManager,
                          const AssetHandling::TextureManager& textureManager)
         : m_renderer(renderer),
           m_drawQueue(),
+          m_resourceManager(resourceManager),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
           m_textureManager(textureManager)
@@ -30,6 +33,8 @@ namespace RNGOEngine::Core::Renderer
 
     void RenderAPI::Render(Window::IWindow& window) const
     {
+        const auto& camera = m_drawQueue.camera;
+
         const auto& clearColor = m_drawQueue.backgroundColor.color;
         const auto& clearR = clearColor.r;
         const auto& clearG = clearColor.g;
@@ -44,6 +49,39 @@ namespace RNGOEngine::Core::Renderer
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
             m_renderer.BindShaderProgram(materialSpecification.shader);
+
+            // TODO: Not sure if this is a great idea.
+            // Default Uniforms.
+            m_renderer.SetFloat("specularStrength", 0.5f);
+            m_renderer.SetInt("shininess", 32);
+
+            // Model Transform
+            m_renderer.SetMat4(
+                "Model", std::span<const float, 16>(glm::value_ptr(opaqueDrawCall.transform.GetMatrix()),
+                                                    16));
+
+            {
+                const auto view = glm::inverse(m_drawQueue.camera.transform.GetMatrix());
+                const auto projectionMatrix = glm::perspective(
+                    glm::radians(camera.fov),
+                    // TODO: SET UP CORRECT VIEWPORT SIZES AND EVENT HANDLING
+                    static_cast<float>(800) / static_cast<float>(600),
+                    camera.nearPlane,
+                    camera.farPlane
+                );
+
+                // TODO: These should not be set per object.
+                // TODO: Hardcoded variable names.
+                m_renderer.SetMat4("View",
+                                   std::span<const float, 16>(glm::value_ptr(view), 16));
+
+                m_renderer.SetMat4("Projection",
+                                   std::span<const float, 16>(glm::value_ptr(projectionMatrix), 16));
+
+                // TODO: Not only are the variable names hardcoded, but they also don't follow the same conventions.
+                m_renderer.SetVec3("viewPosition",
+                                   std::span<const float, 3>(&camera.transform.position[0], 3));
+            }
 
             for (const auto& [name, type, data] : materialSpecification.uniforms)
             {
@@ -80,12 +118,12 @@ namespace RNGOEngine::Core::Renderer
 
                 const auto& modelData = m_modelManager.GetModel(opaqueDrawCall.modelID);
 
-                for (const auto& [meshID, nrOfIndices] : modelData.meshes)
+                for (const auto& meshID : modelData.meshIDs)
                 {
-                    // TODO: Should probably not assume the meshID is the VAO.
-                    // Fetch it from either a resource manager or the ModelManager
-                    m_renderer.BindToVAO(meshID);
-                    m_renderer.DrawElement(nrOfIndices);
+                    const auto actualNrOfIndices = m_resourceManager.GetMeshElementCount(meshID);
+                    const auto vao = m_resourceManager.GetVAO(meshID);
+                    m_renderer.BindToVAO(vao);
+                    m_renderer.DrawElement(actualNrOfIndices);
                 }
             }
         }

@@ -21,14 +21,15 @@ namespace RNGOEngine::AssetHandling
                                       const ModelLoading::ModelHandle modelHandle)
     {
         ModelData modelData;
-        modelData.meshes.reserve(modelHandle.data->meshes.size());
+        modelData.meshIDs.reserve(modelHandle.data->meshes.size());
 
         for (const auto& meshData : modelHandle.data->meshes)
         {
-            modelData.meshes.emplace_back(m_resourceManager.CreateMesh(meshData));
+            modelData.meshIDs.emplace_back(m_resourceManager.CreateMesh(meshData));
         }
 
         m_models.emplace_back(modelData);
+
         return m_nextModelID++;
     }
 

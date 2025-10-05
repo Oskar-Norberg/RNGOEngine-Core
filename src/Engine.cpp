@@ -53,9 +53,10 @@ namespace RNGOEngine::Core
         {
             m_assetManager->AddAssetPath(path, type);
         }
-        
+
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
             *m_renderer,
+            *m_resourceManager,
             m_assetManager->GetModelManager(),
             m_assetManager->GetMaterialManager(),
             m_assetManager->GetTextureManager()

@@ -77,7 +77,6 @@ namespace RNGOEngine::Core::Renderer
         // Binding of shaders
     public:
         virtual void BindShaderProgram(ShaderProgramID program) = 0;
-        void UseShader(ShaderProgramID shader);
 
         // Shader Uniforms
     public:
