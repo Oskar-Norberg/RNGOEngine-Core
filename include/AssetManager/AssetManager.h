@@ -6,9 +6,7 @@
 
 #include "AssetManager/AssetManagers/ModelManager.h"
 
-#include "AssetLoaders/ModelLoader.h"
 #include "AssetLoaders/ShaderLoader.h"
-#include "AssetLoaders/TextureLoader.h"
 #include "AssetManagers/MaterialManager.h"
 #include "AssetManagers/ShaderManager.h"
 #include "AssetManagers/TextureManager.h"
@@ -18,12 +16,9 @@
 
 namespace RNGOEngine
 {
-    namespace Core
+    namespace Resources
     {
-        namespace Renderer
-        {
-            class IRenderer;
-        }
+        class ResourceManager;
     }
 }
 
@@ -34,7 +29,7 @@ namespace RNGOEngine::AssetHandling
     class AssetManager
     {
     public:
-        explicit AssetManager(Core::Renderer::IRenderer& renderer, bool doFlipTexturesVertically);
+        explicit AssetManager(Resources::ResourceManager& resourceManager, bool doFlipTexturesVertically);
 
         // Models
     public:
@@ -74,7 +69,6 @@ namespace RNGOEngine::AssetHandling
         bool m_doFlipTexturesVertically;
 
     private:
-        Core::Renderer::IRenderer& m_renderer;
         AssetFileFetcher m_assetFileFetcher;
 
         Utilities::AssetCache<std::filesystem::path, Core::Renderer::ShaderID> m_shaderCache;

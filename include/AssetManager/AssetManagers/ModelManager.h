@@ -14,12 +14,9 @@
 
 namespace RNGOEngine
 {
-    namespace Core
+    namespace Resources
     {
-        namespace Renderer
-        {
-            class IRenderer;
-        }
+        class ResourceManager;
     }
 }
 
@@ -43,16 +40,16 @@ namespace RNGOEngine::AssetHandling
     class ModelManager
     {
     public:
-        explicit ModelManager(Core::Renderer::IRenderer& renderer);
+        explicit ModelManager(Resources::ResourceManager& resourceManager);
 
         ModelID CreateModel(const std::filesystem::path& path, ModelLoading::ModelHandle modelHandle);
         const ModelData& GetModel(ModelID id) const;
 
     private:
-        std::unordered_map<ModelID, ModelData> m_models;
+        std::vector<ModelData> m_models;
 
     private:
-        Core::Renderer::IRenderer& m_renderer;
+        Resources::ResourceManager& m_resourceManager;
         ModelID m_nextModelID = 0;
     };
 }

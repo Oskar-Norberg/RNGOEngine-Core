@@ -5,11 +5,12 @@
 #include "AssetManager/AssetManagers/TextureManager.h"
 
 #include "Renderer/IRenderer.h"
+#include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    TextureManager::TextureManager(Core::Renderer::IRenderer& renderer)
-        : m_renderer(renderer)
+    TextureManager::TextureManager(Resources::ResourceManager& resourceManager)
+        : m_resourceManager(resourceManager)
     {
     }
 
@@ -20,7 +21,7 @@ namespace RNGOEngine::AssetHandling
 
     Core::Renderer::TextureID TextureManager::CreateTexture(const Textures::TextureHandle texture)
     {
-        m_textures.emplace_back(m_renderer.CreateTexture(texture));
+        m_textures.emplace_back(m_resourceManager.CreateTexture(texture));
 
         return m_textures.size() - 1;
     }

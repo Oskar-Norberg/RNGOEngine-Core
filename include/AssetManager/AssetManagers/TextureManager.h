@@ -6,18 +6,14 @@
 
 #include <vector>
 
-#include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
 
 namespace RNGOEngine
 {
-    namespace Core
+    namespace Resources
     {
-        namespace Renderer
-        {
-            class IRenderer;
-        }
+        class ResourceManager;
     }
 }
 
@@ -26,7 +22,7 @@ namespace RNGOEngine::AssetHandling
     class TextureManager
     {
     public:
-        explicit TextureManager(Core::Renderer::IRenderer& renderer);
+        explicit TextureManager(Resources::ResourceManager& resourceManager);
 
         Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
         Core::Renderer::TextureID CreateTexture(Textures::TextureHandle texture);
@@ -35,6 +31,6 @@ namespace RNGOEngine::AssetHandling
         std::vector<Core::Renderer::TextureID> m_textures;
 
     private:
-        Core::Renderer::IRenderer& m_renderer;
+        Resources::ResourceManager& m_resourceManager;
     };
 }

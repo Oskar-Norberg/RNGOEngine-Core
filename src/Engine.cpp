@@ -10,6 +10,7 @@
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Systems/SystemContext.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Utilities/RNGOAsserts.h"
@@ -50,7 +51,8 @@ namespace RNGOEngine::Core
             m_assetManager->GetMaterialManager(),
             m_assetManager->GetTextureManager()
         );
-        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
+        m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer.get());
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_resourceManager, doFlipTexturesVertically);
         for (const auto& [path, type] : config.assetPaths)
         {
             m_assetManager->AddAssetPath(path, type);

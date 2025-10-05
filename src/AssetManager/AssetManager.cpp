@@ -4,19 +4,18 @@
 
 #include "AssetManager/AssetManager.h"
 
+#include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/IRenderer.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetManager::AssetManager(Core::Renderer::IRenderer& renderer,
-                               const bool doFlipTexturesVertically)
+    AssetManager::AssetManager(Resources::ResourceManager& resourceManager, bool doFlipTexturesVertically)
         : m_doFlipTexturesVertically(doFlipTexturesVertically),
-          m_renderer(renderer),
           m_shaderLoader(m_assetFileFetcher),
-          m_shaderManager(renderer),
-          m_modelManager(renderer),
-          m_textureManager(renderer)
+          m_shaderManager(resourceManager),
+          m_modelManager(resourceManager),
+          m_textureManager(resourceManager)
     {
         AddAssetPath(ENGINE_ASSETS_DIR, All);
 
@@ -26,6 +25,7 @@ namespace RNGOEngine::AssetHandling
         AddAssetPath(ENGINE_MODELS_DIR, Mesh);
         AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
     }
+
 
     ModelID AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
@@ -92,7 +92,7 @@ namespace RNGOEngine::AssetHandling
         else
         {
             const auto loadCompileAndCacheShader = [this](const std::filesystem::path& shaderSourcePath,
-                                                     const Core::Renderer::ShaderType type)
+                                                          const Core::Renderer::ShaderType type)
             {
                 if (m_shaderCache.Contains(shaderSourcePath))
                 {
@@ -125,9 +125,9 @@ namespace RNGOEngine::AssetHandling
             };
 
             const auto vertexShaderID = loadCompileAndCacheShader(vertexSourcePath,
-                                                             Core::Renderer::ShaderType::Vertex);
+                                                                  Core::Renderer::ShaderType::Vertex);
             const auto fragmentShaderID = loadCompileAndCacheShader(fragmentSourcePath,
-                                                               Core::Renderer::ShaderType::Fragment);
+                                                                    Core::Renderer::ShaderType::Fragment);
 
             const auto shaderProgram = m_shaderManager.CreateShaderProgram(vertexShaderID, fragmentShaderID);
             if (shaderProgram.has_value())
@@ -174,6 +174,10 @@ namespace RNGOEngine::AssetHandling
                 case TextureLoader::TextureLoadingError::FailedToLoad:
                     RNGO_ASSERT(false && "Failed to load texture");
                     return INVALID_MODEL_ID;
+                default:
+                    RNGO_ASSERT(false && "Texture loading failed");
+                    return INVALID_MODEL_ID;
+                    break;
             }
         }
 

@@ -11,12 +11,9 @@
 
 namespace RNGOEngine
 {
-    namespace Core
+    namespace Resources
     {
-        namespace Renderer
-        {
-            class IRenderer;
-        }
+        class ResourceManager;
     }
 }
 
@@ -31,7 +28,7 @@ namespace RNGOEngine::AssetHandling
     class ShaderManager
     {
     public:
-        explicit ShaderManager(Core::Renderer::IRenderer& renderer);
+        explicit ShaderManager(Resources::ResourceManager& resourceManager);
         
         std::expected<Core::Renderer::ShaderID, ShaderManagerError> CreateShader(
             std::string_view shaderSource, Core::Renderer::ShaderType type);
@@ -41,6 +38,6 @@ namespace RNGOEngine::AssetHandling
             Core::Renderer::ShaderID fragmentShader);
 
     private:
-        Core::Renderer::IRenderer& m_renderer;
+        Resources::ResourceManager& m_resourceManager;
     };
 }

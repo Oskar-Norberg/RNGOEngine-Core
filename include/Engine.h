@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "AssetManager/AssetManager.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"
 #include "Renderer/IRenderer.h"
@@ -67,6 +68,7 @@ namespace RNGOEngine::Core
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
         std::unique_ptr<Renderer::RenderAPI> m_rendererAPI;
+        std::unique_ptr<Resources::ResourceManager> m_resourceManager;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;

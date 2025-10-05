@@ -4,10 +4,7 @@
 
 #pragma once
 
-#include <string_view>
-
 #include "Renderer/DrawQueue.h"
-#include "Renderer/Handles/TextureHandle.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -54,23 +51,12 @@ namespace RNGOEngine::Core::Renderer
         ///
         bool ListenSendEvents(Events::EventQueue& eventQueue);
 
-    public:
-        MeshID CreateMesh(const Data::Rendering::MeshData& meshData);
-        // TODO: Destruction of meshes and shaders.
-
-    public:
-        // TODO: Perhaps this should return an std::expected for errors.
-        ShaderID CreateShader(std::string_view source, ShaderType type);
-        ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader);
-
-    public:
-        TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle);
-
     private:
         IRenderer& m_renderer;
+        DrawQueue m_drawQueue;
+
         const AssetHandling::ModelManager& m_modelManager;
         const AssetHandling::MaterialManager& m_materialManager;
         const AssetHandling::TextureManager& m_textureManager;
-        DrawQueue m_drawQueue;
     };
 }

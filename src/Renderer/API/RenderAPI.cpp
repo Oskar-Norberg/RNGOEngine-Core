@@ -95,24 +95,4 @@ namespace RNGOEngine::Core::Renderer
         // TODO:
         return false;
     }
-
-    MeshID RenderAPI::CreateMesh(const Data::Rendering::MeshData& meshData)
-    {
-        return INVALID_MESH_ID;
-    }
-
-    ShaderID RenderAPI::CreateShader(std::string_view source, ShaderType type)
-    {
-        return INVALID_SHADER_ID;
-    }
-
-    ShaderProgramID RenderAPI::CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader)
-    {
-        return INVALID_SHADER_PROGRAM_ID;
-    }
-
-    TextureID RenderAPI::CreateTexture(AssetHandling::Textures::TextureHandle textureHandle)
-    {
-        return INVALID_TEXTURE_ID;
-    }
 }

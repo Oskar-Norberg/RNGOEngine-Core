@@ -16,6 +16,10 @@ add_library(${RENDERING_PROJECT_NAME} STATIC
         include/Renderer/Handles/TextureHandle.h
         include/Renderer/API/RenderAPI.h
         src/Renderer/API/RenderAPI.cpp
+        
+        # TODO: ResourceManager unit?
+        include/ResourceManager/ResourceManager.h
+        src/ResourceManager/ResourceManager.cpp
 )
 target_include_directories(${RENDERING_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RENDERING_PROJECT_NAME} PUBLIC glm)
