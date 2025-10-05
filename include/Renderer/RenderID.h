@@ -36,7 +36,6 @@ namespace RNGOEngine::Core::Renderer
     using MeshID = unsigned int;
     using MaterialID = unsigned int;
 
-
     constexpr auto INVALID_MESH_ID = std::numeric_limits<MeshID>::max();
     constexpr auto INVALID_MATERIAL_ID = std::numeric_limits<MaterialID>::max();
 

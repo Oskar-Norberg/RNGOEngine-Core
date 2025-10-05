@@ -29,9 +29,15 @@ namespace RNGOEngine::AssetHandling
     using ModelID = unsigned int;
     constexpr auto INVALID_MODEL_ID = std::numeric_limits<ModelID>::max();
 
+    struct MeshData
+    {
+        Core::Renderer::MeshID meshID;
+        size_t elementCount;
+    };
+
     struct ModelData
     {
-        std::vector<Core::Renderer::MeshID> meshes;
+        std::vector<MeshData> meshes;
     };
 
     class ModelManager

@@ -20,7 +20,7 @@ namespace RNGOEngine::Core::Renderer
     {
         Components::Transform transform;
         MeshID mesh;
-        MaterialSpecification material;
+        MaterialID material;
     };
 
     struct CameraData
