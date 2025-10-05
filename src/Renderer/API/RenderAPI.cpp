@@ -7,6 +7,7 @@
 #include "AssetManager/AssetManagers/MaterialManager.h"
 #include "Renderer/IRenderer.h"
 #include "Utilities/RNGOAsserts.h"
+
 #include "glm/gtc/type_ptr.inl"
 
 namespace RNGOEngine::Core::Renderer
@@ -15,10 +16,10 @@ namespace RNGOEngine::Core::Renderer
                          const AssetHandling::MaterialManager& materialManager,
                          const AssetHandling::TextureManager& textureManager)
         : m_renderer(renderer),
+          m_drawQueue(),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
-          m_textureManager(textureManager),
-          m_drawQueue()
+          m_textureManager(textureManager)
     {
     }
 
@@ -27,7 +28,7 @@ namespace RNGOEngine::Core::Renderer
         m_drawQueue = std::move(drawQueue);
     }
 
-    void RenderAPI::Render(Window::IWindow& window)
+    void RenderAPI::Render(Window::IWindow& window) const
     {
         const auto& clearColor = m_drawQueue.backgroundColor.color;
         const auto& clearR = clearColor.r;
@@ -41,7 +42,7 @@ namespace RNGOEngine::Core::Renderer
         // Opaques
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
-            const auto materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
+            const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
             m_renderer.BindShaderProgram(materialSpecification.shader);
 
             for (const auto& [name, type, data] : materialSpecification.uniforms)

@@ -45,18 +45,21 @@ namespace RNGOEngine::Core
             }
         }
 
+        m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(
+            *m_resourceManager, doFlipTexturesVertically);
+
+        for (const auto& [path, type] : config.assetPaths)
+        {
+            m_assetManager->AddAssetPath(path, type);
+        }
+        
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
             *m_renderer,
             m_assetManager->GetModelManager(),
             m_assetManager->GetMaterialManager(),
             m_assetManager->GetTextureManager()
         );
-        m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer.get());
-        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_resourceManager, doFlipTexturesVertically);
-        for (const auto& [path, type] : config.assetPaths)
-        {
-            m_assetManager->AddAssetPath(path, type);
-        }
 
         AddEngineSystems();
     }

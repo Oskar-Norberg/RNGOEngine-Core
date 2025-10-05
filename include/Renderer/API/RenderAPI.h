@@ -42,7 +42,7 @@ namespace RNGOEngine::Core::Renderer
                            const AssetHandling::TextureManager& textureManager);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
-        void Render(Window::IWindow& window);
+        void Render(Window::IWindow& window) const;
 
     public:
         /// 
