@@ -47,6 +47,7 @@ namespace RNGOEngine::Resources
 
     public:
         Core::Renderer::TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle);
+        void DestroyTexture(Core::Renderer::TextureID texture);
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;

@@ -107,6 +107,12 @@ namespace RNGOEngine::Resources
         const auto nrChannels = data->nrChannels;
         const auto textureData = std::as_bytes(
             std::span<const unsigned char>(data->data, width * height * nrChannels));
+        
         return m_renderer.CreateTexture(width, height, nrChannels, textureData);
+    }
+
+    void ResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)
+    {
+        m_renderer.DestroyTexture(texture);
     }
 }

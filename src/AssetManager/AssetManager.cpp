@@ -70,16 +70,6 @@ namespace RNGOEngine::AssetHandling
         return modelID;
     }
 
-    const ModelData& AssetManager::GetModel(const ModelID id) const
-    {
-        return m_modelManager.GetModel(id);
-    }
-
-    Core::Renderer::TextureID AssetManager::GetTexture(const Core::Renderer::TextureID id) const
-    {
-        return m_textureManager.GetTexture(id);
-    }
-
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {

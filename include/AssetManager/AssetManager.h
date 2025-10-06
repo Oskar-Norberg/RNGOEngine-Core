@@ -45,11 +45,6 @@ namespace RNGOEngine::AssetHandling
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);
 
     public:
-        // TODO: This is internal API to the RenderSystem. This should probably not be public.
-        const ModelData& GetModel(ModelID id) const;
-        Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
-
-    public:
         const MaterialManager& GetMaterialManager() const
         {
             return m_materialManager;
