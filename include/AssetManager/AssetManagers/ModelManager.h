@@ -59,8 +59,13 @@ namespace RNGOEngine::AssetHandling
     private:
         Resources::ResourceManager& m_resourceManager;
 
+        // Model Loading
     private:
         std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(const std::filesystem::path& path) const;
         void UnloadModel(ModelLoading::ModelHandle modelHandle);
+
+        // GPU Interfacing
+    private:
+        ModelData UploadModel(ModelLoading::ModelHandle modelHandle);
     };
 }

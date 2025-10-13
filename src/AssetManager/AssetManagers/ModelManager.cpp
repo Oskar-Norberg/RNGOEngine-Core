@@ -29,25 +29,19 @@ namespace RNGOEngine::AssetHandling
         {
             return std::unexpected(modelHandle.error());
         }
-        const auto& verifiedModelHandle = modelHandle.value();
 
         // Upload model to GPU
-        ModelData modelData;
-        modelData.meshIDs.reserve(verifiedModelHandle.data->meshes.size());
-
-        for (const auto& meshData : verifiedModelHandle.data->meshes)
-        {
-            modelData.meshIDs.emplace_back(m_resourceManager.CreateMesh(meshData));
-        }
+        const auto ModelData = UploadModel(modelHandle.value());
 
         // Unload model from RAM
-        UnloadModel(verifiedModelHandle);
+        UnloadModel(modelHandle.value());
 
         // Cache and return
-        m_models.emplace_back(modelData);
-        m_modelCache.Insert(path, m_models.size() - 1);
-
-        return m_models.size() - 1;
+        const auto id = m_models.size();
+        m_models.emplace_back(ModelData);
+        m_modelCache.Insert(path, id);
+        
+        return id;
     }
 
     std::expected<ModelLoading::ModelHandle, ModelCreationError> ModelManager::LoadModel(
@@ -57,7 +51,7 @@ namespace RNGOEngine::AssetHandling
 
         if (!modelHandle)
         {
-            // Unholy code
+            // Unholy enum-conversion
             switch (modelHandle.error())
             {
                 case ModelLoading::ModelLoadingError::None:
@@ -86,6 +80,19 @@ namespace RNGOEngine::AssetHandling
     void ModelManager::UnloadModel(const ModelLoading::ModelHandle modelHandle)
     {
         ModelLoading::UnloadModel(modelHandle);
+    }
+
+    ModelData ModelManager::UploadModel(ModelLoading::ModelHandle modelHandle)
+    {
+        ModelData modelData;
+        modelData.meshIDs.reserve(modelHandle.data->meshes.size());
+
+        for (const auto& meshData : modelHandle.data->meshes)
+        {
+            modelData.meshIDs.emplace_back(m_resourceManager.CreateMesh(meshData));
+        }
+
+        return modelData;
     }
 
     const ModelData& ModelManager::GetModel(const ModelID id) const
