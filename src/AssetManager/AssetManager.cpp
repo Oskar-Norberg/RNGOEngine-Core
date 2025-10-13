@@ -14,7 +14,7 @@ namespace RNGOEngine::AssetHandling
         : m_doFlipTexturesVertically(doFlipTexturesVertically),
           m_shaderLoader(m_assetFileFetcher),
           m_shaderManager(resourceManager),
-          m_modelManager(resourceManager),
+          m_modelManager(resourceManager, doFlipTexturesVertically),
           m_textureManager(resourceManager)
     {
         AddAssetPath(ENGINE_ASSETS_DIR, All);
@@ -37,37 +37,13 @@ namespace RNGOEngine::AssetHandling
             return INVALID_MODEL_ID;
         }
 
-        if (m_modelCache.Contains(fullPath.value()))
+        const auto model = m_modelManager.CreateModel(fullPath.value());
+        if (!model)
         {
-            return m_modelCache.Get(fullPath.value());
+            RNGO_ASSERT(false && "Model creation failed!");
         }
 
-        const auto meshHandle = ModelLoading::LoadModel(fullPath.value(), m_doFlipTexturesVertically);
-
-        if (!meshHandle.has_value())
-        {
-            switch (meshHandle.error())
-            {
-                case ModelLoading::ModelLoadingError::FileNotFound:
-                    RNGO_ASSERT(false && "Model not found!");
-                case ModelLoading::ModelLoadingError::FailedToLoad:
-                    RNGO_ASSERT(false && "Model could not be loaded!");
-                case ModelLoading::ModelLoadingError::NoMeshesFound:
-                    RNGO_ASSERT(false && "Model has no valid meshes!");
-                case ModelLoading::ModelLoadingError::UnsupportedFormat:
-                    RNGO_ASSERT(false && "Unsupported model format!");
-                default:
-                    RNGO_ASSERT(false && "Model loading failed!");
-            }
-
-            return INVALID_MODEL_ID;
-        }
-        const auto modelID = m_modelManager.CreateModel(fullPath.value(), meshHandle.value());
-
-        ModelLoading::UnloadModel(meshHandle.value());
-        m_modelCache.Insert(fullPath.value(), modelID);
-
-        return modelID;
+        return model.value();
     }
 
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(

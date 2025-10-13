@@ -72,7 +72,6 @@ namespace RNGOEngine::AssetHandling
         ShaderLoader m_shaderLoader;
         ShaderManager m_shaderManager;
 
-        Utilities::AssetCache<std::filesystem::path, ModelID> m_modelCache;
         ModelManager m_modelManager;
 
         Utilities::AssetCache<std::filesystem::path, ModelID> m_textureCache;

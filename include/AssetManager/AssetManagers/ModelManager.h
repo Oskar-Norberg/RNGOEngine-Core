@@ -6,11 +6,11 @@
 
 #include <filesystem>
 #include <limits>
-#include <unordered_map>
 #include <vector>
 
 #include "AssetManager/AssetLoaders/ModelLoader.h"
 #include "Renderer/RenderID.h"
+#include "Utilities/AssetCache/AssetCache.h"
 
 namespace RNGOEngine
 {
@@ -31,20 +31,36 @@ namespace RNGOEngine::AssetHandling
         std::vector<Core::Renderer::MeshID> meshIDs;
     };
 
+    enum class ModelCreationError
+    {
+        None,
+        FileNotFound,
+        FailedToLoad,
+        NoMeshesFound,
+        UnsupportedFormat,
+    };
+
     class ModelManager
     {
     public:
-        explicit ModelManager(Resources::ResourceManager& resourceManager);
+        explicit ModelManager(Resources::ResourceManager& resourceManager, bool flipUVs = false);
 
-        ModelID CreateModel(const std::filesystem::path& path, ModelLoading::ModelHandle modelHandle);
+        std::expected<ModelID, ModelCreationError> CreateModel(const std::filesystem::path& path);
         const ModelData& GetModel(ModelID id) const;
 
     private:
+        bool m_doFlipUVs;
         // TODO: Vector of vector....................
         std::vector<ModelData> m_models;
 
     private:
+        Utilities::AssetCache<std::filesystem::path, ModelID> m_modelCache;
+
+    private:
         Resources::ResourceManager& m_resourceManager;
-        ModelID m_nextModelID = 0;
+
+    private:
+        std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(const std::filesystem::path& path) const;
+        void UnloadModel(ModelLoading::ModelHandle modelHandle);
     };
 }

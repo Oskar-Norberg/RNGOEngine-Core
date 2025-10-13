@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <unordered_map>
+
 namespace RNGOEngine::Utilities
 {
     template<typename T, typename T2, typename Hash = std::hash<T>>
