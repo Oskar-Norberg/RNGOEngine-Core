@@ -27,9 +27,8 @@ namespace RNGOEngine::AssetHandling
     class AssetManager
     {
     public:
-        explicit AssetManager(Resources::ResourceManager& resourceManager, bool doFlipTexturesVertically);
+        explicit AssetManager(Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
-        // Models
     public:
         ModelID LoadModel(const std::filesystem::path& modelPath);
 
@@ -57,9 +56,6 @@ namespace RNGOEngine::AssetHandling
         {
             return m_textureManager;
         }
-
-    private:
-        bool m_doFlipTexturesVertically;
 
     private:
         AssetFileFetcher m_assetFileFetcher;

@@ -19,7 +19,7 @@ namespace RNGOEngine
     }
 }
 
-// TODO: should probably be in Core namespace
+// TODO: should probably be in Core namespace, or renderer perhaps.
 namespace RNGOEngine::Resources
 {
     class ResourceManager

@@ -9,10 +9,9 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetManager::AssetManager(Resources::ResourceManager& resourceManager, bool doFlipTexturesVertically)
-        : m_doFlipTexturesVertically(doFlipTexturesVertically),
-          m_shaderManager(resourceManager, m_assetFileFetcher),
-          m_modelManager(resourceManager, doFlipTexturesVertically),
+    AssetManager::AssetManager(Resources::ResourceManager& resourceManager, const bool doFlipUVs)
+        : m_shaderManager(resourceManager, m_assetFileFetcher),
+          m_modelManager(resourceManager, doFlipUVs),
           m_textureManager(resourceManager)
     {
         AddAssetPath(ENGINE_ASSETS_DIR, All);
@@ -39,6 +38,7 @@ namespace RNGOEngine::AssetHandling
         if (!model)
         {
             RNGO_ASSERT(false && "Model creation failed!");
+            return INVALID_MODEL_ID;
         }
 
         return model.value();
