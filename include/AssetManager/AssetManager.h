@@ -11,8 +11,6 @@
 #include "AssetManagers/ShaderManager.h"
 #include "AssetManagers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
-#include "Utilities/AssetCache/AssetCache.h"
-#include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine
 {
@@ -67,10 +65,7 @@ namespace RNGOEngine::AssetHandling
         AssetFileFetcher m_assetFileFetcher;
         
         ShaderManager m_shaderManager;
-
         ModelManager m_modelManager;
-
-        Utilities::AssetCache<std::filesystem::path, ModelID> m_textureCache;
         TextureManager m_textureManager;
         MaterialManager m_materialManager;
     };

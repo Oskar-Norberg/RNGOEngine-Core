@@ -4,7 +4,6 @@
 
 #include "AssetManager/AssetManager.h"
 
-#include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/IRenderer.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -65,39 +64,19 @@ namespace RNGOEngine::AssetHandling
         if (!fullPath.has_value())
         {
             RNGO_ASSERT(false && "Texture not found!");
-            // I think the IVNALID_TEXTURE_ID Should be handled through the TextureManager.
+            // I think the INVALID_TEXTURE_ID Should be handled through the TextureManager.
+            // So it can inject a default texture.
             return Core::Renderer::INVALID_TEXTURE_ID;
         }
 
-        if (m_textureCache.Contains(fullPath.value()))
+        const auto textureID = m_textureManager.CreateTexture(fullPath.value());
+        if (!textureID.has_value())
         {
-            return m_textureCache.Get(fullPath.value());
+            RNGO_ASSERT(false && "Texture creation failed!");
+            return Core::Renderer::INVALID_TEXTURE_ID;
         }
 
-        const auto textureHandle = TextureLoader::LoadTexture(fullPath.value());
-        if (!textureHandle)
-        {
-            switch (textureHandle.error())
-            {
-                case TextureLoader::TextureLoadingError::FileNotFound:
-                    RNGO_ASSERT(false && "Texture not found");
-                    return INVALID_MODEL_ID;
-                case TextureLoader::TextureLoadingError::FailedToLoad:
-                    RNGO_ASSERT(false && "Failed to load texture");
-                    return INVALID_MODEL_ID;
-                default:
-                    RNGO_ASSERT(false && "Texture loading failed");
-                    return INVALID_MODEL_ID;
-                    break;
-            }
-        }
-
-        const auto textureID = m_textureManager.CreateTexture(textureHandle.value());
-        TextureLoader::FreeTexture(textureHandle.value());
-
-        m_textureCache.Insert(fullPath.value(), textureID);
-
-        return textureID;
+        return textureID.value();
     }
 
     void AssetManager::AddAssetPath(
@@ -108,19 +87,15 @@ namespace RNGOEngine::AssetHandling
             case All:
                 m_assetFileFetcher.AddAssetPath(path);
                 break;
-
             case Shader:
                 m_assetFileFetcher.AddShaderPath(path);
                 break;
-
             case Texture:
                 m_assetFileFetcher.AddTexturePath(path);
                 break;
-
             case Mesh:
                 m_assetFileFetcher.AddMeshPath(path);
                 break;
-
             default:
                 RNGO_ASSERT(false && "Unsupported asset path type");
                 break;

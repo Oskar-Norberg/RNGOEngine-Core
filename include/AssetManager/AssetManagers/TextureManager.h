@@ -4,10 +4,13 @@
 
 #pragma once
 
+#include <expected>
 #include <vector>
 
+#include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
+#include "Utilities/AssetCache/AssetCache.h"
 
 namespace RNGOEngine
 {
@@ -19,18 +22,34 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
+    enum class TextureManagerError
+    {
+        None,
+        FileNotFound,
+        FailedToLoad,
+    };
+
     class TextureManager
     {
     public:
         explicit TextureManager(Resources::ResourceManager& resourceManager);
 
+        std::expected<Core::Renderer::TextureID, TextureManagerError> CreateTexture(const std::filesystem::path& path);
+
+    public:
         Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
-        Core::Renderer::TextureID CreateTexture(Textures::TextureHandle texture);
 
     private:
         std::vector<Core::Renderer::TextureID> m_textures;
+        Utilities::AssetCache<std::filesystem::path, Core::Renderer::TextureID> m_textureCache;
 
     private:
         Resources::ResourceManager& m_resourceManager;
+
+    private:
+        std::expected<Textures::TextureHandle, TextureManagerError> LoadTexture(
+            const std::filesystem::path& path);
+
+        void UnloadTexture(Textures::TextureHandle handle);
     };
 }
