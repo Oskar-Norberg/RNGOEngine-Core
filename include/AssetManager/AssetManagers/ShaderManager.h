@@ -9,6 +9,7 @@
 #include "AssetManager/AssetLoaders/ShaderLoader.h"
 #include "Renderer/RenderID.h"
 #include "Utilities/AssetCache/AssetCache.h"
+#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 #include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine
@@ -21,6 +22,8 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
+    using ShaderManagerID = unsigned int;
+    
     enum class ShaderManagerError
     {
         None,
@@ -39,24 +42,33 @@ namespace RNGOEngine::AssetHandling
         explicit ShaderManager(Resources::ResourceManager& resourceManager,
                                const AssetFileFetcher& assetFetcher);
 
-        std::expected<Core::Renderer::ShaderProgramID, ShaderManagerError> LoadShaderProgram(
+        std::expected<ShaderManagerID, ShaderManagerError> LoadShaderProgram(
             const std::filesystem::path& vertexShaderPath,
             const std::filesystem::path& fragmentShaderPath);
+
+        std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(ShaderManagerID id) const;
 
     private:
         ShaderLoader m_shaderLoader;
         Resources::ResourceManager& m_resourceManager;
 
     private:
-        Utilities::AssetCache<std::filesystem::path, Core::Renderer::ShaderID> m_shaderCache;
-        Utilities::AssetCache<std::pair<Core::Renderer::ShaderID, Core::Renderer::ShaderID>,
-                              Core::Renderer::ShaderID, Utilities::Hash::PairHash> m_shaderProgramCache;
+        std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>> m_shaders;
+        std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>> m_shaderPrograms;
 
     private:
-        std::expected<Core::Renderer::ShaderID, ShaderManagerError> CreateShader(
+        // Links a file path to an index in m_shaders
+        Utilities::AssetCache<std::filesystem::path, ShaderManagerID> m_shaderCache;
+
+        // Links two indices in m_shaders to an index in m_shaderPrograms
+        Utilities::AssetCache<std::pair<ShaderManagerID, ShaderManagerID>, Core::Renderer::ShaderProgramID, Utilities::Hash::PairHash>
+        m_shaderProgramCache;
+
+    private:
+        std::expected<ShaderManagerID, ShaderManagerError> CreateShader(
             const std::filesystem::path& path, Core::Renderer::ShaderType type);
 
-        std::expected<Core::Renderer::ShaderProgramID, ShaderManagerError> CreateShaderProgram(
+        std::expected<ShaderManagerID, ShaderManagerError> CreateShaderProgram(
             Core::Renderer::ShaderID vertexShader,
             Core::Renderer::ShaderID fragmentShader);
     };

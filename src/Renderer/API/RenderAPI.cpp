@@ -7,6 +7,7 @@
 #include "Renderer/API/RenderAPI.h"
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetManager/AssetManagers/ShaderManager.h"
 #include "AssetManager/AssetManagers/TextureManager.h"
 #include "EventQueue/EventQueue.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
@@ -18,15 +19,17 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    RenderAPI::RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
+    RenderAPI::RenderAPI(IRenderer& renderer,
+                         Resources::ResourceManager& resourceManager,
                          const AssetHandling::ModelManager& modelManager,
+                         const AssetHandling::ShaderManager& shaderManager,
                          const AssetHandling::MaterialManager& materialManager,
                          const AssetHandling::TextureManager& textureManager,
-                         const int width,
-                         const int height)
+                         int width, int height)
         : m_renderer(renderer),
           m_drawQueue(),
           m_resourceManager(resourceManager),
+          m_shaderManager(shaderManager),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
           m_textureManager(textureManager),
@@ -58,7 +61,14 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
-            m_renderer.BindShaderProgram(materialSpecification.shader);
+            const auto& shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.shader);
+            if (!shaderProgramID)
+            {
+                RNGO_ASSERT(false && "RenderAPI::Render: Invalid shader program key.");
+                continue;
+            }
+            
+            m_renderer.BindShaderProgram(shaderProgramID.value());
 
             // TODO: Not sure if this is a great idea.
             // Default Uniforms.

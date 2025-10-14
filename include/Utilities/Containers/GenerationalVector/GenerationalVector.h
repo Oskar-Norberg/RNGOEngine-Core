@@ -66,6 +66,12 @@ namespace RNGOEngine::Containers::Vectors
             return m_keys.end();
         }
 
+    public:
+        static GenerationalKey<T> InvalidKey()
+        {
+            return {static_cast<size_t>(-1), static_cast<size_t>(-1)};
+        }
+
     private:
         std::vector<InternalGenerationalKey<T>> m_keys;
         std::vector<int> m_freeIndices;

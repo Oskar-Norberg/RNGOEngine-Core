@@ -58,6 +58,7 @@ namespace RNGOEngine::Core
             *m_renderer,
             *m_resourceManager,
             m_assetManager->GetModelManager(),
+            m_assetManager->GetShaderManager(),
             m_assetManager->GetMaterialManager(),
             m_assetManager->GetTextureManager(),
             config.width, config.height

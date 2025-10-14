@@ -6,6 +6,11 @@
 
 #include "Renderer/DrawQueue.h"
 
+namespace RNGOEngine::AssetHandling
+{
+    class ShaderManager;
+}
+
 namespace RNGOEngine
 {
     namespace Events
@@ -40,6 +45,7 @@ namespace RNGOEngine::Core::Renderer
     public:
         explicit RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
                            const AssetHandling::ModelManager& modelManager,
+                           const AssetHandling::ShaderManager& shaderManager,
                            const AssetHandling::MaterialManager& materialManager,
                            const AssetHandling::TextureManager& textureManager,
                            int width,
@@ -61,6 +67,7 @@ namespace RNGOEngine::Core::Renderer
 
         const Resources::ResourceManager& m_resourceManager;
         const AssetHandling::ModelManager& m_modelManager;
+        const AssetHandling::ShaderManager& m_shaderManager;
         const AssetHandling::MaterialManager& m_materialManager;
         const AssetHandling::TextureManager& m_textureManager;
 

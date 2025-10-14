@@ -40,6 +40,11 @@ namespace RNGOEngine::AssetHandling
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);
 
     public:
+        const ShaderManager& GetShaderManager() const
+        {
+            return m_shaderManager;
+        }
+        
         const MaterialManager& GetMaterialManager() const
         {
             return m_materialManager;

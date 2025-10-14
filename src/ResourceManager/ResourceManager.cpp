@@ -21,45 +21,47 @@ namespace RNGOEngine::Resources
         return m_modelResourceManager.CreateMesh(meshData);
     }
 
-    // TODO:
-    // void ResourceManager::DestroyMesh(const Core::Renderer::MeshID id)
-    // {
-    //     // TODO: Validate id.
-    //     const auto& [vao, vbo, ebo, elementCount] = m_meshes[id];
-    //     m_renderer.DestroyVAO(vao);
-    //     m_renderer.DestroyVBO(vbo);
-    //     m_renderer.DestroyEBO(ebo);
-    //
-    //     m_meshes.at(id) = {Core::Renderer::INVALID_VAO, Core::Renderer::INVALID_VBO,
-    //                        Core::Renderer::INVALID_EBO, 0};
-    // }
-
     std::optional<std::reference_wrapper<const MeshResource>> ResourceManager::GetMeshResource(
         const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {
         return m_modelResourceManager.GetMeshResource(key);
     }
 
-    Core::Renderer::ShaderID ResourceManager::CreateShader(const std::string_view source,
-                                                           const Core::Renderer::ShaderType type)
+    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> ResourceManager::CreateShader(
+        const std::string_view source, const Core::Renderer::ShaderType type)
     {
         return m_shaderResourceManager.CreateShader(source, type);
     }
 
-    Core::Renderer::ShaderProgramID ResourceManager::CreateShaderProgram(
-        const Core::Renderer::ShaderID vertexShader, const Core::Renderer::ShaderID fragmentShader)
+    std::optional<Core::Renderer::ShaderID> ResourceManager::GetShader(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shaderKey)
+    {
+        return m_shaderResourceManager.GetShader(shaderKey);
+    }
+
+    std::optional<Core::Renderer::ShaderProgramID> ResourceManager::GetShaderProgram(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const
+    {
+        return m_shaderResourceManager.GetShaderProgram(key);
+
+    }
+
+    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ResourceManager::
+    CreateShaderProgram(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
+                        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader)
     {
         return m_shaderResourceManager.CreateShaderProgram(vertexShader, fragmentShader);
     }
 
-    void ResourceManager::DestroyShader(Core::Renderer::ShaderID shader)
+    void ResourceManager::DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader)
     {
-        m_shaderResourceManager.DestroyShader(shader);
+        m_shaderResourceManager.MarkShaderForDestruction(shader);
     }
 
-    void ResourceManager::DestroyShaderProgram(Core::Renderer::ShaderProgramID program)
+    void ResourceManager::DestroyShaderProgram(
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program)
     {
-        m_shaderResourceManager.DestroyShaderProgram(program);
+        m_shaderResourceManager.MarkShaderProgramForDestruction(program);
     }
 
     Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> ResourceManager::CreateTexture(

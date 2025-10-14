@@ -34,27 +34,35 @@ namespace RNGOEngine::Resources
     public:
         explicit ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
+        // # MeshResourceManagement
+    public:
         Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
             const Data::Rendering::MeshData& meshData);
         // void DestroyMesh(Core::Renderer::MeshID id);
 
-    public:
         std::optional<std::reference_wrapper<const MeshResource>> GetMeshResource(
             const Containers::Vectors::GenerationalKey<MeshResource>& key) const;
 
+        // # ShaderResourceManagement
     public:
-        Core::Renderer::ShaderID CreateShader(std::string_view source, Core::Renderer::ShaderType type);
-        Core::Renderer::ShaderProgramID CreateShaderProgram(Core::Renderer::ShaderID vertexShader,
-                                                            Core::Renderer::ShaderID fragmentShader);
-        void DestroyShader(Core::Renderer::ShaderID shader);
-        void DestroyShaderProgram(Core::Renderer::ShaderProgramID program);
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> CreateShader(
+            std::string_view source, Core::Renderer::ShaderType type);
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> CreateShaderProgram(
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
+        void DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
+        void DestroyShaderProgram(
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program);
+        std::optional<Core::Renderer::ShaderID> GetShader(
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shaderKey);
+        std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(
+            const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const;
 
+        // # TextureResourceManagement
     public:
         Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
             AssetHandling::Textures::TextureHandle textureHandle);
         void DestroyTexture(const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key);
-
-    public:
         std::optional<Core::Renderer::TextureID> GetTexture(
             const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
 

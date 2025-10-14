@@ -11,7 +11,6 @@ namespace RNGOEngine::AssetHandling
     ShaderManager::ShaderManager(Resources::ResourceManager& resourceManager,
                                  const AssetFileFetcher& assetFetcher)
         : m_shaderLoader(assetFetcher), m_resourceManager(resourceManager)
-
     {
     }
 
@@ -39,13 +38,19 @@ namespace RNGOEngine::AssetHandling
         return shaderProgram.value();
     }
 
+    std::optional<Core::Renderer::ShaderProgramID> ShaderManager::GetShaderProgram(const ShaderManagerID id) const
+    {
+        return m_resourceManager.GetShaderProgram(m_shaderPrograms.at(id));
+    }
+
     std::expected<Core::Renderer::ShaderID, ShaderManagerError> ShaderManager::CreateShader(
         const std::filesystem::path& path, Core::Renderer::ShaderType type)
     {
         // Is already cached?
         if (const auto shader = m_shaderCache.TryGet(path); shader.has_value())
         {
-            return shader.value();
+            const auto shaderIndex = shader.value();
+            return shaderIndex;
         }
 
         const auto shaderSource = m_shaderLoader.LoadShader(path);
@@ -65,10 +70,13 @@ namespace RNGOEngine::AssetHandling
             }
         }
 
-        const auto shaderID = m_resourceManager.CreateShader(shaderSource.value(), type);
-        m_shaderCache.Insert(path, shaderID);
+        const auto shaderKey = m_resourceManager.CreateShader(shaderSource.value(), type);
 
-        return shaderID;
+        const auto index = m_shaders.size();
+        m_shaders.emplace_back(shaderKey);
+        m_shaderCache.Insert(path, index);
+
+        return index;
     }
 
     std::expected<Core::Renderer::ShaderProgramID, ShaderManagerError> ShaderManager::CreateShaderProgram(
@@ -76,14 +84,19 @@ namespace RNGOEngine::AssetHandling
     {
         // Is already cached?
         const auto shaderPair = std::make_pair(vertexShader, fragmentShader);
-        if (const auto shaderProgram = m_shaderProgramCache.TryGet(shaderPair); shaderProgram.has_value())
+        if (const auto shaderProgramIndex = m_shaderProgramCache.TryGet(shaderPair);
+            shaderProgramIndex.has_value())
         {
-            return shaderProgram.value();
+            return shaderProgramIndex.value();
         }
 
-        const auto shaderProgram = m_resourceManager.CreateShaderProgram(vertexShader, fragmentShader);
-        m_shaderProgramCache.Insert(shaderPair, shaderProgram);
-        
-        return shaderProgram;
+        const auto shaderProgram = m_resourceManager.CreateShaderProgram(
+            m_shaders[vertexShader], m_shaders[fragmentShader]);
+
+        const auto index = m_shaderPrograms.size();
+        m_shaderPrograms.emplace_back(shaderProgram);
+        m_shaderProgramCache.Insert(shaderPair, index);
+
+        return index;
     }
 }
