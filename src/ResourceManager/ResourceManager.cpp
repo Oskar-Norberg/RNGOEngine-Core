@@ -10,7 +10,8 @@ namespace RNGOEngine::Resources
 {
     ResourceManager::ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
         : m_modelResourceManager(renderer),
-          m_renderer(renderer)
+          m_shaderResourceManager(renderer),
+          m_textureResourceManager(renderer)
     {
     }
 
@@ -64,18 +65,11 @@ namespace RNGOEngine::Resources
     Core::Renderer::TextureID ResourceManager::CreateTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
-        const auto* data = textureHandle.data;
-        const auto width = data->width;
-        const auto height = data->height;
-        const auto nrChannels = data->nrChannels;
-        const auto textureData = std::as_bytes(
-            std::span<const unsigned char>(data->data, width * height * nrChannels));
-
-        return m_renderer.CreateTexture(width, height, nrChannels, textureData);
+        return m_textureResourceManager.CreateTexture(textureHandle);
     }
 
     void ResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)
     {
-        m_renderer.DestroyTexture(texture);
+        m_textureResourceManager.DestroyTexture(texture);
     }
 }

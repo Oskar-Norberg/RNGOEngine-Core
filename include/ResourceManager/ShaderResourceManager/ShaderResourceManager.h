@@ -4,10 +4,17 @@
 
 #pragma once
 
-#include "Renderer/IRenderer.h"
+#include <string_view>
+#include "Renderer/RenderID.h"
+
+namespace RNGOEngine::Core::Renderer
+{
+    class IRenderer;
+}
 
 namespace RNGOEngine::Resources
 {
+    // TODO: Wrap everything in generational handles.
     class ShaderResourceManager
     {
     public:

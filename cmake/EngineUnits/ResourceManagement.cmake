@@ -8,6 +8,8 @@ add_library(${RESOURCE_MANAGEMENT_PROJECT_NAME} STATIC
         
         include/ResourceManager/ShaderResourceManager/ShaderResourceManager.h
         src/ResourceManager/ShaderResourceManager/ShaderResourceManager.cpp
+        include/ResourceManager/TextureResourceManager/TextureResourceManager.h
+        src/ResourceManager/TextureResourceManager/TextureResourceManager.cpp
 )
 target_include_directories(${RESOURCE_MANAGEMENT_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RESOURCE_MANAGEMENT_PROJECT_NAME} PUBLIC ${RENDERING_PROJECT_NAME})

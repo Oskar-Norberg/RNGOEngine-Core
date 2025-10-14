@@ -4,11 +4,16 @@
 
 #pragma once
 
+#include <optional>
+#include <string_view>
+#include <functional>
+
 #include "Data/MeshData.h"
-#include "ModelResourceManager/ModelResourceManager.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
+#include "ModelResourceManager/ModelResourceManager.h"
 #include "ShaderResourceManager/ShaderResourceManager.h"
+#include "TextureResourceManager/TextureResourceManager.h"
 
 namespace RNGOEngine
 {
@@ -49,9 +54,8 @@ namespace RNGOEngine::Resources
         void DestroyTexture(Core::Renderer::TextureID texture);
 
     private:
-        RNGOEngine::Core::Renderer::IRenderer& m_renderer;
-        
         ModelResourceManager m_modelResourceManager;
         ShaderResourceManager m_shaderResourceManager;
+        TextureResourceManager m_textureResourceManager;
     };
 }
