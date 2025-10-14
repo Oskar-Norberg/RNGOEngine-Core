@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include <utility>
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Containers::Vectors
@@ -13,30 +14,34 @@ namespace RNGOEngine::Containers::Vectors
     template<typename T>
     struct GenerationalKey
     {
-        int ID;
-        int Generation;
+        size_t ID;
+        size_t Generation;
     };
 
     template<typename T>
     struct InternalGenerationalKey
     {
-        int Generation;
+        size_t Generation;
         bool IsLive;
-        T data;
+        T Data;
     };
 
     template<typename T>
     class GenerationalVector
     {
     public:
-        GenerationalKey<T> Add(T&& data);
-        
+        template<typename U>
+        GenerationalKey<T> Insert(U&& data);
+
         void MarkForRemoval(const GenerationalKey<T>& key);
         void Remove(const GenerationalKey<T>& key);
 
         bool IsValid(const GenerationalKey<T>& key) const;
         const T& Get(const GenerationalKey<T>& key) const;
         T& Get(const GenerationalKey<T>& key);
+
+        std::optional<std::reference_wrapper<const T>> GetValidated(const GenerationalKey<T>& key) const;
+        std::optional<std::reference_wrapper<T>> GetValidated(const GenerationalKey<T>& key);
 
         auto begin()
         {
