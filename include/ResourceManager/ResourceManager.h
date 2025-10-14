@@ -5,9 +5,9 @@
 #pragma once
 
 #include "Data/MeshData.h"
+#include "ModelResourceManager/ModelResourceManager.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
-#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
 {
@@ -20,17 +20,9 @@ namespace RNGOEngine
     }
 }
 
-// TODO: should probably be in Core namespace, or renderer perhaps.
+// TODO: should probably be in Core namespace. Maybe even RNGOEngine::Core::Renderer::Resources?
 namespace RNGOEngine::Resources
 {
-    struct MeshResource
-    {
-        Core::Renderer::VAO vao = Core::Renderer::INVALID_VAO;
-        Core::Renderer::VBO vbo = Core::Renderer::INVALID_VBO;
-        Core::Renderer::EBO ebo = Core::Renderer::INVALID_EBO;
-        size_t elementCount = 0;
-    };
-
     class ResourceManager
     {
     public:
@@ -57,11 +49,7 @@ namespace RNGOEngine::Resources
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
-
-    private:
-        // TODO: Pull this out into a MeshResourceManager or something.
-
-
-        Containers::Vectors::GenerationalVector<MeshResource> m_meshes;
+        
+        ModelResourceManager m_modelResourceManager;
     };
 }

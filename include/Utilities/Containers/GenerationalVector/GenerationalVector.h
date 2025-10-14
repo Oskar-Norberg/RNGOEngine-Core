@@ -5,7 +5,10 @@
 #pragma once
 
 #include <vector>
+#include <optional>
+#include <functional>
 #include <utility>
+
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Containers::Vectors

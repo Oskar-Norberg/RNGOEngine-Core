@@ -9,40 +9,15 @@
 namespace RNGOEngine::Resources
 {
     ResourceManager::ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
-        : m_renderer(renderer)
+        : m_modelResourceManager(renderer),
+          m_renderer(renderer)
     {
     }
 
     Containers::Vectors::GenerationalKey<MeshResource> ResourceManager::CreateMesh(
         const Data::Rendering::MeshData& meshData)
     {
-        const auto VAO = m_renderer.CreateVAO();
-        const auto VBO = m_renderer.CreateVBO();
-        const auto EBO = m_renderer.CreateEBO();
-
-        m_renderer.BindToVAO(VAO);
-        m_renderer.BindToVBO(VBO);
-
-        // VBO Data
-        {
-            m_renderer.SetAttributePointer(0, 3, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, position));
-            m_renderer.SetAttributePointer(1, 3, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, normal));
-            m_renderer.SetAttributePointer(2, 2, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, texCoord));
-
-            m_renderer.BufferVBOData(std::as_bytes(std::span(meshData.vertices)), false);
-        }
-
-        // EBO Data
-        {
-            m_renderer.BindToEBO(EBO);
-            m_renderer.BufferEBOData(std::as_bytes(std::span(meshData.indices)), false);
-        }
-
-        const auto handle = m_meshes.Insert(MeshResource{VAO, VBO, EBO, meshData.indices.size()});
-        return handle;
+        return m_modelResourceManager.CreateMesh(meshData);
     }
 
     // TODO:
@@ -61,7 +36,7 @@ namespace RNGOEngine::Resources
     std::optional<std::reference_wrapper<const MeshResource>> ResourceManager::GetMeshResource(
         const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {
-        return m_meshes.GetValidated(key);
+        return m_modelResourceManager.GetMeshResource(key);
     }
 
     Core::Renderer::ShaderID ResourceManager::CreateShader(const std::string_view source,
