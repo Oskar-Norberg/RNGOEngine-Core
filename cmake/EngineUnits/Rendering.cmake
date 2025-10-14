@@ -14,6 +14,8 @@ add_library(${RENDERING_PROJECT_NAME} STATIC
         include/Systems/Core/RenderSystem.h
         src/Systems/Core/RenderSystem.cpp
         include/Renderer/Handles/TextureHandle.h
+        
+        # TODO: Seperate LowLevel Renderer and RenderAPI unit?
         include/Renderer/API/RenderAPI.h
         src/Renderer/API/RenderAPI.cpp
         

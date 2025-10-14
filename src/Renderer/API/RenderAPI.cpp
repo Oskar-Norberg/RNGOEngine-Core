@@ -212,12 +212,19 @@ namespace RNGOEngine::Core::Renderer
 
                 const auto& modelData = m_modelManager.GetModel(opaqueDrawCall.modelID);
 
-                for (const auto& meshID : modelData.meshIDs)
+                for (const auto& meshKey : modelData.meshKeys)
                 {
-                    const auto actualNrOfIndices = m_resourceManager.GetMeshElementCount(meshID);
-                    const auto vao = m_resourceManager.GetVAO(meshID);
-                    m_renderer.BindToVAO(vao);
-                    m_renderer.DrawElement(actualNrOfIndices);
+                    const auto meshResourceOpt = m_resourceManager.GetMeshResource(meshKey);
+
+                    if (meshResourceOpt.has_value())
+                    {
+                        m_renderer.BindToVAO(meshResourceOpt.value().get().vao);
+                        m_renderer.DrawElement(meshResourceOpt.value().get().elementCount);
+                    }
+                    else
+                    {
+                        RNGO_ASSERT(false && "Invalid mesh key in model.");
+                    }
                 }
             }
         }

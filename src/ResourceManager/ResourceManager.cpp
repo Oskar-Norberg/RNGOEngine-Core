@@ -13,7 +13,8 @@ namespace RNGOEngine::Resources
     {
     }
 
-    Core::Renderer::MeshID ResourceManager::CreateMesh(const Data::Rendering::MeshData& meshData)
+    Containers::Vectors::GenerationalKey<MeshResource> ResourceManager::CreateMesh(
+        const Data::Rendering::MeshData& meshData)
     {
         const auto VAO = m_renderer.CreateVAO();
         const auto VBO = m_renderer.CreateVBO();
@@ -40,40 +41,27 @@ namespace RNGOEngine::Resources
             m_renderer.BufferEBOData(std::as_bytes(std::span(meshData.indices)), false);
         }
 
-        m_meshes.emplace_back(VAO, VBO, EBO, meshData.indices.size());
-        return m_meshes.size() - 1;
+        const auto handle = m_meshes.Insert(MeshResource{VAO, VBO, EBO, meshData.indices.size()});
+        return handle;
     }
 
-    void ResourceManager::DestroyMesh(const Core::Renderer::MeshID id)
-    {
-        // TODO: Validate id.
-        const auto& [vao, vbo, ebo, elementCount] = m_meshes[id];
-        m_renderer.DestroyVAO(vao);
-        m_renderer.DestroyVBO(vbo);
-        m_renderer.DestroyEBO(ebo);
+    // TODO:
+    // void ResourceManager::DestroyMesh(const Core::Renderer::MeshID id)
+    // {
+    //     // TODO: Validate id.
+    //     const auto& [vao, vbo, ebo, elementCount] = m_meshes[id];
+    //     m_renderer.DestroyVAO(vao);
+    //     m_renderer.DestroyVBO(vbo);
+    //     m_renderer.DestroyEBO(ebo);
+    //
+    //     m_meshes.at(id) = {Core::Renderer::INVALID_VAO, Core::Renderer::INVALID_VBO,
+    //                        Core::Renderer::INVALID_EBO, 0};
+    // }
 
-        m_meshes.at(id) = {Core::Renderer::INVALID_VAO, Core::Renderer::INVALID_VBO,
-                           Core::Renderer::INVALID_EBO, 0};
-    }
-
-    Core::Renderer::VAO ResourceManager::GetVAO(const Core::Renderer::MeshID id) const
+    std::optional<std::reference_wrapper<const MeshResource>> ResourceManager::GetMeshResource(
+        const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {
-        return m_meshes.at(id).vao;
-    }
-
-    Core::Renderer::VBO ResourceManager::GetVBO(const Core::Renderer::MeshID id) const
-    {
-        return m_meshes.at(id).vbo;
-    }
-
-    Core::Renderer::EBO ResourceManager::GetEBO(const Core::Renderer::MeshID id) const
-    {
-        return m_meshes.at(id).ebo;
-    }
-
-    size_t ResourceManager::GetMeshElementCount(const Core::Renderer::MeshID id) const
-    {
-        return m_meshes.at(id).elementCount;
+        return m_meshes.GetValidated(key);
     }
 
     Core::Renderer::ShaderID ResourceManager::CreateShader(const std::string_view source,
@@ -107,7 +95,7 @@ namespace RNGOEngine::Resources
         const auto nrChannels = data->nrChannels;
         const auto textureData = std::as_bytes(
             std::span<const unsigned char>(data->data, width * height * nrChannels));
-        
+
         return m_renderer.CreateTexture(width, height, nrChannels, textureData);
     }
 

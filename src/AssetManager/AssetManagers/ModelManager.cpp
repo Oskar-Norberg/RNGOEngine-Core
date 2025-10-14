@@ -85,11 +85,11 @@ namespace RNGOEngine::AssetHandling
     ModelData ModelManager::UploadModel(ModelLoading::ModelHandle modelHandle)
     {
         ModelData modelData;
-        modelData.meshIDs.reserve(modelHandle.data->meshes.size());
+        modelData.meshKeys.reserve(modelHandle.data->meshes.size());
 
         for (const auto& meshData : modelHandle.data->meshes)
         {
-            modelData.meshIDs.emplace_back(m_resourceManager.CreateMesh(meshData));
+            modelData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
         }
 
         return modelData;

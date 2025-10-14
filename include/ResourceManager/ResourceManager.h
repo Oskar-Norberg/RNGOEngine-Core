@@ -4,9 +4,10 @@
 
 #pragma once
 
-#include "AssetManager/AssetManagers/ModelManager.h"
+#include "Data/MeshData.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
+#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
 {
@@ -22,21 +23,26 @@ namespace RNGOEngine
 // TODO: should probably be in Core namespace, or renderer perhaps.
 namespace RNGOEngine::Resources
 {
+    struct MeshResource
+    {
+        Core::Renderer::VAO vao = Core::Renderer::INVALID_VAO;
+        Core::Renderer::VBO vbo = Core::Renderer::INVALID_VBO;
+        Core::Renderer::EBO ebo = Core::Renderer::INVALID_EBO;
+        size_t elementCount = 0;
+    };
+
     class ResourceManager
     {
     public:
         explicit ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
-        Core::Renderer::MeshID CreateMesh(const Data::Rendering::MeshData& meshData);
-        void DestroyMesh(Core::Renderer::MeshID id);
-        // Note: Should this be stored here?
-        size_t GetMeshElementCount(Core::Renderer::MeshID id) const;
+        Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
+            const Data::Rendering::MeshData& meshData);
+        // void DestroyMesh(Core::Renderer::MeshID id);
 
     public:
-        // TODO: I don't like these being public.
-        Core::Renderer::VAO GetVAO(Core::Renderer::MeshID id) const;
-        Core::Renderer::VBO GetVBO(Core::Renderer::MeshID id) const;
-        Core::Renderer::EBO GetEBO(Core::Renderer::MeshID id) const;
+        std::optional<std::reference_wrapper<const MeshResource>> GetMeshResource(
+            const Containers::Vectors::GenerationalKey<MeshResource>& key) const;
 
     public:
         Core::Renderer::ShaderID CreateShader(std::string_view source, Core::Renderer::ShaderType type);
@@ -54,14 +60,8 @@ namespace RNGOEngine::Resources
 
     private:
         // TODO: Pull this out into a MeshResourceManager or something.
-        struct MeshResource
-        {
-            Core::Renderer::VAO vao = Core::Renderer::INVALID_VAO;
-            Core::Renderer::VBO vbo = Core::Renderer::INVALID_VBO;
-            Core::Renderer::EBO ebo = Core::Renderer::INVALID_EBO;
-            size_t elementCount = 0;
-        };
 
-        std::vector<MeshResource> m_meshes;
+
+        Containers::Vectors::GenerationalVector<MeshResource> m_meshes;
     };
 }

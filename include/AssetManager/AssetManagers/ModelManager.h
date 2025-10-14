@@ -9,8 +9,9 @@
 #include <vector>
 
 #include "AssetManager/AssetLoaders/ModelLoader.h"
-#include "Renderer/RenderID.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Utilities/AssetCache/AssetCache.h"
+#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
 {
@@ -28,7 +29,8 @@ namespace RNGOEngine::AssetHandling
 
     struct ModelData
     {
-        std::vector<Core::Renderer::MeshID> meshIDs;
+        std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>>
+        meshKeys;
     };
 
     enum class ModelCreationError
@@ -61,7 +63,8 @@ namespace RNGOEngine::AssetHandling
 
         // Model Loading
     private:
-        std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(const std::filesystem::path& path) const;
+        std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(
+            const std::filesystem::path& path) const;
         void UnloadModel(ModelLoading::ModelHandle modelHandle);
 
         // GPU Interfacing
