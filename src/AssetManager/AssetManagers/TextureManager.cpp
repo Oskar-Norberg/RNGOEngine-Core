@@ -15,9 +15,10 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    Core::Renderer::TextureID TextureManager::GetTexture(const Core::Renderer::TextureID id) const
+    std::optional<Core::Renderer::TextureID> TextureManager::GetTexture(
+        const Core::Renderer::TextureID id) const
     {
-        return m_textures[id];
+        return m_resourceManager.GetTexture(m_textures[id]);
     }
 
     std::expected<Core::Renderer::TextureID, TextureManagerError> TextureManager::CreateTexture(

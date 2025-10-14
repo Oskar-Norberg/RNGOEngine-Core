@@ -13,8 +13,8 @@ namespace RNGOEngine::Resources
     {
     }
 
-    Core::Renderer::TextureID TextureResourceManager::CreateTexture(
-        AssetHandling::Textures::TextureHandle textureHandle)
+    Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureResourceManager::CreateTexture(
+        const AssetHandling::Textures::TextureHandle textureHandle)
     {
         const auto* data = textureHandle.data;
         const auto width = data->width;
@@ -23,11 +23,24 @@ namespace RNGOEngine::Resources
         const auto textureData = std::as_bytes(
             std::span<const unsigned char>(data->data, width * height * nrChannels));
 
-        return m_renderer.CreateTexture(width, height, nrChannels, textureData);
+        const auto key = m_textures.Insert(m_renderer.CreateTexture(width, height, nrChannels, textureData));
+        return key;
     }
 
-    void TextureResourceManager::DestroyTexture(Core::Renderer::TextureID texture)
+    void TextureResourceManager::MarkTextureForDeletion(
+        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> key)
     {
-        m_renderer.DestroyTexture(texture);
+        m_textures.MarkForRemoval(key);
+    }
+
+    void TextureResourceManager::DeleteMarkedTextures()
+    {
+        // TODO:
+    }
+
+    std::optional<Core::Renderer::TextureID> TextureResourceManager::GetTexture(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
+    {
+        return m_textures.GetValidated(key);
     }
 }

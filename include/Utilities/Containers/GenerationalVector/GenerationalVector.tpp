@@ -15,14 +15,21 @@ GenerationalKey<T> GenerationalVector<T>::Insert(U&& data)
     {
         const auto index = m_keys.size();
         m_keys.push_back(InternalGenerationalKey<T>{0, true, std::forward<U>(data)});
-        return { index, 0 };
+        return {index, 0};
     }
 }
 
 template<typename T>
 void GenerationalVector<T>::MarkForRemoval(const GenerationalKey<T>& key)
 {
-    m_keys[key.ID].IsLive = false;
+    if (IsValid(key))
+    {
+        m_keys[key.ID].IsLive = false;
+    }
+    else
+    {
+        RNGO_ASSERT(false && "GenerationalVector<T>::MarkForRemoval called with invalid key");
+    }
 }
 
 template<typename T>
@@ -66,8 +73,8 @@ T& GenerationalVector<T>::Get(const GenerationalKey<T>& key)
 }
 
 template<typename T>
-    std::optional<std::reference_wrapper<const T>> GenerationalVector<T>::GetValidated(
-        const GenerationalKey<T>& key) const
+std::optional<std::reference_wrapper<const T>> GenerationalVector<T>::GetValidated(
+    const GenerationalKey<T>& key) const
 {
     if (!IsValid(key))
     {
@@ -85,6 +92,6 @@ std::optional<std::reference_wrapper<T>> GenerationalVector<T>::GetValidated(
     {
         return std::nullopt;
     }
-        
+
     return std::ref(Get(key));
 }

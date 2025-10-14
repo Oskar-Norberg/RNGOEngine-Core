@@ -62,14 +62,21 @@ namespace RNGOEngine::Resources
         m_shaderResourceManager.DestroyShaderProgram(program);
     }
 
-    Core::Renderer::TextureID ResourceManager::CreateTexture(
+    Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> ResourceManager::CreateTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
         return m_textureResourceManager.CreateTexture(textureHandle);
     }
 
-    void ResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)
+    void ResourceManager::DestroyTexture(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key)
     {
-        m_textureResourceManager.DestroyTexture(texture);
+        m_textureResourceManager.MarkTextureForDeletion(key);
+    }
+
+    std::optional<Core::Renderer::TextureID> ResourceManager::GetTexture(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
+    {
+        return m_textureResourceManager.GetTexture(key);
     }
 }

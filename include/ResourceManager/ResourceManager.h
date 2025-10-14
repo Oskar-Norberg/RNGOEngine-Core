@@ -50,8 +50,13 @@ namespace RNGOEngine::Resources
         void DestroyShaderProgram(Core::Renderer::ShaderProgramID program);
 
     public:
-        Core::Renderer::TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle);
-        void DestroyTexture(Core::Renderer::TextureID texture);
+        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
+            AssetHandling::Textures::TextureHandle textureHandle);
+        void DestroyTexture(const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key);
+
+    public:
+        std::optional<Core::Renderer::TextureID> GetTexture(
+            const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
 
     private:
         ModelResourceManager m_modelResourceManager;

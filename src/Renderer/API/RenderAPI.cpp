@@ -202,7 +202,10 @@ namespace RNGOEngine::Core::Renderer
                     case UniformType::Texture:
                     {
                         const auto textureHandle = m_textureManager.GetTexture(data.texture.texture);
-                        m_renderer.SetTexture(name, textureHandle, data.texture.slot);
+                        if (textureHandle)
+                        {
+                            m_renderer.SetTexture(name, textureHandle.value(), data.texture.slot);
+                        }
                     }
                     break;
                     default:
