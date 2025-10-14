@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <string>
-
 #include "Renderer/IRenderer.h"
 
 namespace RNGOEngine::Core::Renderer

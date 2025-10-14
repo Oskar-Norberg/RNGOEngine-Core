@@ -5,8 +5,6 @@
 #pragma once
 
 #include "AssetManager/AssetManagers/ModelManager.h"
-
-#include "AssetLoaders/ShaderLoader.h"
 #include "AssetManagers/MaterialManager.h"
 #include "AssetManagers/ShaderManager.h"
 #include "AssetManagers/TextureManager.h"

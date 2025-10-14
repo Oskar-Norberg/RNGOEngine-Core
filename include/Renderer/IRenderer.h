@@ -8,8 +8,6 @@
 #include <string_view>
 
 #include "RenderID.h"
-// TODO: Get rid of this TextureHandle.
-#include "Handles/TextureHandle.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -81,7 +79,7 @@ namespace RNGOEngine::Core::Renderer
         // Shader Uniforms
     public:
         // TODO: Support uniform buffer objects.
-        // TODO: I feel like referencing uniforms by name is gonna be terrible.
+        // TODO: Expose function to get uniform location. This can then be cached at a higher level.
         virtual void SetBool(std::string_view name, bool value) = 0;
         virtual void SetInt(std::string_view name, int value) = 0;
         virtual void SetFloat(std::string_view name, float value) = 0;
@@ -96,6 +94,7 @@ namespace RNGOEngine::Core::Renderer
         // Create texture
     public:
         // TODO: Assumes 2D texture.
+        // TODO: Pass in format, filtering, wrapping etc.
         virtual TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels, std::span<const std::byte> data) = 0;
 
         // Destroy texture
