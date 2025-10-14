@@ -8,6 +8,7 @@
 #include "ModelResourceManager/ModelResourceManager.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
+#include "ShaderResourceManager/ShaderResourceManager.h"
 
 namespace RNGOEngine
 {
@@ -51,5 +52,6 @@ namespace RNGOEngine::Resources
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
         
         ModelResourceManager m_modelResourceManager;
+        ShaderResourceManager m_shaderResourceManager;
     };
 }

@@ -5,6 +5,9 @@ add_library(${RESOURCE_MANAGEMENT_PROJECT_NAME} STATIC
 
         include/ResourceManager/ModelResourceManager/ModelResourceManager.h
         src/ResourceManager/ModelResourceManager/ModelResourceManager.cpp
+        
+        include/ResourceManager/ShaderResourceManager/ShaderResourceManager.h
+        src/ResourceManager/ShaderResourceManager/ShaderResourceManager.cpp
 )
 target_include_directories(${RESOURCE_MANAGEMENT_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RESOURCE_MANAGEMENT_PROJECT_NAME} PUBLIC ${RENDERING_PROJECT_NAME})

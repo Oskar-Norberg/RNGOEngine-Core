@@ -42,23 +42,23 @@ namespace RNGOEngine::Resources
     Core::Renderer::ShaderID ResourceManager::CreateShader(const std::string_view source,
                                                            const Core::Renderer::ShaderType type)
     {
-        return m_renderer.CreateShader(source, type);
+        return m_shaderResourceManager.CreateShader(source, type);
     }
 
     Core::Renderer::ShaderProgramID ResourceManager::CreateShaderProgram(
         const Core::Renderer::ShaderID vertexShader, const Core::Renderer::ShaderID fragmentShader)
     {
-        return m_renderer.CreateShaderProgram(vertexShader, fragmentShader);
+        return m_shaderResourceManager.CreateShaderProgram(vertexShader, fragmentShader);
     }
 
     void ResourceManager::DestroyShader(Core::Renderer::ShaderID shader)
     {
-        m_renderer.DestroyShader(shader);
+        m_shaderResourceManager.DestroyShader(shader);
     }
 
     void ResourceManager::DestroyShaderProgram(Core::Renderer::ShaderProgramID program)
     {
-        m_renderer.DestroyShaderProgram(program);
+        m_shaderResourceManager.DestroyShaderProgram(program);
     }
 
     Core::Renderer::TextureID ResourceManager::CreateTexture(
