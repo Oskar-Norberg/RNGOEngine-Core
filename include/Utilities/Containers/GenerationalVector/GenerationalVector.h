@@ -4,11 +4,13 @@
 
 #pragma once
 
-#include "Utilities/RNGOAsserts.h"
 #include <vector>
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Containers::Vectors
 {
+    // Doesn't strictly need to be templated, but improves readability.
+    template<typename T>
     struct GenerationalKey
     {
         int ID;
@@ -18,8 +20,8 @@ namespace RNGOEngine::Containers::Vectors
     template<typename T>
     struct InternalGenerationalKey
     {
-        int ID;
         int Generation;
+        bool IsLive;
         T data;
     };
 
@@ -27,12 +29,34 @@ namespace RNGOEngine::Containers::Vectors
     class GenerationalVector
     {
     public:
-        GenerationalKey Add(T&& data);
-        void Remove(const GenerationalKey& key);
+        GenerationalKey<T> Add(T&& data);
+        
+        void MarkForRemoval(const GenerationalKey<T>& key);
+        void Remove(const GenerationalKey<T>& key);
 
-        bool IsValid(const GenerationalKey& key) const;
-        const T& Get(const GenerationalKey& key) const;
-        T& Get(const GenerationalKey& key);
+        bool IsValid(const GenerationalKey<T>& key) const;
+        const T& Get(const GenerationalKey<T>& key) const;
+        T& Get(const GenerationalKey<T>& key);
+
+        auto begin()
+        {
+            return m_keys.begin();
+        }
+
+        auto end()
+        {
+            return m_keys.end();
+        }
+
+        auto begin() const
+        {
+            return m_keys.begin();
+        }
+
+        auto end() const
+        {
+            return m_keys.end();
+        }
 
     private:
         std::vector<InternalGenerationalKey<T>> m_keys;

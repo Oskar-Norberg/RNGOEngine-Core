@@ -66,6 +66,7 @@ namespace RNGOEngine::AssetHandling
             RNGO_ASSERT(false && "Texture not found!");
             // I think the INVALID_TEXTURE_ID Should be handled through the TextureManager.
             // So it can inject a default texture.
+            // Perhaps just move the INVALID_TEXTURE_ID from RenderID to the TextureManager. The renderer shouldn't have to validate any resources.
             return Core::Renderer::INVALID_TEXTURE_ID;
         }
 
