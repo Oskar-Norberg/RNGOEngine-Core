@@ -24,6 +24,8 @@ namespace RNGOEngine
 // Move to a Manager namespace?
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: Make ModelRenderer store this instead of ModelID.
+    // Make this a struct so it can't be implicitly converted to an ID?
     using ModelID = unsigned int;
     constexpr auto INVALID_MODEL_ID = std::numeric_limits<ModelID>::max();
 
@@ -49,7 +51,7 @@ namespace RNGOEngine::AssetHandling
         explicit ModelManager(Resources::ResourceManager& resourceManager, bool flipUVs = false);
 
         std::expected<ModelID, ModelCreationError> CreateModel(const std::filesystem::path& path);
-        ModelData GetModel(ModelID id) const;
+        std::span<const Resources::MeshResource> GetModel(ModelID id) const;
 
     private:
         bool m_doFlipUVs;

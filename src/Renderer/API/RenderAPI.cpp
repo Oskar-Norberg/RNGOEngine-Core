@@ -217,7 +217,7 @@ namespace RNGOEngine::Core::Renderer
                 }
 
                 const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelID);
-                for (const auto& meshData : meshDatas.CachedMeshes)
+                for (const auto& meshData : meshDatas)
                 {
                     m_renderer.BindToVAO(meshData.vao);
                     m_renderer.DrawElement(meshData.elementCount);

@@ -40,15 +40,7 @@ namespace RNGOEngine::AssetHandling
 
     Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(const ShaderManagerID id) const
     {
-        const auto shaderProgramIDOpt = m_resourceManager.GetShaderProgram(m_shaderPrograms.at(id));
-        if (shaderProgramIDOpt.has_value())
-        {
-            return shaderProgramIDOpt.value();
-        }
-
-        RNGO_ASSERT(false && "ShaderManager::GetShaderProgram: Invalid shader program key.");
-        // TODO: Return a default/error shader program?
-        return Core::Renderer::INVALID_SHADER_PROGRAM_ID;
+        return m_shaderPrograms.at(id).CachedProgramID;
     }
 
     std::expected<Core::Renderer::ShaderID, ShaderManagerError> ShaderManager::CreateShader(
@@ -64,9 +56,9 @@ namespace RNGOEngine::AssetHandling
         const auto shaderSource = m_shaderLoader.LoadShader(path);
         if (!shaderSource.has_value())
         {
+            // TODO: Move to separate mapping function.
             switch (shaderSource.error())
             {
-                // TODO: Get feedback on this pattern, I think this looks really ugly.
                 case Shaders::ShaderPreProcessingError::None:
                     return std::unexpected(ShaderManagerError::None);
                 case Shaders::ShaderPreProcessingError::FileNotFound:
@@ -98,11 +90,16 @@ namespace RNGOEngine::AssetHandling
             return shaderProgramIndex.value();
         }
 
-        const auto shaderProgram = m_resourceManager.CreateShaderProgram(
-            m_shaders[vertexShader], m_shaders[fragmentShader]);
+        const auto shaderProgramKey = m_resourceManager.CreateShaderProgram(m_shaders[vertexShader], m_shaders[fragmentShader]);
+        const auto shaderProgramID = m_resourceManager.GetShaderProgram(shaderProgramKey);
+        
+        if (!shaderProgramID.has_value())
+        {
+            return std::unexpected(ShaderManagerError::LinkingFailed);
+        }
 
         const auto index = m_shaderPrograms.size();
-        m_shaderPrograms.emplace_back(shaderProgram);
+        m_shaderPrograms.emplace_back(shaderProgramKey, shaderProgramID.value());
         m_shaderProgramCache.Insert(shaderPair, index);
 
         return index;

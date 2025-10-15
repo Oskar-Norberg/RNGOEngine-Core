@@ -36,6 +36,13 @@ namespace RNGOEngine::AssetHandling
         TokenNotFound,
     };
 
+    struct ShaderProgramData
+    {
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
+        // TODO: Invalidate this on GC
+        Core::Renderer::ShaderProgramID CachedProgramID;
+    };
+
     class ShaderManager
     {
     public:
@@ -54,16 +61,15 @@ namespace RNGOEngine::AssetHandling
 
     private:
         std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>> m_shaders;
-        std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>> m_shaderPrograms;
+        std::vector<ShaderProgramData> m_shaderPrograms;
 
     private:
         // Links a file path to an index in m_shaders
         Utilities::AssetCache<std::filesystem::path, ShaderManagerID> m_shaderCache;
 
         // Links two indices in m_shaders to an index in m_shaderPrograms
-        Utilities::AssetCache<std::pair<ShaderManagerID, ShaderManagerID>, Core::Renderer::ShaderProgramID,
-                              Utilities::Hash::PairHash>
-        m_shaderProgramCache;
+        Utilities::AssetCache<std::pair<ShaderManagerID, ShaderManagerID>, ShaderManagerID,
+                              Utilities::Hash::PairHash> m_shaderProgramCache;
 
     private:
         std::expected<ShaderManagerID, ShaderManagerError> CreateShader(

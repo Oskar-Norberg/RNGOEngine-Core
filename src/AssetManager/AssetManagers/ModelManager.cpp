@@ -102,8 +102,8 @@ namespace RNGOEngine::AssetHandling
         return modelData;
     }
 
-    ModelData ModelManager::GetModel(const ModelID id) const
+    std::span<const Resources::MeshResource> ModelManager::GetModel(const ModelID id) const
     {
-        return m_models.at(id);
+        return m_models.at(id).CachedMeshes;
     }
 }
