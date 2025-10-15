@@ -10,6 +10,7 @@
 #include <utility>
 
 #include "Utilities/RNGOAsserts.h"
+#include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine::Containers::Vectors
 {
@@ -19,6 +20,11 @@ namespace RNGOEngine::Containers::Vectors
     {
         size_t ID;
         size_t Generation;
+
+        bool operator==(const GenerationalKey<T>& other) const
+        {
+            return ID == other.ID && Generation == other.Generation;
+        }
     };
 
     template<typename T>
@@ -78,4 +84,18 @@ namespace RNGOEngine::Containers::Vectors
     };
 
 #include "GenerationalVector.tpp"
+}
+
+// Hash Function for GenerationalKeys
+namespace std
+{
+    template<typename T>
+    struct hash<RNGOEngine::Containers::Vectors::GenerationalKey<T>>
+    {
+        size_t operator()(const RNGOEngine::Containers::Vectors::GenerationalKey<T>& key) const noexcept
+        {
+            return RNGOEngine::Utilities::Hash::CombineHashes(std::hash<size_t>{}(key.ID),
+                                                              std::hash<size_t>{}(key.Generation));
+        }
+    };
 }

@@ -23,6 +23,7 @@ namespace RNGOEngine::Core
         : m_running(true),
           m_window(nullptr),
           m_renderer(nullptr),
+          m_resourceTracker(),
           m_assetManager(nullptr)
     {
         bool doFlipTexturesVertically = false;
@@ -56,7 +57,7 @@ namespace RNGOEngine::Core
 
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
             *m_renderer,
-            *m_resourceManager,
+            m_resourceTracker,
             m_assetManager->GetModelManager(),
             m_assetManager->GetShaderManager(),
             m_assetManager->GetMaterialManager(),

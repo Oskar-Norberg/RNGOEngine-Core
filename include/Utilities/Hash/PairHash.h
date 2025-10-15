@@ -15,6 +15,13 @@ namespace RNGOEngine::Utilities::Hash
     {
         return (static_cast<uint64_t>(a) << 32) | static_cast<uint64_t>(b);
     }
+
+    constexpr inline size_t CombineHashes(size_t a, size_t b)
+    {
+        // Ripped straight from boosts hash_combine
+        a ^= b + 0x9e3779b9 + (a << 6) + (a >> 2);
+        return a;
+    }
     
     struct PairHash
     {

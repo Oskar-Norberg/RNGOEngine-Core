@@ -20,7 +20,7 @@
 namespace RNGOEngine::Core::Renderer
 {
     RenderAPI::RenderAPI(IRenderer& renderer,
-                         Resources::ResourceManager& resourceManager,
+                         Resources::ResourceTracker& resourceTracker,
                          const AssetHandling::ModelManager& modelManager,
                          const AssetHandling::ShaderManager& shaderManager,
                          const AssetHandling::MaterialManager& materialManager,
@@ -28,7 +28,7 @@ namespace RNGOEngine::Core::Renderer
                          int width, int height)
         : m_renderer(renderer),
           m_drawQueue(),
-          m_resourceManager(resourceManager),
+          m_resourceTracker(resourceTracker),
           m_shaderManager(shaderManager),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
