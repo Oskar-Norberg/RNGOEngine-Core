@@ -5,8 +5,6 @@
 #pragma once
 
 #include "AssetManager/AssetManagers/ModelManager.h"
-
-#include "AssetLoaders/ShaderLoader.h"
 #include "AssetManagers/MaterialManager.h"
 #include "AssetManagers/ShaderManager.h"
 #include "AssetManagers/TextureManager.h"
@@ -42,6 +40,11 @@ namespace RNGOEngine::AssetHandling
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);
 
     public:
+        const ShaderManager& GetShaderManager() const
+        {
+            return m_shaderManager;
+        }
+        
         const MaterialManager& GetMaterialManager() const
         {
             return m_materialManager;

@@ -15,9 +15,10 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    Core::Renderer::TextureID TextureManager::GetTexture(const Core::Renderer::TextureID id) const
+    Core::Renderer::TextureID TextureManager::GetTexture(
+        const Core::Renderer::TextureID id) const
     {
-        return m_textures[id];
+        return m_textures.at(id).CachedTextureID;
     }
 
     std::expected<Core::Renderer::TextureID, TextureManagerError> TextureManager::CreateTexture(
@@ -37,9 +38,15 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload to GPU & Store in m_textures
-        const auto textureID = m_resourceManager.CreateTexture(textureHandle.value());
+        const auto textureKey = m_resourceManager.CreateTexture(textureHandle.value());
+        const auto textureIDOpt = m_resourceManager.GetTexture(textureKey);
+        if (!textureIDOpt.has_value())
+        {
+            return std::unexpected(TextureManagerError::FailedToLoad);
+        }
+
         const auto id = m_textures.size();
-        m_textures.emplace_back(textureID);
+        m_textures.emplace_back(textureKey, textureIDOpt.value());
 
         // Unload from RAM
         UnloadTexture(textureHandle.value());
@@ -47,7 +54,7 @@ namespace RNGOEngine::AssetHandling
         // Cache
         m_textureCache.Insert(path, id);
 
-        return m_textures.size() - 1;
+        return id;
     }
 
     std::expected<Textures::TextureHandle, TextureManagerError> TextureManager::LoadTexture(

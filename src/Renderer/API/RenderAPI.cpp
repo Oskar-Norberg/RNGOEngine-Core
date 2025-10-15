@@ -7,6 +7,7 @@
 #include "Renderer/API/RenderAPI.h"
 
 #include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetManager/AssetManagers/ShaderManager.h"
 #include "AssetManager/AssetManagers/TextureManager.h"
 #include "EventQueue/EventQueue.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
@@ -18,15 +19,17 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    RenderAPI::RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
+    RenderAPI::RenderAPI(IRenderer& renderer,
+                         Resources::ResourceManager& resourceManager,
                          const AssetHandling::ModelManager& modelManager,
+                         const AssetHandling::ShaderManager& shaderManager,
                          const AssetHandling::MaterialManager& materialManager,
                          const AssetHandling::TextureManager& textureManager,
-                         const int width,
-                         const int height)
+                         int width, int height)
         : m_renderer(renderer),
           m_drawQueue(),
           m_resourceManager(resourceManager),
+          m_shaderManager(shaderManager),
           m_modelManager(modelManager),
           m_materialManager(materialManager),
           m_textureManager(textureManager),
@@ -58,9 +61,12 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
-            m_renderer.BindShaderProgram(materialSpecification.shader);
+            const auto shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.shader);
+
+            m_renderer.BindShaderProgram(shaderProgramID);
 
             // TODO: Not sure if this is a great idea.
+            // TODO: Defaults should be set in the material system.
             // Default Uniforms.
             m_renderer.SetFloat("specularStrength", 0.5f);
             m_renderer.SetInt("shininess", 32);
@@ -210,14 +216,11 @@ namespace RNGOEngine::Core::Renderer
                         break;
                 }
 
-                const auto& modelData = m_modelManager.GetModel(opaqueDrawCall.modelID);
-
-                for (const auto& meshID : modelData.meshIDs)
+                const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelID);
+                for (const auto& meshData : meshDatas)
                 {
-                    const auto actualNrOfIndices = m_resourceManager.GetMeshElementCount(meshID);
-                    const auto vao = m_resourceManager.GetVAO(meshID);
-                    m_renderer.BindToVAO(vao);
-                    m_renderer.DrawElement(actualNrOfIndices);
+                    m_renderer.BindToVAO(meshData.vao);
+                    m_renderer.DrawElement(meshData.elementCount);
                 }
             }
         }

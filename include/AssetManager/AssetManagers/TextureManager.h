@@ -11,6 +11,7 @@
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
 #include "Utilities/AssetCache/AssetCache.h"
+#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
 {
@@ -29,6 +30,13 @@ namespace RNGOEngine::AssetHandling
         FailedToLoad,
     };
 
+    struct TextureManagerData
+    {
+        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureKey;
+        // TODO: Invalidate this on GC
+        Core::Renderer::TextureID CachedTextureID;
+    };
+
     class TextureManager
     {
     public:
@@ -40,12 +48,13 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
 
     private:
-        std::vector<Core::Renderer::TextureID> m_textures;
+        std::vector<TextureManagerData> m_textures;
         Utilities::AssetCache<std::filesystem::path, Core::Renderer::TextureID> m_textureCache;
 
     private:
         Resources::ResourceManager& m_resourceManager;
 
+        // Load/Unload to RAM
     private:
         std::expected<Textures::TextureHandle, TextureManagerError> LoadTexture(
             const std::filesystem::path& path);

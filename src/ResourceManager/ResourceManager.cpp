@@ -9,110 +9,76 @@
 namespace RNGOEngine::Resources
 {
     ResourceManager::ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
-        : m_renderer(renderer)
+        : m_modelResourceManager(renderer),
+          m_shaderResourceManager(renderer),
+          m_textureResourceManager(renderer)
     {
     }
 
-    Core::Renderer::MeshID ResourceManager::CreateMesh(const Data::Rendering::MeshData& meshData)
+    Containers::Vectors::GenerationalKey<MeshResource> ResourceManager::CreateMesh(
+        const Data::Rendering::MeshData& meshData)
     {
-        const auto VAO = m_renderer.CreateVAO();
-        const auto VBO = m_renderer.CreateVBO();
-        const auto EBO = m_renderer.CreateEBO();
-
-        m_renderer.BindToVAO(VAO);
-        m_renderer.BindToVBO(VBO);
-
-        // VBO Data
-        {
-            m_renderer.SetAttributePointer(0, 3, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, position));
-            m_renderer.SetAttributePointer(1, 3, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, normal));
-            m_renderer.SetAttributePointer(2, 2, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, texCoord));
-
-            m_renderer.BufferVBOData(std::as_bytes(std::span(meshData.vertices)), false);
-        }
-
-        // EBO Data
-        {
-            m_renderer.BindToEBO(EBO);
-            m_renderer.BufferEBOData(std::as_bytes(std::span(meshData.indices)), false);
-        }
-
-        m_meshes.emplace_back(VAO, VBO, EBO, meshData.indices.size());
-        return m_meshes.size() - 1;
+        return m_modelResourceManager.CreateMesh(meshData);
     }
 
-    void ResourceManager::DestroyMesh(const Core::Renderer::MeshID id)
+    std::optional<std::reference_wrapper<const MeshResource>> ResourceManager::GetMeshResource(
+        const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {
-        // TODO: Validate id.
-        const auto& [vao, vbo, ebo, elementCount] = m_meshes[id];
-        m_renderer.DestroyVAO(vao);
-        m_renderer.DestroyVBO(vbo);
-        m_renderer.DestroyEBO(ebo);
-
-        m_meshes.at(id) = {Core::Renderer::INVALID_VAO, Core::Renderer::INVALID_VBO,
-                           Core::Renderer::INVALID_EBO, 0};
+        return m_modelResourceManager.GetMeshResource(key);
     }
 
-    Core::Renderer::VAO ResourceManager::GetVAO(const Core::Renderer::MeshID id) const
+    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> ResourceManager::CreateShader(
+        const std::string_view source, const Core::Renderer::ShaderType type)
     {
-        return m_meshes.at(id).vao;
+        return m_shaderResourceManager.CreateShader(source, type);
     }
 
-    Core::Renderer::VBO ResourceManager::GetVBO(const Core::Renderer::MeshID id) const
+    std::optional<Core::Renderer::ShaderID> ResourceManager::GetShader(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shaderKey)
     {
-        return m_meshes.at(id).vbo;
+        return m_shaderResourceManager.GetShader(shaderKey);
     }
 
-    Core::Renderer::EBO ResourceManager::GetEBO(const Core::Renderer::MeshID id) const
+    std::optional<Core::Renderer::ShaderProgramID> ResourceManager::GetShaderProgram(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const
     {
-        return m_meshes.at(id).ebo;
+        return m_shaderResourceManager.GetShaderProgram(key);
+
     }
 
-    size_t ResourceManager::GetMeshElementCount(const Core::Renderer::MeshID id) const
+    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ResourceManager::
+    CreateShaderProgram(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
+                        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader)
     {
-        return m_meshes.at(id).elementCount;
+        return m_shaderResourceManager.CreateShaderProgram(vertexShader, fragmentShader);
     }
 
-    Core::Renderer::ShaderID ResourceManager::CreateShader(const std::string_view source,
-                                                           const Core::Renderer::ShaderType type)
+    void ResourceManager::DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader)
     {
-        return m_renderer.CreateShader(source, type);
+        m_shaderResourceManager.MarkShaderForDestruction(shader);
     }
 
-    Core::Renderer::ShaderProgramID ResourceManager::CreateShaderProgram(
-        const Core::Renderer::ShaderID vertexShader, const Core::Renderer::ShaderID fragmentShader)
+    void ResourceManager::DestroyShaderProgram(
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program)
     {
-        return m_renderer.CreateShaderProgram(vertexShader, fragmentShader);
+        m_shaderResourceManager.MarkShaderProgramForDestruction(program);
     }
 
-    void ResourceManager::DestroyShader(Core::Renderer::ShaderID shader)
-    {
-        m_renderer.DestroyShader(shader);
-    }
-
-    void ResourceManager::DestroyShaderProgram(Core::Renderer::ShaderProgramID program)
-    {
-        m_renderer.DestroyShaderProgram(program);
-    }
-
-    Core::Renderer::TextureID ResourceManager::CreateTexture(
+    Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> ResourceManager::CreateTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
-        const auto* data = textureHandle.data;
-        const auto width = data->width;
-        const auto height = data->height;
-        const auto nrChannels = data->nrChannels;
-        const auto textureData = std::as_bytes(
-            std::span<const unsigned char>(data->data, width * height * nrChannels));
-        
-        return m_renderer.CreateTexture(width, height, nrChannels, textureData);
+        return m_textureResourceManager.CreateTexture(textureHandle);
     }
 
-    void ResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)
+    void ResourceManager::DestroyTexture(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key)
     {
-        m_renderer.DestroyTexture(texture);
+        m_textureResourceManager.MarkTextureForDeletion(key);
+    }
+
+    std::optional<Core::Renderer::TextureID> ResourceManager::GetTexture(
+        const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
+    {
+        return m_textureResourceManager.GetTexture(key);
     }
 }

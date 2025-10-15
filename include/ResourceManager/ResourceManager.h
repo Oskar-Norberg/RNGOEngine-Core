@@ -4,9 +4,16 @@
 
 #pragma once
 
-#include "AssetManager/AssetManagers/ModelManager.h"
+#include <optional>
+#include <string_view>
+#include <functional>
+
+#include "Data/MeshData.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
+#include "ModelResourceManager/ModelResourceManager.h"
+#include "ShaderResourceManager/ShaderResourceManager.h"
+#include "TextureResourceManager/TextureResourceManager.h"
 
 namespace RNGOEngine
 {
@@ -19,7 +26,7 @@ namespace RNGOEngine
     }
 }
 
-// TODO: should probably be in Core namespace, or renderer perhaps.
+// TODO: should probably be in Core namespace. Maybe even RNGOEngine::Core::Renderer::Resources?
 namespace RNGOEngine::Resources
 {
     class ResourceManager
@@ -27,41 +34,41 @@ namespace RNGOEngine::Resources
     public:
         explicit ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
-        Core::Renderer::MeshID CreateMesh(const Data::Rendering::MeshData& meshData);
-        void DestroyMesh(Core::Renderer::MeshID id);
-        // Note: Should this be stored here?
-        size_t GetMeshElementCount(Core::Renderer::MeshID id) const;
-
+        // # MeshResourceManagement
     public:
-        // TODO: I don't like these being public.
-        Core::Renderer::VAO GetVAO(Core::Renderer::MeshID id) const;
-        Core::Renderer::VBO GetVBO(Core::Renderer::MeshID id) const;
-        Core::Renderer::EBO GetEBO(Core::Renderer::MeshID id) const;
+        Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
+            const Data::Rendering::MeshData& meshData);
+        // void DestroyMesh(Core::Renderer::MeshID id);
 
-    public:
-        Core::Renderer::ShaderID CreateShader(std::string_view source, Core::Renderer::ShaderType type);
-        Core::Renderer::ShaderProgramID CreateShaderProgram(Core::Renderer::ShaderID vertexShader,
-                                                            Core::Renderer::ShaderID fragmentShader);
-        void DestroyShader(Core::Renderer::ShaderID shader);
-        void DestroyShaderProgram(Core::Renderer::ShaderProgramID program);
+        std::optional<std::reference_wrapper<const MeshResource>> GetMeshResource(
+            const Containers::Vectors::GenerationalKey<MeshResource>& key) const;
 
+        // # ShaderResourceManagement
     public:
-        Core::Renderer::TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle);
-        void DestroyTexture(Core::Renderer::TextureID texture);
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> CreateShader(
+            std::string_view source, Core::Renderer::ShaderType type);
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> CreateShaderProgram(
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
+        void DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
+        void DestroyShaderProgram(
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program);
+        std::optional<Core::Renderer::ShaderID> GetShader(
+            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shaderKey);
+        std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(
+            const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const;
+
+        // # TextureResourceManagement
+    public:
+        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
+            AssetHandling::Textures::TextureHandle textureHandle);
+        void DestroyTexture(const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key);
+        std::optional<Core::Renderer::TextureID> GetTexture(
+            const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
 
     private:
-        RNGOEngine::Core::Renderer::IRenderer& m_renderer;
-
-    private:
-        // TODO: Pull this out into a MeshResourceManager or something.
-        struct MeshResource
-        {
-            Core::Renderer::VAO vao = Core::Renderer::INVALID_VAO;
-            Core::Renderer::VBO vbo = Core::Renderer::INVALID_VBO;
-            Core::Renderer::EBO ebo = Core::Renderer::INVALID_EBO;
-            size_t elementCount = 0;
-        };
-
-        std::vector<MeshResource> m_meshes;
+        ModelResourceManager m_modelResourceManager;
+        ShaderResourceManager m_shaderResourceManager;
+        TextureResourceManager m_textureResourceManager;
     };
 }

@@ -40,7 +40,7 @@ namespace RNGOEngine::AssetHandling
         const auto id = m_models.size();
         m_models.emplace_back(ModelData);
         m_modelCache.Insert(path, id);
-        
+
         return id;
     }
 
@@ -85,18 +85,25 @@ namespace RNGOEngine::AssetHandling
     ModelData ModelManager::UploadModel(ModelLoading::ModelHandle modelHandle)
     {
         ModelData modelData;
-        modelData.meshIDs.reserve(modelHandle.data->meshes.size());
+        modelData.meshKeys.reserve(modelHandle.data->meshes.size());
+        modelData.CachedMeshes.reserve(modelHandle.data->meshes.size());
 
         for (const auto& meshData : modelHandle.data->meshes)
         {
-            modelData.meshIDs.emplace_back(m_resourceManager.CreateMesh(meshData));
+            modelData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
+
+            const auto meshResourceOpt = m_resourceManager.GetMeshResource(modelData.meshKeys.back());
+            if (meshResourceOpt.has_value())
+            {
+                modelData.CachedMeshes.emplace_back(meshResourceOpt.value());
+            }
         }
 
         return modelData;
     }
 
-    const ModelData& ModelManager::GetModel(const ModelID id) const
+    std::span<const Resources::MeshResource> ModelManager::GetModel(const ModelID id) const
     {
-        return m_models.at(id);
+        return m_models.at(id).CachedMeshes;
     }
 }

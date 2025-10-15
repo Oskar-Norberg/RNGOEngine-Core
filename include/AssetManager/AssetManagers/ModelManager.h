@@ -9,8 +9,9 @@
 #include <vector>
 
 #include "AssetManager/AssetLoaders/ModelLoader.h"
-#include "Renderer/RenderID.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Utilities/AssetCache/AssetCache.h"
+#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
 {
@@ -23,12 +24,16 @@ namespace RNGOEngine
 // Move to a Manager namespace?
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: Make ModelRenderer store this instead of ModelID.
+    // Make this a struct so it can't be implicitly converted to an ID?
     using ModelID = unsigned int;
     constexpr auto INVALID_MODEL_ID = std::numeric_limits<ModelID>::max();
 
     struct ModelData
     {
-        std::vector<Core::Renderer::MeshID> meshIDs;
+        std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
+        // TODO: Invalidate this on GC
+        std::vector<Resources::MeshResource> CachedMeshes;
     };
 
     enum class ModelCreationError
@@ -46,11 +51,12 @@ namespace RNGOEngine::AssetHandling
         explicit ModelManager(Resources::ResourceManager& resourceManager, bool flipUVs = false);
 
         std::expected<ModelID, ModelCreationError> CreateModel(const std::filesystem::path& path);
-        const ModelData& GetModel(ModelID id) const;
+        std::span<const Resources::MeshResource> GetModel(ModelID id) const;
 
     private:
         bool m_doFlipUVs;
-        // TODO: Vector of vector....................
+        // TODO: This should probably be a sparse set.
+        // TODO: As models are loaded and unloaded this will continue to grow indefinitely and get even more fragmented.
         std::vector<ModelData> m_models;
 
     private:
@@ -61,7 +67,8 @@ namespace RNGOEngine::AssetHandling
 
         // Model Loading
     private:
-        std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(const std::filesystem::path& path) const;
+        std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(
+            const std::filesystem::path& path) const;
         void UnloadModel(ModelLoading::ModelHandle modelHandle);
 
         // GPU Interfacing
