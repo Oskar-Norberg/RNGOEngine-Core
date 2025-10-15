@@ -15,10 +15,18 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::optional<Core::Renderer::TextureID> TextureManager::GetTexture(
+    Core::Renderer::TextureID TextureManager::GetTexture(
         const Core::Renderer::TextureID id) const
     {
-        return m_resourceManager.GetTexture(m_textures[id]);
+        const auto textureOpt = m_resourceManager.GetTexture(m_textures[id]);
+        if (textureOpt)
+        {
+            return textureOpt.value();
+        }
+
+        RNGO_ASSERT(false && "TextureManager::GetTexture: Invalid texture key.");
+        // TODO: Return a default/error texture?
+        return Core::Renderer::INVALID_TEXTURE_ID;
     }
 
     std::expected<Core::Renderer::TextureID, TextureManagerError> TextureManager::CreateTexture(

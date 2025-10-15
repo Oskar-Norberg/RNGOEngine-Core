@@ -15,7 +15,6 @@ namespace RNGOEngine::Core::Renderer
 
 namespace RNGOEngine::Resources
 {
-    // TODO: Wrap everything in generational handles.
     class TextureResourceManager
     {
     public:

@@ -61,16 +61,12 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
-            const auto& shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.shader);
-            if (!shaderProgramID)
-            {
-                RNGO_ASSERT(false && "RenderAPI::Render: Invalid shader program key.");
-                continue;
-            }
-            
-            m_renderer.BindShaderProgram(shaderProgramID.value());
+            const auto shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.shader);
+
+            m_renderer.BindShaderProgram(shaderProgramID);
 
             // TODO: Not sure if this is a great idea.
+            // TODO: Defaults should be set in the material system.
             // Default Uniforms.
             m_renderer.SetFloat("specularStrength", 0.5f);
             m_renderer.SetInt("shininess", 32);
@@ -212,10 +208,7 @@ namespace RNGOEngine::Core::Renderer
                     case UniformType::Texture:
                     {
                         const auto textureHandle = m_textureManager.GetTexture(data.texture.texture);
-                        if (textureHandle)
-                        {
-                            m_renderer.SetTexture(name, textureHandle.value(), data.texture.slot);
-                        }
+                        m_renderer.SetTexture(name, textureHandle, data.texture.slot);
                     }
                     break;
                     default:
@@ -223,21 +216,11 @@ namespace RNGOEngine::Core::Renderer
                         break;
                 }
 
-                const auto& modelData = m_modelManager.GetModel(opaqueDrawCall.modelID);
-
-                for (const auto& meshKey : modelData.meshKeys)
+                const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelID);
+                for (const auto& meshData : meshDatas.CachedMeshes)
                 {
-                    const auto meshResourceOpt = m_resourceManager.GetMeshResource(meshKey);
-
-                    if (meshResourceOpt.has_value())
-                    {
-                        m_renderer.BindToVAO(meshResourceOpt.value().get().vao);
-                        m_renderer.DrawElement(meshResourceOpt.value().get().elementCount);
-                    }
-                    else
-                    {
-                        RNGO_ASSERT(false && "Invalid mesh key in model.");
-                    }
+                    m_renderer.BindToVAO(meshData.vao);
+                    m_renderer.DrawElement(meshData.elementCount);
                 }
             }
         }

@@ -38,9 +38,17 @@ namespace RNGOEngine::AssetHandling
         return shaderProgram.value();
     }
 
-    std::optional<Core::Renderer::ShaderProgramID> ShaderManager::GetShaderProgram(const ShaderManagerID id) const
+    Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(const ShaderManagerID id) const
     {
-        return m_resourceManager.GetShaderProgram(m_shaderPrograms.at(id));
+        const auto shaderProgramIDOpt = m_resourceManager.GetShaderProgram(m_shaderPrograms.at(id));
+        if (shaderProgramIDOpt.has_value())
+        {
+            return shaderProgramIDOpt.value();
+        }
+
+        RNGO_ASSERT(false && "ShaderManager::GetShaderProgram: Invalid shader program key.");
+        // TODO: Return a default/error shader program?
+        return Core::Renderer::INVALID_SHADER_PROGRAM_ID;
     }
 
     std::expected<Core::Renderer::ShaderID, ShaderManagerError> ShaderManager::CreateShader(

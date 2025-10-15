@@ -23,7 +23,7 @@ namespace RNGOEngine
 namespace RNGOEngine::AssetHandling
 {
     using ShaderManagerID = unsigned int;
-    
+
     enum class ShaderManagerError
     {
         None,
@@ -46,7 +46,7 @@ namespace RNGOEngine::AssetHandling
             const std::filesystem::path& vertexShaderPath,
             const std::filesystem::path& fragmentShaderPath);
 
-        std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(ShaderManagerID id) const;
+        Core::Renderer::ShaderProgramID GetShaderProgram(ShaderManagerID id) const;
 
     private:
         ShaderLoader m_shaderLoader;
@@ -61,7 +61,8 @@ namespace RNGOEngine::AssetHandling
         Utilities::AssetCache<std::filesystem::path, ShaderManagerID> m_shaderCache;
 
         // Links two indices in m_shaders to an index in m_shaderPrograms
-        Utilities::AssetCache<std::pair<ShaderManagerID, ShaderManagerID>, Core::Renderer::ShaderProgramID, Utilities::Hash::PairHash>
+        Utilities::AssetCache<std::pair<ShaderManagerID, ShaderManagerID>, Core::Renderer::ShaderProgramID,
+                              Utilities::Hash::PairHash>
         m_shaderProgramCache;
 
     private:

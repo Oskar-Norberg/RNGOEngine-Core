@@ -38,7 +38,7 @@ namespace RNGOEngine::AssetHandling
         std::expected<Core::Renderer::TextureID, TextureManagerError> CreateTexture(const std::filesystem::path& path);
 
     public:
-        std::optional<Core::Renderer::TextureID> GetTexture(Core::Renderer::TextureID id) const;
+        Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
 
     private:
         std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>> m_textures;

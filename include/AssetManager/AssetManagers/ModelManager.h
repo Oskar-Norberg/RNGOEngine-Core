@@ -29,8 +29,9 @@ namespace RNGOEngine::AssetHandling
 
     struct ModelData
     {
-        std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>>
-        meshKeys;
+        std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
+        // TODO: Invalidate this on GC
+        std::vector<Resources::MeshResource> CachedMeshes;
     };
 
     enum class ModelCreationError
@@ -48,11 +49,12 @@ namespace RNGOEngine::AssetHandling
         explicit ModelManager(Resources::ResourceManager& resourceManager, bool flipUVs = false);
 
         std::expected<ModelID, ModelCreationError> CreateModel(const std::filesystem::path& path);
-        const ModelData& GetModel(ModelID id) const;
+        ModelData GetModel(ModelID id) const;
 
     private:
         bool m_doFlipUVs;
-        // TODO: Vector of vector....................
+        // TODO: This should probably be a sparse set.
+        // TODO: As models are loaded and unloaded this will continue to grow indefinitely and get even more fragmented.
         std::vector<ModelData> m_models;
 
     private:
