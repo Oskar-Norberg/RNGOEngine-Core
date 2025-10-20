@@ -6,6 +6,7 @@ add_library(${CONTAINERS_PROJECT_NAME} INTERFACE
         include/Utilities/Containers/QuadTree/QuadTree.tpp
         include/Utilities/Containers/GenerationalVector/GenerationalVector.h
         include/Utilities/Containers/GenerationalVector/GenerationalVector.tpp
+        include/Utilities/Containers/GenerationalVector/UnmarkedIterator.tpp
 )
 target_include_directories(${CONTAINERS_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${CONTAINERS_PROJECT_NAME} INTERFACE ${PROFILING_PROJECT_NAME} ${UTILITIES_PROJECT_NAME})
