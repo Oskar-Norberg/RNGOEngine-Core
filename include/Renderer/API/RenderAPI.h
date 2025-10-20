@@ -20,7 +20,7 @@ namespace RNGOEngine
 
     namespace Resources
     {
-        class ResourceManager;
+        class ResourceTracker;
     }
 
     namespace Core
@@ -43,7 +43,8 @@ namespace RNGOEngine::Core::Renderer
     class RenderAPI
     {
     public:
-        explicit RenderAPI(IRenderer& renderer, Resources::ResourceManager& resourceManager,
+        explicit RenderAPI(IRenderer& renderer,
+                           Resources::ResourceTracker& resourceTracker,
                            const AssetHandling::ModelManager& modelManager,
                            const AssetHandling::ShaderManager& shaderManager,
                            const AssetHandling::MaterialManager& materialManager,
@@ -65,7 +66,7 @@ namespace RNGOEngine::Core::Renderer
         IRenderer& m_renderer;
         DrawQueue m_drawQueue;
 
-        const Resources::ResourceManager& m_resourceManager;
+        const Resources::ResourceTracker& m_resourceTracker;
         const AssetHandling::ModelManager& m_modelManager;
         const AssetHandling::ShaderManager& m_shaderManager;
         const AssetHandling::MaterialManager& m_materialManager;

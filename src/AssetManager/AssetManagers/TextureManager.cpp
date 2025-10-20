@@ -16,13 +16,24 @@ namespace RNGOEngine::AssetHandling
     }
 
     Core::Renderer::TextureID TextureManager::GetTexture(
-        const Core::Renderer::TextureID id) const
+        Containers::Vectors::GenerationalKey<TextureManagerData> key) const
     {
-        return m_textures.at(id).CachedTextureID;
+        if (const auto texture = m_textures.GetValidated(key); texture)
+        {
+            return texture.value().get().CachedTextureID;
+        }
+
+        if (const auto texture = m_textures.GetValidated(GetInvalidTexture()); texture)
+        {
+            return texture.value().get().CachedTextureID;
+        }
+
+        RNGO_ASSERT(false && "TextureManager::GetTexture GetInvalidTexture failed!");
+        return Core::Renderer::INVALID_TEXTURE_ID;
     }
 
-    std::expected<Core::Renderer::TextureID, TextureManagerError> TextureManager::CreateTexture(
-        const std::filesystem::path& path)
+    std::expected<Containers::Vectors::GenerationalKey<TextureManagerData>, TextureManagerError>
+    TextureManager::CreateTexture(const std::filesystem::path& path)
     {
         // Check Cache
         if (const auto cachedTexture = m_textureCache.TryGet(path); cachedTexture.has_value())
@@ -45,16 +56,25 @@ namespace RNGOEngine::AssetHandling
             return std::unexpected(TextureManagerError::FailedToLoad);
         }
 
-        const auto id = m_textures.size();
-        m_textures.emplace_back(textureKey, textureIDOpt.value());
+        TextureManagerData textureIDData = {
+            .TextureKey = textureKey,
+            .CachedTextureID = textureIDOpt.value(),
+        };
+        const auto key = m_textures.Insert(textureIDData);
 
         // Unload from RAM
         UnloadTexture(textureHandle.value());
 
         // Cache
-        m_textureCache.Insert(path, id);
+        m_textureCache.Insert(path, key);
 
-        return id;
+        return key;
+    }
+
+    Containers::Vectors::GenerationalKey<TextureManagerData> TextureManager::GetInvalidTexture() const
+    {
+        // TODO: Return actual invalid texture
+        return m_textures.InvalidKey();
     }
 
     std::expected<Textures::TextureHandle, TextureManagerError> TextureManager::LoadTexture(

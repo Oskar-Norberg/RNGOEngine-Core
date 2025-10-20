@@ -19,8 +19,8 @@ namespace RNGOEngine::Core::Renderer
     struct Drawable
     {
         Components::Transform transform;
-        AssetHandling::ModelID modelID;
-        MaterialID material;
+        Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelID;
+        AssetHandling::MaterialID material;
     };
 
     struct CameraData

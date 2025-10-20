@@ -15,7 +15,8 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<ModelID, ModelCreationError> ModelManager::CreateModel(const std::filesystem::path& path)
+    std::expected<Containers::Vectors::GenerationalKey<ModelData>, ModelCreationError> ModelManager::
+    CreateModel(const std::filesystem::path& path)
     {
         // Check cache for model
         if (m_modelCache.Contains(path))
@@ -31,17 +32,16 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload model to GPU
-        const auto ModelData = UploadModel(modelHandle.value());
+        const auto modelData = UploadModel(modelHandle.value());
 
         // Unload model from RAM
         UnloadModel(modelHandle.value());
 
         // Cache and return
-        const auto id = m_models.size();
-        m_models.emplace_back(ModelData);
-        m_modelCache.Insert(path, id);
+        const auto key = m_models.Insert(modelData);
+        m_modelCache.Insert(path, key);
 
-        return id;
+        return key;
     }
 
     std::expected<ModelLoading::ModelHandle, ModelCreationError> ModelManager::LoadModel(
@@ -102,8 +102,26 @@ namespace RNGOEngine::AssetHandling
         return modelData;
     }
 
-    std::span<const Resources::MeshResource> ModelManager::GetModel(const ModelID id) const
+    std::span<const Resources::MeshResource> ModelManager::GetModel(
+        const Containers::Vectors::GenerationalKey<ModelData>& key) const
     {
-        return m_models.at(id).CachedMeshes;
+        // TODO: This does mean key validity checking in the update loop. Fine for now!
+        if (const auto modelDataOpt = m_models.GetValidated(key); modelDataOpt)
+        {
+            return modelDataOpt.value().get().CachedMeshes;
+        }
+
+        if (const auto modelDataOpt = m_models.GetValidated(GetInvalidModel()); modelDataOpt)
+        {
+            return modelDataOpt.value().get().CachedMeshes;
+        }
+
+        return {};
+    }
+
+    Containers::Vectors::GenerationalKey<ModelData> ModelManager::GetInvalidModel() const
+    {
+        // TODO: Return an actual error model.
+        return RNGOEngine::Containers::Vectors::GenerationalVector<RNGOEngine::AssetHandling::ModelData>::InvalidKey();
     }
 }

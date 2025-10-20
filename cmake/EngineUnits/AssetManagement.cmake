@@ -23,7 +23,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         
         include/AssetManager/AssetManagers/TextureManager.h
         src/AssetManager/AssetManagers/TextureManager.cpp
-        
+
+        include/AssetManager/AssetManagers/Material/Material.h
         include/AssetManager/AssetManagers/MaterialManager.h
         src/AssetManager/AssetManagers/MaterialManager.cpp
         
