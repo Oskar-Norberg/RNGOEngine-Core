@@ -5,9 +5,7 @@
 #pragma once
 
 #include <expected>
-#include <vector>
 
-#include "AssetManager/AssetLoaders/TextureLoader.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
 #include "Utilities/AssetCache/AssetCache.h"
@@ -42,14 +40,18 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit TextureManager(Resources::ResourceManager& resourceManager);
 
-        std::expected<Core::Renderer::TextureID, TextureManagerError> CreateTexture(const std::filesystem::path& path);
+        std::expected<Containers::Vectors::GenerationalKey<TextureManagerData>, TextureManagerError>
+        CreateTexture(const std::filesystem::path& path);
 
     public:
-        Core::Renderer::TextureID GetTexture(Core::Renderer::TextureID id) const;
+        Core::Renderer::TextureID GetTexture(Containers::Vectors::GenerationalKey<TextureManagerData> key) const;
+
+    public:
+        Containers::Vectors::GenerationalKey<TextureManagerData> GetInvalidTexture() const;
 
     private:
-        std::vector<TextureManagerData> m_textures;
-        Utilities::AssetCache<std::filesystem::path, Core::Renderer::TextureID> m_textureCache;
+        Containers::Vectors::GenerationalVector<TextureManagerData> m_textures;
+        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<TextureManagerData>> m_textureCache;
 
     private:
         Resources::ResourceManager& m_resourceManager;
