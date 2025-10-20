@@ -30,13 +30,4 @@ namespace RNGOEngine::Core::Renderer
     constexpr auto INVALID_SHADER_ID = std::numeric_limits<ShaderID>::max();
     constexpr auto INVALID_SHADER_PROGRAM_ID = std::numeric_limits<ShaderProgramID>::max();
     constexpr auto INVALID_TEXTURE_ID = std::numeric_limits<TextureID>::max();
-
-    // TODO: Consider moving to a separate file?
-    // # Higher level renderer IDs
-    using MeshID = unsigned int;
-    using MaterialID = unsigned int;
-
-    constexpr auto INVALID_MESH_ID = std::numeric_limits<MeshID>::max();
-    constexpr auto INVALID_MATERIAL_ID = std::numeric_limits<MaterialID>::max();
-
 }

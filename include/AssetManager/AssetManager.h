@@ -34,7 +34,7 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
                                                       const std::filesystem::path& fragmentSourcePath);
 
-        Core::Renderer::TextureID LoadTexture(std::string_view texturePath);
+        Containers::Vectors::GenerationalKey<TextureManagerData> LoadTexture(std::string_view texturePath);
 
     public:
         void AddAssetPath(const std::filesystem::path& path, AssetPathType type);

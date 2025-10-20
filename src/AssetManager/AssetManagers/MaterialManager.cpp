@@ -6,15 +6,15 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    Core::Renderer::MaterialID MaterialManager::CreateMaterial(Core::Renderer::ShaderProgramID id)
+    MaterialID MaterialManager::CreateMaterial(Core::Renderer::ShaderProgramID id)
     {
         m_materials.emplace_back(id);
-        return static_cast<Core::Renderer::MaterialID>(m_materials.size() - 1);
+        return static_cast<MaterialID>(m_materials.size() - 1);
     }
 
-    std::optional<std::reference_wrapper<Core::Renderer::MaterialSpecification>>
+    std::optional<std::reference_wrapper<MaterialSpecification>>
     MaterialManager::TryGetMaterial(
-        const Core::Renderer::MaterialID id)
+        const MaterialID id)
     {
         if (m_materials.size() <= id)
         {
@@ -25,8 +25,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     // TODO: Should this maybe not be optional?
-    std::optional<std::reference_wrapper<const Core::Renderer::MaterialSpecification>> MaterialManager::
-    TryGetMaterial(Core::Renderer::MaterialID id) const
+    std::optional<std::reference_wrapper<const MaterialSpecification>> MaterialManager::
+    TryGetMaterial(MaterialID id) const
     {
         if (m_materials.size() <= id)
         {
@@ -36,86 +36,92 @@ namespace RNGOEngine::AssetHandling
         return std::cref(m_materials[id]);
     }
 
-    const Core::Renderer::MaterialSpecification& MaterialManager::GetMaterial(
-        const Core::Renderer::MaterialID id) const
+    const MaterialSpecification& MaterialManager::GetMaterial(
+        const MaterialID id) const
     {
         return m_materials[id];
     }
 
-    void MaterialManager::SetTexture(Core::Renderer::MaterialID id, Core::Renderer::TextureID texture,
+    void MaterialManager::SetTexture(MaterialID id,
+                                     Containers::Vectors::GenerationalKey<TextureManagerData> texture,
                                      int slot)
     {
         m_materials[id].uniforms.emplace_back(
             "Texture" + std::to_string(slot),
-            Core::Renderer::UniformType::Texture,
-            Core::Renderer::UniformData{.texture = {texture, slot}}
+            MaterialParameterType::Texture,
+            MaterialParameterData{
+                .texture = MaterialTextureSpecification{
+                    .texture = texture,
+                    .slot = slot
+                }
+            }
         );
     }
 
-    void MaterialManager::SetBool(Core::Renderer::MaterialID id, std::string_view name, bool value)
+    void MaterialManager::SetBool(MaterialID id, std::string_view name, bool value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Bool,
-            Core::Renderer::UniformData{.b = value}
+            MaterialParameterType::Bool,
+            MaterialParameterData{.b = value}
         );
     }
 
-    void MaterialManager::SetInt(Core::Renderer::MaterialID id, std::string_view name, int value)
+    void MaterialManager::SetInt(MaterialID id, std::string_view name, int value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Int,
-            Core::Renderer::UniformData{.i = value}
+            MaterialParameterType::Int,
+            MaterialParameterData{.i = value}
         );
     }
 
-    void MaterialManager::SetFloat(Core::Renderer::MaterialID id, std::string_view name, float value)
+    void MaterialManager::SetFloat(MaterialID id, std::string_view name, float value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Float,
-            Core::Renderer::UniformData{.f = value}
+            MaterialParameterType::Float,
+            MaterialParameterData{.f = value}
         );
     }
 
-    void MaterialManager::SetVec2(Core::Renderer::MaterialID id, std::string_view name,
+    void MaterialManager::SetVec2(MaterialID id, std::string_view name,
                                   const glm::vec2& value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Vec2,
-            Core::Renderer::UniformData{.v2 = value}
+            MaterialParameterType::Vec2,
+            MaterialParameterData{.v2 = value}
         );
     }
 
-    void MaterialManager::SetVec3(Core::Renderer::MaterialID id, std::string_view name,
+    void MaterialManager::SetVec3(MaterialID id, std::string_view name,
                                   const glm::vec3& value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Vec3,
-            Core::Renderer::UniformData{.v3 = value}
+            MaterialParameterType::Vec3,
+            MaterialParameterData{.v3 = value}
         );
     }
 
-    void MaterialManager::SetVec4(Core::Renderer::MaterialID id, std::string_view name,
+    void MaterialManager::SetVec4(MaterialID id, std::string_view name,
                                   const glm::vec4& value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Vec4,
-            Core::Renderer::UniformData{.v4 = value}
+            MaterialParameterType::Vec4,
+            MaterialParameterData{.v4 = value}
         );
     }
 
-    void MaterialManager::SetMat4(Core::Renderer::MaterialID id, std::string_view name,
+    void MaterialManager::SetMat4(MaterialID id, std::string_view name,
                                   const glm::mat4& value)
     {
         m_materials[id].uniforms.emplace_back(
             name.data(),
-            Core::Renderer::UniformType::Mat4,
-            Core::Renderer::UniformData{.m4 = value}
+            MaterialParameterType::Mat4,
+            MaterialParameterData{.m4 = value}
         );
     }
 }

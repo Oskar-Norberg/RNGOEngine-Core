@@ -184,28 +184,28 @@ namespace RNGOEngine::Core::Renderer
             {
                 switch (type)
                 {
-                    case UniformType::Bool:
+                    case AssetHandling::MaterialParameterType::Bool:
                         m_renderer.SetBool(name, data.b);
                         break;
-                    case UniformType::Int:
+                    case AssetHandling::MaterialParameterType::Int:
                         m_renderer.SetInt(name, data.i);
                         break;
-                    case UniformType::Float:
+                    case AssetHandling::MaterialParameterType::Float:
                         m_renderer.SetFloat(name, data.f);
                         break;
-                    case UniformType::Vec2:
+                    case AssetHandling::MaterialParameterType::Vec2:
                         m_renderer.SetVec2(name, std::span<const float, 2>(&data.v2[0], 2));
                         break;
-                    case UniformType::Vec3:
+                    case AssetHandling::MaterialParameterType::Vec3:
                         m_renderer.SetVec3(name, std::span<const float, 3>(&data.v3[0], 3));
                         break;
-                    case UniformType::Vec4:
+                    case AssetHandling::MaterialParameterType::Vec4:
                         m_renderer.SetVec4(name, std::span<const float, 4>(&data.v4[0], 4));
                         break;
-                    case UniformType::Mat4:
+                    case AssetHandling::MaterialParameterType::Mat4:
                         m_renderer.SetMat4(name, std::span<const float, 16>(glm::value_ptr(data.m4), 16));
                         break;
-                    case UniformType::Texture:
+                    case AssetHandling::MaterialParameterType::Texture:
                     {
                         const auto textureHandle = m_textureManager.GetTexture(data.texture.texture);
                         m_renderer.SetTexture(name, textureHandle, data.texture.slot);

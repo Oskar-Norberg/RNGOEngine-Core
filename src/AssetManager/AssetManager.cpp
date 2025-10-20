@@ -57,24 +57,21 @@ namespace RNGOEngine::AssetHandling
         return Core::Renderer::MaterialHandle(materialID, m_materialManager);
     }
 
-    Core::Renderer::TextureID AssetManager::LoadTexture(
+    Containers::Vectors::GenerationalKey<TextureManagerData> AssetManager::LoadTexture(
         const std::string_view texturePath)
     {
         const auto fullPath = m_assetFileFetcher.GetTexturePath(texturePath);
         if (!fullPath.has_value())
         {
             RNGO_ASSERT(false && "Texture not found!");
-            // I think the INVALID_TEXTURE_ID Should be handled through the TextureManager.
-            // So it can inject a default texture.
-            // Perhaps just move the INVALID_TEXTURE_ID from RenderID to the TextureManager. The renderer shouldn't have to validate any resources.
-            return Core::Renderer::INVALID_TEXTURE_ID;
+            return m_textureManager.GetInvalidTexture();
         }
 
         const auto textureID = m_textureManager.CreateTexture(fullPath.value());
         if (!textureID.has_value())
         {
             RNGO_ASSERT(false && "Texture creation failed!");
-            return Core::Renderer::INVALID_TEXTURE_ID;
+            return m_textureManager.GetInvalidTexture();
         }
 
         return textureID.value();

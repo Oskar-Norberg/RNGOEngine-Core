@@ -11,13 +11,14 @@
 #include "glm/gtx/quaternion.hpp"
 
 #include "AssetManager/AssetManagers/ModelManager.h"
+#include "AssetManager/AssetManagers/Material/Material.h"
 
 namespace RNGOEngine::Components
 {
     struct MeshRenderer
     {
         Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelID;
-        Core::Renderer::MaterialID materialID;
+        AssetHandling::MaterialID materialID;
     };
 
     struct Transform

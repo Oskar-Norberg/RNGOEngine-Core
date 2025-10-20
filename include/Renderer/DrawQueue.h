@@ -20,7 +20,7 @@ namespace RNGOEngine::Core::Renderer
     {
         Components::Transform transform;
         Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelID;
-        MaterialID material;
+        AssetHandling::MaterialID material;
     };
 
     struct CameraData

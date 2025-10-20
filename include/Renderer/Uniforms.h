@@ -5,7 +5,6 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <glm/glm.hpp>
 
 #include "RenderID.h"
@@ -37,13 +36,5 @@ namespace RNGOEngine::Core::Renderer
         std::string name;
         UniformType type;
         UniformData data;
-    };
-
-    struct MaterialSpecification
-    {
-        ShaderProgramID shader;
-        
-        // Consider stack allocated array with max size?
-        std::vector<UniformSpecification> uniforms;
     };
 }
