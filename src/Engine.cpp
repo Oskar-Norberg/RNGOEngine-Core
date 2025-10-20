@@ -70,8 +70,10 @@ namespace RNGOEngine::Core
 
     void Engine::Run()
     {
-        auto lastFrame = std::chrono::high_resolution_clock::now();
+        // Initialization
 
+        // Main Loop
+        auto lastFrame = std::chrono::high_resolution_clock::now();
         while (m_running)
         {
             RNGO_ZONE_SCOPE;
@@ -98,6 +100,9 @@ namespace RNGOEngine::Core
 
             RNGO_FRAME_MARK;
         }
+
+        // Shutdown
+        m_resourceManager->DestroyAllResources();
     }
 
     void Engine::PollWindowEvents()

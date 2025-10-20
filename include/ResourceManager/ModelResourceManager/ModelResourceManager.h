@@ -32,6 +32,7 @@ namespace RNGOEngine::Resources
         size_t elementCount = 0;
     };
 
+    // TODO: This should be called MeshResourceManager. This does not deal with a high level Model.
     class ModelResourceManager
     {
     public:
@@ -48,10 +49,17 @@ namespace RNGOEngine::Resources
         std::optional<std::reference_wrapper<const MeshResource>> GetMeshResource(
             const Containers::Vectors::GenerationalKey<MeshResource>& key) const;
 
+        // # Clean Up
+    public:
+        void DestroyAllMeshes();
+
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
 
     private:
         Containers::Vectors::GenerationalVector<MeshResource> m_meshes;
+
+    private:
+        void DestroyMeshResource(const MeshResource& meshResource);
     };
 }

@@ -81,4 +81,9 @@ namespace RNGOEngine::Resources
     {
         return m_textureResourceManager.GetTexture(key);
     }
+
+    void ResourceManager::DestroyAllResources()
+    {
+        m_modelResourceManager.DestroyAllMeshes();
+    }
 }

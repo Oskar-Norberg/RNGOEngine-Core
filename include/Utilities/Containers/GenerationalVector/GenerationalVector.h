@@ -14,6 +14,13 @@
 
 namespace RNGOEngine::Containers::Vectors
 {
+    enum class GenerationalKeyStatus
+    {
+        Unmarked, // Live / Not Marked for Removal
+        Marked, // Marked for removal, but not cleaned up yet
+        Removed // Dead / Removed, cleaned up
+    };
+
     // Doesn't strictly need to be templated, but improves readability.
     template<typename T>
     struct GenerationalKey
@@ -31,14 +38,17 @@ namespace RNGOEngine::Containers::Vectors
     struct InternalGenerationalKey
     {
         size_t Generation;
-        bool IsLive;
+        GenerationalKeyStatus Status;
         T Data;
     };
-
 
     template<typename T>
     class GenerationalVector
     {
+    public:
+#include "UnmarkedIterator.tpp"
+#include "MarkedIterator.tpp"
+
     public:
         inline static const GenerationalKey<T> INVALID_GENERATIONAL_KEY = GenerationalKey<T>{
             static_cast<size_t>(-1), static_cast<size_t>(-1)};
@@ -57,24 +67,34 @@ namespace RNGOEngine::Containers::Vectors
         std::optional<std::reference_wrapper<const T>> GetValidated(const GenerationalKey<T>& key) const;
         std::optional<std::reference_wrapper<T>> GetValidated(const GenerationalKey<T>& key);
 
-        auto begin()
+        // All Iterators
+    public:
+        // Unmarked Iterators
+    public:
+        UnmarkedRange Live()
         {
-            return m_keys.begin();
+            return {UnmarkedGenerationalIterator(this, 0),
+                    UnmarkedGenerationalIterator(this, m_keys.size())};
         }
 
-        auto end()
+        UnmarkedRange Live() const
         {
-            return m_keys.end();
+            return {UnmarkedGenerationalIterator(this, 0),
+                    UnmarkedGenerationalIterator(this, m_keys.size())};
         }
 
-        auto begin() const
+        // Marked Iterators
+    public:
+        MarkedRange Marked()
         {
-            return m_keys.begin();
+            return {MarkedGenerationalIterator(this, 0),
+                    MarkedGenerationalIterator(this, m_keys.size())};
         }
 
-        auto end() const
+        MarkedRange Marked() const
         {
-            return m_keys.end();
+            return {MarkedGenerationalIterator(this, 0),
+                    MarkedGenerationalIterator(this, m_keys.size())};
         }
 
     public:
@@ -84,6 +104,7 @@ namespace RNGOEngine::Containers::Vectors
         }
 
     private:
+        friend class GenerationalIterator;
         std::vector<InternalGenerationalKey<T>> m_keys;
         std::vector<int> m_freeIndices;
     };

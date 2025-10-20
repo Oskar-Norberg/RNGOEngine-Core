@@ -51,4 +51,26 @@ namespace RNGOEngine::Resources
     {
         return m_meshes.GetValidated(key);
     }
+
+    void ModelResourceManager::DestroyAllMeshes()
+    {
+        for (const auto mesh : m_meshes.Live())
+        {
+            DestroyMeshResource(m_meshes.Get(mesh));
+            m_meshes.Remove(mesh);
+        }
+
+        for (const auto mesh : m_meshes.Marked())
+        {
+            DestroyMeshResource(m_meshes.Get(mesh));
+            m_meshes.Remove(mesh);
+        }
+    }
+
+    void ModelResourceManager::DestroyMeshResource(const MeshResource& meshResource)
+    {
+        m_renderer.DestroyVAO(meshResource.vao);
+        m_renderer.DestroyVBO(meshResource.vbo);
+        m_renderer.DestroyEBO(meshResource.ebo);
+    }
 }

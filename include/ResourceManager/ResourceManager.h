@@ -66,6 +66,10 @@ namespace RNGOEngine::Resources
         std::optional<Core::Renderer::TextureID> GetTexture(
             const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
 
+        // # Clean Up
+    public:
+        void DestroyAllResources();
+
     private:
         ModelResourceManager m_modelResourceManager;
         ShaderResourceManager m_shaderResourceManager;
