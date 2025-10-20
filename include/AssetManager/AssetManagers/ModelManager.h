@@ -24,11 +24,6 @@ namespace RNGOEngine
 // Move to a Manager namespace?
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Make ModelRenderer store this instead of ModelID.
-    // Make this a struct so it can't be implicitly converted to an ID?
-    using ModelID = unsigned int;
-    constexpr auto INVALID_MODEL_ID = std::numeric_limits<ModelID>::max();
-
     struct ModelData
     {
         std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
@@ -50,17 +45,20 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelManager(Resources::ResourceManager& resourceManager, bool flipUVs = false);
 
-        std::expected<ModelID, ModelCreationError> CreateModel(const std::filesystem::path& path);
-        std::span<const Resources::MeshResource> GetModel(ModelID id) const;
+        std::expected<Containers::Vectors::GenerationalKey<ModelData>, ModelCreationError> CreateModel(
+            const std::filesystem::path& path);
+        std::span<const Resources::MeshResource> GetModel(
+            const Containers::Vectors::GenerationalKey<ModelData>& key) const;
+
+    public:
+        Containers::Vectors::GenerationalKey<ModelData> GetInvalidModel() const;
 
     private:
         bool m_doFlipUVs;
-        // TODO: This should probably be a sparse set.
-        // TODO: As models are loaded and unloaded this will continue to grow indefinitely and get even more fragmented.
-        std::vector<ModelData> m_models;
+        Containers::Vectors::GenerationalVector<ModelData> m_models;
 
     private:
-        Utilities::AssetCache<std::filesystem::path, ModelID> m_modelCache;
+        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<ModelData>> m_modelCache;
 
     private:
         Resources::ResourceManager& m_resourceManager;

@@ -24,21 +24,21 @@ namespace RNGOEngine::AssetHandling
     }
 
 
-    ModelID AssetManager::LoadModel(
+    Containers::Vectors::GenerationalKey<ModelData> AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
         if (!fullPath.has_value())
         {
             RNGO_ASSERT(false && "Model not found!");
-            return INVALID_MODEL_ID;
+            return m_modelManager.GetInvalidModel();
         }
 
         const auto model = m_modelManager.CreateModel(fullPath.value());
         if (!model)
         {
             RNGO_ASSERT(false && "Model creation failed!");
-            return INVALID_MODEL_ID;
+            return m_modelManager.GetInvalidModel();
         }
 
         return model.value();

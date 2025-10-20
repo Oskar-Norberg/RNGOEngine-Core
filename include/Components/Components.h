@@ -16,7 +16,7 @@ namespace RNGOEngine::Components
 {
     struct MeshRenderer
     {
-        AssetHandling::ModelID modelID;
+        Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelID;
         Core::Renderer::MaterialID materialID;
     };
 

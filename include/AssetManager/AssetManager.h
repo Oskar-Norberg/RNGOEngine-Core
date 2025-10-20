@@ -28,7 +28,7 @@ namespace RNGOEngine::AssetHandling
         explicit AssetManager(Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
     public:
-        ModelID LoadModel(const std::filesystem::path& modelPath);
+        Containers::Vectors::GenerationalKey<ModelData> LoadModel(const std::filesystem::path& modelPath);
 
     public:
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,

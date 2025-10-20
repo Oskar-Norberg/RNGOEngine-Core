@@ -35,9 +35,14 @@ namespace RNGOEngine::Containers::Vectors
         T Data;
     };
 
+
     template<typename T>
     class GenerationalVector
     {
+    public:
+        inline static const GenerationalKey<T> INVALID_GENERATIONAL_KEY = GenerationalKey<T>{
+            static_cast<size_t>(-1), static_cast<size_t>(-1)};
+
     public:
         template<typename U>
         GenerationalKey<T> Insert(U&& data);
