@@ -98,6 +98,7 @@ namespace RNGOEngine::Core
             PollEngineEvents();
             ClearEvents();
 
+            ++m_frameCount;
             RNGO_FRAME_MARK;
         }
 
@@ -172,7 +173,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        m_rendererAPI->Render(*m_window);
+        m_rendererAPI->Render(*m_window, m_frameCount);
         m_window->SwapBuffers();
     }
 

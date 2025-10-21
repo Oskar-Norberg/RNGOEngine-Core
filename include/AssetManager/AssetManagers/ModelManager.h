@@ -53,12 +53,18 @@ namespace RNGOEngine::AssetHandling
     public:
         Containers::Vectors::GenerationalKey<ModelData> GetInvalidModel() const;
 
+        // Only really relevant for the RenderAPI/ResourceTracker, use friends?
+    public:
+        std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> GetAllMeshKeys(
+            const Containers::Vectors::GenerationalKey<ModelData>& key) const;
+
     private:
         bool m_doFlipUVs;
         Containers::Vectors::GenerationalVector<ModelData> m_models;
 
     private:
-        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<ModelData>> m_modelCache;
+        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<ModelData>>
+        m_modelCache;
 
     private:
         Resources::ResourceManager& m_resourceManager;

@@ -11,18 +11,19 @@ namespace RNGOEngine::Resources
 {
     class ResourceTracker
     {
-        void MarkModelLastUsed(const Containers::Vectors::GenerationalKey<MeshResource>& modelKey, int frame);
+    public:
+        void MarkModelLastUsed(const Containers::Vectors::GenerationalKey<MeshResource>& modelKey, size_t frame);
 
         void MarkShaderProgramLastUsed(
             const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& shaderKey,
-            int frame);
+            size_t frame);
 
         void MarkTextureLastUsed(
-            const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& textureKey, int frame);
+            const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& textureKey, size_t frame);
 
     private:
-        std::unordered_map<Containers::Vectors::GenerationalKey<MeshResource>, int> m_models;
-        std::unordered_map<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>, int> m_shaderPrograms;
-        std::unordered_map<Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>, int> m_textures;
+        std::unordered_map<Containers::Vectors::GenerationalKey<MeshResource>, size_t> m_models;
+        std::unordered_map<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>, size_t> m_shaderPrograms;
+        std::unordered_map<Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>, size_t> m_textures;
     };
 }

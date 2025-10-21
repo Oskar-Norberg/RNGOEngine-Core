@@ -40,6 +40,8 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Core::Renderer
 {
+    // TODO: In the future this will need to have some sort of render-pipeline / pass system.
+    // Doing everything in one function is not scalable.
     class RenderAPI
     {
     public:
@@ -53,7 +55,7 @@ namespace RNGOEngine::Core::Renderer
                            int height);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
-        void Render(Window::IWindow& window) const;
+        void Render(Window::IWindow& window, size_t frameCount) const;
 
     public:
         /// 
@@ -66,7 +68,7 @@ namespace RNGOEngine::Core::Renderer
         IRenderer& m_renderer;
         DrawQueue m_drawQueue;
 
-        const Resources::ResourceTracker& m_resourceTracker;
+        Resources::ResourceTracker& m_resourceTracker;
         const AssetHandling::ModelManager& m_modelManager;
         const AssetHandling::ShaderManager& m_shaderManager;
         const AssetHandling::MaterialManager& m_materialManager;
@@ -74,5 +76,12 @@ namespace RNGOEngine::Core::Renderer
 
     private:
         int m_width, m_height;
+
+    private:
+        void ClearAmbientColor(Window::IWindow& window) const;
+        void RenderOpaque(Window::IWindow& window) const;
+
+    private:
+        void MarkOpaqueUsed(size_t frameCount) const;
     };
 }

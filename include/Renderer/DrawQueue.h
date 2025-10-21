@@ -15,11 +15,12 @@ namespace RNGOEngine::Core::Renderer
 {
     constexpr auto NR_OF_POINTLIGHTS = 16;
     constexpr auto NR_OF_SPOTLIGHTS = 16;
-    
+
+    // TODO: Consistent case on public struct members.
     struct Drawable
     {
         Components::Transform transform;
-        Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelID;
+        Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelKey;
         AssetHandling::MaterialID material;
     };
 

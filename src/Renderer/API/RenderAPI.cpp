@@ -13,6 +13,7 @@
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
+#include "ResourceManager/ResourceTracker.h"
 #include "Utilities/RNGOAsserts.h"
 
 #include "glm/gtc/type_ptr.inl"
@@ -25,12 +26,12 @@ namespace RNGOEngine::Core::Renderer
                          const AssetHandling::ShaderManager& shaderManager,
                          const AssetHandling::MaterialManager& materialManager,
                          const AssetHandling::TextureManager& textureManager,
-                         int width, int height)
+                         const int width, const int height)
         : m_renderer(renderer),
           m_drawQueue(),
           m_resourceTracker(resourceTracker),
-          m_shaderManager(shaderManager),
           m_modelManager(modelManager),
+          m_shaderManager(shaderManager),
           m_materialManager(materialManager),
           m_textureManager(textureManager),
           m_width(width),
@@ -44,10 +45,31 @@ namespace RNGOEngine::Core::Renderer
         m_drawQueue = std::move(drawQueue);
     }
 
-    void RenderAPI::Render(Window::IWindow& window) const
+    void RenderAPI::Render(Window::IWindow& window, size_t frameCount) const
     {
-        const auto& camera = m_drawQueue.camera;
+        // Render
+        ClearAmbientColor(window);
+        RenderOpaque(window);
 
+        // Track Resources
+        MarkOpaqueUsed(frameCount);
+    }
+
+    bool RenderAPI::ListenSendEvents(Events::EventQueue& eventQueue)
+    {
+        const auto resizeEvents = eventQueue.GetEvents<Events::WindowSizeEvent>();
+        for (const auto& [width, height] : resizeEvents)
+        {
+            m_width = width;
+            m_height = height;
+            m_renderer.SetViewPortSize(width, height);
+        }
+
+        return false;
+    }
+
+    void RenderAPI::ClearAmbientColor(Window::IWindow& window) const
+    {
         const auto& clearColor = m_drawQueue.backgroundColor.color;
         const auto& clearR = clearColor.r;
         const auto& clearG = clearColor.g;
@@ -56,8 +78,12 @@ namespace RNGOEngine::Core::Renderer
 
         m_renderer.ClearColor();
         m_renderer.ClearDepth();
+    }
 
-        // Opaques
+    void RenderAPI::RenderOpaque(Window::IWindow& window) const
+    {
+        const auto& camera = m_drawQueue.camera;
+
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
@@ -78,6 +104,7 @@ namespace RNGOEngine::Core::Renderer
 
             // Camera Settings
             // Yes. This is set per object right now. Yes, it is terrible.
+            // TODO: UBOs PLEEAAAAAAAAAAAASEEEEEEEEEEEEEEEEE
             {
                 const auto view = glm::inverse(m_drawQueue.camera.transform.GetMatrix());
                 const auto projectionMatrix = glm::perspective(
@@ -216,7 +243,7 @@ namespace RNGOEngine::Core::Renderer
                         break;
                 }
 
-                const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelID);
+                const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelKey);
                 for (const auto& meshData : meshDatas)
                 {
                     m_renderer.BindToVAO(meshData.vao);
@@ -226,16 +253,19 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    bool RenderAPI::ListenSendEvents(Events::EventQueue& eventQueue)
+    // Technically it would be quicker to do this while rendering, but this is cleaner.
+    void RenderAPI::MarkOpaqueUsed(size_t frameCount) const
     {
-        const auto resizeEvents = eventQueue.GetEvents<Events::WindowSizeEvent>();
-        for (const auto& [width, height] : resizeEvents)
+        // Mark meshes Used.
+        for (auto opaque : m_drawQueue.opaqueObjects)
         {
-            m_width = width;
-            m_height = height;
-            m_renderer.SetViewPortSize(width, height);
+            const auto& modelKeys = m_modelManager.GetAllMeshKeys(opaque.modelKey);
+            for (auto mesh : modelKeys)
+            {
+                m_resourceTracker.MarkModelLastUsed(mesh, frameCount);
+            }
         }
 
-        return false;
+        // TODO: Mark shaders and textures.
     }
 }

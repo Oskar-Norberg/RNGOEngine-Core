@@ -35,6 +35,7 @@ namespace RNGOEngine::Core
         size_t height = 600;
         std::string name = "RNGOEngine";
 
+        // TODO: No reason for this to be a vector, make it a span instead.
         std::vector<std::pair<std::filesystem::path, AssetHandling::AssetPathType>> assetPaths;
     };
 
@@ -65,6 +66,8 @@ namespace RNGOEngine::Core
 
     private:
         bool m_running;
+        // TODO: Consider adding frame count to SystemContext, or wrapping it in a TimeContext.
+        size_t m_frameCount = 0;
 
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;

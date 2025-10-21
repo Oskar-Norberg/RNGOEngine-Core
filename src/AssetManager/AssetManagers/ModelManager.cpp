@@ -124,4 +124,22 @@ namespace RNGOEngine::AssetHandling
         // TODO: Return an actual error model.
         return RNGOEngine::Containers::Vectors::GenerationalVector<RNGOEngine::AssetHandling::ModelData>::InvalidKey();
     }
+
+    std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> ModelManager::
+    GetAllMeshKeys(const Containers::Vectors::GenerationalKey<ModelData>& key) const
+    {
+        // TODO: This does mean key validity checking in the update loop. Fine for now!
+        if (const auto modelDataOpt = m_models.GetValidated(key); modelDataOpt)
+        {
+            return modelDataOpt.value().get().meshKeys;
+        }
+
+        if (const auto modelDataOpt = m_models.GetValidated(GetInvalidModel()); modelDataOpt)
+        {
+            RNGO_ASSERT(false && "ModelManager::GetAllMeshKeys called with invalid model key.");
+            return modelDataOpt.value().get().meshKeys;
+        }
+
+        return {};
+    }
 }
