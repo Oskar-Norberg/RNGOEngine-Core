@@ -99,4 +99,9 @@ namespace RNGOEngine::AssetHandling
                 break;
         }
     }
+
+    void AssetManager::RebuildResourceCaches()
+    {
+        m_modelManager.RebuildCache();
+    }
 }

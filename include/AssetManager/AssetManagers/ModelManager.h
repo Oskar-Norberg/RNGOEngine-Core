@@ -27,7 +27,6 @@ namespace RNGOEngine::AssetHandling
     struct ModelData
     {
         std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
-        // TODO: Invalidate this on GC
         std::vector<Resources::MeshResource> CachedMeshes;
     };
 
@@ -58,6 +57,10 @@ namespace RNGOEngine::AssetHandling
         std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> GetAllMeshKeys(
             const Containers::Vectors::GenerationalKey<ModelData>& key) const;
 
+        // Engine Internal
+    public:
+        void RebuildCache();
+
     private:
         bool m_doFlipUVs;
         Containers::Vectors::GenerationalVector<ModelData> m_models;
@@ -68,6 +71,9 @@ namespace RNGOEngine::AssetHandling
 
     private:
         Resources::ResourceManager& m_resourceManager;
+
+    private:
+        void UpdateModelCache(ModelData& modelData);
 
         // Model Loading
     private:

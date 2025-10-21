@@ -207,6 +207,9 @@ namespace RNGOEngine::Core
         if (!unusedResources.IsEmpty())
         {
             m_resourceManager->DestroyMeshes(unusedResources.meshes);
+
+            // TODO: Could be optimized by passing the ResourceCollection and letting the AssetManager only rebuild affected caches.
+            m_assetManager->RebuildResourceCaches();
         }
     }
 

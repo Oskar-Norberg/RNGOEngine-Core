@@ -60,6 +60,10 @@ namespace RNGOEngine::AssetHandling
             return m_textureManager;
         }
 
+        // Engine Internal
+    public:
+        void RebuildResourceCaches();
+
     private:
         AssetFileFetcher m_assetFileFetcher;
         

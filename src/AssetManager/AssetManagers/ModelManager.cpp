@@ -44,6 +44,25 @@ namespace RNGOEngine::AssetHandling
         return key;
     }
 
+    void ModelManager::UpdateModelCache(ModelData& modelData)
+    {
+        modelData.CachedMeshes.clear();
+        modelData.CachedMeshes.reserve(modelData.meshKeys.size());
+
+        for (const auto& meshKey : modelData.meshKeys)
+        {
+            const auto meshID = m_resourceManager.GetMeshResource(meshKey);
+            if (meshID.has_value())
+            {
+                modelData.CachedMeshes.emplace_back(meshID.value().get());
+            }
+            else
+            {
+                RNGO_ASSERT(false && "ModelManager::UpdateModelCache Mesh key invalid!");
+            }
+        }
+    }
+
     std::expected<ModelLoading::ModelHandle, ModelCreationError> ModelManager::LoadModel(
         const std::filesystem::path& path) const
     {
@@ -86,18 +105,13 @@ namespace RNGOEngine::AssetHandling
     {
         ModelData modelData;
         modelData.meshKeys.reserve(modelHandle.data->meshes.size());
-        modelData.CachedMeshes.reserve(modelHandle.data->meshes.size());
 
         for (const auto& meshData : modelHandle.data->meshes)
         {
             modelData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
-
-            const auto meshResourceOpt = m_resourceManager.GetMeshResource(modelData.meshKeys.back());
-            if (meshResourceOpt.has_value())
-            {
-                modelData.CachedMeshes.emplace_back(meshResourceOpt.value());
-            }
         }
+
+        UpdateModelCache(modelData);
 
         return modelData;
     }
@@ -122,7 +136,8 @@ namespace RNGOEngine::AssetHandling
     Containers::Vectors::GenerationalKey<ModelData> ModelManager::GetInvalidModel() const
     {
         // TODO: Return an actual error model.
-        return RNGOEngine::Containers::Vectors::GenerationalVector<RNGOEngine::AssetHandling::ModelData>::InvalidKey();
+        return RNGOEngine::Containers::Vectors::GenerationalVector<
+            RNGOEngine::AssetHandling::ModelData>::InvalidKey();
     }
 
     std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> ModelManager::
@@ -141,5 +156,16 @@ namespace RNGOEngine::AssetHandling
         }
 
         return {};
+    }
+
+    void ModelManager::RebuildCache()
+    {
+        for (const auto& modelKey : m_models.Live())
+        {
+            if (auto modelDataOpt = m_models.GetValidated(modelKey); modelDataOpt)
+            {
+                UpdateModelCache(modelDataOpt.value().get());
+            }
+        }
     }
 }
