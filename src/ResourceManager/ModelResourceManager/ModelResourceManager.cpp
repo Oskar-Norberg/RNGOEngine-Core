@@ -46,6 +46,19 @@ namespace RNGOEngine::Resources
         return handle;
     }
 
+    void ModelResourceManager::DestroyMesh(Containers::Vectors::GenerationalKey<MeshResource> meshKey)
+    {
+        if (const auto validatedMesh = m_meshes.GetValidated(meshKey); validatedMesh)
+        {
+            DestroyMeshResource(validatedMesh.value());
+            m_meshes.Remove(meshKey);
+        }
+        else
+        {
+            RNGO_ASSERT(false && "ModelResourceManager::DestroyMesh trying to destroy invalid mesh.");
+        }
+    }
+
     std::optional<std::reference_wrapper<const MeshResource>> ModelResourceManager::GetMeshResource(
         const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {

@@ -1,5 +1,7 @@
 ﻿set(RESOURCE_MANAGEMENT_PROJECT_NAME RNGOEngine_ResourceManagement)
 add_library(${RESOURCE_MANAGEMENT_PROJECT_NAME} STATIC
+        include/ResourceManager/ResourceCollection.h
+        
         include/ResourceManager/ResourceManager.h
         src/ResourceManager/ResourceManager.cpp
 

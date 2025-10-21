@@ -21,6 +21,20 @@ namespace RNGOEngine::Resources
         return m_modelResourceManager.CreateMesh(meshData);
     }
 
+    void ResourceManager::DestroyMesh(const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
+    {
+        // TODO: Add a callback for when a model is destroyed?
+        m_modelResourceManager.DestroyMesh(mesh);
+    }
+
+    void ResourceManager::DestroyMeshes(const ResourceCollection<MeshResource>& meshes)
+    {
+        for (const auto& mesh : meshes.Resources)
+        {
+            DestroyMesh(mesh);
+        }
+    }
+
     std::optional<std::reference_wrapper<const MeshResource>> ResourceManager::GetMeshResource(
         const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {
@@ -43,7 +57,6 @@ namespace RNGOEngine::Resources
         const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const
     {
         return m_shaderResourceManager.GetShaderProgram(key);
-
     }
 
     Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ResourceManager::

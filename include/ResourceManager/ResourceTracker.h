@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "ResourceCollection.h"
 #include "ModelResourceManager/ModelResourceManager.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
@@ -11,13 +12,14 @@ namespace RNGOEngine::Resources
 {
     struct TrackedCollection
     {
-        std::vector<Containers::Vectors::GenerationalKey<MeshResource>> meshes;
-        std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>> textures;
-        std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>> shaderPrograms;
+        // TODO: Mayhaps store in a union?
+        ResourceCollection<MeshResource> meshes;
+        ResourceCollection<Core::Renderer::TextureID> textures;
+        ResourceCollection<Core::Renderer::ShaderProgramID> shaderPrograms;
 
         bool IsEmpty() const
         {
-            return meshes.empty() && textures.empty() && shaderPrograms.empty();
+            return meshes.Resources.empty() && textures.Resources.empty() && shaderPrograms.Resources.empty();
         }
     };
 
@@ -35,7 +37,7 @@ namespace RNGOEngine::Resources
             const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& textureKey, size_t frame);
 
     public:
-        TrackedCollection GetUnusedResources(size_t currentFrame, size_t frameThreshold) const;
+        TrackedCollection GetUnusedResources(size_t currentFrame, size_t frameThreshold);
 
     private:
         std::unordered_map<Containers::Vectors::GenerationalKey<MeshResource>, size_t> m_models;

@@ -42,7 +42,7 @@ namespace RNGOEngine::Resources
     public:
         Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
             const Data::Rendering::MeshData& meshData);
-        // TODO: Mesh Destruction
+        void DestroyMesh(Containers::Vectors::GenerationalKey<MeshResource> meshKey);
 
         // Accessors
     public:

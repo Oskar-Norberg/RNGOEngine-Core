@@ -65,6 +65,11 @@ namespace RNGOEngine::Core
         }
 
     private:
+        // TODO: Break into EngineSettings data-only header?
+        // constexpr static size_t RESOURCE_CHECK_INTERVAL = 300; // Frames
+        constexpr static size_t RESOURCE_UNUSED_THRESHOLD = 300; // Frames
+
+    private:
         bool m_running;
         // TODO: Consider adding frame count to SystemContext, or wrapping it in a TimeContext.
         size_t m_frameCount = 0;
@@ -100,6 +105,7 @@ namespace RNGOEngine::Core
         void PollGameEvents();
         void PollEngineEvents();
         void ClearEvents();
+        void CheckUnusedResources();
 
     private:
         void AddEngineSystems();

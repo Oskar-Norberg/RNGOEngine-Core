@@ -97,6 +97,7 @@ namespace RNGOEngine::Core
             PollGameEvents();
             PollEngineEvents();
             ClearEvents();
+            CheckUnusedResources();
 
             ++m_frameCount;
             RNGO_FRAME_MARK;
@@ -194,6 +195,19 @@ namespace RNGOEngine::Core
     void Engine::ClearEvents()
     {
         m_eventQueue.Clear();
+    }
+
+    void Engine::CheckUnusedResources()
+    {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("Engine::CheckUnusedResources");
+        // TODO: Check only every RESOURCE_CHECK_INTERVAL frames.
+        const auto unusedResources = m_resourceTracker.GetUnusedResources(m_frameCount, 300);
+
+        if (!unusedResources.IsEmpty())
+        {
+            m_resourceManager->DestroyMeshes(unusedResources.meshes);
+        }
     }
 
     void Engine::AddEngineSystems()

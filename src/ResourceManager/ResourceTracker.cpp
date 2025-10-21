@@ -25,34 +25,48 @@ namespace RNGOEngine::Resources
         m_textures[textureKey] = frame;
     }
 
-    TrackedCollection ResourceTracker::GetUnusedResources(size_t currentFrame, size_t frameThreshold) const
+    // TODO: This removes resources from tracking if unused. Name is misleading.
+    TrackedCollection ResourceTracker::GetUnusedResources(size_t currentFrame, size_t frameThreshold)
     {
         // TODO: This will allocate three vectors every time called, optimize if needed.
         TrackedCollection unused;
 
-        for (const auto& [modelKey, lastUsedFrame] : m_models)
+        // TODO: Rewrite this to be a lambda to reduce code duplication
+        std::erase_if(m_models, [&](const auto& kvp)
         {
-            if (currentFrame - lastUsedFrame >= frameThreshold)
-            {
-                unused.meshes.emplace_back(modelKey);
-            }
-        }
+            const auto& [modelKey, lastUsedFrame] = kvp;
 
-        for (const auto& [shaderKey, lastUsedFrame] : m_shaderPrograms)
-        {
             if (currentFrame - lastUsedFrame >= frameThreshold)
             {
-                unused.shaderPrograms.emplace_back(shaderKey);
+                unused.meshes.Resources.emplace_back(modelKey);
+                return true;
             }
-        }
+            return false;
+        });
 
-        for (const auto& [textureKey, lastUsedFrame] : m_textures)
+        std::erase_if(m_shaderPrograms, [&](const auto& kvp)
         {
+            const auto& [shaderKey, lastUsedFrame] = kvp;
+
             if (currentFrame - lastUsedFrame >= frameThreshold)
             {
-                unused.textures.emplace_back(textureKey);
+                unused.shaderPrograms.Resources.emplace_back(shaderKey);
+                return true;
             }
-        }
+            return false;
+        });
+
+        std::erase_if(m_textures, [&](const auto& kvp)
+        {
+            const auto& [textureKey, lastUsedFrame] = kvp;
+
+            if (currentFrame - lastUsedFrame >= frameThreshold)
+            {
+                unused.textures.Resources.emplace_back(textureKey);
+                return true;
+            }
+            return false;
+        });
 
         return unused;
     }

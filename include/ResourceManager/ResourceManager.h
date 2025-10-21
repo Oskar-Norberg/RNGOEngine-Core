@@ -8,6 +8,7 @@
 #include <string_view>
 #include <functional>
 
+#include "ResourceCollection.h"
 #include "Data/MeshData.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
@@ -38,7 +39,8 @@ namespace RNGOEngine::Resources
     public:
         Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
             const Data::Rendering::MeshData& meshData);
-        // void DestroyMesh(Core::Renderer::MeshID id);
+        void DestroyMesh(const Containers::Vectors::GenerationalKey<MeshResource>& mesh);
+        void DestroyMeshes(const ResourceCollection<MeshResource>& meshes);
 
         std::optional<std::reference_wrapper<const MeshResource>> GetMeshResource(
             const Containers::Vectors::GenerationalKey<MeshResource>& key) const;
