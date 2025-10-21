@@ -4,6 +4,8 @@
 
 #include "AssetManager/AssetManagers/ModelManager.h"
 
+#include <unordered_set>
+
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/RNGOAsserts.h"
@@ -21,7 +23,14 @@ namespace RNGOEngine::AssetHandling
         // Check cache for model
         if (m_modelCache.Contains(path))
         {
-            return m_modelCache.Get(path);
+            if (m_models.IsValid(m_modelCache.Get(path)))
+            {
+                return m_modelCache.Get(path);
+            }
+            else
+            {
+                m_modelCache.Remove(path);
+            }
         }
 
         // Load Model into RAM
@@ -166,6 +175,32 @@ namespace RNGOEngine::AssetHandling
             {
                 UpdateModelCache(modelDataOpt.value().get());
             }
+        }
+    }
+
+    void ModelManager::OnMeshDestroyed(
+        const Containers::Vectors::GenerationalKey<Resources::MeshResource>& meshKey)
+    {
+        // TODO: This is going to be the slowest thing ever.
+        std::unordered_set<Containers::Vectors::GenerationalKey<ModelData>> modelsToUpdate;
+
+        for (const auto& modelKey : m_models.Live())
+        {
+            if (auto modelDataOpt = m_models.GetValidated(modelKey); modelDataOpt)
+            {
+                auto& modelData = modelDataOpt.value().get();
+                const auto& meshKeys = modelData.meshKeys;
+
+                if (std::ranges::find(meshKeys, meshKey) != meshKeys.end())
+                {
+                    modelsToUpdate.insert(modelKey);
+                }
+            }
+        }
+
+        for (const auto& modelKey : modelsToUpdate)
+        {
+            m_models.Remove(modelKey);
         }
     }
 }

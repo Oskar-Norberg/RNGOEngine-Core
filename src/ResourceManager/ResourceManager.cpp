@@ -15,6 +15,12 @@ namespace RNGOEngine::Resources
     {
     }
 
+    void ResourceManager::RegisterDestructionCallback(
+        std::function<void(const Containers::Vectors::GenerationalKey<MeshResource>&)> callback)
+    {
+        m_meshDestructionCallbacks.emplace_back(callback);
+    }
+
     Containers::Vectors::GenerationalKey<MeshResource> ResourceManager::CreateMesh(
         const Data::Rendering::MeshData& meshData)
     {
@@ -23,7 +29,6 @@ namespace RNGOEngine::Resources
 
     void ResourceManager::DestroyMesh(const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
     {
-        // TODO: Add a callback for when a model is destroyed?
         m_modelResourceManager.DestroyMesh(mesh);
     }
 
@@ -32,6 +37,11 @@ namespace RNGOEngine::Resources
         for (const auto& mesh : meshes.Resources)
         {
             DestroyMesh(mesh);
+            
+            for (const auto& callback : m_meshDestructionCallbacks)
+            {
+                callback(mesh);
+            }
         }
     }
 

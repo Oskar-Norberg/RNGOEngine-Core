@@ -54,12 +54,16 @@ namespace RNGOEngine::AssetHandling
 
         // Only really relevant for the RenderAPI/ResourceTracker, use friends?
     public:
-        std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> GetAllMeshKeys(
+        std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>>
+        GetAllMeshKeys(
             const Containers::Vectors::GenerationalKey<ModelData>& key) const;
 
         // Engine Internal
     public:
         void RebuildCache();
+
+        void OnMeshDestroyed(
+            const Containers::Vectors::GenerationalKey<Resources::MeshResource>& meshKey);
 
     private:
         bool m_doFlipUVs;

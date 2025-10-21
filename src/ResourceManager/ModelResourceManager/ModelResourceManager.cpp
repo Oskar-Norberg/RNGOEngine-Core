@@ -55,7 +55,7 @@ namespace RNGOEngine::Resources
         }
         else
         {
-            RNGO_ASSERT(false && "ModelResourceManager::DestroyMesh trying to destroy invalid mesh.");
+            // Mesh has already been destroyed.
         }
     }
 

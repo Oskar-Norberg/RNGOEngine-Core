@@ -65,6 +65,13 @@ namespace RNGOEngine::Core
             config.width, config.height
         );
 
+        m_resourceManager->RegisterDestructionCallback(
+            [this]<typename... T0>(T0&&... args)
+            {
+                m_assetManager->OnMeshDestroyed(std::forward<T0>(args)...);
+            }
+        );
+
         AddEngineSystems();
     }
 
@@ -202,7 +209,7 @@ namespace RNGOEngine::Core
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("Engine::CheckUnusedResources");
         // TODO: Check only every RESOURCE_CHECK_INTERVAL frames.
-        const auto unusedResources = m_resourceTracker.GetUnusedResources(m_frameCount, 300);
+        const auto unusedResources = m_resourceTracker.GetUnusedResources(m_frameCount, RESOURCE_UNUSED_THRESHOLD);
 
         if (!unusedResources.IsEmpty())
         {

@@ -35,6 +35,12 @@ namespace RNGOEngine::Resources
     public:
         explicit ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
+        // Register Callbacks
+    public:
+        void RegisterDestructionCallback(
+            std::function<void(const Containers::Vectors::GenerationalKey<MeshResource>&)> callback);
+        // void DeregisterDestructionCallback();
+
         // # MeshResourceManagement
     public:
         Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
@@ -71,6 +77,10 @@ namespace RNGOEngine::Resources
         // # Clean Up
     public:
         void DestroyAllResources();
+
+    private:
+        std::vector<std::function<void(const Containers::Vectors::GenerationalKey<MeshResource>&)>>
+        m_meshDestructionCallbacks;
 
     private:
         ModelResourceManager m_modelResourceManager;

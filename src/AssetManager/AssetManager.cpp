@@ -100,6 +100,12 @@ namespace RNGOEngine::AssetHandling
         }
     }
 
+    void AssetManager::OnMeshDestroyed(
+        const Containers::Vectors::GenerationalKey<Resources::MeshResource>& meshKey)
+    {
+        m_modelManager.OnMeshDestroyed(meshKey);
+    }
+
     void AssetManager::RebuildResourceCaches()
     {
         m_modelManager.RebuildCache();
