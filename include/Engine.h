@@ -67,7 +67,7 @@ namespace RNGOEngine::Core
     private:
         // TODO: Break into EngineSettings data-only header?
         // constexpr static size_t RESOURCE_CHECK_INTERVAL = 300; // Frames
-        constexpr static size_t RESOURCE_UNUSED_THRESHOLD = 300; // Frames
+        constexpr static size_t RESOURCE_UNUSED_THRESHOLD = 5; // Frames
 
     private:
         bool m_running;

@@ -21,11 +21,11 @@ namespace RNGOEngine::AssetHandling
     CreateModel(const std::filesystem::path& path)
     {
         // Check cache for model
-        if (m_modelCache.Contains(path))
+        if (const auto cachedModel = m_modelCache.TryGet(path); cachedModel)
         {
-            if (m_models.IsValid(m_modelCache.Get(path)))
+            if (m_models.IsValid(cachedModel.value()))
             {
-                return m_modelCache.Get(path);
+                return cachedModel.value();
             }
             else
             {
@@ -50,25 +50,44 @@ namespace RNGOEngine::AssetHandling
         const auto key = m_models.Insert(modelData);
         m_modelCache.Insert(path, key);
 
+        // Update Model Cache
+        UpdateModelCache(key);
+
         return key;
     }
 
-    void ModelManager::UpdateModelCache(ModelData& modelData)
+    void ModelManager::UpdateModelCache(const Containers::Vectors::GenerationalKey<ModelData>& key)
     {
-        modelData.CachedMeshes.clear();
-        modelData.CachedMeshes.reserve(modelData.meshKeys.size());
+        const auto modelDataOpt = m_models.GetValidated(key);
+        if (!modelDataOpt)
+        {
+            RNGO_ASSERT(false && "ModelManager::UpdateModelCache called with invalid model key.");
+            return;
+        }
 
-        for (const auto& meshKey : modelData.meshKeys)
+        auto& [meshKeys, CachedMeshes] = modelDataOpt.value().get();
+        CachedMeshes.clear();
+        CachedMeshes.reserve(meshKeys.size());
+
+        bool invalid = false;
+        for (const auto& meshKey : meshKeys)
         {
             const auto meshID = m_resourceManager.GetMeshResource(meshKey);
             if (meshID.has_value())
             {
-                modelData.CachedMeshes.emplace_back(meshID.value().get());
+                CachedMeshes.emplace_back(meshID.value().get());
             }
             else
             {
-                RNGO_ASSERT(false && "ModelManager::UpdateModelCache Mesh key invalid!");
+                // Model has invalid mesh key, has been unloaded by ResourceManager.
+                invalid = true;
+                break;
             }
+        }
+
+        if (invalid)
+        {
+            m_models.Remove(key);
         }
     }
 
@@ -119,9 +138,7 @@ namespace RNGOEngine::AssetHandling
         {
             modelData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
         }
-
-        UpdateModelCache(modelData);
-
+        
         return modelData;
     }
 
@@ -171,36 +188,7 @@ namespace RNGOEngine::AssetHandling
     {
         for (const auto& modelKey : m_models.Live())
         {
-            if (auto modelDataOpt = m_models.GetValidated(modelKey); modelDataOpt)
-            {
-                UpdateModelCache(modelDataOpt.value().get());
-            }
-        }
-    }
-
-    void ModelManager::OnMeshDestroyed(
-        const Containers::Vectors::GenerationalKey<Resources::MeshResource>& meshKey)
-    {
-        // TODO: This is going to be the slowest thing ever.
-        std::unordered_set<Containers::Vectors::GenerationalKey<ModelData>> modelsToUpdate;
-
-        for (const auto& modelKey : m_models.Live())
-        {
-            if (auto modelDataOpt = m_models.GetValidated(modelKey); modelDataOpt)
-            {
-                auto& modelData = modelDataOpt.value().get();
-                const auto& meshKeys = modelData.meshKeys;
-
-                if (std::ranges::find(meshKeys, meshKey) != meshKeys.end())
-                {
-                    modelsToUpdate.insert(modelKey);
-                }
-            }
-        }
-
-        for (const auto& modelKey : modelsToUpdate)
-        {
-            m_models.Remove(modelKey);
+            UpdateModelCache(modelKey);
         }
     }
 }

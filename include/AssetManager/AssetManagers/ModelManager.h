@@ -62,9 +62,6 @@ namespace RNGOEngine::AssetHandling
     public:
         void RebuildCache();
 
-        void OnMeshDestroyed(
-            const Containers::Vectors::GenerationalKey<Resources::MeshResource>& meshKey);
-
     private:
         bool m_doFlipUVs;
         Containers::Vectors::GenerationalVector<ModelData> m_models;
@@ -77,7 +74,7 @@ namespace RNGOEngine::AssetHandling
         Resources::ResourceManager& m_resourceManager;
 
     private:
-        void UpdateModelCache(ModelData& modelData);
+        void UpdateModelCache(const Containers::Vectors::GenerationalKey<ModelData>& key);
 
         // Model Loading
     private:

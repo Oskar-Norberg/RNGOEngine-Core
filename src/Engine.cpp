@@ -65,13 +65,6 @@ namespace RNGOEngine::Core
             config.width, config.height
         );
 
-        m_resourceManager->RegisterDestructionCallback(
-            [this]<typename... T0>(T0&&... args)
-            {
-                m_assetManager->OnMeshDestroyed(std::forward<T0>(args)...);
-            }
-        );
-
         AddEngineSystems();
     }
 

@@ -62,7 +62,6 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internal
     public:
-        void OnMeshDestroyed(const Containers::Vectors::GenerationalKey<Resources::MeshResource>& meshKey);
         void RebuildResourceCaches();
 
     private:
