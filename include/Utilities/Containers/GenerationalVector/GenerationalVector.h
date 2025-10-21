@@ -104,7 +104,6 @@ namespace RNGOEngine::Containers::Vectors
         }
 
     private:
-        friend class GenerationalIterator;
         std::vector<InternalGenerationalKey<T>> m_keys;
         std::vector<int> m_freeIndices;
     };

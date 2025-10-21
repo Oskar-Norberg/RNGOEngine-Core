@@ -6,13 +6,15 @@ GenerationalKey<T> GenerationalVector<T>::Insert(U&& data)
     {
         const auto index = m_freeIndices.size() - 1;
         m_freeIndices.pop_back();
-        m_keys[index] = InternalGenerationalKey<T>{m_keys[index].Generation + 1, GenerationalKeyStatus::Unmarked, std::forward<U>(data)};
+        m_keys[index] = InternalGenerationalKey<T>{m_keys[index].Generation + 1,
+                                                   GenerationalKeyStatus::Unmarked, std::forward<U>(data)};
         return {index, m_keys[index].Generation};
     }
     else
     {
         const auto index = m_keys.size();
-        m_keys.push_back(InternalGenerationalKey<T>{0, GenerationalKeyStatus::Unmarked, std::forward<U>(data)});
+        m_keys.push_back(
+            InternalGenerationalKey<T>{0, GenerationalKeyStatus::Unmarked, std::forward<U>(data)});
         return {index, 0};
     }
 }
@@ -41,7 +43,8 @@ void GenerationalVector<T>::Remove(const GenerationalKey<T>& key)
 template<typename T>
 bool GenerationalVector<T>::IsValid(const GenerationalKey<T>& key) const
 {
-    return m_keys[key.ID].Generation == key.Generation && m_keys[key.ID].Status == GenerationalKeyStatus::Unmarked;
+    return key.ID < m_keys.size() && (m_keys[key.ID].Generation == key.Generation && m_keys[key.ID].Status ==
+           GenerationalKeyStatus::Unmarked);
 }
 
 template<typename T>
