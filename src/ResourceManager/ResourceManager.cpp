@@ -21,7 +21,8 @@ namespace RNGOEngine::Resources
         return m_modelResourceManager.CreateMesh(meshData);
     }
 
-    void ResourceManager::MarkMeshForDestruction(const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
+    void ResourceManager::MarkMeshForDestruction(
+        const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
     {
         m_modelResourceManager.MarkMeshForDestruction(mesh);
     }
@@ -106,16 +107,19 @@ namespace RNGOEngine::Resources
             m_textureResourceManager.MarkTextureForDeletion(textureKey);
         }
 
-        // for (const auto shaderProgramKey : resources.shaderPrograms.Resources)
-        // {
-        //     m_shaderResourceManager.MarkShaderProgramForDestruction(shaderProgramKey);
-        // }
+        for (const auto shaderProgramKey : resources.shaderPrograms.Resources)
+        {
+            m_shaderResourceManager.MarkShaderProgramForDestruction(shaderProgramKey);
+        }
     }
 
     void ResourceManager::DestroyMarkedResources()
     {
         m_modelResourceManager.DestroyMarkedMeshes();
         m_textureResourceManager.DestroyMarkedTextures();
+        
+        m_shaderResourceManager.DestroyMarkedShaders();
+        m_shaderResourceManager.DestroyMarkedShadersPrograms();
     }
 
     void ResourceManager::DestroyAllResources()
@@ -128,8 +132,12 @@ namespace RNGOEngine::Resources
         m_textureResourceManager.MarkAllTextures();
         m_textureResourceManager.DestroyMarkedTextures();
 
+        // Shaders
+        m_shaderResourceManager.MarkAllShaders();
+        m_shaderResourceManager.DestroyMarkedShaders();
+        
         // Shader Programs
-        // TODO:
-
+        m_shaderResourceManager.MarkAllShaderPrograms();
+        m_shaderResourceManager.DestroyMarkedShadersPrograms();
     }
 }

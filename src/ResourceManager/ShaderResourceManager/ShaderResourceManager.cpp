@@ -77,4 +77,36 @@ GetShaderProgram(const Containers::Vectors::GenerationalKey<Core::Renderer::Shad
     return m_shaderPrograms.GetUnmarkedValidated(key);
 }
 
-// TODO: actual destruction of marked shaders.
+void RNGOEngine::Resources::ShaderResourceManager::MarkAllShaders()
+{
+    for (const auto key : m_shaders.Live())
+    {
+        m_shaders.MarkForRemoval(key);
+    }
+}
+
+void RNGOEngine::Resources::ShaderResourceManager::DestroyMarkedShaders()
+{
+    for (const auto key : m_shaders.Marked())
+    {
+        m_renderer.DestroyShader(m_shaders.GetMarked(key));
+        m_shaders.Remove(key);
+    }
+}
+
+void RNGOEngine::Resources::ShaderResourceManager::MarkAllShaderPrograms()
+{
+    for (const auto key : m_shaderPrograms.Live())
+    {
+        m_shaderPrograms.MarkForRemoval(key);
+    }
+}
+
+void RNGOEngine::Resources::ShaderResourceManager::DestroyMarkedShadersPrograms()
+{
+    for (const auto key : m_shaderPrograms.Marked())
+    {
+        m_renderer.DestroyShader(m_shaderPrograms.GetMarked(key));
+        m_shaderPrograms.Remove(key);
+    }
+}

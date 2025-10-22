@@ -28,14 +28,24 @@ namespace RNGOEngine::Resources
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
 
+    public:
         void MarkShaderForDestruction(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
         void MarkShaderProgramForDestruction(
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program);
 
+    public:
         std::optional<Core::Renderer::ShaderID> GetShader(
             const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>& key) const;
         std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(
             const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const;
+
+        // Engine Internals
+    public:
+        void MarkAllShaders();
+        void DestroyMarkedShaders();
+        
+        void MarkAllShaderPrograms();
+        void DestroyMarkedShadersPrograms();
 
     private:
         Containers::Vectors::GenerationalVector<Core::Renderer::ShaderID> m_shaders;
