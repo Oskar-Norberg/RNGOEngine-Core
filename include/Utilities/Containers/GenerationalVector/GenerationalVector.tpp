@@ -4,9 +4,9 @@ GenerationalKey<T> GenerationalVector<T>::Insert(U&& data)
 {
     if (!m_freeIndices.empty())
     {
-        const auto index = m_freeIndices.size() - 1;
+        const auto index = m_freeIndices.back();
         m_freeIndices.pop_back();
-        m_keys[index] = InternalGenerationalKey<T>{m_keys[index].Generation + 1,
+        m_keys[index] = InternalGenerationalKey<T>{m_keys[index].Generation,
                                                    GenerationalKeyStatus::Unmarked, std::forward<U>(data)};
         return {index, m_keys[index].Generation};
     }
@@ -22,7 +22,7 @@ GenerationalKey<T> GenerationalVector<T>::Insert(U&& data)
 template<typename T>
 void GenerationalVector<T>::MarkForRemoval(const GenerationalKey<T>& key)
 {
-    if (IsValid(key))
+    if (IsValidUnmarked(key))
     {
         m_keys[key.ID].Status = GenerationalKeyStatus::Marked;
     }
@@ -41,16 +41,21 @@ void GenerationalVector<T>::Remove(const GenerationalKey<T>& key)
 }
 
 template<typename T>
-bool GenerationalVector<T>::IsValid(const GenerationalKey<T>& key) const
+bool GenerationalVector<T>::IsValidUnmarked(const GenerationalKey<T>& key) const
 {
-    return key.ID < m_keys.size() && (m_keys[key.ID].Generation == key.Generation && m_keys[key.ID].Status ==
-                                      GenerationalKeyStatus::Unmarked);
+    return IsValidID(key) && MatchesGeneration(key) && IsUnmarked(key);
 }
 
 template<typename T>
-const T& GenerationalVector<T>::Get(const GenerationalKey<T>& key) const
+bool GenerationalVector<T>::IsValidMarked(const GenerationalKey<T>& key) const
 {
-    if (!IsValid(key))
+    return IsValidID(key) && MatchesGeneration(key) && IsMarked(key);
+}
+
+template<typename T>
+const T& GenerationalVector<T>::GetUnmarked(const GenerationalKey<T>& key) const
+{
+    if (!IsValidUnmarked(key))
     {
         RNGO_ASSERT(false && "Invalid Generational Key!");
     }
@@ -59,21 +64,58 @@ const T& GenerationalVector<T>::Get(const GenerationalKey<T>& key) const
 }
 
 template<typename T>
-T& GenerationalVector<T>::Get(const GenerationalKey<T>& key)
+T& GenerationalVector<T>::GetUnmarked(const GenerationalKey<T>& key)
 {
-    if (!IsValid(key))
-    {
-        RNGO_ASSERT(false && "Invalid Generational Key!");
-    }
-
-    return m_keys[key.ID].Data;
+    return const_cast<T&>(static_cast<const GenerationalVector*>(this)->GetUnmarked(key));
 }
 
 template<typename T>
-std::optional<std::reference_wrapper<const T>> GenerationalVector<T>::GetValidated(
+std::optional<std::reference_wrapper<const T>> GenerationalVector<T>::GetUnmarkedValidated(
     const GenerationalKey<T>& key) const
 {
-    if (!IsValid(key))
+    if (!IsValidUnmarked(key))
+    {
+        return std::nullopt;
+    }
+
+    return std::cref(GetUnmarked(key));
+}
+
+template<typename T>
+std::optional<std::reference_wrapper<T>> GenerationalVector<T>::GetUnmarkedValidated(
+    const GenerationalKey<T>& key)
+{
+    auto unmarkedOpt = static_cast<const GenerationalVector<T>*>(this)->GetUnmarkedValidated(key);
+    if (!unmarkedOpt)
+    {
+        return std::nullopt;
+    }
+
+    return std::ref(const_cast<T&>(unmarkedOpt.value().get()));
+}
+
+template<typename T>
+T& GenerationalVector<T>::GetMarked(const GenerationalKey<T>& key)
+{
+    if (!IsValidMarked(key))
+    {
+        RNGO_ASSERT(false && "Invalid Generational Key!");
+    }
+
+    return m_keys[key.ID].Data;
+}
+
+template<typename T>
+const T& GenerationalVector<T>::GetMarked(const GenerationalKey<T>& key) const
+{
+    return const_cast<T&>(static_cast<const GenerationalVector*>(this)->GetMarked(key));
+}
+
+template<typename T>
+std::optional<std::reference_wrapper<T>> GenerationalVector<T>::GetMarkedValidated(
+    const GenerationalKey<T>& key)
+{
+    if (!IsValidMarked(key))
     {
         return std::nullopt;
     }
@@ -82,13 +124,40 @@ std::optional<std::reference_wrapper<const T>> GenerationalVector<T>::GetValidat
 }
 
 template<typename T>
-std::optional<std::reference_wrapper<T>> GenerationalVector<T>::GetValidated(
-    const GenerationalKey<T>& key)
+std::optional<std::reference_wrapper<const T>> GenerationalVector<T>::GetMarkedValidated(
+    const GenerationalKey<T>& key) const
 {
-    if (!IsValid(key))
+    const auto markedOption = GetMarkedValidated(key);
+    if (!markedOption)
     {
-        return std::nullopt;
+        return markedOption;
     }
 
-    return std::ref(Get(key));
+    return std::ref(const_cast<T&>(markedOption.value().get()));
+}
+
+template<typename T>
+bool GenerationalVector<T>::IsValidID(const GenerationalKey<T>& key) const
+{
+    return m_keys.size() > key.ID;
+}
+
+template<typename T>
+bool GenerationalVector<T>::MatchesGeneration(const GenerationalKey<T>& key) const
+{
+    // Assumes ID is a valid index.
+    return m_keys[key.ID].Generation == key.Generation;
+}
+
+template<typename T>
+bool GenerationalVector<T>::IsUnmarked(const GenerationalKey<T>& key) const
+{
+    // Assumes key is valid.
+    return m_keys[key.ID].Status == GenerationalKeyStatus::Unmarked;
+}
+
+template<typename T>
+bool GenerationalVector<T>::IsMarked(const GenerationalKey<T>& key) const
+{
+    return m_keys[key.ID].Status == GenerationalKeyStatus::Marked;
 }

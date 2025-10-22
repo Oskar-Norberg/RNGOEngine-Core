@@ -46,36 +46,36 @@ namespace RNGOEngine::Resources
         return handle;
     }
 
-    void ModelResourceManager::DestroyMesh(Containers::Vectors::GenerationalKey<MeshResource> meshKey)
+    void ModelResourceManager::MarkMeshForDestruction(const Containers::Vectors::GenerationalKey<MeshResource>& meshKey)
     {
-        if (const auto validatedMesh = m_meshes.GetValidated(meshKey); validatedMesh)
-        {
-            DestroyMeshResource(validatedMesh.value());
-            m_meshes.Remove(meshKey);
-        }
-        else
-        {
-            // Mesh has already been destroyed.
-        }
+        m_meshes.MarkForRemoval(meshKey);
     }
 
     std::optional<std::reference_wrapper<const MeshResource>> ModelResourceManager::GetMeshResource(
         const Containers::Vectors::GenerationalKey<MeshResource>& key) const
     {
-        return m_meshes.GetValidated(key);
+        return m_meshes.GetUnmarkedValidated(key);
+    }
+
+    void ModelResourceManager::DestroyMarkedMeshes()
+    {
+        for (const auto key : m_meshes.Marked())
+        {
+            // m_meshes.GetValidated()
+        }
     }
 
     void ModelResourceManager::DestroyAllMeshes()
     {
         for (const auto mesh : m_meshes.Live())
         {
-            DestroyMeshResource(m_meshes.Get(mesh));
+            DestroyMeshResource(m_meshes.GetUnmarked(mesh));
             m_meshes.Remove(mesh);
         }
 
         for (const auto mesh : m_meshes.Marked())
         {
-            DestroyMeshResource(m_meshes.Get(mesh));
+            DestroyMeshResource(m_meshes.GetMarked(mesh));
             m_meshes.Remove(mesh);
         }
     }

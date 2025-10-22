@@ -61,12 +61,24 @@ namespace RNGOEngine::Containers::Vectors
         void MarkForRemoval(const GenerationalKey<T>& key);
         void Remove(const GenerationalKey<T>& key);
 
-        bool IsValid(const GenerationalKey<T>& key) const;
-        const T& Get(const GenerationalKey<T>& key) const;
-        T& Get(const GenerationalKey<T>& key);
+        bool IsValidUnmarked(const GenerationalKey<T>& key) const;
+        bool IsValidMarked(const GenerationalKey<T>& key) const;
 
-        std::optional<std::reference_wrapper<const T>> GetValidated(const GenerationalKey<T>& key) const;
-        std::optional<std::reference_wrapper<T>> GetValidated(const GenerationalKey<T>& key);
+        // Get Unmarked
+    public:
+        const T& GetUnmarked(const GenerationalKey<T>& key) const;
+        T& GetUnmarked(const GenerationalKey<T>& key);
+
+        std::optional<std::reference_wrapper<const T>> GetUnmarkedValidated(const GenerationalKey<T>& key) const;
+        std::optional<std::reference_wrapper<T>> GetUnmarkedValidated(const GenerationalKey<T>& key);
+
+        // Get Marked
+    public:
+        const T& GetMarked(const GenerationalKey<T>& key) const;
+        T& GetMarked(const GenerationalKey<T>& key);
+
+        std::optional<std::reference_wrapper<const T>> GetMarkedValidated(const GenerationalKey<T>& key) const;
+        std::optional<std::reference_wrapper<T>> GetMarkedValidated(const GenerationalKey<T>& key);
 
         // All Iterators
     public:
@@ -106,7 +118,15 @@ namespace RNGOEngine::Containers::Vectors
 
     private:
         std::vector<InternalGenerationalKey<T>> m_keys;
-        std::vector<int> m_freeIndices;
+        std::vector<size_t> m_freeIndices;
+
+    private:
+        bool IsValidID(const GenerationalKey<T>& key) const;
+        bool MatchesGeneration(const GenerationalKey<T>& key) const;
+
+    private:
+        bool IsUnmarked(const GenerationalKey<T>& key) const;
+        bool IsMarked(const GenerationalKey<T>& key) const;
     };
 
 #include "GenerationalVector.tpp"

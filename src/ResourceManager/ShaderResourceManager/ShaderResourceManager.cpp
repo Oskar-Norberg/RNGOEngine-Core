@@ -25,8 +25,8 @@ RNGOEngine::Containers::Vectors::GenerationalKey<unsigned> RNGOEngine::Resources
 CreateShaderProgram(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
                     Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader)
 {
-    const auto vertexShaderID = m_shaders.GetValidated(vertexShader);
-    const auto fragmentShaderID = m_shaders.GetValidated(fragmentShader);
+    const auto vertexShaderID = m_shaders.GetUnmarkedValidated(vertexShader);
+    const auto fragmentShaderID = m_shaders.GetUnmarkedValidated(fragmentShader);
 
     if (!vertexShaderID || !fragmentShaderID)
     {
@@ -44,7 +44,7 @@ CreateShaderProgram(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderI
 void RNGOEngine::Resources::ShaderResourceManager::MarkShaderForDestruction(
     Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader)
 {
-    if (!m_shaders.IsValid(shader))
+    if (!m_shaders.IsValidUnmarked(shader))
     {
         RNGO_ASSERT(false && "ShaderResourceManager::DestroyShader invalid key.");
         return;
@@ -56,7 +56,7 @@ void RNGOEngine::Resources::ShaderResourceManager::MarkShaderForDestruction(
 void RNGOEngine::Resources::ShaderResourceManager::MarkShaderProgramForDestruction(
     Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program)
 {
-    if (!m_shaderPrograms.IsValid(program))
+    if (!m_shaderPrograms.IsValidUnmarked(program))
     {
         RNGO_ASSERT(false && "ShaderResourceManager::DestroyShaderProgram invalid key.");
         return;
@@ -68,13 +68,13 @@ void RNGOEngine::Resources::ShaderResourceManager::MarkShaderProgramForDestructi
 std::optional<RNGOEngine::Core::Renderer::ShaderID> RNGOEngine::Resources::ShaderResourceManager::GetShader(
     const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>& key) const
 {
-    return m_shaders.GetValidated(key);
+    return m_shaders.GetUnmarkedValidated(key);
 }
 
 std::optional<RNGOEngine::Core::Renderer::ShaderProgramID> RNGOEngine::Resources::ShaderResourceManager::
 GetShaderProgram(const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const
 {
-    return m_shaderPrograms.GetValidated(key);
+    return m_shaderPrograms.GetUnmarkedValidated(key);
 }
 
 // TODO: actual destruction of marked shaders.

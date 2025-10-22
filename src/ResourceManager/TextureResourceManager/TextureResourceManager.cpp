@@ -41,6 +41,6 @@ namespace RNGOEngine::Resources
     std::optional<Core::Renderer::TextureID> TextureResourceManager::GetTexture(
         const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
     {
-        return m_textures.GetValidated(key);
+        return m_textures.GetUnmarkedValidated(key);
     }
 }

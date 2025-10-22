@@ -23,7 +23,7 @@ namespace RNGOEngine::AssetHandling
         // Check cache for model
         if (const auto cachedModel = m_modelCache.TryGet(path); cachedModel)
         {
-            if (m_models.IsValid(cachedModel.value()))
+            if (m_models.IsValidUnmarked(cachedModel.value()))
             {
                 return cachedModel.value();
             }
@@ -58,7 +58,7 @@ namespace RNGOEngine::AssetHandling
 
     void ModelManager::UpdateModelCache(const Containers::Vectors::GenerationalKey<ModelData>& key)
     {
-        const auto modelDataOpt = m_models.GetValidated(key);
+        const auto modelDataOpt = m_models.GetUnmarkedValidated(key);
         if (!modelDataOpt)
         {
             RNGO_ASSERT(false && "ModelManager::UpdateModelCache called with invalid model key.");
@@ -146,12 +146,12 @@ namespace RNGOEngine::AssetHandling
         const Containers::Vectors::GenerationalKey<ModelData>& key) const
     {
         // TODO: This does mean key validity checking in the update loop. Fine for now!
-        if (const auto modelDataOpt = m_models.GetValidated(key); modelDataOpt)
+        if (const auto modelDataOpt = m_models.GetUnmarkedValidated(key); modelDataOpt)
         {
             return modelDataOpt.value().get().CachedMeshes;
         }
 
-        if (const auto modelDataOpt = m_models.GetValidated(GetInvalidModel()); modelDataOpt)
+        if (const auto modelDataOpt = m_models.GetUnmarkedValidated(GetInvalidModel()); modelDataOpt)
         {
             return modelDataOpt.value().get().CachedMeshes;
         }
@@ -170,12 +170,12 @@ namespace RNGOEngine::AssetHandling
     GetAllMeshKeys(const Containers::Vectors::GenerationalKey<ModelData>& key) const
     {
         // TODO: This does mean key validity checking in the update loop. Fine for now!
-        if (const auto modelDataOpt = m_models.GetValidated(key); modelDataOpt)
+        if (const auto modelDataOpt = m_models.GetUnmarkedValidated(key); modelDataOpt)
         {
             return modelDataOpt.value().get().meshKeys;
         }
 
-        if (const auto modelDataOpt = m_models.GetValidated(GetInvalidModel()); modelDataOpt)
+        if (const auto modelDataOpt = m_models.GetUnmarkedValidated(GetInvalidModel()); modelDataOpt)
         {
             RNGO_ASSERT(false && "ModelManager::GetAllMeshKeys called with invalid model key.");
             return modelDataOpt.value().get().meshKeys;

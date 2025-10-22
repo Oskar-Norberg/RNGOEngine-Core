@@ -18,12 +18,12 @@ namespace RNGOEngine::AssetHandling
     Core::Renderer::TextureID TextureManager::GetTexture(
         Containers::Vectors::GenerationalKey<TextureManagerData> key) const
     {
-        if (const auto texture = m_textures.GetValidated(key); texture)
+        if (const auto texture = m_textures.GetUnmarkedValidated(key); texture)
         {
             return texture.value().get().CachedTextureID;
         }
 
-        if (const auto texture = m_textures.GetValidated(GetInvalidTexture()); texture)
+        if (const auto texture = m_textures.GetUnmarkedValidated(GetInvalidTexture()); texture)
         {
             return texture.value().get().CachedTextureID;
         }

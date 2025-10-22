@@ -23,7 +23,7 @@ namespace RNGOEngine::Resources
 
     void ResourceManager::DestroyMesh(const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
     {
-        m_modelResourceManager.DestroyMesh(mesh);
+        m_modelResourceManager.MarkMeshForDestruction(mesh);
     }
 
     void ResourceManager::DestroyMeshes(const ResourceCollection<MeshResource>& meshes)
