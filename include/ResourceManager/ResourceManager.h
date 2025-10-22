@@ -39,6 +39,7 @@ namespace RNGOEngine::Resources
     public:
         Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
             const Data::Rendering::MeshData& meshData);
+
         void MarkMeshForDestruction(const Containers::Vectors::GenerationalKey<MeshResource>& mesh);
         void MarkMeshesForDestruction(const ResourceCollection<MeshResource>& meshes);
 
@@ -52,9 +53,11 @@ namespace RNGOEngine::Resources
         Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> CreateShaderProgram(
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
+
         void DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
         void DestroyShaderProgram(
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program);
+
         std::optional<Core::Renderer::ShaderID> GetShader(
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shaderKey);
         std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(
@@ -64,7 +67,10 @@ namespace RNGOEngine::Resources
     public:
         Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
             AssetHandling::Textures::TextureHandle textureHandle);
-        void DestroyTexture(const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key);
+
+        void MarkTextureForDestruction(
+            const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key);
+
         std::optional<Core::Renderer::TextureID> GetTexture(
             const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
 

@@ -16,14 +16,9 @@ namespace RNGOEngine::Resources
     Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureResourceManager::CreateTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
-        const auto* data = textureHandle.data;
-        const auto width = data->width;
-        const auto height = data->height;
-        const auto nrChannels = data->nrChannels;
-        const auto textureData = std::as_bytes(
-            std::span<const unsigned char>(data->data, width * height * nrChannels));
+        const auto textureID = UploadTexture(textureHandle);
+        const auto key = m_textures.Insert(textureID);
 
-        const auto key = m_textures.Insert(m_renderer.CreateTexture(width, height, nrChannels, textureData));
         return key;
     }
 
@@ -33,9 +28,31 @@ namespace RNGOEngine::Resources
         m_textures.MarkForRemoval(key);
     }
 
-    void TextureResourceManager::DeleteMarkedTextures()
+    void TextureResourceManager::DestroyMarkedTextures()
     {
-        // TODO:
+        for (const auto key : m_textures.Marked())
+        {
+            DestroyTexture(m_textures.GetMarked(key));
+            m_textures.Remove(key);
+        }
+    }
+
+    Core::Renderer::TextureID TextureResourceManager::UploadTexture(
+        const AssetHandling::Textures::TextureHandle textureHandle)
+    {
+        const auto* data = textureHandle.data;
+        const auto width = data->width;
+        const auto height = data->height;
+        const auto nrChannels = data->nrChannels;
+        const auto textureData = std::as_bytes(
+            std::span<const unsigned char>(data->data, width * height * nrChannels));
+
+        return m_renderer.CreateTexture(width, height, nrChannels, textureData);
+    }
+
+    void TextureResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)
+    {
+        m_renderer.DestroyTexture(texture);
     }
 
     std::optional<Core::Renderer::TextureID> TextureResourceManager::GetTexture(

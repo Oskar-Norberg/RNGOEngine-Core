@@ -82,7 +82,7 @@ namespace RNGOEngine::Resources
         return m_textureResourceManager.CreateTexture(textureHandle);
     }
 
-    void ResourceManager::DestroyTexture(
+    void ResourceManager::MarkTextureForDestruction(
         const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key)
     {
         m_textureResourceManager.MarkTextureForDeletion(key);
@@ -97,6 +97,7 @@ namespace RNGOEngine::Resources
     void ResourceManager::DestroyMarkedResources()
     {
         m_modelResourceManager.DestroyMarkedMeshes();
+        m_textureResourceManager.DestroyMarkedTextures();
     }
 
     void ResourceManager::DestroyAllResources()

@@ -22,19 +22,27 @@ namespace RNGOEngine::Resources
 
         // Creation / Destruction
     public:
-        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> CreateTexture(AssetHandling::Textures::TextureHandle textureHandle);
+        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
+            AssetHandling::Textures::TextureHandle textureHandle);
         void MarkTextureForDeletion(Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> key);
-
-        void DeleteMarkedTextures();
 
         // Accessors
     public:
-        std::optional<Core::Renderer::TextureID> GetTexture(const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
+        std::optional<Core::Renderer::TextureID> GetTexture(
+            const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
+
+        // Engine Internals
+    public:
+        void DestroyMarkedTextures();
 
     private:
         Containers::Vectors::GenerationalVector<Core::Renderer::TextureID> m_textures;
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
+
+    private:
+        Core::Renderer::TextureID UploadTexture(const AssetHandling::Textures::TextureHandle textureHandle);
+        void DestroyTexture(Core::Renderer::TextureID texture);
     };
 }
