@@ -54,6 +54,13 @@ namespace RNGOEngine::AssetHandling
         }
     }
 
+    void ShaderManager::RebuildCache()
+    {
+        for (const auto key : m_shaderPrograms.Live())
+        {
+        }
+    }
+
     std::expected<Containers::Vectors::GenerationalKey<ShaderManagerData>, ShaderManagerError>
     ShaderManager::CreateShader(
         const std::filesystem::path& path, Core::Renderer::ShaderType type)
@@ -105,7 +112,7 @@ namespace RNGOEngine::AssetHandling
         Containers::Vectors::GenerationalKey<ShaderManagerData> fragmentShaderKey)
     {
         const auto pair = std::make_pair(vertexShaderKey, fragmentShaderKey);
-        
+
         // Is already cached?
         if (const auto shaderProgram = m_shaderProgramCache.TryGet(pair); shaderProgram)
         {
@@ -175,13 +182,15 @@ namespace RNGOEngine::AssetHandling
 
         const auto shaderProgramIDOpt = m_resourceManager.
             GetShaderProgram(reference.value().get().ProgramKey);
-        if (!shaderProgramIDOpt)
+        if (shaderProgramIDOpt)
+        {
+            reference.value().get().CachedProgramID = shaderProgramIDOpt.value();
+        }
+        else
         {
             // TODO: Invalidate shaderProgram??
             RNGO_ASSERT(false && "ShaderManager::UpdateCache invalid key.");
-            return;
+            m_shaderPrograms.Remove(key);
         }
-
-        reference.value().get().CachedProgramID = shaderProgramIDOpt.value();
     }
 }

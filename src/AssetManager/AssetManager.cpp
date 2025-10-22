@@ -102,5 +102,6 @@ namespace RNGOEngine::AssetHandling
     {
         m_modelManager.RebuildCache();
         m_textureManager.RebuildCache();
+        m_shaderManager.RebuildCache();
     }
 }

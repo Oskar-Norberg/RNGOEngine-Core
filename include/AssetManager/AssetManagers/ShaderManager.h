@@ -65,6 +65,10 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::ShaderProgramID GetShaderProgram(
             Containers::Vectors::GenerationalKey<ShaderManagerProgramData> key) const;
 
+        // Engine Internal
+    public:
+        void RebuildCache();
+
     private:
         ShaderLoader m_shaderLoader;
         Resources::ResourceManager& m_resourceManager;

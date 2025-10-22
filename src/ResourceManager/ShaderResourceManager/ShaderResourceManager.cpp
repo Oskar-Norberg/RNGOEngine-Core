@@ -106,7 +106,7 @@ void RNGOEngine::Resources::ShaderResourceManager::DestroyMarkedShadersPrograms(
 {
     for (const auto key : m_shaderPrograms.Marked())
     {
-        m_renderer.DestroyShader(m_shaderPrograms.GetMarked(key));
+        m_renderer.DestroyShaderProgram(m_shaderPrograms.GetMarked(key));
         m_shaderPrograms.Remove(key);
     }
 }
