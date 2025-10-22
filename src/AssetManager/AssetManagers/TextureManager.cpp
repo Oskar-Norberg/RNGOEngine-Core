@@ -60,7 +60,7 @@ namespace RNGOEngine::AssetHandling
             .TextureKey = textureKey,
             .CachedTextureID = textureIDOpt.value(),
         };
-        const auto key = m_textures.Insert(textureIDData);
+        const auto key = m_textures.Insert(std::move(textureIDData));
 
         // Unload from RAM
         UnloadTexture(textureHandle.value());

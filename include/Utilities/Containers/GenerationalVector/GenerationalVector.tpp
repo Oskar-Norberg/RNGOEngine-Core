@@ -1,5 +1,5 @@
 ﻿template<typename T>
-template<typename U>
+template<Concepts::ConstructibleFrom<T> U>
 GenerationalKey<T> GenerationalVector<T>::Insert(U&& data)
 {
     if (!m_freeIndices.empty())
@@ -44,19 +44,16 @@ template<typename T>
 bool GenerationalVector<T>::IsValid(const GenerationalKey<T>& key) const
 {
     return key.ID < m_keys.size() && (m_keys[key.ID].Generation == key.Generation && m_keys[key.ID].Status ==
-           GenerationalKeyStatus::Unmarked);
+                                      GenerationalKeyStatus::Unmarked);
 }
 
 template<typename T>
 const T& GenerationalVector<T>::Get(const GenerationalKey<T>& key) const
 {
-    // TODO: Redundant code for const and non-const ver
-#ifndef N_DEBUG
     if (!IsValid(key))
     {
         RNGO_ASSERT(false && "Invalid Generational Key!");
     }
-#endif
 
     return m_keys[key.ID].Data;
 }
@@ -64,12 +61,10 @@ const T& GenerationalVector<T>::Get(const GenerationalKey<T>& key) const
 template<typename T>
 T& GenerationalVector<T>::Get(const GenerationalKey<T>& key)
 {
-#ifndef N_DEBUG
     if (!IsValid(key))
     {
         RNGO_ASSERT(false && "Invalid Generational Key!");
     }
-#endif
 
     return m_keys[key.ID].Data;
 }

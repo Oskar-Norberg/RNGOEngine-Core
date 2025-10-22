@@ -9,6 +9,7 @@
 #include <functional>
 #include <utility>
 
+#include "Concepts/Concepts.h"
 #include "Utilities/RNGOAsserts.h"
 #include "Utilities/Hash/PairHash.h"
 
@@ -54,7 +55,7 @@ namespace RNGOEngine::Containers::Vectors
             static_cast<size_t>(-1), static_cast<size_t>(-1)};
 
     public:
-        template<typename U>
+        template<Concepts::ConstructibleFrom<T> U>
         GenerationalKey<T> Insert(U&& data);
 
         void MarkForRemoval(const GenerationalKey<T>& key);
