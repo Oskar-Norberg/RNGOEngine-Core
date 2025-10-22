@@ -33,6 +33,7 @@ namespace RNGOEngine::Resources
 
         // Engine Internals
     public:
+        void MarkAllTextures();
         void DestroyMarkedTextures();
 
     private:

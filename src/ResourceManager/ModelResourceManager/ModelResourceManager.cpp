@@ -58,6 +58,14 @@ namespace RNGOEngine::Resources
         return m_meshes.GetUnmarkedValidated(key);
     }
 
+    void ModelResourceManager::MarkAllMeshes()
+    {
+        for (const auto meshKey : m_meshes.Live())
+        {
+            m_meshes.MarkForRemoval(meshKey);
+        }
+    }
+
     void ModelResourceManager::DestroyMarkedMeshes()
     {
         for (const auto key : m_meshes.Marked())
@@ -65,21 +73,6 @@ namespace RNGOEngine::Resources
             const auto& meshResource = m_meshes.GetMarked(key);
             DestroyMeshResource(meshResource);
             m_meshes.Remove(key);
-        }
-    }
-
-    void ModelResourceManager::DestroyAllMeshes()
-    {
-        for (const auto mesh : m_meshes.Live())
-        {
-            DestroyMeshResource(m_meshes.GetUnmarked(mesh));
-            m_meshes.Remove(mesh);
-        }
-
-        for (const auto mesh : m_meshes.Marked())
-        {
-            DestroyMeshResource(m_meshes.GetMarked(mesh));
-            m_meshes.Remove(mesh);
         }
     }
 

@@ -28,15 +28,6 @@ namespace RNGOEngine::Resources
         m_textures.MarkForRemoval(key);
     }
 
-    void TextureResourceManager::DestroyMarkedTextures()
-    {
-        for (const auto key : m_textures.Marked())
-        {
-            DestroyTexture(m_textures.GetMarked(key));
-            m_textures.Remove(key);
-        }
-    }
-
     Core::Renderer::TextureID TextureResourceManager::UploadTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
@@ -59,5 +50,22 @@ namespace RNGOEngine::Resources
         const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
     {
         return m_textures.GetUnmarkedValidated(key);
+    }
+
+    void TextureResourceManager::MarkAllTextures()
+    {
+        for (const auto& key : m_textures.Live())
+        {
+            m_textures.MarkForRemoval(key);
+        }
+    }
+
+    void TextureResourceManager::DestroyMarkedTextures()
+    {
+        for (const auto key : m_textures.Marked())
+        {
+            DestroyTexture(m_textures.GetMarked(key));
+            m_textures.Remove(key);
+        }
     }
 }

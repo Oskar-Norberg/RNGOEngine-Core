@@ -120,6 +120,16 @@ namespace RNGOEngine::Resources
 
     void ResourceManager::DestroyAllResources()
     {
-        m_modelResourceManager.DestroyAllMeshes();
+        // Meshes
+        m_modelResourceManager.MarkAllMeshes();
+        m_modelResourceManager.DestroyMarkedMeshes();
+
+        // Textures
+        m_textureResourceManager.MarkAllTextures();
+        m_textureResourceManager.DestroyMarkedTextures();
+
+        // Shader Programs
+        // TODO:
+
     }
 }

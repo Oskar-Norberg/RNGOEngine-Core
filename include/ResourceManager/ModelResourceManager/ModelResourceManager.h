@@ -51,9 +51,8 @@ namespace RNGOEngine::Resources
 
         // # Engine Internals
     public:
+        void MarkAllMeshes();
         void DestroyMarkedMeshes();
-        // TODO: Instead of having a separate DestroyAllMeshes function. Consider having a MarkAllMeshesForDestruction function and then calling DestroyMarkedMeshes.
-        void DestroyAllMeshes();
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
