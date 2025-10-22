@@ -10,7 +10,9 @@ namespace RNGOEngine::AssetHandling
 {
     ShaderManager::ShaderManager(Resources::ResourceManager& resourceManager,
                                  const AssetFileFetcher& assetFetcher)
-        : m_shaderLoader(assetFetcher), m_resourceManager(resourceManager)
+        : m_shaderLoader(assetFetcher),
+          m_resourceManager(resourceManager),
+          m_shaderProgramCache()
     {
     }
 
@@ -57,12 +59,18 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& path, Core::Renderer::ShaderType type)
     {
         // Is already cached?
-        // TODO:
-        // if (const auto shader = m_shaderCache.TryGet(path); shader.has_value())
-        // {
-        //     const auto shaderIndex = shader.value();
-        //     return shaderIndex;
-        // }
+        if (const auto shader = m_shaderCache.TryGet(path); shader.has_value())
+        {
+            if (m_shaders.IsValidUnmarked(shader.value()))
+            {
+                return shader.value();
+            }
+            else
+            {
+                // Remove invalid cache entry.
+                m_shaderCache.Remove(path);
+            }
+        }
 
         const auto shaderSource = m_shaderLoader.LoadShader(path);
         if (!shaderSource.has_value())
@@ -82,8 +90,11 @@ namespace RNGOEngine::AssetHandling
         }
 
         const auto shaderKey = m_resourceManager.CreateShader(shaderSource.value(), type);
+
         const auto shaderManagerData = ShaderManagerData{.ShaderKey = shaderKey};
         const auto key = m_shaders.Insert(shaderManagerData);
+
+        m_shaderCache.Insert(path, key);
 
         return key;
     }
@@ -93,6 +104,22 @@ namespace RNGOEngine::AssetHandling
         Containers::Vectors::GenerationalKey<ShaderManagerData> vertexShaderKey,
         Containers::Vectors::GenerationalKey<ShaderManagerData> fragmentShaderKey)
     {
+        const auto pair = std::make_pair(vertexShaderKey, fragmentShaderKey);
+        
+        // Is already cached?
+        if (const auto shaderProgram = m_shaderProgramCache.TryGet(pair); shaderProgram)
+        {
+            if (m_shaderPrograms.IsValidUnmarked(shaderProgram.value()))
+            {
+                return shaderProgram.value();
+            }
+            else
+            {
+                // Remove invalid cache entry.
+                m_shaderProgramCache.Remove(pair);
+            }
+        }
+
         const auto vertexShaderKeyOpt = m_shaders.GetUnmarkedValidated(vertexShaderKey);
         if (!vertexShaderKeyOpt)
         {
@@ -111,6 +138,7 @@ namespace RNGOEngine::AssetHandling
         const auto wrappedKey = m_shaderPrograms.Insert(ShaderManagerProgramData{key});
 
         UpdateCache(wrappedKey);
+        m_shaderProgramCache.Insert(pair, wrappedKey);
 
         return wrappedKey;
     }

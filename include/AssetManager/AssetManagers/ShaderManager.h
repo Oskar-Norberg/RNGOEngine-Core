@@ -73,6 +73,17 @@ namespace RNGOEngine::AssetHandling
         Containers::Vectors::GenerationalVector<ShaderManagerData> m_shaders;
         Containers::Vectors::GenerationalVector<ShaderManagerProgramData> m_shaderPrograms;
 
+        // Caches
+    private:
+        // Path -> Shader Key
+        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<ShaderManagerData>>
+        m_shaderCache;
+        // Vertex Shader Key, Fragment Shader Key -> Shader Program Key
+        Utilities::AssetCache<std::pair<Containers::Vectors::GenerationalKey<ShaderManagerData>,
+                                        Containers::Vectors::GenerationalKey<ShaderManagerData>>,
+                              Containers::Vectors::GenerationalKey<ShaderManagerProgramData>,
+                              Utilities::Hash::PairHash> m_shaderProgramCache;
+
     private:
         std::expected<Containers::Vectors::GenerationalKey<ShaderManagerData>, ShaderManagerError>
         CreateShader(
