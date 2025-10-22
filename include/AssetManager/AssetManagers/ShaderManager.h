@@ -27,16 +27,24 @@ namespace RNGOEngine::AssetHandling
     enum class ShaderManagerError
     {
         None,
+
         // Resources
+        ShaderNotFound,
         CompilationFailed,
         LinkingFailed,
+
         // Preprocessing
         FileNotFound,
         MalformedInclude,
         TokenNotFound,
     };
 
-    struct ShaderProgramData
+    struct ShaderManagerData
+    {
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> ShaderKey;
+    };
+
+    struct ShaderManagerProgramData
     {
         Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
         // TODO: Invalidate this on GC
@@ -49,34 +57,40 @@ namespace RNGOEngine::AssetHandling
         explicit ShaderManager(Resources::ResourceManager& resourceManager,
                                const AssetFileFetcher& assetFetcher);
 
-        std::expected<ShaderManagerID, ShaderManagerError> LoadShaderProgram(
+        std::expected<Containers::Vectors::GenerationalKey<ShaderManagerProgramData>, ShaderManagerError>
+        LoadShaderProgram(
             const std::filesystem::path& vertexShaderPath,
             const std::filesystem::path& fragmentShaderPath);
 
-        Core::Renderer::ShaderProgramID GetShaderProgram(ShaderManagerID id) const;
+        Core::Renderer::ShaderProgramID GetShaderProgram(
+            Containers::Vectors::GenerationalKey<ShaderManagerProgramData> key) const;
 
     private:
         ShaderLoader m_shaderLoader;
         Resources::ResourceManager& m_resourceManager;
 
     private:
-        std::vector<Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>> m_shaders;
-        std::vector<ShaderProgramData> m_shaderPrograms;
+        Containers::Vectors::GenerationalVector<ShaderManagerData> m_shaders;
+        Containers::Vectors::GenerationalVector<ShaderManagerProgramData> m_shaderPrograms;
 
     private:
-        // Links a file path to an index in m_shaders
-        Utilities::AssetCache<std::filesystem::path, ShaderManagerID> m_shaderCache;
-
-        // Links two indices in m_shaders to an index in m_shaderPrograms
-        Utilities::AssetCache<std::pair<ShaderManagerID, ShaderManagerID>, ShaderManagerID,
-                              Utilities::Hash::PairHash> m_shaderProgramCache;
-
-    private:
-        std::expected<ShaderManagerID, ShaderManagerError> CreateShader(
+        std::expected<Containers::Vectors::GenerationalKey<ShaderManagerData>, ShaderManagerError>
+        CreateShader(
             const std::filesystem::path& path, Core::Renderer::ShaderType type);
 
-        std::expected<ShaderManagerID, ShaderManagerError> CreateShaderProgram(
-            Core::Renderer::ShaderID vertexShader,
-            Core::Renderer::ShaderID fragmentShader);
+        std::expected<Containers::Vectors::GenerationalKey<ShaderManagerProgramData>, ShaderManagerError>
+        CreateShaderProgram(
+            Containers::Vectors::GenerationalKey<ShaderManagerData> vertexShaderKey,
+            Containers::Vectors::GenerationalKey<ShaderManagerData> fragmentShaderKey);
+
+    private:
+        std::expected<Core::Renderer::ShaderID, ShaderManagerError> GetShaderFromKey(
+            Containers::Vectors::GenerationalKey<ShaderManagerData> key) const;
+
+    private:
+        Core::Renderer::ShaderProgramID GetInvalidShaderProgramID() const;
+
+    private:
+        void UpdateCache(Containers::Vectors::GenerationalKey<ShaderManagerProgramData> key);
     };
 }

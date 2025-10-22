@@ -87,7 +87,7 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
-            const auto shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.shader);
+            const auto shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.get().shader);
 
             m_renderer.BindShaderProgram(shaderProgramID);
 
@@ -207,7 +207,7 @@ namespace RNGOEngine::Core::Renderer
                 m_renderer.SetInt("numSpotlights", static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
-            for (const auto& [name, type, data] : materialSpecification.uniforms)
+            for (const auto& [name, type, data] : materialSpecification.get().uniforms)
             {
                 switch (type)
                 {
@@ -242,7 +242,7 @@ namespace RNGOEngine::Core::Renderer
                         RNGO_ASSERT(false && "Unknown uniform type.");
                         break;
                 }
-
+            
                 const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelKey);
                 for (const auto& meshData : meshDatas)
                 {
@@ -267,19 +267,23 @@ namespace RNGOEngine::Core::Renderer
         }
 
         // Mark Textures.
-        for (auto opaque : m_drawQueue.opaqueObjects)
-        {
-            const auto& materialSpecification = m_materialManager.GetMaterial(opaque.material);
-            for (const auto& [name, type, data] : materialSpecification.uniforms)
-            {
-                if (type == AssetHandling::MaterialParameterType::Texture)
-                {
-                    m_resourceTracker.MarkTextureLastUsed(m_textureManager.GetTextureKey(data.texture.textureKey), frameCount);
-                }
-            }
-        }
+        // for (auto opaque : m_drawQueue.opaqueObjects)
+        // {
+        //     const auto& materialSpecification = m_materialManager.GetMaterial(opaque.material);
+        //     for (const auto& [name, type, data] : materialSpecification.uniforms)
+        //     {
+        //         if (type == AssetHandling::MaterialParameterType::Texture)
+        //         {
+        //             m_resourceTracker.MarkTextureLastUsed(m_textureManager.GetTextureKey(data.texture.textureKey), frameCount);
+        //         }
+        //     }
+        // }
 
         // TODO: Mark Shaders / Materials.
-        
+        // for (auto opaque : m_drawQueue.opaqueObjects)
+        // {
+        //     const auto& materialSpecification = m_materialManager.GetMaterial(opaque.material);
+        //     m_resourceTracker.MarkShaderProgramLastUsed(materialSpecification.shader, frameCount);
+        // }
     }
 }

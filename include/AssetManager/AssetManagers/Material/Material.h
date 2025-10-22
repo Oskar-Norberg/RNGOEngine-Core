@@ -6,16 +6,12 @@
 
 #include <vector>
 
+#include "AssetManager/AssetManagers/ShaderManager.h"
 #include "AssetManager/AssetManagers/TextureManager.h"
-#include "Renderer/RenderID.h"
-#include "Renderer/Uniforms.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    using MaterialID = unsigned int;
-    constexpr auto INVALID_MATERIAL_ID = std::numeric_limits<MaterialID>::max();
-    
     enum class MaterialParameterType { Bool, Int, Float, Vec2, Vec3, Vec4, Mat4, Texture };
 
     struct MaterialTextureSpecification
@@ -45,7 +41,7 @@ namespace RNGOEngine::AssetHandling
 
     struct MaterialSpecification
     {
-        Core::Renderer::ShaderProgramID shader;
+        Containers::Vectors::GenerationalKey<ShaderManagerProgramData> shader;
 
         // Consider stack allocated array with max size?
         std::vector<MaterialParameter> uniforms;

@@ -23,7 +23,6 @@ namespace RNGOEngine::AssetHandling
         AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
     }
 
-
     Containers::Vectors::GenerationalKey<ModelData> AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
@@ -53,8 +52,8 @@ namespace RNGOEngine::AssetHandling
             RNGO_ASSERT(false && "Shader program could not compile!");
         }
 
-        const auto materialID = m_materialManager.CreateMaterial(shaderProgram.value());
-        return Core::Renderer::MaterialHandle(materialID, m_materialManager);
+        const auto materialKey = m_materialManager.CreateMaterial(shaderProgram.value());
+        return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
 
     Containers::Vectors::GenerationalKey<TextureManagerData> AssetManager::LoadTexture(
@@ -77,8 +76,7 @@ namespace RNGOEngine::AssetHandling
         return textureID.value();
     }
 
-    void AssetManager::AddAssetPath(
-        const std::filesystem::path& path, const AssetPathType type)
+    void AssetManager::AddAssetPath(const std::filesystem::path& path, const AssetPathType type)
     {
         switch (type)
         {

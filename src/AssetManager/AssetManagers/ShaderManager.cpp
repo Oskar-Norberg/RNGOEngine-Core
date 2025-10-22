@@ -14,22 +14,23 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<Core::Renderer::ShaderProgramID, ShaderManagerError> ShaderManager::LoadShaderProgram(
-        const std::filesystem::path& vertexShaderPath, const std::filesystem::path& fragmentShaderPath)
+    std::expected<Containers::Vectors::GenerationalKey<ShaderManagerProgramData>, ShaderManagerError>
+    ShaderManager::LoadShaderProgram(const std::filesystem::path& vertexShaderPath,
+                                     const std::filesystem::path& fragmentShaderPath)
     {
-        const auto vertexShader = CreateShader(vertexShaderPath, Core::Renderer::ShaderType::Vertex);
-        if (!vertexShader.has_value())
+        const auto vertexShaderKey = CreateShader(vertexShaderPath, Core::Renderer::ShaderType::Vertex);
+        if (!vertexShaderKey)
         {
-            return std::unexpected(vertexShader.error());
+            return std::unexpected(vertexShaderKey.error());
         }
 
-        const auto fragmentShader = CreateShader(fragmentShaderPath, Core::Renderer::ShaderType::Fragment);
-        if (!fragmentShader.has_value())
+        const auto fragmentShaderKey = CreateShader(fragmentShaderPath, Core::Renderer::ShaderType::Fragment);
+        if (!fragmentShaderKey)
         {
-            return std::unexpected(fragmentShader.error());
+            return std::unexpected(fragmentShaderKey.error());
         }
 
-        const auto shaderProgram = CreateShaderProgram(vertexShader.value(), fragmentShader.value());
+        const auto shaderProgram = CreateShaderProgram(vertexShaderKey.value(), fragmentShaderKey.value());
         if (!shaderProgram.has_value())
         {
             return std::unexpected(shaderProgram.error());
@@ -38,20 +39,30 @@ namespace RNGOEngine::AssetHandling
         return shaderProgram.value();
     }
 
-    Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(const ShaderManagerID id) const
+    Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(
+        Containers::Vectors::GenerationalKey<ShaderManagerProgramData> key) const
     {
-        return m_shaderPrograms.at(id).CachedProgramID;
+        if (const auto shaderKey = m_shaderPrograms.GetUnmarkedValidated(key); shaderKey)
+        {
+            return shaderKey.value().get().CachedProgramID;
+        }
+        else
+        {
+            return GetInvalidShaderProgramID();
+        }
     }
 
-    std::expected<Core::Renderer::ShaderID, ShaderManagerError> ShaderManager::CreateShader(
+    std::expected<Containers::Vectors::GenerationalKey<ShaderManagerData>, ShaderManagerError>
+    ShaderManager::CreateShader(
         const std::filesystem::path& path, Core::Renderer::ShaderType type)
     {
         // Is already cached?
-        if (const auto shader = m_shaderCache.TryGet(path); shader.has_value())
-        {
-            const auto shaderIndex = shader.value();
-            return shaderIndex;
-        }
+        // TODO:
+        // if (const auto shader = m_shaderCache.TryGet(path); shader.has_value())
+        // {
+        //     const auto shaderIndex = shader.value();
+        //     return shaderIndex;
+        // }
 
         const auto shaderSource = m_shaderLoader.LoadShader(path);
         if (!shaderSource.has_value())
@@ -71,37 +82,78 @@ namespace RNGOEngine::AssetHandling
         }
 
         const auto shaderKey = m_resourceManager.CreateShader(shaderSource.value(), type);
+        const auto shaderManagerData = ShaderManagerData{.ShaderKey = shaderKey};
+        const auto key = m_shaders.Insert(shaderManagerData);
 
-        const auto index = m_shaders.size();
-        m_shaders.emplace_back(shaderKey);
-        m_shaderCache.Insert(path, index);
-
-        return index;
+        return key;
     }
 
-    std::expected<Core::Renderer::ShaderProgramID, ShaderManagerError> ShaderManager::CreateShaderProgram(
-        const Core::Renderer::ShaderID vertexShader, const Core::Renderer::ShaderID fragmentShader)
+    std::expected<Containers::Vectors::GenerationalKey<ShaderManagerProgramData>, ShaderManagerError>
+    ShaderManager::CreateShaderProgram(
+        Containers::Vectors::GenerationalKey<ShaderManagerData> vertexShaderKey,
+        Containers::Vectors::GenerationalKey<ShaderManagerData> fragmentShaderKey)
     {
-        // Is already cached?
-        const auto shaderPair = std::make_pair(vertexShader, fragmentShader);
-        if (const auto shaderProgramIndex = m_shaderProgramCache.TryGet(shaderPair);
-            shaderProgramIndex.has_value())
+        const auto vertexShaderKeyOpt = m_shaders.GetUnmarkedValidated(vertexShaderKey);
+        if (!vertexShaderKeyOpt)
         {
-            return shaderProgramIndex.value();
+            return std::unexpected(ShaderManagerError::ShaderNotFound);
+        }
+        const auto vertexShader = vertexShaderKeyOpt.value().get().ShaderKey;
+
+        const auto fragmentShaderKeyOpt = m_shaders.GetUnmarkedValidated(fragmentShaderKey);
+        if (!fragmentShaderKeyOpt)
+        {
+            return std::unexpected(ShaderManagerError::ShaderNotFound);
+        }
+        const auto fragmentShader = fragmentShaderKeyOpt.value().get().ShaderKey;
+
+        const auto key = m_resourceManager.CreateShaderProgram(vertexShader, fragmentShader);
+        const auto wrappedKey = m_shaderPrograms.Insert(ShaderManagerProgramData{key});
+
+        UpdateCache(wrappedKey);
+
+        return wrappedKey;
+    }
+
+    std::expected<Core::Renderer::ShaderID, ShaderManagerError> ShaderManager::GetShaderFromKey(
+        Containers::Vectors::GenerationalKey<ShaderManagerData> key) const
+    {
+        if (const auto shaderKey = m_shaders.GetUnmarkedValidated(key); shaderKey)
+        {
+            const auto shaderID = m_resourceManager.GetShader(shaderKey.value().get().ShaderKey);
+            if (shaderID)
+            {
+                return shaderID.value();
+            }
         }
 
-        const auto shaderProgramKey = m_resourceManager.CreateShaderProgram(m_shaders[vertexShader], m_shaders[fragmentShader]);
-        const auto shaderProgramID = m_resourceManager.GetShaderProgram(shaderProgramKey);
-        
-        if (!shaderProgramID.has_value())
+        return std::unexpected(ShaderManagerError::ShaderNotFound);
+    }
+
+    Core::Renderer::ShaderProgramID ShaderManager::GetInvalidShaderProgramID() const
+    {
+        // TODO: Return actual invalid shader.
+        return Core::Renderer::INVALID_SHADER_PROGRAM_ID;
+    }
+
+    void ShaderManager::UpdateCache(Containers::Vectors::GenerationalKey<ShaderManagerProgramData> key)
+    {
+        const auto reference = m_shaderPrograms.GetUnmarkedValidated(key);
+        if (!reference)
         {
-            return std::unexpected(ShaderManagerError::LinkingFailed);
+            RNGO_ASSERT(false && "ShaderManager::UpdateCache invalid key.");
+            return;
         }
 
-        const auto index = m_shaderPrograms.size();
-        m_shaderPrograms.emplace_back(shaderProgramKey, shaderProgramID.value());
-        m_shaderProgramCache.Insert(shaderPair, index);
+        const auto shaderProgramIDOpt = m_resourceManager.
+            GetShaderProgram(reference.value().get().ProgramKey);
+        if (!shaderProgramIDOpt)
+        {
+            // TODO: Invalidate shaderProgram??
+            RNGO_ASSERT(false && "ShaderManager::UpdateCache invalid key.");
+            return;
+        }
 
-        return index;
+        reference.value().get().CachedProgramID = shaderProgramIDOpt.value();
     }
 }

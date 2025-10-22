@@ -6,119 +6,168 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    MaterialID MaterialManager::CreateMaterial(Core::Renderer::ShaderProgramID id)
+    Containers::Vectors::GenerationalKey<MaterialSpecification> MaterialManager::CreateMaterial(
+        Containers::Vectors::GenerationalKey<ShaderManagerProgramData> id)
     {
-        m_materials.emplace_back(id);
-        return static_cast<MaterialID>(m_materials.size() - 1);
+        const auto key = m_materials.Insert(MaterialSpecification{.shader = id, .uniforms = {}});
+        return key;
     }
 
-    std::optional<std::reference_wrapper<MaterialSpecification>>
-    MaterialManager::TryGetMaterial(
-        const MaterialID id)
+    std::reference_wrapper<MaterialSpecification> MaterialManager::GetMaterial(
+        const Containers::Vectors::GenerationalKey<MaterialSpecification>& id)
     {
-        if (m_materials.size() <= id)
+        return std::ref(
+            const_cast<MaterialSpecification&>(
+                static_cast<const MaterialManager*>(this)->GetMaterial(id).get()));
+    }
+
+    std::reference_wrapper<const MaterialSpecification> MaterialManager::GetMaterial(
+        const Containers::Vectors::GenerationalKey<MaterialSpecification>& id) const
+    {
+        if (const auto materialOpt = m_materials.GetUnmarkedValidated(id); materialOpt)
         {
-            return std::nullopt;
+            return materialOpt.value().get();
         }
 
-        return std::ref(m_materials[id]);
+        RNGO_ASSERT(false && "MaterialManager::GetMaterial invalid key.");
+        // TODO: Return default material.
     }
 
-    // TODO: Should this maybe not be optional?
-    std::optional<std::reference_wrapper<const MaterialSpecification>> MaterialManager::
-    TryGetMaterial(MaterialID id) const
-    {
-        if (m_materials.size() <= id)
-        {
-            return std::nullopt;
-        }
-
-        return std::cref(m_materials[id]);
-    }
-
-    const MaterialSpecification& MaterialManager::GetMaterial(
-        const MaterialID id) const
-    {
-        return m_materials[id];
-    }
-
-    void MaterialManager::SetTexture(MaterialID id,
-                                     Containers::Vectors::GenerationalKey<TextureManagerData> texture,
+    void MaterialManager::SetTexture(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                     Containers::Vectors::GenerationalKey<TextureManagerData> textureKey,
                                      int slot)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             "Texture" + std::to_string(slot),
             MaterialParameterType::Texture,
             MaterialParameterData{
                 .texture = MaterialTextureSpecification{
-                    .textureKey = texture,
+                    .textureKey = textureKey,
                     .slot = slot
                 }
-            }
-        );
+            });
     }
 
-    void MaterialManager::SetBool(MaterialID id, std::string_view name, bool value)
+    void MaterialManager::SetBool(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                  std::string_view name, bool value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Bool,
             MaterialParameterData{.b = value}
         );
     }
 
-    void MaterialManager::SetInt(MaterialID id, std::string_view name, int value)
+    void MaterialManager::SetInt(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                 std::string_view name, int value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Int,
             MaterialParameterData{.i = value}
         );
     }
 
-    void MaterialManager::SetFloat(MaterialID id, std::string_view name, float value)
+    void MaterialManager::SetFloat(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                   std::string_view name, float value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Float,
             MaterialParameterData{.f = value}
         );
     }
 
-    void MaterialManager::SetVec2(MaterialID id, std::string_view name,
-                                  const glm::vec2& value)
+    void MaterialManager::SetVec2(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                  std::string_view name, const glm::vec2& value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Vec2,
             MaterialParameterData{.v2 = value}
         );
     }
 
-    void MaterialManager::SetVec3(MaterialID id, std::string_view name,
-                                  const glm::vec3& value)
+    void MaterialManager::SetVec3(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                  std::string_view name, const glm::vec3& value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Vec3,
             MaterialParameterData{.v3 = value}
         );
     }
 
-    void MaterialManager::SetVec4(MaterialID id, std::string_view name,
-                                  const glm::vec4& value)
+    void MaterialManager::SetVec4(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                  std::string_view name, const glm::vec4& value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Vec4,
             MaterialParameterData{.v4 = value}
         );
     }
 
-    void MaterialManager::SetMat4(MaterialID id, std::string_view name,
-                                  const glm::mat4& value)
+    void MaterialManager::SetMat4(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
+                                  std::string_view name, const glm::mat4& value)
     {
-        m_materials[id].uniforms.emplace_back(
+        const auto validated = m_materials.GetUnmarkedValidated(key);
+        if (!validated)
+        {
+            RNGO_ASSERT(false && "MaterialManager::SetTexture invalid key.");
+            return;
+        }
+
+        validated.value().get().uniforms.emplace_back(
             name.data(),
             MaterialParameterType::Mat4,
             MaterialParameterData{.m4 = value}

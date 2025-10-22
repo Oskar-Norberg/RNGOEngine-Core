@@ -21,13 +21,13 @@ namespace RNGOEngine::Core::Renderer
     {
         Components::Transform transform;
         Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelKey;
-        AssetHandling::MaterialID material;
+        Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> material;
     };
 
     struct CameraData
     {
         Components::Transform transform;
-        
+
         float fov;
         float nearPlane;
         float farPlane;
