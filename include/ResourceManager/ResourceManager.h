@@ -39,8 +39,8 @@ namespace RNGOEngine::Resources
     public:
         Containers::Vectors::GenerationalKey<MeshResource> CreateMesh(
             const Data::Rendering::MeshData& meshData);
-        void DestroyMesh(const Containers::Vectors::GenerationalKey<MeshResource>& mesh);
-        void DestroyMeshes(const ResourceCollection<MeshResource>& meshes);
+        void MarkMeshForDestruction(const Containers::Vectors::GenerationalKey<MeshResource>& mesh);
+        void MarkMeshesForDestruction(const ResourceCollection<MeshResource>& meshes);
 
         std::optional<std::reference_wrapper<const MeshResource>> GetMeshResource(
             const Containers::Vectors::GenerationalKey<MeshResource>& key) const;
@@ -70,6 +70,7 @@ namespace RNGOEngine::Resources
 
         // # Clean Up
     public:
+        void DestroyMarkedResources();
         void DestroyAllResources();
 
     private:

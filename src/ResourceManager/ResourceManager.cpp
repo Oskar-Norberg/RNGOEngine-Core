@@ -21,16 +21,16 @@ namespace RNGOEngine::Resources
         return m_modelResourceManager.CreateMesh(meshData);
     }
 
-    void ResourceManager::DestroyMesh(const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
+    void ResourceManager::MarkMeshForDestruction(const Containers::Vectors::GenerationalKey<MeshResource>& mesh)
     {
         m_modelResourceManager.MarkMeshForDestruction(mesh);
     }
 
-    void ResourceManager::DestroyMeshes(const ResourceCollection<MeshResource>& meshes)
+    void ResourceManager::MarkMeshesForDestruction(const ResourceCollection<MeshResource>& meshes)
     {
         for (const auto& mesh : meshes.Resources)
         {
-            DestroyMesh(mesh);
+            MarkMeshForDestruction(mesh);
         }
     }
 
@@ -92,6 +92,11 @@ namespace RNGOEngine::Resources
         const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
     {
         return m_textureResourceManager.GetTexture(key);
+    }
+
+    void ResourceManager::DestroyMarkedResources()
+    {
+        m_modelResourceManager.DestroyMarkedMeshes();
     }
 
     void ResourceManager::DestroyAllResources()

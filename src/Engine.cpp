@@ -202,11 +202,13 @@ namespace RNGOEngine::Core
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("Engine::CheckUnusedResources");
         // TODO: Check only every RESOURCE_CHECK_INTERVAL frames.
-        const auto unusedResources = m_resourceTracker.GetUnusedResources(m_frameCount, RESOURCE_UNUSED_THRESHOLD);
+        const auto unusedResources = m_resourceTracker.GetUnusedResources(
+            m_frameCount, RESOURCE_UNUSED_THRESHOLD);
 
         if (!unusedResources.IsEmpty())
         {
-            m_resourceManager->DestroyMeshes(unusedResources.meshes);
+            m_resourceManager->MarkMeshesForDestruction(unusedResources.meshes);
+            m_resourceManager->DestroyMarkedResources();
 
             // TODO: Could be optimized by passing the ResourceCollection and letting the AssetManager only rebuild affected caches.
             m_assetManager->RebuildResourceCaches();

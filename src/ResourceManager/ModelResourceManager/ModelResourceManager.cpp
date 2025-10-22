@@ -46,7 +46,8 @@ namespace RNGOEngine::Resources
         return handle;
     }
 
-    void ModelResourceManager::MarkMeshForDestruction(const Containers::Vectors::GenerationalKey<MeshResource>& meshKey)
+    void ModelResourceManager::MarkMeshForDestruction(
+        const Containers::Vectors::GenerationalKey<MeshResource>& meshKey)
     {
         m_meshes.MarkForRemoval(meshKey);
     }
@@ -61,7 +62,9 @@ namespace RNGOEngine::Resources
     {
         for (const auto key : m_meshes.Marked())
         {
-            // m_meshes.GetValidated()
+            const auto& meshResource = m_meshes.GetMarked(key);
+            DestroyMeshResource(meshResource);
+            m_meshes.Remove(key);
         }
     }
 
