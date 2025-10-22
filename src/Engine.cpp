@@ -207,7 +207,7 @@ namespace RNGOEngine::Core
 
         if (!unusedResources.IsEmpty())
         {
-            m_resourceManager->MarkMeshesForDestruction(unusedResources.meshes);
+            m_resourceManager->MarkForDestruction(unusedResources);
             m_resourceManager->DestroyMarkedResources();
 
             // TODO: Could be optimized by passing the ResourceCollection and letting the AssetManager only rebuild affected caches.

@@ -51,7 +51,7 @@ namespace RNGOEngine::AssetHandling
             MaterialParameterType::Texture,
             MaterialParameterData{
                 .texture = MaterialTextureSpecification{
-                    .texture = texture,
+                    .textureKey = texture,
                     .slot = slot
                 }
             }

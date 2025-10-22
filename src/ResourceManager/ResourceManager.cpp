@@ -94,6 +94,24 @@ namespace RNGOEngine::Resources
         return m_textureResourceManager.GetTexture(key);
     }
 
+    void ResourceManager::MarkForDestruction(const TrackedCollection& resources)
+    {
+        for (const auto meshKey : resources.meshes.Resources)
+        {
+            m_modelResourceManager.MarkMeshForDestruction(meshKey);
+        }
+
+        for (const auto textureKey : resources.textures.Resources)
+        {
+            m_textureResourceManager.MarkTextureForDeletion(textureKey);
+        }
+
+        // for (const auto shaderProgramKey : resources.shaderPrograms.Resources)
+        // {
+        //     m_shaderResourceManager.MarkShaderProgramForDestruction(shaderProgramKey);
+        // }
+    }
+
     void ResourceManager::DestroyMarkedResources()
     {
         m_modelResourceManager.DestroyMarkedMeshes();

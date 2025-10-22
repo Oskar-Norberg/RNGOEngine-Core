@@ -20,7 +20,7 @@ namespace RNGOEngine::AssetHandling
 
     struct MaterialTextureSpecification
     {
-        Containers::Vectors::GenerationalKey<TextureManagerData> texture;
+        Containers::Vectors::GenerationalKey<TextureManagerData> textureKey;
         int slot;
     };
 

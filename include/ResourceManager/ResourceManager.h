@@ -9,6 +9,7 @@
 #include <functional>
 
 #include "ResourceCollection.h"
+#include "ResourceTracker.h"
 #include "Data/MeshData.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
@@ -73,6 +74,9 @@ namespace RNGOEngine::Resources
 
         std::optional<Core::Renderer::TextureID> GetTexture(
             const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const;
+
+        // Mark for Destruction
+        void MarkForDestruction(const TrackedCollection& resources);
 
         // # Clean Up
     public:

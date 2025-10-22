@@ -31,7 +31,6 @@ namespace RNGOEngine::AssetHandling
     struct TextureManagerData
     {
         Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureKey;
-        // TODO: Invalidate this on GC
         Core::Renderer::TextureID CachedTextureID;
     };
 
@@ -49,6 +48,12 @@ namespace RNGOEngine::AssetHandling
     public:
         Containers::Vectors::GenerationalKey<TextureManagerData> GetInvalidTexture() const;
 
+        // Engine Internals
+    public:
+        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> GetTextureKey(
+            const Containers::Vectors::GenerationalKey<TextureManagerData>& key) const;
+        void RebuildCache();
+
     private:
         Containers::Vectors::GenerationalVector<TextureManagerData> m_textures;
         Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<TextureManagerData>> m_textureCache;
@@ -56,6 +61,10 @@ namespace RNGOEngine::AssetHandling
     private:
         Resources::ResourceManager& m_resourceManager;
 
+        
+    private:
+        void UpdateTextureCache(const Containers::Vectors::GenerationalKey<TextureManagerData>& key);
+        
         // Load/Unload to RAM
     private:
         std::expected<Textures::TextureHandle, TextureManagerError> LoadTexture(

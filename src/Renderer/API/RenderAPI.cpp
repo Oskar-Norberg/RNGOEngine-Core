@@ -234,7 +234,7 @@ namespace RNGOEngine::Core::Renderer
                         break;
                     case AssetHandling::MaterialParameterType::Texture:
                     {
-                        const auto textureHandle = m_textureManager.GetTexture(data.texture.texture);
+                        const auto textureHandle = m_textureManager.GetTexture(data.texture.textureKey);
                         m_renderer.SetTexture(name, textureHandle, data.texture.slot);
                     }
                     break;
@@ -266,6 +266,20 @@ namespace RNGOEngine::Core::Renderer
             }
         }
 
-        // TODO: Mark shaders and textures.
+        // Mark Textures.
+        for (auto opaque : m_drawQueue.opaqueObjects)
+        {
+            const auto& materialSpecification = m_materialManager.GetMaterial(opaque.material);
+            for (const auto& [name, type, data] : materialSpecification.uniforms)
+            {
+                if (type == AssetHandling::MaterialParameterType::Texture)
+                {
+                    m_resourceTracker.MarkTextureLastUsed(m_textureManager.GetTextureKey(data.texture.textureKey), frameCount);
+                }
+            }
+        }
+
+        // TODO: Mark Shaders / Materials.
+        
     }
 }

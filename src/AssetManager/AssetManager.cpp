@@ -103,5 +103,6 @@ namespace RNGOEngine::AssetHandling
     void AssetManager::RebuildResourceCaches()
     {
         m_modelManager.RebuildCache();
+        m_textureManager.RebuildCache();
     }
 }
