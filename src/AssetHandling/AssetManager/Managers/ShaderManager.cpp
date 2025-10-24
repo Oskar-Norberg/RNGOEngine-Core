@@ -2,14 +2,14 @@
 // Created by Oskar.Norberg on 2025-09-11.
 //
 
-#include "AssetManager/AssetManagers/ShaderManager.h"
+#include "AssetHandling/AssetManager/Managers/ShaderManager.h"
 
 #include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
 {
     ShaderManager::ShaderManager(Resources::ResourceManager& resourceManager,
-                                 const AssetFileFetcher& assetFetcher)
+                                 const AssetFetcher& assetFetcher)
         : m_shaderLoader(assetFetcher),
           m_resourceManager(resourceManager),
           m_shaderProgramCache()

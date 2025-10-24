@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-09-08.
 //
 
-#include "AssetManager/AssetLoaders/ModelLoader.h"
+#include "AssetHandling/AssetLoaders/ModelLoader.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>

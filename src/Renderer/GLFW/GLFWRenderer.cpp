@@ -9,8 +9,6 @@
 
 #include <format>
 
-#include "AssetManager/AssetManagers/MaterialManager.h"
-#include "AssetManager/AssetManagers/TextureManager.h"
 #include "Data/MeshData.h"
 #include "Utilities/RNGOAsserts.h"
 

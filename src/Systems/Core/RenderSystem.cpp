@@ -4,7 +4,7 @@
 
 #include "Systems/Core/RenderSystem.h"
 
-#include "AssetManager/AssetManager.h"
+#include "../../../include/AssetHandling/AssetManager/AssetManager.h"
 #include "Systems/SystemContext.h"
 #include "World/World.h"
 

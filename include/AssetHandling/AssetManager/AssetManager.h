@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include "AssetManager/AssetManagers/ModelManager.h"
-#include "AssetManagers/MaterialManager.h"
-#include "AssetManagers/ShaderManager.h"
-#include "AssetManagers/TextureManager.h"
+#include "AssetHandling/AssetFetcher/AssetFetcher.h"
+#include "AssetHandling/AssetManager/Managers/ModelManager.h"
+#include "AssetHandling/AssetManager/Managers/MaterialManager.h"
+#include "AssetHandling/AssetManager/Managers/ShaderManager.h"
+#include "AssetHandling/AssetManager/Managers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
 
 namespace RNGOEngine
@@ -65,7 +66,7 @@ namespace RNGOEngine::AssetHandling
         void RebuildResourceCaches();
 
     private:
-        AssetFileFetcher m_assetFileFetcher;
+        AssetFetcher m_assetFileFetcher;
         
         ShaderManager m_shaderManager;
         ModelManager m_modelManager;

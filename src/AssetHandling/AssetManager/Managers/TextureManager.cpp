@@ -2,9 +2,9 @@
 // Created by Oskar.Norberg on 2025-09-10.
 //
 
-#include "AssetManager/AssetManagers/TextureManager.h"
+#include "AssetHandling/AssetManager/Managers/TextureManager.h"
 
-#include "AssetManager/AssetLoaders/TextureLoader.h"
+#include "AssetHandling/AssetLoaders/TextureLoader.h"
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
 

@@ -7,7 +7,7 @@
 #include <string_view>
 #include <glm/glm.hpp>
 
-#include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetHandling/AssetManager/Managers/MaterialManager.h"
 
 namespace RNGOEngine::Core::Renderer
 {

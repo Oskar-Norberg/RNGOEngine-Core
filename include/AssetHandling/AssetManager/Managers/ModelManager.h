@@ -8,7 +8,7 @@
 #include <limits>
 #include <vector>
 
-#include "AssetManager/AssetLoaders/ModelLoader.h"
+#include "AssetHandling/AssetLoaders/ModelLoader.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/AssetCache/AssetCache.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"

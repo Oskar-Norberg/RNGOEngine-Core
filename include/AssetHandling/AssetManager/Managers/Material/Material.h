@@ -6,8 +6,8 @@
 
 #include <vector>
 
-#include "AssetManager/AssetManagers/ShaderManager.h"
-#include "AssetManager/AssetManagers/TextureManager.h"
+#include "AssetHandling/AssetManager/Managers/ShaderManager.h"
+#include "AssetHandling/AssetManager/Managers/TextureManager.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::AssetHandling

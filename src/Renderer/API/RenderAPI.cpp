@@ -6,9 +6,9 @@
 
 #include "Renderer/API/RenderAPI.h"
 
-#include "AssetManager/AssetManagers/MaterialManager.h"
-#include "AssetManager/AssetManagers/ShaderManager.h"
-#include "AssetManager/AssetManagers/TextureManager.h"
+#include "AssetHandling/AssetManager/Managers/MaterialManager.h"
+#include "AssetHandling/AssetManager/Managers/ShaderManager.h"
+#include "AssetHandling/AssetManager/Managers/TextureManager.h"
 #include "EventQueue/EventQueue.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Renderer/IRenderer.h"

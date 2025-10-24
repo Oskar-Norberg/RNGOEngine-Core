@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "AssetManager/AssetFileFetcher.h"
+#include "../AssetFetcher/AssetFetcher.h"
 #include "Renderer/IRenderer.h"
 #include "Shader/ShaderPreprocessor.h"
 
@@ -13,7 +13,7 @@ namespace RNGOEngine::AssetHandling
     class ShaderLoader
     {
     public:
-        explicit ShaderLoader(const AssetFileFetcher& assetFetcher)
+        explicit ShaderLoader(const AssetFetcher& assetFetcher)
             : shaderPreprocessor(assetFetcher)
         {
         }

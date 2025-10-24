@@ -6,7 +6,7 @@
 
 #include <memory>
 
-#include "AssetManager/AssetManager.h"
+#include "AssetHandling/AssetManager/AssetManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"

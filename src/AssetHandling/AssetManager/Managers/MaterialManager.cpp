@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-09-10.
 //
 
-#include "AssetManager/AssetManagers/MaterialManager.h"
+#include "AssetHandling/AssetManager/Managers/MaterialManager.h"
 
 namespace RNGOEngine::AssetHandling
 {

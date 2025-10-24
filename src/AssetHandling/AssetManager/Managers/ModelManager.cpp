@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-09-08.
 //
 
-#include "AssetManager/AssetManagers/ModelManager.h"
+#include "AssetHandling/AssetManager/Managers/ModelManager.h"
 
 #include <unordered_set>
 

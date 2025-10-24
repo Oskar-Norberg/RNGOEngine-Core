@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-08-27.
 //
 
-#include "AssetManager/AssetManager.h"
+#include "../../../include/AssetHandling/AssetManager/AssetManager.h"
 
 #include "Renderer/IRenderer.h"
 #include "Utilities/RNGOAsserts.h"

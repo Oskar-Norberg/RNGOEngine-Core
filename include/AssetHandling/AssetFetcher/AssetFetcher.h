@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class AssetFileFetcher
+    class AssetFetcher
     {
     public:
         void AddAssetPath(const std::filesystem::path& path)

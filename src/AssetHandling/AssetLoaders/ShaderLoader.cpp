@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-09-03.
 //
 
-#include "AssetManager/AssetLoaders/ShaderLoader.h"
+#include "AssetHandling/AssetLoaders/ShaderLoader.h"
 
 namespace RNGOEngine::AssetHandling
 {

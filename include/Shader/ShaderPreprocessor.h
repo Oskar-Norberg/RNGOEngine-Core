@@ -11,7 +11,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "AssetManager/AssetFileFetcher.h"
+#include "AssetHandling/AssetFetcher/AssetFetcher.h"
 
 namespace RNGOEngine::Shaders
 {
@@ -28,7 +28,7 @@ namespace RNGOEngine::Shaders
     class ShaderPreProcessor
     {
     public:
-        explicit ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher);
+        explicit ShaderPreProcessor(const AssetHandling::AssetFetcher& assetFetcher);
         std::expected<std::string, ShaderPreProcessingError> Parse(const std::filesystem::path& source) const;
 
         void AddDefinition(std::string_view name, std::string_view value);
@@ -50,6 +50,6 @@ namespace RNGOEngine::Shaders
 
         std::vector<std::filesystem::path> m_includeDirectories;
 
-        const AssetHandling::AssetFileFetcher& m_assetFetcher;
+        const AssetHandling::AssetFetcher& m_assetFetcher;
     };
 }

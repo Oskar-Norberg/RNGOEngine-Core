@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-09-03.
 //
 
-#include "AssetManager/AssetLoaders/TextureLoader.h"
+#include "AssetHandling/AssetLoaders/TextureLoader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

@@ -10,8 +10,8 @@
 #include <glm/ext/matrix_transform.hpp>
 #include "glm/gtx/quaternion.hpp"
 
-#include "AssetManager/AssetManagers/ModelManager.h"
-#include "AssetManager/AssetManagers/Material/Material.h"
+#include "AssetHandling/AssetManager/Managers/ModelManager.h"
+#include "AssetHandling/AssetManager/Managers/Material/Material.h"
 
 namespace RNGOEngine::Components
 {

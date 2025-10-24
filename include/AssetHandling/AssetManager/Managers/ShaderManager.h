@@ -6,7 +6,7 @@
 
 #include <expected>
 
-#include "AssetManager/AssetLoaders/ShaderLoader.h"
+#include "AssetHandling/AssetLoaders/ShaderLoader.h"
 #include "Renderer/RenderID.h"
 #include "Utilities/AssetCache/AssetCache.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
@@ -55,7 +55,7 @@ namespace RNGOEngine::AssetHandling
     {
     public:
         explicit ShaderManager(Resources::ResourceManager& resourceManager,
-                               const AssetFileFetcher& assetFetcher);
+                               const AssetFetcher& assetFetcher);
 
         std::expected<Containers::Vectors::GenerationalKey<ShaderManagerProgramData>, ShaderManagerError>
         LoadShaderProgram(
