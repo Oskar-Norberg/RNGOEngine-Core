@@ -5,13 +5,17 @@
 #pragma once
 
 #include <filesystem>
-#include <limits>
 #include <vector>
 
+#include "AssetHandling/AssetDatabase/AssetDatabase.h"
 #include "AssetHandling/AssetLoaders/ModelLoader.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Utilities/AssetCache/AssetCache.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
+
+namespace RNGOEngine::AssetHandling
+{
+    class AssetDatabase;
+}
 
 namespace RNGOEngine
 {
@@ -24,10 +28,9 @@ namespace RNGOEngine
 // Move to a Manager namespace?
 namespace RNGOEngine::AssetHandling
 {
-    struct ModelData
+    struct RuntimeModelData
     {
         std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
-        std::vector<Resources::MeshResource> CachedMeshes;
     };
 
     enum class ModelCreationError
@@ -42,39 +45,26 @@ namespace RNGOEngine::AssetHandling
     class ModelManager
     {
     public:
-        explicit ModelManager(Resources::ResourceManager& resourceManager, bool flipUVs = false);
+        explicit ModelManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager,
+                              bool flipUVs = false);
 
-        std::expected<Containers::Vectors::GenerationalKey<ModelData>, ModelCreationError> CreateModel(
-            const std::filesystem::path& path);
-        std::span<const Resources::MeshResource> GetModel(
-            const Containers::Vectors::GenerationalKey<ModelData>& key) const;
+        std::expected<AssetHandle, ModelCreationError> CreateModel(const std::filesystem::path& path);
 
     public:
-        Containers::Vectors::GenerationalKey<ModelData> GetInvalidModel() const;
+        AssetHandle GetInvalidModel() const;
 
         // Only really relevant for the RenderAPI/ResourceTracker, use friends?
     public:
-        std::span<const Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>>
-        GetAllMeshKeys(
-            const Containers::Vectors::GenerationalKey<ModelData>& key) const;
-
-        // Engine Internal
-    public:
-        void RebuildCache();
+        // TODO: Make this return an optional or expected?
+        const RuntimeModelData& GetRuntimeModelData(AssetHandle handle) const;
 
     private:
         bool m_doFlipUVs;
-        Containers::Vectors::GenerationalVector<ModelData> m_models;
+        std::unordered_map<AssetHandle, RuntimeModelData> m_models;
 
     private:
-        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<ModelData>>
-        m_modelCache;
-
-    private:
+        AssetDatabase& m_assetDatabase;
         Resources::ResourceManager& m_resourceManager;
-
-    private:
-        void UpdateModelCache(const Containers::Vectors::GenerationalKey<ModelData>& key);
 
         // Model Loading
     private:
@@ -84,6 +74,6 @@ namespace RNGOEngine::AssetHandling
 
         // GPU Interfacing
     private:
-        ModelData UploadModel(ModelLoading::ModelHandle modelHandle);
+        RuntimeModelData UploadModel(ModelLoading::ModelHandle modelHandle);
     };
 }

@@ -43,7 +43,7 @@ namespace RNGOEngine::Systems::Core
                                        ? world.GetRegistry().get<Components::Transform>(entity)
                                        : Components::Transform();
 
-            drawQueue.opaqueObjects.emplace_back(transform, meshRender.modelID, meshRender.materialID);
+            drawQueue.opaqueObjects.emplace_back(transform, meshRender.modelHandle, meshRender.materialID);
         }
     }
 

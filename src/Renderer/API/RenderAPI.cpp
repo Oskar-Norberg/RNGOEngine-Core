@@ -20,15 +20,15 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    RenderAPI::RenderAPI(IRenderer& renderer,
-                         Resources::ResourceTracker& resourceTracker,
+    RenderAPI::RenderAPI(IRenderer& renderer, Resources::ResourceTracker& resourceTracker,
+                         const Resources::ResourceManager& resourceManager,
                          const AssetHandling::ModelManager& modelManager,
                          const AssetHandling::ShaderManager& shaderManager,
                          const AssetHandling::MaterialManager& materialManager,
-                         const AssetHandling::TextureManager& textureManager,
-                         const int width, const int height)
+                         const AssetHandling::TextureManager& textureManager, int width, int height)
         : m_renderer(renderer),
           m_drawQueue(),
+          m_resourceManager(resourceManager),
           m_resourceTracker(resourceTracker),
           m_modelManager(modelManager),
           m_shaderManager(shaderManager),
@@ -242,12 +242,20 @@ namespace RNGOEngine::Core::Renderer
                         RNGO_ASSERT(false && "Unknown uniform type.");
                         break;
                 }
-            
-                const auto& meshDatas = m_modelManager.GetModel(opaqueDrawCall.modelKey);
-                for (const auto& meshData : meshDatas)
+
+                const auto& meshDatas = m_modelManager.GetRuntimeModelData(opaqueDrawCall.modelHandle);
+                for (const auto& meshData : meshDatas.meshKeys)
                 {
-                    m_renderer.BindToVAO(meshData.vao);
-                    m_renderer.DrawElement(meshData.elementCount);
+                    // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
+                    const auto meshResourceOpt = m_resourceManager.GetMeshResource(meshData);
+                    if (!meshResourceOpt.has_value())
+                    {
+                        RNGO_ASSERT(false && "Invalid mesh resource in RenderAPI::RenderOpaque.");
+                        continue;
+                    }
+                    const auto& meshResource = meshResourceOpt->get();
+                    m_renderer.BindToVAO(meshResource.vao);
+                    m_renderer.DrawElement(meshResource.elementCount);
                 }
             }
         }
@@ -257,14 +265,14 @@ namespace RNGOEngine::Core::Renderer
     void RenderAPI::MarkOpaqueUsed(size_t frameCount) const
     {
         // Mark meshes Used.
-        for (auto opaque : m_drawQueue.opaqueObjects)
-        {
-            const auto& modelKeys = m_modelManager.GetAllMeshKeys(opaque.modelKey);
-            for (auto mesh : modelKeys)
-            {
-                m_resourceTracker.MarkModelLastUsed(mesh, frameCount);
-            }
-        }
+        // for (auto opaque : m_drawQueue.opaqueObjects)
+        // {
+        //     const auto& modelKeys = m_modelManager.GetRuntimeModelData(opaque.modelKey);
+        //     for (auto mesh : modelKeys)
+        //     {
+        //         m_resourceTracker.MarkModelLastUsed(mesh, frameCount);
+        //     }
+        // }
 
         // Mark Textures.
         // for (auto opaque : m_drawQueue.opaqueObjects)

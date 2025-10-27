@@ -19,7 +19,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    Containers::Vectors::GenerationalKey<RuntimeModelData> AssetManager::LoadModel(
+    AssetHandle AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
@@ -75,7 +75,7 @@ namespace RNGOEngine::AssetHandling
 
     void AssetManager::RebuildResourceCaches()
     {
-        m_modelManager.RebuildCache();
+        // m_modelManager.RebuildCache();
         m_textureManager.RebuildCache();
         m_shaderManager.RebuildCache();
     }
