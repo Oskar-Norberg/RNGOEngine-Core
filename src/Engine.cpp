@@ -23,7 +23,7 @@ namespace RNGOEngine::Core
         : m_running(true),
           m_window(nullptr),
           m_renderer(nullptr),
-          m_resourceTracker(),
+          m_assetDatabase(m_assetFetcher),
           m_assetManager(nullptr)
     {
         bool doFlipTexturesVertically = false;

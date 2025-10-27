@@ -6,6 +6,11 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    AssetDatabase::AssetDatabase(AssetFetcher& assetFetcher)
+        : m_assetFetcher(assetFetcher)
+    {
+    }
+
     Utilities::UUID AssetDatabase::LoadModel(const std::filesystem::path& modelPath)
     {
         return Utilities::UUID();

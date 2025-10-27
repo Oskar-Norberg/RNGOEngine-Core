@@ -6,6 +6,7 @@
 
 #include <memory>
 
+#include "AssetHandling/AssetDatabase/AssetDatabase.h"
 #include "AssetHandling/AssetManager/AssetManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Concepts/Concepts.h"
@@ -59,6 +60,8 @@ namespace RNGOEngine::Core
         void Run();
 
     public:
+        // TODO: This is ugly.
+        // TODO: Only expose a AddAssetPath function.
         AssetHandling::AssetManager& GetAssetManager() const
         {
             return *m_assetManager;
@@ -82,6 +85,7 @@ namespace RNGOEngine::Core
         std::unique_ptr<Resources::ResourceManager> m_resourceManager;
         Resources::ResourceTracker m_resourceTracker;
         AssetHandling::AssetFetcher m_assetFetcher;
+        AssetHandling::AssetDatabase m_assetDatabase;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;
