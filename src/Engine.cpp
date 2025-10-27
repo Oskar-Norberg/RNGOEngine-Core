@@ -52,7 +52,7 @@ namespace RNGOEngine::Core
 
         for (const auto& [path, type] : config.assetPaths)
         {
-            m_assetManager->AddAssetPath(path, type);
+            m_assetFetcher.AddAssetPath(path, type);
         }
 
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
@@ -105,6 +105,11 @@ namespace RNGOEngine::Core
 
         // Shutdown
         m_resourceManager->DestroyAllResources();
+    }
+
+    void Engine::AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type)
+    {
+        m_assetFetcher.AddAssetPath(path, type);
     }
 
     void Engine::PollWindowEvents()

@@ -2,7 +2,7 @@
 // Created by Oskar.Norberg on 2025-08-27.
 //
 
-#include "../../../include/AssetHandling/AssetManager/AssetManager.h"
+#include "AssetHandling/AssetManager/AssetManager.h"
 
 #include "Renderer/IRenderer.h"
 #include "Utilities/RNGOAsserts.h"
@@ -16,13 +16,7 @@ namespace RNGOEngine::AssetHandling
           m_modelManager(resourceManager, doFlipUVs),
           m_textureManager(resourceManager)
     {
-        AddAssetPath(ENGINE_ASSETS_DIR, All);
 
-        AddAssetPath(ENGINE_SHADERS_DIR, Shader);
-        AddAssetPath(ENGINE_SHADER_INCLUDE_DIR, Shader);
-
-        AddAssetPath(ENGINE_MODELS_DIR, Mesh);
-        AddAssetPath(ENGINE_TEXTURES_DIR, Texture);
     }
 
     Containers::Vectors::GenerationalKey<ModelData> AssetManager::LoadModel(
@@ -78,27 +72,7 @@ namespace RNGOEngine::AssetHandling
         return textureID.value();
     }
 
-    void AssetManager::AddAssetPath(const std::filesystem::path& path, const AssetPathType type)
-    {
-        switch (type)
-        {
-            case All:
-                m_assetFileFetcher.AddAssetPath(path);
-                break;
-            case Shader:
-                m_assetFileFetcher.AddShaderPath(path);
-                break;
-            case Texture:
-                m_assetFileFetcher.AddTexturePath(path);
-                break;
-            case Mesh:
-                m_assetFileFetcher.AddMeshPath(path);
-                break;
-            default:
-                RNGO_ASSERT(false && "Unsupported asset path type");
-                break;
-        }
-    }
+    
 
     void AssetManager::RebuildResourceCaches()
     {

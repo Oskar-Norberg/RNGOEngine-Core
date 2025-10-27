@@ -21,9 +21,6 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Make enum class.
-    enum AssetPathType { All, Shader, Texture, Mesh };
-
     class AssetManager
     {
     public:
@@ -37,9 +34,6 @@ namespace RNGOEngine::AssetHandling
                                                       const std::filesystem::path& fragmentSourcePath);
 
         Containers::Vectors::GenerationalKey<TextureManagerData> LoadTexture(std::string_view texturePath);
-
-    public:
-        void AddAssetPath(const std::filesystem::path& path, AssetPathType type);
 
     public:
         const ShaderManager& GetShaderManager() const

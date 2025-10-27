@@ -59,13 +59,15 @@ namespace RNGOEngine::Core
 
         void Run();
 
+
+        // Asset Management
     public:
-        // TODO: This is ugly.
-        // TODO: Only expose a AddAssetPath function.
         AssetHandling::AssetManager& GetAssetManager() const
         {
             return *m_assetManager;
         }
+
+        void AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type);
 
     private:
         // TODO: Break into EngineSettings data-only header?
@@ -81,7 +83,7 @@ namespace RNGOEngine::Core
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
         std::unique_ptr<Renderer::RenderAPI> m_rendererAPI;
-        
+
         std::unique_ptr<Resources::ResourceManager> m_resourceManager;
         Resources::ResourceTracker m_resourceTracker;
         AssetHandling::AssetFetcher m_assetFetcher;
@@ -90,7 +92,7 @@ namespace RNGOEngine::Core
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;
         InputManager m_inputManager;
-        
+
         Systems::SystemContext m_gameContext;
         Systems::SystemScheduler<Systems::SystemContext> m_gameSystems;
 
