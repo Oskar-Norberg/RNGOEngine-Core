@@ -13,6 +13,6 @@ namespace RNGOEngine::AssetHandling
 
     Utilities::UUID AssetDatabase::LoadModel(const std::filesystem::path& modelPath)
     {
-        return m_meshDatabase.LoadModel(modelPath);
+        return m_modelDatabase.LoadModel(modelPath);
     }
 }

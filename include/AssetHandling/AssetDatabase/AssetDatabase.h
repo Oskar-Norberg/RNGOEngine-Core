@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-#include "Databases/MeshDatabase.h"
+#include "Databases/ModelDatabase.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine
@@ -31,6 +31,6 @@ namespace RNGOEngine::AssetHandling
         AssetFetcher& m_assetFetcher;
 
     private:
-        MeshDatabase m_meshDatabase;
+        ModelDatabase m_modelDatabase;
     };
 }

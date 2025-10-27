@@ -4,8 +4,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/AssetHandling/AssetDatabase/AssetDatabase.h
         src/AssetHandling/AssetDatabase/AssetDatabase.cpp
 
-        include/AssetHandling/AssetDatabase/Databases/MeshDatabase.h
-        src/AssetHandling/AssetDatabase/Databases/MeshDatabase.cpp
+        include/AssetHandling/AssetDatabase/Databases/ModelDatabase.h
+        src/AssetHandling/AssetDatabase/Databases/ModelDatabase.cpp
 
 
 
