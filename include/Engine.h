@@ -81,6 +81,7 @@ namespace RNGOEngine::Core
         
         std::unique_ptr<Resources::ResourceManager> m_resourceManager;
         Resources::ResourceTracker m_resourceTracker;
+        AssetHandling::AssetFetcher m_assetFetcher;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;

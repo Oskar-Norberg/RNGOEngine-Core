@@ -9,8 +9,10 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetManager::AssetManager(Resources::ResourceManager& resourceManager, const bool doFlipUVs)
-        : m_shaderManager(resourceManager, m_assetFileFetcher),
+    AssetManager::AssetManager(AssetFetcher& assetFetcher, Resources::ResourceManager& resourceManager,
+                               const bool doFlipUVs)
+        : m_assetFileFetcher(assetFetcher),
+          m_shaderManager(resourceManager, m_assetFileFetcher),
           m_modelManager(resourceManager, doFlipUVs),
           m_textureManager(resourceManager)
     {

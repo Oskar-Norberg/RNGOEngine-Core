@@ -21,12 +21,13 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: Make enum class.
     enum AssetPathType { All, Shader, Texture, Mesh };
 
     class AssetManager
     {
     public:
-        explicit AssetManager(Resources::ResourceManager& resourceManager, bool doFlipUVs);
+        explicit AssetManager(AssetFetcher& assetFetcher, Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
     public:
         Containers::Vectors::GenerationalKey<ModelData> LoadModel(const std::filesystem::path& modelPath);
@@ -66,7 +67,8 @@ namespace RNGOEngine::AssetHandling
         void RebuildResourceCaches();
 
     private:
-        AssetFetcher m_assetFileFetcher;
+        // TODO: Manager should get from the Database in the future. Remove this when possible.
+        AssetFetcher& m_assetFileFetcher;
         
         ShaderManager m_shaderManager;
         ModelManager m_modelManager;

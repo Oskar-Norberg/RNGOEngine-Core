@@ -48,7 +48,7 @@ namespace RNGOEngine::Core
 
         m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(
-            *m_resourceManager, doFlipTexturesVertically);
+            m_assetFetcher, *m_resourceManager, doFlipTexturesVertically);
 
         for (const auto& [path, type] : config.assetPaths)
         {
@@ -207,7 +207,7 @@ namespace RNGOEngine::Core
         if (m_framesSinceGC >= RESOURCE_CHECK_INTERVAL)
         {
             m_framesSinceGC = 0;
-            
+
             const auto unusedResources = m_resourceTracker.GetUnusedResources(
                 m_frameCount, RESOURCE_UNUSED_THRESHOLD);
 
