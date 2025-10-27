@@ -8,5 +8,6 @@ namespace RNGOEngine::AssetHandling
 {
     Utilities::UUID MeshDatabase::LoadModel(const std::filesystem::path& modelPath)
     {
+        return {};
     }
 }

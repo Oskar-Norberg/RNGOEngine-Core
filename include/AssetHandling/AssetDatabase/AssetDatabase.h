@@ -5,6 +5,8 @@
 #pragma once
 
 #include <filesystem>
+
+#include "Databases/MeshDatabase.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine
@@ -27,5 +29,8 @@ namespace RNGOEngine::AssetHandling
 
     private:
         AssetFetcher& m_assetFetcher;
+
+    private:
+        MeshDatabase m_meshDatabase;
     };
 }

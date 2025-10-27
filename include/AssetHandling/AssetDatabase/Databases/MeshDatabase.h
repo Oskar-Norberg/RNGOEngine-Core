@@ -11,6 +11,7 @@ namespace RNGOEngine::AssetHandling
 {
     class MeshDatabase
     {
+    public:
         Utilities::UUID LoadModel(const std::filesystem::path& modelPath);
     };
 }

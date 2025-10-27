@@ -17,6 +17,7 @@ include(cmake/UnityBuild.cmake)
 include(cmake/CPM.cmake)
 include(cmake/Dependencies.cmake)
 
+# TODO: Apparently the TextureHandle.h is not included anywhere. It is header only, so its fine. But it should be included somewhere.
 # Engine Units
 include(cmake/EngineUnits/Data.cmake)
 
