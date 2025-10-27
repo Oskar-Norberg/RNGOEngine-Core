@@ -11,6 +11,11 @@
 #include "AssetHandling/AssetManager/Managers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
 
+namespace RNGOEngine::AssetHandling
+{
+    class AssetDatabase;
+}
+
 namespace RNGOEngine
 {
     namespace Resources
@@ -24,7 +29,8 @@ namespace RNGOEngine::AssetHandling
     class AssetManager
     {
     public:
-        explicit AssetManager(AssetFetcher& assetFetcher, Resources::ResourceManager& resourceManager, bool doFlipUVs);
+        // TODO: Goal is for AssetManager to not ever use the AssetFetcher. Only interact with assets through the AssetDatabase.
+        explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
     public:
         Containers::Vectors::GenerationalKey<ModelData> LoadModel(const std::filesystem::path& modelPath);
@@ -61,6 +67,7 @@ namespace RNGOEngine::AssetHandling
         void RebuildResourceCaches();
 
     private:
+        AssetDatabase& m_assetDatabase;
         // TODO: Manager should get from the Database in the future. Remove this when possible.
         AssetFetcher& m_assetFileFetcher;
         

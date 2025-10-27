@@ -48,7 +48,9 @@ namespace RNGOEngine::Core
 
         m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(
-            m_assetFetcher, *m_resourceManager, doFlipTexturesVertically);
+            m_assetFetcher, m_assetDatabase, *m_resourceManager,
+            doFlipTexturesVertically
+        );
 
         for (const auto& [path, type] : config.assetPaths)
         {
@@ -73,6 +75,8 @@ namespace RNGOEngine::Core
         // Initialization
 
         // Main Loop
+        // TODO: Use a fixed timestep for system updates.
+        // TODO: I don't think high_resolution_clock is guaranteed to never go backwards.
         auto lastFrame = std::chrono::high_resolution_clock::now();
         while (m_running)
         {

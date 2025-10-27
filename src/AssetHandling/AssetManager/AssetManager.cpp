@@ -9,14 +9,14 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetManager::AssetManager(AssetFetcher& assetFetcher, Resources::ResourceManager& resourceManager,
-                               const bool doFlipUVs)
-        : m_assetFileFetcher(assetFetcher),
+    AssetManager::AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
+                               Resources::ResourceManager& resourceManager, bool doFlipUVs)
+        : m_assetDatabase(assetDatabase),
+          m_assetFileFetcher(assetFetcher),
           m_shaderManager(resourceManager, m_assetFileFetcher),
           m_modelManager(resourceManager, doFlipUVs),
           m_textureManager(resourceManager)
     {
-
     }
 
     Containers::Vectors::GenerationalKey<ModelData> AssetManager::LoadModel(
@@ -72,7 +72,6 @@ namespace RNGOEngine::AssetHandling
         return textureID.value();
     }
 
-    
 
     void AssetManager::RebuildResourceCaches()
     {
