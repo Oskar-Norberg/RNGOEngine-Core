@@ -28,9 +28,4 @@ namespace RNGOEngine::Utilities
     {
         return m_uuid == other.m_uuid;
     }
-
-    constexpr UUID::operator uint64_t() const
-    {
-        return m_uuid;
-    }
 }

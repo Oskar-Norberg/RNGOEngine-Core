@@ -33,7 +33,7 @@ namespace RNGOEngine::AssetHandling
         explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
     public:
-        Containers::Vectors::GenerationalKey<ModelData> LoadModel(const std::filesystem::path& modelPath);
+        Containers::Vectors::GenerationalKey<RuntimeModelData> LoadModel(const std::filesystem::path& modelPath);
 
     public:
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,

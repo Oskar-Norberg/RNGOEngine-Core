@@ -4,10 +4,86 @@
 
 #include "AssetHandling/AssetDatabase/Databases/ModelDatabase.h"
 
+#include "Utilities/RNGOAsserts.h"
+
 namespace RNGOEngine::AssetHandling
 {
-    Utilities::UUID ModelDatabase::LoadModel(const std::filesystem::path& modelPath)
+    Utilities::UUID ModelDatabase::Insert(ModelLoading::ModelHandle modelHandle,
+                                          const std::filesystem::path& modelPath)
     {
-        return {};
+        const auto uuid = Utilities::UUID();
+        ModelRecord record{
+            .uuid = uuid,
+            .path = modelPath,
+            .state = ModelDatabaseState::Loaded,
+            .model = modelHandle,
+        };
+
+        const auto key = m_modelRecords.Insert(std::move(record));
+        m_modelUUIDToIndexMap.insert({uuid, key});
+        m_modelPathToUUIDMap.insert({modelPath, uuid});
+
+        return uuid;
+    }
+
+    std::optional<Utilities::UUID> ModelDatabase::TryGetModelUUID(
+        const std::filesystem::path& modelPath) const
+    {
+        if (m_modelPathToUUIDMap.contains(modelPath))
+        {
+            return m_modelPathToUUIDMap.at(modelPath);
+        }
+
+        return std::nullopt;
+    }
+
+    std::expected<ModelLoading::ModelHandle, ModelDatabaseError> ModelDatabase::GetModelData(
+        const Utilities::UUID& uuid) const
+    {
+        if (m_modelUUIDToIndexMap.contains(uuid))
+        {
+            const auto key = m_modelUUIDToIndexMap.at(uuid);
+            const auto recordOpt = m_modelRecords.GetUnmarkedValidated(key);
+            if (recordOpt.has_value())
+            {
+                return recordOpt->get().model.value();
+            }
+        }
+
+        return std::unexpected(ModelDatabaseError::ModelNotFound);
+    }
+
+    std::expected<ModelLoading::ModelHandle, ModelDatabaseError> ModelDatabase::GetModelData(
+        const std::filesystem::path& modelPath) const
+    {
+        if (m_modelPathToUUIDMap.contains(modelPath))
+        {
+            const auto uuid = m_modelPathToUUIDMap.at(modelPath);
+            return GetModelData(uuid);
+        }
+
+        return std::unexpected(ModelDatabaseError::ModelNotFound);
+    }
+
+    void ModelDatabase::MarkModelUploaded(const Utilities::UUID uuid)
+    {
+        if (!m_modelUUIDToIndexMap.contains(uuid))
+        {
+            RNGO_ASSERT(false && "ModelDatabase::MarkModelUploaded called with invalid UUID.");
+            return;
+        }
+
+        const auto key = m_modelUUIDToIndexMap.at(uuid);
+        auto recordOpt = m_modelRecords.GetUnmarkedValidated(key);
+        if (!recordOpt)
+        {
+            RNGO_ASSERT(false && "ModelDatabase::MarkModelUploaded called with invalid UUID.");
+            return;
+        }
+        auto& record = recordOpt->get();
+        record.state = ModelDatabaseState::UploadedToGPU;
+
+        // Free CPU-side model data. Could be made optional.
+        record.model.reset();
     }
 }

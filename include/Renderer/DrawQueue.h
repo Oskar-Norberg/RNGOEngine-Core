@@ -20,7 +20,7 @@ namespace RNGOEngine::Core::Renderer
     struct Drawable
     {
         Components::Transform transform;
-        Containers::Vectors::GenerationalKey<AssetHandling::ModelData> modelKey;
+        Containers::Vectors::GenerationalKey<AssetHandling::RuntimeModelData> modelKey;
         Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> material;
     };
 

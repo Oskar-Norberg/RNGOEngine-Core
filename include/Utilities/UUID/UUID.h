@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <functional>
 #include <cstdint>
 
 namespace RNGOEngine::Utilities
@@ -20,9 +21,25 @@ namespace RNGOEngine::Utilities
 
         bool operator==(const UUID& other) const;
 
-        explicit constexpr operator uint64_t() const;
+        explicit constexpr operator uint64_t() const
+        {
+            return m_uuid;
+        }
 
     private:
         std::uint64_t m_uuid;
+    };
+}
+
+// Hash Function for UUIDs
+namespace std
+{
+    template<>
+    struct hash<RNGOEngine::Utilities::UUID>
+    {
+        size_t operator()(const RNGOEngine::Utilities::UUID& uuid) const noexcept
+        {
+            return std::hash<uint64_t>{}(static_cast<uint64_t>(uuid));
+        }
     };
 }

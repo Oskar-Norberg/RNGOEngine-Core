@@ -14,12 +14,12 @@ namespace RNGOEngine::AssetHandling
         : m_assetDatabase(assetDatabase),
           m_assetFileFetcher(assetFetcher),
           m_shaderManager(resourceManager, m_assetFileFetcher),
-          m_modelManager(resourceManager, doFlipUVs),
+          m_modelManager(assetDatabase, resourceManager, doFlipUVs),
           m_textureManager(resourceManager)
     {
     }
 
-    Containers::Vectors::GenerationalKey<ModelData> AssetManager::LoadModel(
+    Containers::Vectors::GenerationalKey<RuntimeModelData> AssetManager::LoadModel(
         const std::filesystem::path& modelPath)
     {
         const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
