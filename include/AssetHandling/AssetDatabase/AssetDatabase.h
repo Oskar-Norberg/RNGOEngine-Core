@@ -7,6 +7,7 @@
 #include <filesystem>
 
 #include "Databases/ModelDatabase.h"
+#include "Databases/TextureDatabase.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine
@@ -39,7 +40,17 @@ namespace RNGOEngine::AssetHandling
         void MarkModelUploaded(AssetHandle uuid);
 
         // Texture Database
-    // public:
+    public:
+        Utilities::UUID Insert(Textures::TextureHandle textureHandle, const std::filesystem::path& texturePath);
+        std::optional<Utilities::UUID> TryGetTextureUUID(const std::filesystem::path& texturePath) const;
+        // TODO: Unload textures.
+
+        std::expected<Textures::TextureHandle, TextureDatabaseError> GetTextureData(
+            const Utilities::UUID& uuid) const;
+        std::expected<Textures::TextureHandle, TextureDatabaseError> GetTextureData(
+            const std::filesystem::path& texturePath) const;
+
+        void MarkTextureUploaded(Utilities::UUID uuid);
 
         // Shader Database
     // public:
@@ -49,5 +60,6 @@ namespace RNGOEngine::AssetHandling
 
     private:
         ModelDatabase m_modelDatabase;
+        TextureDatabase m_textureDatabase;
     };
 }

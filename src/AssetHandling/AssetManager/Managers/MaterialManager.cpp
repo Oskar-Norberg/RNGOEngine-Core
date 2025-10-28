@@ -34,7 +34,7 @@ namespace RNGOEngine::AssetHandling
     }
 
     void MaterialManager::SetTexture(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
-                                     Containers::Vectors::GenerationalKey<TextureManagerData> textureKey,
+                                     AssetHandle textureHandle,
                                      int slot)
     {
         const auto validated = m_materials.GetUnmarkedValidated(key);
@@ -44,15 +44,13 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        validated.value().get().uniforms.emplace_back(
-            "Texture" + std::to_string(slot),
-            MaterialParameterType::Texture,
-            MaterialParameterData{
-                .texture = MaterialTextureSpecification{
-                    .textureKey = textureKey,
+        validated.value().get().uniforms.push_back({
+                "Texture" + std::to_string(slot),
+                MaterialTextureSpecification{
+                    .textureHandle = textureHandle,
                     .slot = slot
-                }
-            });
+                }}
+        );
     }
 
     void MaterialManager::SetBool(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
@@ -67,8 +65,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Bool,
-            MaterialParameterData{.b = value}
+            value
         );
     }
 
@@ -84,8 +81,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Int,
-            MaterialParameterData{.i = value}
+            value
         );
     }
 
@@ -101,8 +97,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Float,
-            MaterialParameterData{.f = value}
+            value
         );
     }
 
@@ -118,8 +113,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Vec2,
-            MaterialParameterData{.v2 = value}
+            value
         );
     }
 
@@ -135,8 +129,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Vec3,
-            MaterialParameterData{.v3 = value}
+            value
         );
     }
 
@@ -152,8 +145,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Vec4,
-            MaterialParameterData{.v4 = value}
+            value
         );
     }
 
@@ -169,8 +161,7 @@ namespace RNGOEngine::AssetHandling
 
         validated.value().get().uniforms.emplace_back(
             name.data(),
-            MaterialParameterType::Mat4,
-            MaterialParameterData{.m4 = value}
+            value
         );
     }
 }

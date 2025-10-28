@@ -6,6 +6,7 @@
 
 #include <expected>
 
+#include "AssetHandling/AssetDatabase/AssetDatabase.h"
 #include "Renderer/RenderID.h"
 #include "Renderer/Handles/TextureHandle.h"
 #include "Utilities/AssetCache/AssetCache.h"
@@ -28,46 +29,35 @@ namespace RNGOEngine::AssetHandling
         FailedToLoad,
     };
 
-    struct TextureManagerData
+    struct RuntimeTextureData
     {
         Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureKey;
-        Core::Renderer::TextureID CachedTextureID;
     };
 
     class TextureManager
     {
     public:
-        explicit TextureManager(Resources::ResourceManager& resourceManager);
-
-        std::expected<Containers::Vectors::GenerationalKey<TextureManagerData>, TextureManagerError>
-        CreateTexture(const std::filesystem::path& path);
+        explicit TextureManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager);
 
     public:
-        Core::Renderer::TextureID GetTexture(Containers::Vectors::GenerationalKey<TextureManagerData> key) const;
+        std::expected<AssetHandle, TextureManagerError> CreateTexture(const std::filesystem::path& path);
 
     public:
-        Containers::Vectors::GenerationalKey<TextureManagerData> GetInvalidTexture() const;
+        AssetHandle GetInvalidTexture() const;
 
-        // Engine Internals
     public:
-        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> GetTextureKey(
-            const Containers::Vectors::GenerationalKey<TextureManagerData>& key) const;
-        void RebuildCache();
+        Core::Renderer::TextureID GetTexture(const AssetHandle& uuid) const;
 
     private:
-        Containers::Vectors::GenerationalVector<TextureManagerData> m_textures;
-        Utilities::AssetCache<std::filesystem::path, Containers::Vectors::GenerationalKey<TextureManagerData>> m_textureCache;
+        std::unordered_map<AssetHandle, RuntimeTextureData> m_textures;
 
     private:
         Resources::ResourceManager& m_resourceManager;
+        AssetDatabase& m_assetDatabase;
 
-        
+        // Load to RAM
     private:
-        void UpdateTextureCache(const Containers::Vectors::GenerationalKey<TextureManagerData>& key);
-        
-        // Load/Unload to RAM
-    private:
-        std::expected<Textures::TextureHandle, TextureManagerError> LoadTexture(
+        std::expected<Textures::TextureHandle, TextureManagerError> LoadFromDisk(
             const std::filesystem::path& path);
 
         void UnloadTexture(Textures::TextureHandle handle);

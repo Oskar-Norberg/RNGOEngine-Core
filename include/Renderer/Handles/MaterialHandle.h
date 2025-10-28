@@ -21,7 +21,7 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        void SetTexture(const Containers::Vectors::GenerationalKey<AssetHandling::TextureManagerData> texture,
+        void SetTexture(const AssetHandling::AssetHandle texture,
                         const int slot) const
         {
             m_manager.SetTexture(m_materialKey, texture, slot);

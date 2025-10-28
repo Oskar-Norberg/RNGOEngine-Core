@@ -41,4 +41,33 @@ namespace RNGOEngine::AssetHandling
     {
         m_modelDatabase.MarkModelUploaded(uuid);
     }
+
+    Utilities::UUID AssetDatabase::Insert(const Textures::TextureHandle textureHandle,
+        const std::filesystem::path& texturePath)
+    {
+        return m_textureDatabase.Insert(textureHandle, texturePath);
+    }
+
+    std::optional<Utilities::UUID> AssetDatabase::TryGetTextureUUID(
+        const std::filesystem::path& texturePath) const
+    {
+        return m_textureDatabase.TryGetTextureUUID(texturePath);
+    }
+
+    std::expected<Textures::TextureHandle, TextureDatabaseError> AssetDatabase::GetTextureData(
+        const Utilities::UUID& uuid) const
+    {
+        return m_textureDatabase.GetTextureData(uuid);
+    }
+
+    std::expected<Textures::TextureHandle, TextureDatabaseError> AssetDatabase::GetTextureData(
+        const std::filesystem::path& texturePath) const
+    {
+        return m_textureDatabase.GetTextureData(texturePath);
+    }
+
+    void AssetDatabase::MarkTextureUploaded(const Utilities::UUID uuid)
+    {
+        m_textureDatabase.MarkTextureUploaded(uuid);
+    }
 }

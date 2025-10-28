@@ -15,7 +15,7 @@ namespace RNGOEngine::AssetHandling
           m_assetFileFetcher(assetFetcher),
           m_shaderManager(resourceManager, m_assetFileFetcher),
           m_modelManager(assetDatabase, resourceManager, doFlipUVs),
-          m_textureManager(resourceManager)
+          m_textureManager(assetDatabase, resourceManager)
     {
     }
 
@@ -52,7 +52,7 @@ namespace RNGOEngine::AssetHandling
         return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
 
-    Containers::Vectors::GenerationalKey<TextureManagerData> AssetManager::LoadTexture(
+    AssetHandle AssetManager::LoadTexture(
         const std::string_view texturePath)
     {
         const auto fullPath = m_assetFileFetcher.GetTexturePath(texturePath);
@@ -76,7 +76,7 @@ namespace RNGOEngine::AssetHandling
     void AssetManager::RebuildResourceCaches()
     {
         // m_modelManager.RebuildCache();
-        m_textureManager.RebuildCache();
+        // m_textureManager.RebuildCache();
         m_shaderManager.RebuildCache();
     }
 }

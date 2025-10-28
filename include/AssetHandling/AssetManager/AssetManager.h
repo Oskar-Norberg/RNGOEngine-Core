@@ -39,7 +39,7 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
                                                       const std::filesystem::path& fragmentSourcePath);
 
-        Containers::Vectors::GenerationalKey<TextureManagerData> LoadTexture(std::string_view texturePath);
+        AssetHandle LoadTexture(std::string_view texturePath);
 
     public:
         const ShaderManager& GetShaderManager() const

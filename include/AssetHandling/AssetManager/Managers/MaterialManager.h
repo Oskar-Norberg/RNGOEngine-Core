@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include <optional>
-
 #include "ShaderManager.h"
 #include "TextureManager.h"
 #include "Renderer/Uniforms.h"
@@ -28,7 +26,7 @@ namespace RNGOEngine::AssetHandling
         // Shader Uniforms
     public:
         void SetTexture(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
-                        Containers::Vectors::GenerationalKey<TextureManagerData> textureKey, int slot);
+                        AssetHandle textureHandle, int slot);
         void SetBool(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,
                      std::string_view name, bool value);
         void SetInt(const Containers::Vectors::GenerationalKey<MaterialSpecification>& key,

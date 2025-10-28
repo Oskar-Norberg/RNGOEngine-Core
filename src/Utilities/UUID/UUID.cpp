@@ -22,6 +22,27 @@ namespace RNGOEngine::Utilities
     {
     }
 
+    UUID::~UUID()
+    {
+    }
+
+    UUID& UUID::operator=(const UUID& other)
+    {
+        m_uuid = other.m_uuid;
+        return *this;
+    }
+
+    UUID::UUID(UUID&& other) noexcept
+    {
+        m_uuid = other.m_uuid;
+    }
+
+    UUID& UUID::operator=(UUID&& other) noexcept
+    {
+        m_uuid = other.m_uuid;
+        return *this;
+    }
+
     UUID::UUID(const UUID& other) = default;
 
     bool UUID::operator==(const UUID& other) const

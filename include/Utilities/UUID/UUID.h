@@ -17,7 +17,12 @@ namespace RNGOEngine::Utilities
     public:
         UUID();
         explicit UUID(std::uint64_t value);
+        
+        ~UUID();
         UUID(const UUID& other);
+        UUID& operator=(const UUID& other);
+        UUID(UUID&& other) noexcept;
+        UUID& operator=(UUID&& other) noexcept;
 
         bool operator==(const UUID& other) const;
 
