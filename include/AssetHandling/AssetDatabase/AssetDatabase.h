@@ -6,6 +6,7 @@
 
 #include <filesystem>
 
+#include "AssetHandle.h"
 #include "AssetState.h"
 #include "Databases/MaterialDatabase.h"
 #include "Databases/ModelDatabase.h"
@@ -14,13 +15,8 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    using AssetHandle = Utilities::UUID;
-
     class AssetDatabase
     {
-    public:
-        explicit AssetDatabase();
-
         // Asset State
     public:
         AssetState GetAssetState(const AssetHandle& uuid) const;

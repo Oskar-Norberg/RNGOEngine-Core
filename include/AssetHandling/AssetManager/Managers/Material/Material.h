@@ -4,11 +4,13 @@
 
 #pragma once
 
+#include <string>
 #include <variant>
 #include <vector>
+#include <glm/glm.hpp>
 
+#include "AssetHandling/AssetDatabase/AssetHandle.h"
 #include "AssetHandling/AssetManager/Managers/ShaderManager.h"
-#include "AssetHandling/AssetManager/Managers/TextureManager.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::AssetHandling

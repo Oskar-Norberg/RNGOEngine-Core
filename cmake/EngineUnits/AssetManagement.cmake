@@ -1,6 +1,8 @@
 set(ASSET_MANAGER_PROJECT_NAME RNGOEngine_AssetManager)
 add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         # Asset Database
+        include/AssetHandling/AssetDatabase/AssetHandle.h
+        
         include/AssetHandling/AssetDatabase/AssetState.h
         include/AssetHandling/AssetDatabase/AssetDatabase.h
         src/AssetHandling/AssetDatabase/AssetDatabase.cpp

@@ -6,10 +6,6 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetDatabase::AssetDatabase()
-    {
-    }
-
     AssetState AssetDatabase::GetAssetState(const AssetHandle& uuid) const
     {
         if (m_handleToDatabaseType.contains(uuid))
