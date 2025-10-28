@@ -7,17 +7,10 @@
 #include <filesystem>
 
 #include "AssetState.h"
+#include "Databases/MaterialDatabase.h"
 #include "Databases/ModelDatabase.h"
 #include "Databases/TextureDatabase.h"
 #include "Utilities/UUID/UUID.h"
-
-namespace RNGOEngine
-{
-    namespace AssetHandling
-    {
-        class AssetFetcher;
-    }
-}
 
 namespace RNGOEngine::AssetHandling
 {
@@ -61,12 +54,14 @@ namespace RNGOEngine::AssetHandling
         // public:
 
     private:
+        MaterialDatabase m_materialDatabase;
         ModelDatabase m_modelDatabase;
         TextureDatabase m_textureDatabase;
 
     private:
         enum class DatabaseType
         {
+            Material,
             Model,
             Texture,
         };

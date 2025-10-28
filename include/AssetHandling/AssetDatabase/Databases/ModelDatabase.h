@@ -16,8 +16,6 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    enum class ModelDatabaseState { Unloaded, Loaded, UploadedToGPU };
-
     struct ModelRecord
     {
         // Metadata

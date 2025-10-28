@@ -21,8 +21,6 @@ namespace RNGOEngine::AssetHandling
         TextureNotFound
     };
 
-    enum class TextureDatabaseState { Unloaded, Loaded, UploadedToGPU };
-
     struct TextureRecord
     {
         // Metadata
