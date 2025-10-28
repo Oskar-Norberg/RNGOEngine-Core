@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <variant>
 #include <vector>
 
 #include "AssetHandling/AssetManager/Managers/ShaderManager.h"
@@ -12,31 +13,17 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    enum class MaterialParameterType { Bool, Int, Float, Vec2, Vec3, Vec4, Mat4, Texture };
-
     struct MaterialTextureSpecification
     {
-        Containers::Vectors::GenerationalKey<TextureManagerData> textureKey;
+        AssetHandle textureHandle;
         int slot;
-    };
-
-    union MaterialParameterData
-    {
-        bool b;
-        int i;
-        float f;
-        glm::vec2 v2;
-        glm::vec3 v3;
-        glm::vec4 v4;
-        glm::mat4 m4;
-        MaterialTextureSpecification texture;
     };
 
     struct MaterialParameter
     {
         std::string name;
-        MaterialParameterType type;
-        MaterialParameterData data;
+        std::variant<bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat4,
+             MaterialTextureSpecification> data;
     };
 
     struct MaterialSpecification

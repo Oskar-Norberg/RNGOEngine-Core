@@ -207,41 +207,50 @@ namespace RNGOEngine::Core::Renderer
                 m_renderer.SetInt("numSpotlights", static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
-            for (const auto& [name, type, data] : materialSpecification.get().uniforms)
+            for (const auto& [name, data] : materialSpecification.get().uniforms)
             {
-                switch (type)
+                std::visit([this, &name]<typename T0>(T0&& arg)
                 {
-                    case AssetHandling::MaterialParameterType::Bool:
-                        m_renderer.SetBool(name, data.b);
-                        break;
-                    case AssetHandling::MaterialParameterType::Int:
-                        m_renderer.SetInt(name, data.i);
-                        break;
-                    case AssetHandling::MaterialParameterType::Float:
-                        m_renderer.SetFloat(name, data.f);
-                        break;
-                    case AssetHandling::MaterialParameterType::Vec2:
-                        m_renderer.SetVec2(name, std::span<const float, 2>(&data.v2[0], 2));
-                        break;
-                    case AssetHandling::MaterialParameterType::Vec3:
-                        m_renderer.SetVec3(name, std::span<const float, 3>(&data.v3[0], 3));
-                        break;
-                    case AssetHandling::MaterialParameterType::Vec4:
-                        m_renderer.SetVec4(name, std::span<const float, 4>(&data.v4[0], 4));
-                        break;
-                    case AssetHandling::MaterialParameterType::Mat4:
-                        m_renderer.SetMat4(name, std::span<const float, 16>(glm::value_ptr(data.m4), 16));
-                        break;
-                    case AssetHandling::MaterialParameterType::Texture:
+                    using T = std::decay_t<T0>;
+                    if constexpr (std::is_same_v<T, bool>)
                     {
-                        const auto textureHandle = m_textureManager.GetTexture(data.texture.textureKey);
-                        m_renderer.SetTexture(name, textureHandle, data.texture.slot);
+                        m_renderer.SetBool(name, arg);
                     }
-                    break;
-                    default:
-                        RNGO_ASSERT(false && "Unknown uniform type.");
-                        break;
-                }
+                    else if constexpr (std::is_same_v<T, int>)
+                    {
+                        m_renderer.SetInt(name, arg);
+                    }
+                    else if constexpr (std::is_same_v<T, float>)
+                    {
+                        m_renderer.SetFloat(name, arg);
+                    }
+                    else if constexpr (std::is_same_v<T, glm::vec2>)
+                    {
+                        m_renderer.SetVec2(name, std::span<const float, 2>(&arg[0], 2));
+                    }
+                    else if constexpr (std::is_same_v<T, glm::vec3>)
+                    {
+                        m_renderer.SetVec3(name, std::span<const float, 3>(&arg[0], 3));
+                    }
+                    else if constexpr (std::is_same_v<T, glm::vec4>)
+                    {
+                        m_renderer.SetVec4(name, std::span<const float, 4>(&arg[0], 4));
+                    }
+                    else if constexpr (std::is_same_v<T, glm::mat4>)
+                    {
+                        m_renderer.SetMat4(name, std::span<const float, 16>(glm::value_ptr(arg), 16));
+                    }
+                    else if constexpr (std::is_same_v<T, AssetHandling::MaterialTextureSpecification>)
+                    {
+                        const auto textureHandle = m_textureManager.GetTexture(arg.textureHandle);
+                        m_renderer.SetTexture(name, textureHandle, arg.slot);
+                    }
+                    else
+                    {
+                        // TODO: Because this is a constexpr if, this should probably be a static assert.
+                        RNGO_ASSERT(false && "RenderAPI::RenderOpaque uniform type.");
+                    }
+                }, data);
 
                 const auto& meshDatas = m_modelManager.GetRuntimeModelData(opaqueDrawCall.modelHandle);
                 for (const auto& meshData : meshDatas.meshKeys)
