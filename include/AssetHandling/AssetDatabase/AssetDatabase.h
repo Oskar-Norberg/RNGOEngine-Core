@@ -6,6 +6,7 @@
 
 #include <filesystem>
 
+#include "AssetState.h"
 #include "Databases/ModelDatabase.h"
 #include "Databases/TextureDatabase.h"
 #include "Utilities/UUID/UUID.h"
@@ -21,27 +22,33 @@ namespace RNGOEngine
 namespace RNGOEngine::AssetHandling
 {
     using AssetHandle = Utilities::UUID;
-    
+
     class AssetDatabase
     {
     public:
-        explicit AssetDatabase(AssetFetcher& assetFetcher);
+        explicit AssetDatabase();
+
+        // Asset State
+    public:
+        AssetState GetAssetState(const AssetHandle& uuid) const;
+        void SetAssetState(const AssetHandle& uuid, AssetState state);
+        // TODO: Will probably need some QOL helpers.
 
         // Model Database
     public:
         AssetHandle Insert(ModelLoading::ModelHandle modelHandle, const std::filesystem::path& modelPath);
         std::optional<AssetHandle> TryGetModelUUID(const std::filesystem::path& modelPath) const;
+        // TODO: Destruction of models
 
         std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
             const AssetHandle& uuid) const;
         std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
             const std::filesystem::path& modelPath) const;
 
-        void MarkModelUploaded(AssetHandle uuid);
-
         // Texture Database
     public:
-        Utilities::UUID Insert(Textures::TextureHandle textureHandle, const std::filesystem::path& texturePath);
+        Utilities::UUID Insert(Textures::TextureHandle textureHandle,
+                               const std::filesystem::path& texturePath);
         std::optional<Utilities::UUID> TryGetTextureUUID(const std::filesystem::path& texturePath) const;
         // TODO: Unload textures.
 
@@ -50,16 +57,21 @@ namespace RNGOEngine::AssetHandling
         std::expected<Textures::TextureHandle, TextureDatabaseError> GetTextureData(
             const std::filesystem::path& texturePath) const;
 
-        void MarkTextureUploaded(Utilities::UUID uuid);
-
         // Shader Database
-    // public:
-
-    private:
-        AssetFetcher& m_assetFetcher;
+        // public:
 
     private:
         ModelDatabase m_modelDatabase;
         TextureDatabase m_textureDatabase;
+
+    private:
+        enum class DatabaseType
+        {
+            Model,
+            Texture,
+        };
+
+        // Stores which database an asset belongs to.
+        std::unordered_map<AssetHandle, DatabaseType> m_handleToDatabaseType;
     };
 }

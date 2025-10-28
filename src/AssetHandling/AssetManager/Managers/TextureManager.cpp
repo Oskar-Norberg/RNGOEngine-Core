@@ -45,6 +45,9 @@ namespace RNGOEngine::AssetHandling
         auto uuid = m_assetDatabase.Insert(textureHandle.value(), path);
         m_textures.insert({uuid, textureIDData});
 
+        // Mark Asset as consumed
+        m_assetDatabase.SetAssetState(uuid, AssetState::Consumed);
+
         return uuid;
     }
 

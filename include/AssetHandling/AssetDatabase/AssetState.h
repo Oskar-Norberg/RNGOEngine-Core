@@ -6,7 +6,9 @@
 
 enum class AssetState
 {
-    Unloaded,
-    LoadedToRAM,
-    Consumed
+    Unregistered, // Database is not aware of asset.
+    Registered, // Registered to Database, but not loaded.
+    LoadedToRAM, // Asset is loaded to RAM.
+    Consumed, // Asset has been consumed / unloaded from RAM.
+    Destroyed, // Asset has been destroyed,
 };

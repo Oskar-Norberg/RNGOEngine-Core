@@ -13,7 +13,7 @@ namespace RNGOEngine::AssetHandling
         TextureRecord record{
             .uuid = uuid,
             .path = texturePath,
-            .state = TextureDatabaseState::Loaded,
+            .state = AssetState::Registered,
             .texture = textureHandle,
         };
 
@@ -62,17 +62,29 @@ namespace RNGOEngine::AssetHandling
         return std::unexpected(TextureDatabaseError::TextureNotFound);
     }
 
-    void TextureDatabase::MarkTextureUploaded(const Utilities::UUID uuid)
+    AssetState TextureDatabase::GetAssetState(const Utilities::UUID& uuid) const
     {
-        const auto key = m_textureUUIDToKeyMap.at(uuid);
-        const auto textureOpt = m_textureRecords.GetUnmarkedValidated(key);
-        if (!textureOpt)
+        const auto textureRecordOpt = m_textureRecords.GetUnmarkedValidated(
+            m_textureUUIDToKeyMap.at(uuid)
+        );
+
+        if (!textureRecordOpt)
         {
-            RNGO_ASSERT(false && "TextureDatabase::MarkTextureUploaded called with invalid key.");
-            return;
+            return AssetState::Unregistered;
         }
-        
-        auto& textureRecord = textureOpt->get();
-        textureRecord.state = TextureDatabaseState::UploadedToGPU;
+
+        return textureRecordOpt->get().state;
+    }
+
+    void TextureDatabase::SetAssetState(const Utilities::UUID& uuid, AssetState state)
+    {
+        const auto textureRecordOpt = m_textureRecords.GetUnmarkedValidated(
+            m_textureUUIDToKeyMap.at(uuid)
+        );
+
+        if (textureRecordOpt)
+        {
+            textureRecordOpt->get().state = state;
+        }
     }
 }

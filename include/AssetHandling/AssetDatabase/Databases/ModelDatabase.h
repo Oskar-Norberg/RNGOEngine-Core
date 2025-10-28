@@ -9,6 +9,7 @@
 #include <optional>
 #include <unordered_map>
 
+#include "AssetHandling/AssetDatabase/AssetState.h"
 #include "AssetHandling/AssetLoaders/ModelLoader.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 #include "Utilities/UUID/UUID.h"
@@ -23,7 +24,7 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID uuid;
         std::filesystem::path path;
         // State
-        ModelDatabaseState state = ModelDatabaseState::Unloaded;
+        AssetState state = AssetState::Unregistered;
         // Data
         std::optional<ModelLoading::ModelHandle> model;
     };
@@ -52,7 +53,9 @@ namespace RNGOEngine::AssetHandling
         std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
             const std::filesystem::path& modelPath) const;
 
-        void MarkModelUploaded(Utilities::UUID uuid);
+        AssetState GetAssetState(const Utilities::UUID& uuid) const;
+        void SetAssetState(const Utilities::UUID& uuid, AssetState state);
+
 
     private:
         Containers::Vectors::GenerationalVector<ModelRecord> m_modelRecords;

@@ -9,6 +9,7 @@
 #include <optional>
 #include <unordered_map>
 
+#include "AssetHandling/AssetDatabase/AssetState.h"
 #include "Utilities/UUID/UUID.h"
 #include "Renderer/Handles/TextureHandle.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
@@ -28,7 +29,7 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID uuid;
         std::filesystem::path path;
         // State
-        TextureDatabaseState state = TextureDatabaseState::Unloaded;
+        AssetState state = AssetState::Unregistered;
         // Data
         // TODO: Storing the TextureHandle here means the Database is tied to asset loading. Is this necessary?
         std::optional<Textures::TextureHandle> texture;
@@ -46,7 +47,8 @@ namespace RNGOEngine::AssetHandling
         std::expected<Textures::TextureHandle, TextureDatabaseError> GetTextureData(
             const std::filesystem::path& texturePath) const;
 
-        void MarkTextureUploaded(Utilities::UUID uuid);
+        AssetState GetAssetState(const Utilities::UUID& uuid) const;
+        void SetAssetState(const Utilities::UUID& uuid, AssetState state);
 
     private:
         std::unordered_map<std::filesystem::path, Utilities::UUID> m_texturePathToUUIDMap;

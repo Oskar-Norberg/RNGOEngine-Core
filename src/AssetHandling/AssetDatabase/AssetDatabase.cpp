@@ -6,16 +6,56 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetDatabase::AssetDatabase(AssetFetcher& assetFetcher)
-        : m_assetFetcher(assetFetcher),
-          m_modelDatabase()
+    AssetDatabase::AssetDatabase()
     {
     }
 
-    AssetHandle AssetDatabase::Insert(const ModelLoading::ModelHandle modelHandle,
-                                          const std::filesystem::path& modelPath)
+    AssetState AssetDatabase::GetAssetState(const AssetHandle& uuid) const
     {
-        return m_modelDatabase.Insert(modelHandle, modelPath);
+        if (m_handleToDatabaseType.contains(uuid))
+        {
+            const auto type = m_handleToDatabaseType.at(uuid);
+            switch (type)
+            {
+                case DatabaseType::Model:
+                    return m_modelDatabase.GetAssetState(uuid);
+                    break;
+                case DatabaseType::Texture:
+                    return m_textureDatabase.GetAssetState(uuid);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return AssetState::Unregistered;
+    }
+
+    void AssetDatabase::SetAssetState(const AssetHandle& uuid, AssetState state)
+    {
+        if (m_handleToDatabaseType.contains(uuid))
+        {
+            const auto type = m_handleToDatabaseType.at(uuid);
+            switch (type)
+            {
+                case DatabaseType::Model:
+                    m_modelDatabase.SetAssetState(uuid, state);
+                    break;
+                case DatabaseType::Texture:
+                    m_textureDatabase.SetAssetState(uuid, state);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    AssetHandle AssetDatabase::Insert(const ModelLoading::ModelHandle modelHandle,
+                                      const std::filesystem::path& modelPath)
+    {
+        const auto handle = m_modelDatabase.Insert(modelHandle, modelPath);
+        m_handleToDatabaseType.insert({handle, DatabaseType::Model});
+        return handle;
     }
 
     std::optional<AssetHandle> AssetDatabase::TryGetModelUUID(
@@ -36,16 +76,12 @@ namespace RNGOEngine::AssetHandling
         return m_modelDatabase.GetModelData(modelPath);
     }
 
-    // TODO: Clang wants me to pass by ref, look into if that's a good idea.
-    void AssetDatabase::MarkModelUploaded(const AssetHandle uuid)
-    {
-        m_modelDatabase.MarkModelUploaded(uuid);
-    }
-
     Utilities::UUID AssetDatabase::Insert(const Textures::TextureHandle textureHandle,
-        const std::filesystem::path& texturePath)
+                                          const std::filesystem::path& texturePath)
     {
-        return m_textureDatabase.Insert(textureHandle, texturePath);
+        const auto handle = m_textureDatabase.Insert(textureHandle, texturePath);
+        m_handleToDatabaseType.insert({handle, DatabaseType::Texture});
+        return handle;
     }
 
     std::optional<Utilities::UUID> AssetDatabase::TryGetTextureUUID(
@@ -64,10 +100,5 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& texturePath) const
     {
         return m_textureDatabase.GetTextureData(texturePath);
-    }
-
-    void AssetDatabase::MarkTextureUploaded(const Utilities::UUID uuid)
-    {
-        m_textureDatabase.MarkTextureUploaded(uuid);
     }
 }

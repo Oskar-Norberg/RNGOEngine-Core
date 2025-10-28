@@ -41,7 +41,8 @@ namespace RNGOEngine::AssetHandling
 
         // Add model to database
         auto assetHandle = m_assetDatabase.Insert(modelHandle.value(), path);
-        m_assetDatabase.MarkModelUploaded(assetHandle);
+        // Mark Asset as consumed
+        m_assetDatabase.SetAssetState(assetHandle, AssetState::Consumed);
 
         // Add model to runtime data
         m_models.insert({assetHandle, std::move(modelData)});

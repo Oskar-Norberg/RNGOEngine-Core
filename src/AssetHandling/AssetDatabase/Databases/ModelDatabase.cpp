@@ -15,7 +15,7 @@ namespace RNGOEngine::AssetHandling
         ModelRecord record{
             .uuid = uuid,
             .path = modelPath,
-            .state = ModelDatabaseState::Loaded,
+            .state = AssetState::Registered,
             .model = modelHandle,
         };
 
@@ -65,25 +65,27 @@ namespace RNGOEngine::AssetHandling
         return std::unexpected(ModelDatabaseError::ModelNotFound);
     }
 
-    void ModelDatabase::MarkModelUploaded(const Utilities::UUID uuid)
+    AssetState ModelDatabase::GetAssetState(const Utilities::UUID& uuid) const
     {
-        if (!m_modelUUIDToIndexMap.contains(uuid))
+        const auto modelOpt = m_modelRecords.GetUnmarkedValidated(
+            m_modelUUIDToIndexMap.at(uuid));
+
+        if (modelOpt)
         {
-            RNGO_ASSERT(false && "ModelDatabase::MarkModelUploaded called with invalid UUID.");
-            return;
+            return modelOpt->get().state;
         }
 
-        const auto key = m_modelUUIDToIndexMap.at(uuid);
-        auto recordOpt = m_modelRecords.GetUnmarkedValidated(key);
-        if (!recordOpt)
-        {
-            RNGO_ASSERT(false && "ModelDatabase::MarkModelUploaded called with invalid UUID.");
-            return;
-        }
-        auto& record = recordOpt->get();
-        record.state = ModelDatabaseState::UploadedToGPU;
+        return AssetState::Unregistered;
+    }
 
-        // Free CPU-side model data. Could be made optional.
-        record.model.reset();
+    void ModelDatabase::SetAssetState(const Utilities::UUID& uuid, AssetState state)
+    {
+        const auto modelOpt = m_modelRecords.GetUnmarkedValidated(
+            m_modelUUIDToIndexMap.at(uuid));
+
+        if (modelOpt)
+        {
+            modelOpt->get().state = state;
+        }
     }
 }

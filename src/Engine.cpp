@@ -23,7 +23,6 @@ namespace RNGOEngine::Core
         : m_running(true),
           m_window(nullptr),
           m_renderer(nullptr),
-          m_assetDatabase(m_assetFetcher),
           m_assetManager(nullptr)
     {
         bool doFlipTexturesVertically = false;
@@ -109,6 +108,7 @@ namespace RNGOEngine::Core
         }
 
         // Shutdown
+        // TODO: This should probably be done through the AssetManager to inform the AssetDatabase of destruction.
         m_resourceManager->DestroyAllResources();
     }
 
