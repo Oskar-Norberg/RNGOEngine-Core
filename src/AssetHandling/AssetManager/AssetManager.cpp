@@ -13,9 +13,10 @@ namespace RNGOEngine::AssetHandling
                                Resources::ResourceManager& resourceManager, bool doFlipUVs)
         : m_assetDatabase(assetDatabase),
           m_assetFileFetcher(assetFetcher),
-          m_shaderManager(resourceManager, m_assetFileFetcher),
+          m_shaderManager(assetDatabase, resourceManager, m_assetFileFetcher),
           m_modelManager(assetDatabase, resourceManager, doFlipUVs),
-          m_textureManager(assetDatabase, resourceManager)
+          m_textureManager(assetDatabase, resourceManager),
+          m_materialManager(assetDatabase, m_shaderManager, m_textureManager)
     {
     }
 
@@ -42,13 +43,13 @@ namespace RNGOEngine::AssetHandling
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
-        const auto shaderProgram = m_shaderManager.LoadShaderProgram(vertexSourcePath, fragmentSourcePath);
-        if (!shaderProgram.has_value())
-        {
-            RNGO_ASSERT(false && "Shader program could not compile!");
-        }
+        const auto vertexShader = m_shaderManager.CreateShader(vertexSourcePath,
+                                                               Core::Renderer::ShaderType::Vertex);
+        const auto fragmentShader = m_shaderManager.CreateShader(fragmentSourcePath,
+                                                                 Core::Renderer::ShaderType::Fragment);
 
-        const auto materialKey = m_materialManager.CreateMaterial(shaderProgram.value());
+        const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
+
         return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
 
@@ -77,6 +78,6 @@ namespace RNGOEngine::AssetHandling
     {
         // m_modelManager.RebuildCache();
         // m_textureManager.RebuildCache();
-        m_shaderManager.RebuildCache();
+        // m_shaderManager.RebuildCache();
     }
 }
