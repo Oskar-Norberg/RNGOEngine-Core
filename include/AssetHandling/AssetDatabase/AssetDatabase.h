@@ -10,11 +10,13 @@
 #include "AssetState.h"
 #include "Databases/MaterialDatabase.h"
 #include "Databases/ModelDatabase.h"
+#include "Databases/ShaderDatabase.h"
 #include "Databases/TextureDatabase.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: This should really be a singleton.
     class AssetDatabase
     {
         // Asset State
@@ -25,6 +27,7 @@ namespace RNGOEngine::AssetHandling
 
         // Model Database
     public:
+        // TODO: Rename to InsertModel to avoid overload collisions. Don't pass ModelHandle. Keep that in RuntimeModelManager.
         AssetHandle Insert(ModelLoading::ModelHandle modelHandle, const std::filesystem::path& modelPath);
         std::optional<AssetHandle> TryGetModelUUID(const std::filesystem::path& modelPath) const;
         // TODO: Destruction of models
@@ -36,6 +39,7 @@ namespace RNGOEngine::AssetHandling
 
         // Texture Database
     public:
+        // TODO: Make these return AssetHandle instead of UUID. It's the same thing, but semantics.
         Utilities::UUID Insert(Textures::TextureHandle textureHandle,
                                const std::filesystem::path& texturePath);
         std::optional<Utilities::UUID> TryGetTextureUUID(const std::filesystem::path& texturePath) const;
@@ -47,9 +51,13 @@ namespace RNGOEngine::AssetHandling
             const std::filesystem::path& texturePath) const;
 
         // Shader Database
-        // public:
+    public:
+        Utilities::UUID InsertShader(const std::filesystem::path& shaderPath);
+        std::optional<AssetHandle> TryGetShaderUUID(const std::filesystem::path& shaderPath) const;
+
 
     private:
+        ShaderDatabase m_shaderDatabase;
         MaterialDatabase m_materialDatabase;
         ModelDatabase m_modelDatabase;
         TextureDatabase m_textureDatabase;
@@ -57,6 +65,7 @@ namespace RNGOEngine::AssetHandling
     private:
         enum class DatabaseType
         {
+            Shader,
             Material,
             Model,
             Texture,

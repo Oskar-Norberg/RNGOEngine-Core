@@ -13,6 +13,13 @@ namespace RNGOEngine::AssetHandling
             const auto type = m_handleToDatabaseType.at(uuid);
             switch (type)
             {
+                case DatabaseType::Shader:
+                    return m_shaderDatabase.GetAssetState(uuid);
+                    break;
+                case DatabaseType::Material:
+                    // TODO:
+                    return AssetState::Registered;
+                    break;
                 case DatabaseType::Model:
                     return m_modelDatabase.GetAssetState(uuid);
                     break;
@@ -20,6 +27,7 @@ namespace RNGOEngine::AssetHandling
                     return m_textureDatabase.GetAssetState(uuid);
                     break;
                 default:
+                    RNGO_ASSERT(false && "AssetDatabase::GetAssetState: Unsuported database type.");
                     break;
             }
         }
@@ -34,6 +42,13 @@ namespace RNGOEngine::AssetHandling
             const auto type = m_handleToDatabaseType.at(uuid);
             switch (type)
             {
+                case DatabaseType::Shader:
+                    m_shaderDatabase.SetAssetState(uuid, state);
+                    break;
+                case DatabaseType::Material:
+                    // TODO: Do Materials need asset state? I guess freeing their memory would be nice.
+                    // m_materialDatabase.SetAssetState(uuid, state);
+                    break;
                 case DatabaseType::Model:
                     m_modelDatabase.SetAssetState(uuid, state);
                     break;
@@ -97,4 +112,33 @@ namespace RNGOEngine::AssetHandling
     {
         return m_textureDatabase.GetTextureData(texturePath);
     }
+
+    Utilities::UUID AssetDatabase::InsertShader(const std::filesystem::path& shaderPath)
+    {
+        const auto handle = m_shaderDatabase.Insert(shaderPath);
+        m_handleToDatabaseType.insert({handle, DatabaseType::Shader});
+        return handle;
+    }
+
+    std::optional<AssetHandle> AssetDatabase::TryGetShaderUUID(
+        const std::filesystem::path& shaderPath) const
+    {
+        return m_shaderDatabase.TryGetShaderUUID(shaderPath);
+    }
+
+    AssetHandle AssetDatabase::InsertMaterial(const AssetHandle& vertexShader,
+                                              const AssetHandle& fragmentShader,
+                                              const std::filesystem::path& materialPath)
+    {
+        const auto handle = m_materialDatabase.InsertMaterial(vertexShader, fragmentShader, materialPath);
+        m_handleToDatabaseType.insert({handle, DatabaseType::Material});
+        return handle;
+    }
+
+    std::optional<AssetHandle> AssetDatabase::TryGetMaterialUUID(
+        const std::filesystem::path& shaderPath) const
+    {
+        return m_materialDatabase.TryGetMaterialUUID(shaderPath);
+    }
+
 }
