@@ -55,6 +55,15 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID InsertShader(const std::filesystem::path& shaderPath);
         std::optional<AssetHandle> TryGetShaderUUID(const std::filesystem::path& shaderPath) const;
 
+        // Material Database
+    public:
+        AssetHandle InsertMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader,
+                               const std::filesystem::path& materialPath);
+        std::optional<AssetHandle> TryGetMaterialUUID(const std::filesystem::path& shaderPath) const;
+        std::optional<std::reference_wrapper<MaterialParameters>> GetMaterialParameters(
+    const AssetHandle& materialHandle);
+        std::optional<std::reference_wrapper<const MaterialParameters>> GetMaterialParameters(
+            const AssetHandle& materialHandle) const;
 
     private:
         ShaderDatabase m_shaderDatabase;

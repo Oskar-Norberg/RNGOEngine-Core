@@ -141,4 +141,15 @@ namespace RNGOEngine::AssetHandling
         return m_materialDatabase.TryGetMaterialUUID(shaderPath);
     }
 
+    std::optional<std::reference_wrapper<MaterialParameters>> AssetDatabase::GetMaterialParameters(
+        const AssetHandle& materialHandle)
+    {
+        return m_materialDatabase.GetMaterialParameters(materialHandle);
+    }
+
+    std::optional<std::reference_wrapper<const MaterialParameters>> AssetDatabase::GetMaterialParameters(
+        const AssetHandle& materialHandle) const
+    {
+        return m_materialDatabase.GetMaterialParameters(materialHandle);
+    }
 }
