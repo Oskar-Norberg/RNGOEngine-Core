@@ -46,6 +46,7 @@ namespace RNGOEngine::AssetHandling
         std::optional<Utilities::UUID> TryGetModelUUID(const std::filesystem::path& modelPath) const;
         // TODO: Unload models.
 
+        // TODO: Don't store runtime data here.
         std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
             const Utilities::UUID& uuid) const;
         std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
@@ -53,7 +54,6 @@ namespace RNGOEngine::AssetHandling
 
         AssetState GetAssetState(const Utilities::UUID& uuid) const;
         void SetAssetState(const Utilities::UUID& uuid, AssetState state);
-
 
     private:
         Containers::Vectors::GenerationalVector<ModelRecord> m_modelRecords;

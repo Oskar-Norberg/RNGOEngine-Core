@@ -10,8 +10,6 @@
 #include <glm/glm.hpp>
 
 #include "AssetHandling/AssetDatabase/AssetHandle.h"
-#include "AssetHandling/AssetManager/Managers/ShaderManager.h"
-#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -28,10 +26,8 @@ namespace RNGOEngine::AssetHandling
              MaterialTextureSpecification> data;
     };
 
-    struct MaterialSpecification
+    struct MaterialParameters
     {
-        Containers::Vectors::GenerationalKey<ShaderManagerProgramData> shader;
-
         // Consider stack allocated array with max size?
         std::vector<MaterialParameter> uniforms;
     };

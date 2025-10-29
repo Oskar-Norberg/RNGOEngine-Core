@@ -8,6 +8,8 @@
 
 #include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
+
+#include "AssetHandling/AssetManager/Managers/MaterialManager.h"
 #include "glm/gtx/quaternion.hpp"
 
 #include "AssetHandling/AssetManager/Managers/ModelManager.h"
@@ -18,7 +20,7 @@ namespace RNGOEngine::Components
     struct MeshRenderer
     {
         AssetHandling::AssetHandle modelHandle;
-        Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> materialID;
+        Containers::Vectors::GenerationalKey<AssetHandling::RuntimeMaterial> materialKey;
     };
 
     struct Transform

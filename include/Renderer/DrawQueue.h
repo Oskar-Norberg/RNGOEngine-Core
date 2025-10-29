@@ -21,7 +21,7 @@ namespace RNGOEngine::Core::Renderer
     {
         Components::Transform transform;
         AssetHandling::AssetHandle modelHandle;
-        Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> material;
+        Containers::Vectors::GenerationalKey<AssetHandling::RuntimeMaterial> material;
     };
 
     struct CameraData

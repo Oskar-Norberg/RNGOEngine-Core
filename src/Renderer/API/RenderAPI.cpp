@@ -87,7 +87,7 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawCall : m_drawQueue.opaqueObjects)
         {
             const auto& materialSpecification = m_materialManager.GetMaterial(opaqueDrawCall.material);
-            const auto shaderProgramID = m_shaderManager.GetShaderProgram(materialSpecification.get().shader);
+            const auto shaderProgramID = materialSpecification.shaderProgram;
 
             m_renderer.BindShaderProgram(shaderProgramID);
 
@@ -207,7 +207,7 @@ namespace RNGOEngine::Core::Renderer
                 m_renderer.SetInt("numSpotlights", static_cast<int>(m_drawQueue.spotlightIndex));
             }
 
-            for (const auto& [name, data] : materialSpecification.get().uniforms)
+            for (const auto& [name, data] : materialSpecification.uniforms)
             {
                 std::visit([this, &name]<typename T0>(T0&& arg)
                 {

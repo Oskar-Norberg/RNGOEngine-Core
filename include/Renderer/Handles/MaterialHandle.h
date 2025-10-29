@@ -15,13 +15,13 @@ namespace RNGOEngine::Core::Renderer
     {
     public:
         explicit MaterialHandle(
-            Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> materialKey,
+            const Containers::Vectors::GenerationalKey<AssetHandling::RuntimeMaterial>& materialKey,
             AssetHandling::MaterialManager& manager)
             : m_materialKey(materialKey), m_manager(manager)
         {
         }
 
-        void SetTexture(const AssetHandling::AssetHandle texture,
+        void SetTexture(const AssetHandling::AssetHandle& texture,
                         const int slot) const
         {
             m_manager.SetTexture(m_materialKey, texture, slot);
@@ -62,13 +62,13 @@ namespace RNGOEngine::Core::Renderer
             m_manager.SetMat4(m_materialKey, name, value);
         }
 
-        Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> GetMaterialKey() const
+        Containers::Vectors::GenerationalKey<AssetHandling::RuntimeMaterial> GetMaterialAssetHandle() const
         {
             return m_materialKey;
         }
 
     private:
-        Containers::Vectors::GenerationalKey<AssetHandling::MaterialSpecification> m_materialKey;
+        Containers::Vectors::GenerationalKey<AssetHandling::RuntimeMaterial> m_materialKey;
         AssetHandling::MaterialManager& m_manager;
     };
 }
