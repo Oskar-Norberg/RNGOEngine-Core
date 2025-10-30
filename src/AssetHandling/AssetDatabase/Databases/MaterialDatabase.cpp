@@ -34,6 +34,7 @@ namespace RNGOEngine::AssetHandling
     std::optional<std::reference_wrapper<MaterialParameters>> MaterialDatabase::GetMaterialParameters(
         const AssetHandle& materialHandle)
     {
+        // TODO: Duplicate code
         if (m_materialsByPath.contains(materialHandle))
         {
             const auto validated = m_materials.GetUnmarkedValidated(m_materialsByPath.at(materialHandle));

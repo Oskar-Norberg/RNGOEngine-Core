@@ -20,7 +20,7 @@ namespace RNGOEngine::Components
     struct MeshRenderer
     {
         AssetHandling::AssetHandle modelHandle;
-        Containers::Vectors::GenerationalKey<AssetHandling::RuntimeMaterial> materialKey;
+        AssetHandling::AssetHandle materialKey;
     };
 
     struct Transform

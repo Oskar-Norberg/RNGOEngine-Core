@@ -14,9 +14,8 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    Containers::Vectors::GenerationalKey<RuntimeMaterial> MaterialManager::CreateMaterial(
-        const AssetHandle& vertexShader,
-        const AssetHandle& fragmentShader)
+    AssetHandle MaterialManager::CreateMaterial(const AssetHandle& vertexShader,
+                                                const AssetHandle& fragmentShader)
     {
         // TODO: Path is currently not used.
         const auto materialHandle = m_assetDatabase.InsertMaterial(vertexShader, fragmentShader, {});
@@ -27,37 +26,30 @@ namespace RNGOEngine::AssetHandling
             .shaderProgramKey = programID
         };
 
-        const auto runtimeKey = m_materials.Insert(runtimeMaterialData);
-        return runtimeKey;
+        m_materials.insert({materialHandle, runtimeMaterialData});
+        return materialHandle;
     }
 
-    ResolvedMaterial MaterialManager::GetMaterial(
-        const Containers::Vectors::GenerationalKey<RuntimeMaterial>& handle) const
+    ResolvedMaterial MaterialManager::GetMaterial(const AssetHandle& handle) const
     {
         const auto params = GetValidatedMaterialParameters(handle);
-
-        // Return default material? Or try to recreate?
-        if (!params)
+        if (!params || !m_materials.contains(handle))
         {
-            RNGO_ASSERT(false && "MaterialManager::GetMaterial: Material parameters not found.");
-            // TODO: Undefined.
+            // TODO: Return error material / Try to reload material?
+            return {};
         }
-
-        const auto validated = m_materials.GetUnmarkedValidated(handle);
-        if (!validated)
-        {
-            RNGO_ASSERT(false && "MaterialManager::GetMaterial: RuntimeMaterial not found.");
-            // TODO: Undefined.
-        }
-
-        const auto shaderProgramID = m_shaderManager.GetShaderProgram(validated->get().shaderProgramKey);
-
-        return ResolvedMaterial{shaderProgramID, std::span(params->get().uniforms)};
+        
+        const auto& [materialUUID, shaderProgramKey] = m_materials.at(handle);
+        
+        const ResolvedMaterial mat{
+            .shaderProgram = m_shaderManager.GetShaderProgram(shaderProgramKey),
+            .uniforms = params->get().uniforms
+        };
+        
+        return mat;
     }
 
-    void MaterialManager::SetTexture(
-        const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-        AssetHandle textureHandle, int slot)
+    void MaterialManager::SetTexture(const AssetHandle& materialHandle, AssetHandle textureHandle, int slot)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -75,8 +67,7 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetBool(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-                                  std::string_view name, bool value)
+    void MaterialManager::SetBool(const AssetHandle& materialHandle, std::string_view name, bool value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -92,8 +83,7 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetInt(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-                                 std::string_view name, int value)
+    void MaterialManager::SetInt(const AssetHandle& materialHandle, std::string_view name, int value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -108,9 +98,7 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetFloat(
-        const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name,
-        float value)
+    void MaterialManager::SetFloat(const AssetHandle& materialHandle, std::string_view name, float value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -125,8 +113,8 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetVec2(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-                                  std::string_view name, const glm::vec2& value)
+    void MaterialManager::SetVec2(const AssetHandle& materialHandle, std::string_view name,
+                                  const glm::vec2& value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -141,8 +129,8 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetVec3(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-                                  std::string_view name, const glm::vec3& value)
+    void MaterialManager::SetVec3(const AssetHandle& materialHandle, std::string_view name,
+                                  const glm::vec3& value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -157,8 +145,8 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetVec4(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-                                  std::string_view name, const glm::vec4& value)
+    void MaterialManager::SetVec4(const AssetHandle& materialHandle, std::string_view name,
+                                  const glm::vec4& value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -173,8 +161,8 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::SetMat4(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle,
-                                  std::string_view name, const glm::mat4& value)
+    void MaterialManager::SetMat4(const AssetHandle& materialHandle, std::string_view name,
+                                  const glm::mat4& value)
     {
         const auto parametersOpt = GetValidatedMaterialParameters(materialHandle);
         if (!parametersOpt)
@@ -189,18 +177,11 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    std::optional<std::reference_wrapper<const MaterialParameters>> MaterialManager::
-    GetValidatedMaterialParameters(
-        const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle) const
+    std::optional<std::reference_wrapper<const MaterialParameters>>
+    MaterialManager::GetValidatedMaterialParameters(const AssetHandle& materialHandle) const
     {
         // TODO: Duplicate code
-        const auto validated = m_materials.GetUnmarkedValidated(materialHandle);
-        if (!validated)
-        {
-            // TODO: Recreate invalid material?
-            return std::nullopt;
-        }
-        auto materialParameters = m_assetDatabase.GetMaterialParameters(validated->get().materialUUID);
+        auto materialParameters = m_assetDatabase.GetMaterialParameters(materialHandle);
 
         if (!materialParameters)
         {
@@ -211,21 +192,15 @@ namespace RNGOEngine::AssetHandling
     }
 
     std::optional<std::reference_wrapper<MaterialParameters>> MaterialManager::GetValidatedMaterialParameters(
-        const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle)
+        const AssetHandle& materialHandle)
     {
-        const auto validated = m_materials.GetUnmarkedValidated(materialHandle);
-        if (!validated)
-        {
-            // TODO: Recreate invalid material?
-            return std::nullopt;
-        }
-        auto materialParameters = m_assetDatabase.GetMaterialParameters(validated->get().materialUUID);
-
+        auto materialParameters = m_assetDatabase.GetMaterialParameters(materialHandle);
         if (!materialParameters)
         {
             return std::nullopt;
         }
 
-        return materialParameters;
+        auto& nonConstRef = const_cast<MaterialParameters&>(materialParameters->get());
+        return std::ref(nonConstRef);
     }
 }

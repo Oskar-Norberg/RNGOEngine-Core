@@ -31,24 +31,33 @@ namespace RNGOEngine::AssetHandling
                         TextureManager& textureManager);
 
     public:
-        Containers::Vectors::GenerationalKey<RuntimeMaterial> CreateMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader);
+        // TODO: In the future, Materials should be created just like shaders from some sort of serialized file that stores UUIDs to shaders and a list of params.
+        AssetHandle CreateMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader);
 
     public:
-        ResolvedMaterial GetMaterial(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& handle) const;
+        ResolvedMaterial GetMaterial(const AssetHandle& handle) const;
 
         // Shader Uniforms
     public:
-        void SetTexture(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, AssetHandle textureHandle, int slot);
-        void SetBool(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, bool value);
-        void SetInt(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, int value);
-        void SetFloat(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, float value);
-        void SetVec2(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, const glm::vec2& value);
-        void SetVec3(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, const glm::vec3& value);
-        void SetVec4(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, const glm::vec4& value);
-        void SetMat4(const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle, std::string_view name, const glm::mat4& value);
+        void SetTexture(const AssetHandle& materialHandle,
+                        AssetHandle textureHandle, int slot);
+        void SetBool(const AssetHandle& materialHandle,
+                     std::string_view name, bool value);
+        void SetInt(const AssetHandle& materialHandle,
+                    std::string_view name, int value);
+        void SetFloat(const AssetHandle& materialHandle,
+                      std::string_view name, float value);
+        void SetVec2(const AssetHandle& materialHandle,
+                     std::string_view name, const glm::vec2& value);
+        void SetVec3(const AssetHandle& materialHandle,
+                     std::string_view name, const glm::vec3& value);
+        void SetVec4(const AssetHandle& materialHandle,
+                     std::string_view name, const glm::vec4& value);
+        void SetMat4(const AssetHandle& materialHandle,
+                     std::string_view name, const glm::mat4& value);
 
     private:
-        Containers::Vectors::GenerationalVector<RuntimeMaterial> m_materials;
+        std::unordered_map<AssetHandle, RuntimeMaterial> m_materials;
 
     private:
         AssetDatabase& m_assetDatabase;
@@ -57,8 +66,8 @@ namespace RNGOEngine::AssetHandling
 
     private:
         std::optional<std::reference_wrapper<const MaterialParameters>> GetValidatedMaterialParameters(
-    const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle) const;
+            const AssetHandle& materialHandle) const;
         std::optional<std::reference_wrapper<MaterialParameters>> GetValidatedMaterialParameters(
-            const Containers::Vectors::GenerationalKey<RuntimeMaterial>& materialHandle);
+            const AssetHandle& materialHandle);
     };
 }
