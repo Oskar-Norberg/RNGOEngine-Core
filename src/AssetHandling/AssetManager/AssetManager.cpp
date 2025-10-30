@@ -73,14 +73,14 @@ namespace RNGOEngine::AssetHandling
         return textureID.value();
     }
 
-    void AssetManager::DestroyAllAssets()
+    void AssetManager::BeginDestroyAllAssets()
     {
         // TODO: Save persistent database changes?
-        m_shaderManager.DestroyAllShaders();
-        m_shaderManager.DestroyAllShaderPrograms();
+        m_shaderManager.BeginDestroyAllShaders();
+        m_shaderManager.BeginDestroyAllShaderPrograms();
 
-        m_modelManager.DestroyAllModels();
-        m_textureManager.DestroyAllTextures();
-        m_materialManager.DestroyAllMaterials();
+        m_modelManager.BeginDestroyAllModels();
+        m_textureManager.BeginDestroyAllTextures();
+        m_materialManager.BeginDestroyAllMaterials();
     }
 }

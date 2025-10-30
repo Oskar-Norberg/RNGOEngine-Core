@@ -76,7 +76,7 @@ namespace RNGOEngine::AssetHandling
         return textureOpt.value();
     }
 
-    void TextureManager::DestroyAllTextures()
+    void TextureManager::BeginDestroyAllTextures()
     {
         for (const auto& [handle, textureData] : m_textures)
         {

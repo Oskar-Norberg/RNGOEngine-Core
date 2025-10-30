@@ -65,7 +65,7 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internal
     public:
-        void DestroyAllAssets();
+        void BeginDestroyAllAssets();
 
     private:
         AssetDatabase& m_assetDatabase;

@@ -108,8 +108,7 @@ namespace RNGOEngine::Core
         }
 
         // Shutdown
-        // TODO: This should probably be done through the AssetManager to inform the AssetDatabase of destruction.
-        m_assetManager->DestroyAllAssets();
+        CleanUp();
     }
 
     void Engine::AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type)
@@ -212,24 +211,31 @@ namespace RNGOEngine::Core
         RNGO_ZONE_SCOPE;
         RNGO_ZONE_NAME_C("Engine::CheckUnusedResources");
 
-        ++m_framesSinceGC;
+        // TODO: Implement resource GC
+        // ++m_framesSinceGC;
+        //
+        // if (m_framesSinceGC >= RESOURCE_CHECK_INTERVAL)
+        // {
+        //     m_framesSinceGC = 0;
+        //
+        //     const auto unusedResources = m_resourceTracker.GetUnusedResources(
+        //         m_frameCount, RESOURCE_UNUSED_THRESHOLD);
+        //
+        //     if (!unusedResources.IsEmpty())
+        //     {
+        //         m_resourceManager->MarkForDestruction(unusedResources);
+        //         m_resourceManager->DestroyMarkedResources();
+        //
+        //         // TODO: Could be optimized by passing the ResourceCollection and letting the AssetManager only rebuild affected caches.
+        //         m_assetManager->RebuildResourceCaches();
+        //     }
+        // }
+    }
 
-        if (m_framesSinceGC >= RESOURCE_CHECK_INTERVAL)
-        {
-            m_framesSinceGC = 0;
-
-            const auto unusedResources = m_resourceTracker.GetUnusedResources(
-                m_frameCount, RESOURCE_UNUSED_THRESHOLD);
-
-            if (!unusedResources.IsEmpty())
-            {
-                m_resourceManager->MarkForDestruction(unusedResources);
-                m_resourceManager->DestroyMarkedResources();
-
-                // TODO: Could be optimized by passing the ResourceCollection and letting the AssetManager only rebuild affected caches.
-                m_assetManager->RebuildResourceCaches();
-            }
-        }
+    void Engine::CleanUp()
+    {
+        m_assetManager->BeginDestroyAllAssets();
+        m_resourceManager->DestroyMarkedResources();
     }
 
     void Engine::AddEngineSystems()

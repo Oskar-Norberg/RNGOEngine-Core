@@ -50,7 +50,7 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internals
     public:
-        void DestroyAllTextures();
+        void BeginDestroyAllTextures();
 
     private:
         std::unordered_map<AssetHandle, RuntimeTextureData> m_textures;

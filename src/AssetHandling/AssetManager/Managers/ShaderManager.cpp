@@ -123,7 +123,7 @@ namespace RNGOEngine::AssetHandling
         return shaderProgramOpt.value();
     }
 
-    void ShaderManager::DestroyAllShaders()
+    void ShaderManager::BeginDestroyAllShaders()
     {
         for (const auto shader : m_shaders.Live())
         {
@@ -135,7 +135,7 @@ namespace RNGOEngine::AssetHandling
         }
     }
 
-    void ShaderManager::DestroyAllShaderPrograms()
+    void ShaderManager::BeginDestroyAllShaderPrograms()
     {
         for (const auto program : m_shaderPrograms.Live())
         {

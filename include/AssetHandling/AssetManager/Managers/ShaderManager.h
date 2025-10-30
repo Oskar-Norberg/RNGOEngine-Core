@@ -72,8 +72,8 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internal
     public:
-        void DestroyAllShaders();
-        void DestroyAllShaderPrograms();
+        void BeginDestroyAllShaders();
+        void BeginDestroyAllShaderPrograms();
 
     private:
         AssetDatabase& m_assetDatabase;

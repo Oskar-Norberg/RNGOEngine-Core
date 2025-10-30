@@ -60,7 +60,7 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internals
     public:
-        void DestroyAllModels();
+        void BeginDestroyAllModels();
 
     private:
         bool m_doFlipUVs;

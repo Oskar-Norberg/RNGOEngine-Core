@@ -116,6 +116,9 @@ namespace RNGOEngine::Core
         void CheckUnusedResources();
 
     private:
+        void CleanUp();
+
+    private:
         void AddEngineSystems();
     };
 }

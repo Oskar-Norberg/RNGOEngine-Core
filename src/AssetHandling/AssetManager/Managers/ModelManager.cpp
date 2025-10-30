@@ -99,7 +99,7 @@ namespace RNGOEngine::AssetHandling
         return m_models.at(handle);
     }
 
-    void ModelManager::DestroyAllModels()
+    void ModelManager::BeginDestroyAllModels()
     {
         for (const auto& [assetHandle, modelData] : m_models)
         {

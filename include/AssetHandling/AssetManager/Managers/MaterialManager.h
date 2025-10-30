@@ -58,7 +58,7 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internals
     public:
-        void DestroyAllMaterials();
+        void BeginDestroyAllMaterials();
 
     private:
         std::unordered_map<AssetHandle, RuntimeMaterial> m_materials;

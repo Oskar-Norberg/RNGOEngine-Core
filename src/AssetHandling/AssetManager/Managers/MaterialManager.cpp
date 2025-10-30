@@ -177,7 +177,7 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
-    void MaterialManager::DestroyAllMaterials()
+    void MaterialManager::BeginDestroyAllMaterials()
     {
         // TODO: Save persistent database changes?
     }
