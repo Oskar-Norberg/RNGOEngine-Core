@@ -41,8 +41,6 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Core::Renderer
 {
-    // TODO: In the future this will need to have some sort of render-pipeline / pass system.
-    // Doing everything in one function is not scalable.
     class RenderAPI
     {
     public:

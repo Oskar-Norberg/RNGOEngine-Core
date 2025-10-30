@@ -34,10 +34,9 @@ namespace RNGOEngine::Core
         RenderType renderType = RenderType::Headless;
         size_t width = 800;
         size_t height = 600;
-        std::string name = "RNGOEngine";
+        std::string_view name = "RNGOEngine";
 
-        // TODO: No reason for this to be a vector, make it a span instead.
-        std::vector<std::pair<std::filesystem::path, AssetHandling::AssetPathType>> assetPaths;
+        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetPathType>> assetPaths;
     };
 
     class Engine
