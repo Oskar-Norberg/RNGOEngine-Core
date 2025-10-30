@@ -1,0 +1,91 @@
+﻿//
+// Created by Oskar.Norberg on 2025-09-11.
+//
+
+#pragma once
+
+#include <expected>
+
+#include "AssetHandling/AssetDatabase/AssetDatabase.h"
+#include "AssetHandling/AssetDatabase/AssetHandle.h"
+#include "AssetHandling/AssetLoaders/ShaderLoader.h"
+#include "Renderer/RenderID.h"
+#include "Utilities/AssetCache/AssetCache.h"
+#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
+
+namespace RNGOEngine
+{
+    namespace Resources
+    {
+        class ResourceManager;
+    }
+}
+
+namespace RNGOEngine::AssetHandling
+{
+    using ShaderManagerID = unsigned int;
+
+    enum class ShaderManagerError
+    {
+        None,
+
+        // Resources
+        ShaderNotFound,
+        CompilationFailed,
+        LinkingFailed,
+
+        // Preprocessing
+        FileNotFound,
+        MalformedInclude,
+        TokenNotFound,
+    };
+
+    struct RuntimeShaderData
+    {
+        Core::Renderer::ShaderType Type;
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> ShaderKey;
+    };
+
+    struct RuntimeShaderProgramData
+    {
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
+    };
+
+    // TODO: Separate Shader and ShaderProgram into separate managers.
+    class ShaderManager
+    {
+    public:
+        explicit ShaderManager(AssetDatabase& assetDatabase,
+                               Resources::ResourceManager& resourceManager,
+                               const AssetFetcher& assetFetcher);
+
+    public:
+        AssetHandle CreateShader(const std::filesystem::path& path, Core::Renderer::ShaderType type);
+
+    public:
+        Containers::Vectors::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(
+            const AssetHandle& vertexShader,
+            const AssetHandle& fragmentShader);
+
+    public:
+        Core::Renderer::ShaderProgramID GetShaderProgram(const Containers::Vectors::GenerationalKey<RuntimeShaderProgramData>& key);
+
+        // Engine Internal
+    public:
+        void BeginDestroyAllShaders();
+        void BeginDestroyAllShaderPrograms();
+
+    private:
+        AssetDatabase& m_assetDatabase;
+        Resources::ResourceManager& m_resourceManager;
+        ShaderLoader m_shaderLoader;
+
+    private:
+        Containers::Vectors::GenerationalVector<RuntimeShaderData> m_shaders;
+        Containers::Vectors::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
+
+    private:
+        std::unordered_map<AssetHandle, Containers::Vectors::GenerationalKey<RuntimeShaderData>>
+        m_handleToShader;
+    };
+}

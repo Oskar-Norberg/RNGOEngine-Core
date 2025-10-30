@@ -5,11 +5,12 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include <glm/glm.hpp>
 
 #include "RenderID.h"
 
+// TODO: The Renderer actually makes no use of these uniforms.
+// They are only used by the RenderAPI when setting material uniforms.
 namespace RNGOEngine::Core::Renderer
 {
     enum class UniformType { Bool, Int, Float, Vec2, Vec3, Vec4, Mat4, Texture };
@@ -37,13 +38,5 @@ namespace RNGOEngine::Core::Renderer
         std::string name;
         UniformType type;
         UniformData data;
-    };
-
-    struct MaterialSpecification
-    {
-        ShaderProgramID shader;
-        
-        // Consider stack allocated array with max size?
-        std::vector<UniformSpecification> uniforms;
     };
 }

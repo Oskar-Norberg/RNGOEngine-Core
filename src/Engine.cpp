@@ -10,6 +10,7 @@
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Systems/SystemContext.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Utilities/RNGOAsserts.h"
@@ -31,7 +32,7 @@ namespace RNGOEngine::Core
             case RenderType::GLFW_OpenGL:
             {
                 m_window = std::make_unique<Window::GLFWWindow>(config.width, config.height, config.name);
-                m_renderer = std::make_unique<Renderer::GLFWRenderer>(config.width, config.height);
+                m_renderer = std::make_unique<Renderer::GLFWRenderer>();
                 doFlipTexturesVertically = true;
                 break;
             }
@@ -44,19 +45,39 @@ namespace RNGOEngine::Core
             }
         }
 
-        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_renderer, doFlipTexturesVertically);
+        m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(
+            m_assetFetcher, m_assetDatabase, *m_resourceManager,
+            doFlipTexturesVertically
+        );
+
         for (const auto& [path, type] : config.assetPaths)
         {
-            m_assetManager->AddAssetPath(path, type);
+            m_assetFetcher.AddAssetPath(path, type);
         }
+
+        m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
+            *m_renderer,
+            m_resourceTracker,
+            *m_resourceManager,
+            m_assetManager->GetModelManager(),
+            m_assetManager->GetShaderManager(),
+            m_assetManager->GetMaterialManager(),
+            m_assetManager->GetTextureManager(),
+            config.width, config.height
+        );
 
         AddEngineSystems();
     }
 
     void Engine::Run()
     {
-        auto lastFrame = std::chrono::high_resolution_clock::now();
+        // Initialization
 
+        // Main Loop
+        // TODO: Use a fixed timestep for system updates.
+        // TODO: I don't think high_resolution_clock is guaranteed to never go backwards.
+        auto lastFrame = std::chrono::high_resolution_clock::now();
         while (m_running)
         {
             RNGO_ZONE_SCOPE;
@@ -80,9 +101,19 @@ namespace RNGOEngine::Core
             PollGameEvents();
             PollEngineEvents();
             ClearEvents();
+            CheckUnusedResources();
 
+            ++m_frameCount;
             RNGO_FRAME_MARK;
         }
+
+        // Shutdown
+        CleanUp();
+    }
+
+    void Engine::AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type)
+    {
+        m_assetFetcher.AddAssetPath(path, type);
     }
 
     void Engine::PollWindowEvents()
@@ -97,7 +128,7 @@ namespace RNGOEngine::Core
         do
         {
             moreEvents = m_window->ListenSendEvents(m_eventQueue);
-            moreEvents = moreEvents || m_renderer->ListenSendEvents(m_eventQueue);
+            moreEvents = moreEvents || m_rendererAPI->ListenSendEvents(m_eventQueue);
         } while (moreEvents);
 
         m_inputManager.Update(m_eventQueue);
@@ -116,7 +147,7 @@ namespace RNGOEngine::Core
         m_engineContext.jobSystem = &m_jobSystem;
         m_engineContext.assetManager = m_assetManager.get();
         m_engineContext.eventQueue = &m_eventQueue;
-        m_engineContext.renderer = m_renderer.get();
+        m_engineContext.renderer = m_rendererAPI.get();
 
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineContext);
 
@@ -152,7 +183,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        m_renderer->Render(*m_window);
+        m_rendererAPI->Render(*m_window, m_frameCount);
         m_window->SwapBuffers();
     }
 
@@ -173,6 +204,38 @@ namespace RNGOEngine::Core
     void Engine::ClearEvents()
     {
         m_eventQueue.Clear();
+    }
+
+    void Engine::CheckUnusedResources()
+    {
+        RNGO_ZONE_SCOPE;
+        RNGO_ZONE_NAME_C("Engine::CheckUnusedResources");
+
+        // TODO: Implement resource GC
+        // ++m_framesSinceGC;
+        //
+        // if (m_framesSinceGC >= RESOURCE_CHECK_INTERVAL)
+        // {
+        //     m_framesSinceGC = 0;
+        //
+        //     const auto unusedResources = m_resourceTracker.GetUnusedResources(
+        //         m_frameCount, RESOURCE_UNUSED_THRESHOLD);
+        //
+        //     if (!unusedResources.IsEmpty())
+        //     {
+        //         m_resourceManager->MarkForDestruction(unusedResources);
+        //         m_resourceManager->DestroyMarkedResources();
+        //
+        //         // TODO: Could be optimized by passing the ResourceCollection and letting the AssetManager only rebuild affected caches.
+        //         m_assetManager->RebuildResourceCaches();
+        //     }
+        // }
+    }
+
+    void Engine::CleanUp()
+    {
+        m_assetManager->BeginDestroyAllAssets();
+        m_resourceManager->DestroyMarkedResources();
     }
 
     void Engine::AddEngineSystems()

@@ -16,7 +16,7 @@
 
 namespace RNGOEngine::Shaders
 {
-    ShaderPreProcessor::ShaderPreProcessor(const AssetHandling::AssetFileFetcher& assetFetcher)
+    ShaderPreProcessor::ShaderPreProcessor(const AssetHandling::AssetFetcher& assetFetcher)
         : m_assetFetcher(assetFetcher)
     {
         AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));

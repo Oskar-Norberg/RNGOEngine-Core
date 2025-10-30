@@ -31,7 +31,7 @@ namespace RNGOEngine
         
         namespace Renderer
         {
-            class IRenderer;
+            class RenderAPI;
         }
     }
 }
@@ -52,7 +52,7 @@ namespace RNGOEngine::Systems
         Utilities::JobSystem* jobSystem = nullptr;
         Events::EventQueue* eventQueue = nullptr;
         AssetHandling::AssetManager* assetManager = nullptr;
-        RNGOEngine::Core::Renderer::IRenderer* renderer = nullptr;
+        RNGOEngine::Core::Renderer::RenderAPI* renderer = nullptr;
     };
 
     struct SystemContext

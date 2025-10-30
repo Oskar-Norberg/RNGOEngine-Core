@@ -6,10 +6,14 @@
 
 #include <memory>
 
-#include "AssetManager/AssetManager.h"
+#include "AssetHandling/AssetDatabase/AssetDatabase.h"
+#include "AssetHandling/AssetManager/AssetManager.h"
+#include "ResourceManager/ResourceManager.h"
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"
 #include "Renderer/IRenderer.h"
+#include "Renderer/API/RenderAPI.h"
+#include "ResourceManager/ResourceTracker.h"
 #include "Systems/ISystem.h"
 #include "Systems/SystemScheduler.h"
 #include "Scene/Scene.h"
@@ -32,6 +36,7 @@ namespace RNGOEngine::Core
         size_t height = 600;
         std::string name = "RNGOEngine";
 
+        // TODO: No reason for this to be a vector, make it a span instead.
         std::vector<std::pair<std::filesystem::path, AssetHandling::AssetPathType>> assetPaths;
     };
 
@@ -54,22 +59,40 @@ namespace RNGOEngine::Core
 
         void Run();
 
+
+        // Asset Management
     public:
         AssetHandling::AssetManager& GetAssetManager() const
         {
             return *m_assetManager;
         }
 
+        void AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type);
+
+    private:
+        // TODO: Break into EngineSettings data-only header?
+        constexpr static size_t RESOURCE_CHECK_INTERVAL = 300; // Frames
+        constexpr static size_t RESOURCE_UNUSED_THRESHOLD = 300; // Frames
+
     private:
         bool m_running;
+        // TODO: Consider adding frame count to SystemContext, or wrapping it in a TimeContext.
+        size_t m_frameCount = 0;
+        size_t m_framesSinceGC = 0;
 
         std::unique_ptr<Window::IWindow> m_window;
         std::unique_ptr<Renderer::IRenderer> m_renderer;
+        std::unique_ptr<Renderer::RenderAPI> m_rendererAPI;
+
+        std::unique_ptr<Resources::ResourceManager> m_resourceManager;
+        Resources::ResourceTracker m_resourceTracker;
+        AssetHandling::AssetFetcher m_assetFetcher;
+        AssetHandling::AssetDatabase m_assetDatabase;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
         SceneManager m_sceneManager;
         InputManager m_inputManager;
-        
+
         Systems::SystemContext m_gameContext;
         Systems::SystemScheduler<Systems::SystemContext> m_gameSystems;
 
@@ -90,6 +113,10 @@ namespace RNGOEngine::Core
         void PollGameEvents();
         void PollEngineEvents();
         void ClearEvents();
+        void CheckUnusedResources();
+
+    private:
+        void CleanUp();
 
     private:
         void AddEngineSystems();

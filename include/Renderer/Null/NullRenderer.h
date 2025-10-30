@@ -10,17 +10,75 @@ namespace RNGOEngine::Core::Renderer
     class NullRenderer : public IRenderer
     {
     public:
-        void SubmitDrawQueue(DrawQueue drawQueue) override
+        void SetViewPortSize(int width, int height) override
         {
         }
 
-        void Render(Window::IWindow& window) override
+        void SetClearColor(float r, float g, float b, float a) override
         {
         }
 
-        MeshID CreateMesh(const Data::Rendering::MeshData& meshData) override
+        void ClearColor() override
         {
-            return INVALID_MESH_ID;
+        }
+
+        void ClearDepth() override
+        {
+        }
+
+        void DrawElement(size_t numIndices) override
+        {
+        }
+
+        VAO CreateVAO() override
+        {
+            return INVALID_VAO;
+        }
+
+        VBO CreateVBO() override
+        {
+            return INVALID_VBO;
+        }
+
+        EBO CreateEBO() override
+        {
+            return INVALID_EBO;
+        }
+
+        void DestroyVAO(VAO vao) override
+        {
+        }
+
+        void DestroyVBO(VBO vbo) override
+        {
+        }
+
+        void DestroyEBO(EBO ebo) override
+        {
+        }
+
+        void BindToVAO(VAO vao) override
+        {
+        }
+
+        void BindToVBO(VBO vbo) override
+        {
+        }
+
+        void BindToEBO(EBO ebo) override
+        {
+        }
+
+        void SetAttributePointer(unsigned index, int size, size_t stride, size_t offset) override
+        {
+        }
+
+        void BufferVBOData(std::span<const std::byte> data, bool isDynamic) override
+        {
+        }
+
+        void BufferEBOData(std::span<const std::byte> data, bool isDynamic) override
+        {
         }
 
         ShaderID CreateShader(std::string_view source, ShaderType type) override
@@ -33,14 +91,66 @@ namespace RNGOEngine::Core::Renderer
             return INVALID_SHADER_PROGRAM_ID;
         }
 
-        TextureID CreateTexture(AssetHandling::Textures::TextureHandle textureHandle) override
+        void DestroyShader(ShaderID shader) override
+        {
+        }
+
+        void DestroyShaderProgram(ShaderProgramID program) override
+        {
+        }
+
+        void BindShaderProgram(ShaderProgramID program) override
+        {
+        }
+
+        void SetBool(std::string_view name, bool value) override
+        {
+        }
+
+        void SetInt(std::string_view name, int value) override
+        {
+        }
+
+        void SetFloat(std::string_view name, float value) override
+        {
+        }
+
+        void SetVec2(std::string_view name, std::span<const float, 2> value) override
+        {
+        }
+
+        void SetVec3(std::string_view name, std::span<const float, 3> value) override
+        {
+        }
+
+        void SetVec4(std::string_view name, std::span<const float, 4> value) override
+        {
+        }
+
+        void SetMat2(std::string_view name, std::span<const float, 4> value) override
+        {
+        }
+
+        void SetMat3(std::string_view name, std::span<const float, 9> value) override
+        {
+        }
+
+        void SetMat4(std::string_view name, std::span<const float, 16> value) override
+        {
+        }
+
+        void SetTexture(std::string_view name, TextureID texture, unsigned slot) override
+        {
+        }
+
+        TextureID CreateTexture(unsigned width, unsigned height, unsigned nrChannels,
+                                std::span<const std::byte> data) override
         {
             return INVALID_TEXTURE_ID;
         }
 
-        bool ListenSendEvents(Events::EventQueue& eventQueue) override
+        void DestroyTexture(TextureID texture) override
         {
-            return false;
         }
     };
 }

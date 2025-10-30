@@ -29,7 +29,6 @@ namespace RNGOEngine::Core::Window
 
         m_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
 
-        // TODO: PLEASE MAKE CUSTOM ENGINE LEVEL ASSERTIONS.
         RNGO_ASSERT(m_window && "Failed to create GLFW window");
 
         glfwMakeContextCurrent(m_window);
