@@ -30,7 +30,8 @@ namespace RNGOEngine::AssetHandling
     {
     public:
         // TODO: Goal is for AssetManager to not ever use the AssetFetcher. Only interact with assets through the AssetDatabase.
-        explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager, bool doFlipUVs);
+        explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
+                              Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
     public:
         AssetHandle LoadModel(const std::filesystem::path& modelPath);
@@ -46,7 +47,7 @@ namespace RNGOEngine::AssetHandling
         {
             return m_shaderManager;
         }
-        
+
         const MaterialManager& GetMaterialManager() const
         {
             return m_materialManager;
@@ -64,13 +65,13 @@ namespace RNGOEngine::AssetHandling
 
         // Engine Internal
     public:
-        void RebuildResourceCaches();
+        void DestroyAllAssets();
 
     private:
         AssetDatabase& m_assetDatabase;
         // TODO: Manager should get from the Database in the future. Remove this when possible.
         AssetFetcher& m_assetFileFetcher;
-        
+
         ShaderManager m_shaderManager;
         ModelManager m_modelManager;
         TextureManager m_textureManager;

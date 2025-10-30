@@ -70,6 +70,11 @@ namespace RNGOEngine::AssetHandling
     public:
         Core::Renderer::ShaderProgramID GetShaderProgram(const Containers::Vectors::GenerationalKey<RuntimeShaderProgramData>& key);
 
+        // Engine Internal
+    public:
+        void DestroyAllShaders();
+        void DestroyAllShaderPrograms();
+
     private:
         AssetDatabase& m_assetDatabase;
         Resources::ResourceManager& m_resourceManager;

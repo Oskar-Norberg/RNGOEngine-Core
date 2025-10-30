@@ -55,8 +55,8 @@ namespace RNGOEngine::Resources
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
 
-        void DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
-        void DestroyShaderProgram(
+        void MarkShaderForDestruction(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
+        void MarkShaderProgramForDestruction(
             Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program);
 
         std::optional<Core::Renderer::ShaderID> GetShader(
@@ -81,7 +81,6 @@ namespace RNGOEngine::Resources
         // # Clean Up
     public:
         void DestroyMarkedResources();
-        void DestroyAllResources();
 
     private:
         ModelResourceManager m_modelResourceManager;

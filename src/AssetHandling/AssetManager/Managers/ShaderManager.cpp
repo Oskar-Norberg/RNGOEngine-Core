@@ -105,13 +105,13 @@ namespace RNGOEngine::AssetHandling
         const Containers::Vectors::GenerationalKey<RuntimeShaderProgramData>& key)
     {
         const auto validated = m_shaderPrograms.GetUnmarkedValidated(key);
-        
+
         if (!validated)
         {
             // TODO: Return default? Return optional?
             return {};
         }
-        
+
         const auto programKey = validated->get().ProgramKey;
         const auto shaderProgramOpt = m_resourceManager.GetShaderProgram(programKey);
         if (!shaderProgramOpt)
@@ -119,7 +119,31 @@ namespace RNGOEngine::AssetHandling
             // TODO Return default? Return optional?
             return {};
         }
-        
+
         return shaderProgramOpt.value();
+    }
+
+    void ShaderManager::DestroyAllShaders()
+    {
+        for (const auto shader : m_shaders.Live())
+        {
+            const auto validated = m_shaders.GetUnmarkedValidated(shader);
+            if (validated)
+            {
+                m_resourceManager.MarkShaderForDestruction(validated->get().ShaderKey);
+            }
+        }
+    }
+
+    void ShaderManager::DestroyAllShaderPrograms()
+    {
+        for (const auto program : m_shaderPrograms.Live())
+        {
+            const auto validated = m_shaderPrograms.GetUnmarkedValidated(program);
+            if (validated)
+            {
+                m_resourceManager.MarkShaderProgramForDestruction(validated->get().ProgramKey);
+            }
+        }
     }
 }

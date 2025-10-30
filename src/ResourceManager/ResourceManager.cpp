@@ -66,12 +66,13 @@ namespace RNGOEngine::Resources
         return m_shaderResourceManager.CreateShaderProgram(vertexShader, fragmentShader);
     }
 
-    void ResourceManager::DestroyShader(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader)
+    void ResourceManager::MarkShaderForDestruction(
+        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader)
     {
         m_shaderResourceManager.MarkShaderForDestruction(shader);
     }
 
-    void ResourceManager::DestroyShaderProgram(
+    void ResourceManager::MarkShaderProgramForDestruction(
         Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program)
     {
         m_shaderResourceManager.MarkShaderProgramForDestruction(program);
@@ -117,27 +118,8 @@ namespace RNGOEngine::Resources
     {
         m_modelResourceManager.DestroyMarkedMeshes();
         m_textureResourceManager.DestroyMarkedTextures();
-        
+
         m_shaderResourceManager.DestroyMarkedShaders();
-        m_shaderResourceManager.DestroyMarkedShadersPrograms();
-    }
-
-    void ResourceManager::DestroyAllResources()
-    {
-        // Meshes
-        m_modelResourceManager.MarkAllMeshes();
-        m_modelResourceManager.DestroyMarkedMeshes();
-
-        // Textures
-        m_textureResourceManager.MarkAllTextures();
-        m_textureResourceManager.DestroyMarkedTextures();
-
-        // Shaders
-        m_shaderResourceManager.MarkAllShaders();
-        m_shaderResourceManager.DestroyMarkedShaders();
-        
-        // Shader Programs
-        m_shaderResourceManager.MarkAllShaderPrograms();
         m_shaderResourceManager.DestroyMarkedShadersPrograms();
     }
 }

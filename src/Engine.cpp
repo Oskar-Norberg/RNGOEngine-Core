@@ -109,7 +109,7 @@ namespace RNGOEngine::Core
 
         // Shutdown
         // TODO: This should probably be done through the AssetManager to inform the AssetDatabase of destruction.
-        m_resourceManager->DestroyAllResources();
+        m_assetManager->DestroyAllAssets();
     }
 
     void Engine::AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type)

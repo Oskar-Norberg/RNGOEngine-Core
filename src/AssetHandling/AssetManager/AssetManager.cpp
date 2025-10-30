@@ -73,11 +73,13 @@ namespace RNGOEngine::AssetHandling
         return textureID.value();
     }
 
-
-    void AssetManager::RebuildResourceCaches()
+    void AssetManager::DestroyAllAssets()
     {
-        // m_modelManager.RebuildCache();
-        // m_textureManager.RebuildCache();
-        // m_shaderManager.RebuildCache();
+        m_shaderManager.DestroyAllShaders();
+        m_shaderManager.DestroyAllShaderPrograms();
+
+        // m_modelManager.DestroyAllModels();
+        // m_textureManager.DestroyAllTextures();
+        // m_materialManager.DestroyAllMaterials();
     }
 }
