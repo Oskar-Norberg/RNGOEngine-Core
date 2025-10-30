@@ -177,6 +177,11 @@ namespace RNGOEngine::AssetHandling
         );
     }
 
+    void MaterialManager::DestroyAllMaterials()
+    {
+        // TODO: Save persistent database changes?
+    }
+
     std::optional<std::reference_wrapper<const MaterialParameters>>
     MaterialManager::GetValidatedMaterialParameters(const AssetHandle& materialHandle) const
     {

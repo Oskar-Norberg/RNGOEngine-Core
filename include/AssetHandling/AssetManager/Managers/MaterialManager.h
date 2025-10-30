@@ -56,6 +56,10 @@ namespace RNGOEngine::AssetHandling
         void SetMat4(const AssetHandle& materialHandle,
                      std::string_view name, const glm::mat4& value);
 
+        // Engine Internals
+    public:
+        void DestroyAllMaterials();
+
     private:
         std::unordered_map<AssetHandle, RuntimeMaterial> m_materials;
 
