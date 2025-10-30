@@ -9,7 +9,7 @@
 namespace RNGOEngine::Resources
 {
     ResourceManager::ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
-        : m_modelResourceManager(renderer),
+        : m_meshResourceManager(renderer),
           m_shaderResourceManager(renderer),
           m_textureResourceManager(renderer)
     {
@@ -18,13 +18,13 @@ namespace RNGOEngine::Resources
     Containers::GenerationalKey<MeshResource> ResourceManager::CreateMesh(
         const Data::Rendering::MeshData& meshData)
     {
-        return m_modelResourceManager.CreateMesh(meshData);
+        return m_meshResourceManager.CreateMesh(meshData);
     }
 
     void ResourceManager::MarkMeshForDestruction(
         const Containers::GenerationalKey<MeshResource>& mesh)
     {
-        m_modelResourceManager.MarkMeshForDestruction(mesh);
+        m_meshResourceManager.MarkMeshForDestruction(mesh);
     }
 
     void ResourceManager::MarkMeshesForDestruction(const ResourceCollection<MeshResource>& meshes)
@@ -38,7 +38,7 @@ namespace RNGOEngine::Resources
     std::optional<std::reference_wrapper<const MeshResource>> ResourceManager::GetMeshResource(
         const Containers::GenerationalKey<MeshResource>& key) const
     {
-        return m_modelResourceManager.GetMeshResource(key);
+        return m_meshResourceManager.GetMeshResource(key);
     }
 
     Containers::GenerationalKey<Core::Renderer::ShaderID> ResourceManager::CreateShader(
@@ -100,7 +100,7 @@ namespace RNGOEngine::Resources
     {
         for (const auto meshKey : resources.meshes.Resources)
         {
-            m_modelResourceManager.MarkMeshForDestruction(meshKey);
+            m_meshResourceManager.MarkMeshForDestruction(meshKey);
         }
 
         for (const auto textureKey : resources.textures.Resources)
@@ -116,7 +116,7 @@ namespace RNGOEngine::Resources
 
     void ResourceManager::DestroyMarkedResources()
     {
-        m_modelResourceManager.DestroyMarkedMeshes();
+        m_meshResourceManager.DestroyMarkedMeshes();
         m_textureResourceManager.DestroyMarkedTextures();
 
         m_shaderResourceManager.DestroyMarkedShaders();

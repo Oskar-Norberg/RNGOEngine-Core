@@ -2,19 +2,19 @@
 // Created by Oskar.Norberg on 2025-10-14.
 //
 
-#include "ResourceManager/ModelResourceManager/ModelResourceManager.h"
+#include "ResourceManager/MeshResourceManager/MeshResourceManager.h"
 
 #include "Data/MeshData.h"
 #include "Renderer/IRenderer.h"
 
 namespace RNGOEngine::Resources
 {
-    ModelResourceManager::ModelResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
+    MeshResourceManager::MeshResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
         : m_renderer(renderer)
     {
     }
 
-    Containers::GenerationalKey<MeshResource> ModelResourceManager::CreateMesh(
+    Containers::GenerationalKey<MeshResource> MeshResourceManager::CreateMesh(
         const Data::Rendering::MeshData& meshData)
     {
         const auto VAO = m_renderer.CreateVAO();
@@ -46,19 +46,19 @@ namespace RNGOEngine::Resources
         return handle;
     }
 
-    void ModelResourceManager::MarkMeshForDestruction(
+    void MeshResourceManager::MarkMeshForDestruction(
         const Containers::GenerationalKey<MeshResource>& meshKey)
     {
         m_meshes.MarkForRemoval(meshKey);
     }
 
-    std::optional<std::reference_wrapper<const MeshResource>> ModelResourceManager::GetMeshResource(
+    std::optional<std::reference_wrapper<const MeshResource>> MeshResourceManager::GetMeshResource(
         const Containers::GenerationalKey<MeshResource>& key) const
     {
         return m_meshes.GetUnmarkedValidated(key);
     }
 
-    void ModelResourceManager::MarkAllMeshes()
+    void MeshResourceManager::MarkAllMeshes()
     {
         for (const auto meshKey : m_meshes.Live())
         {
@@ -66,7 +66,7 @@ namespace RNGOEngine::Resources
         }
     }
 
-    void ModelResourceManager::DestroyMarkedMeshes()
+    void MeshResourceManager::DestroyMarkedMeshes()
     {
         for (const auto key : m_meshes.Marked())
         {
@@ -76,7 +76,7 @@ namespace RNGOEngine::Resources
         }
     }
 
-    void ModelResourceManager::DestroyMeshResource(const MeshResource& meshResource)
+    void MeshResourceManager::DestroyMeshResource(const MeshResource& meshResource)
     {
         m_renderer.DestroyVAO(meshResource.vao);
         m_renderer.DestroyVBO(meshResource.vbo);

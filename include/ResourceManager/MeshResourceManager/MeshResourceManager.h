@@ -32,11 +32,10 @@ namespace RNGOEngine::Resources
         size_t elementCount = 0;
     };
 
-    // TODO: This should be called MeshResourceManager. This does not deal with a high level Model.
-    class ModelResourceManager
+    class MeshResourceManager
     {
     public:
-        explicit ModelResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
+        explicit MeshResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
         // Creation / Destruction
     public:

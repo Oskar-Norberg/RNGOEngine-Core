@@ -4,8 +4,8 @@
 
 #pragma once
 
+#include "MeshResourceManager/MeshResourceManager.h"
 #include "ResourceCollection.h"
-#include "ModelResourceManager/ModelResourceManager.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::Resources

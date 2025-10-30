@@ -5,8 +5,8 @@ add_library(${RESOURCE_MANAGEMENT_PROJECT_NAME} STATIC
         include/ResourceManager/ResourceManager.h
         src/ResourceManager/ResourceManager.cpp
 
-        include/ResourceManager/ModelResourceManager/ModelResourceManager.h
-        src/ResourceManager/ModelResourceManager/ModelResourceManager.cpp
+        include/ResourceManager/MeshResourceManager/MeshResourceManager.h
+        src/ResourceManager/MeshResourceManager/MeshResourceManager.cpp
         
         include/ResourceManager/ShaderResourceManager/ShaderResourceManager.h
         src/ResourceManager/ShaderResourceManager/ShaderResourceManager.cpp

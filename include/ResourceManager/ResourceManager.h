@@ -4,16 +4,16 @@
 
 #pragma once
 
+#include <functional>
 #include <optional>
 #include <string_view>
-#include <functional>
 
+#include "Data/MeshData.h"
+#include "MeshResourceManager/MeshResourceManager.h"
+#include "Renderer/Handles/TextureHandle.h"
+#include "Renderer/RenderID.h"
 #include "ResourceCollection.h"
 #include "ResourceTracker.h"
-#include "Data/MeshData.h"
-#include "Renderer/RenderID.h"
-#include "Renderer/Handles/TextureHandle.h"
-#include "ModelResourceManager/ModelResourceManager.h"
 #include "ShaderResourceManager/ShaderResourceManager.h"
 #include "TextureResourceManager/TextureResourceManager.h"
 
@@ -83,7 +83,7 @@ namespace RNGOEngine::Resources
         void DestroyMarkedResources();
 
     private:
-        ModelResourceManager m_modelResourceManager;
+        MeshResourceManager m_meshResourceManager;
         ShaderResourceManager m_shaderResourceManager;
         TextureResourceManager m_textureResourceManager;
     };

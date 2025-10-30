@@ -29,7 +29,6 @@ namespace RNGOEngine::AssetHandling
     class AssetManager
     {
     public:
-        // TODO: Goal is for AssetManager to not ever use the AssetFetcher. Only interact with assets through the AssetDatabase.
         explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
                               Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
