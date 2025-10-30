@@ -76,6 +76,14 @@ namespace RNGOEngine::AssetHandling
         return textureOpt.value();
     }
 
+    void TextureManager::DestroyAllTextures()
+    {
+        for (const auto& [handle, textureData] : m_textures)
+        {
+            m_resourceManager.MarkTextureForDestruction(textureData.TextureKey);
+        }
+    }
+
     std::expected<Textures::TextureHandle, TextureManagerError> TextureManager::LoadFromDisk(
         const std::filesystem::path& path)
     {

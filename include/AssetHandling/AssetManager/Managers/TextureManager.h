@@ -48,6 +48,10 @@ namespace RNGOEngine::AssetHandling
     public:
         Core::Renderer::TextureID GetTexture(const AssetHandle& uuid) const;
 
+        // Engine Internals
+    public:
+        void DestroyAllTextures();
+
     private:
         std::unordered_map<AssetHandle, RuntimeTextureData> m_textures;
 
