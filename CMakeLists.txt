@@ -18,15 +18,16 @@ include(cmake/CPM.cmake)
 include(cmake/Dependencies.cmake)
 
 # TODO: Apparently the TextureHandle.h is not included anywhere. It is header only, so its fine. But it should be included somewhere.
+# ^ For some unknown reason I put it in the core renderer. resource manager depends on it... it should be in AssetManager and its data should be passed as parameters.
 # Engine Units
 include(cmake/EngineUnits/Data.cmake)
 
 include(cmake/EngineUnits/Profiling.cmake)
 
 include(cmake/EngineUnits/Concepts.cmake)
+include(cmake/EngineUnits/Math.cmake)
 include(cmake/EngineUnits/Utilities.cmake)
 include(cmake/EngineUnits/Containers.cmake)
-include(cmake/EngineUnits/Math.cmake)
 include(cmake/EngineUnits/Events.cmake)
 include(cmake/EngineUnits/InputManager.cmake)
 
@@ -60,9 +61,9 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${PROFILING_PROJECT_NAME}
         
         ${CONCEPTS_PROJECT_NAME}
+        ${MATH_PROJECT_NAME}
         ${UTILITIES_PROJECT_NAME}
         ${CONTAINERS_PROJECT_NAME}
-        ${MATH_PROJECT_NAME}
         ${EVENTS_PROJECT_NAME}
         ${INPUT_MANAGER_PROJECT_NAME}
 
