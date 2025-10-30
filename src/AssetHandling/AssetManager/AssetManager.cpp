@@ -75,11 +75,12 @@ namespace RNGOEngine::AssetHandling
 
     void AssetManager::DestroyAllAssets()
     {
+        // TODO: Save persistent database changes?
         m_shaderManager.DestroyAllShaders();
         m_shaderManager.DestroyAllShaderPrograms();
 
-        // m_modelManager.DestroyAllModels();
         // m_textureManager.DestroyAllTextures();
         // m_materialManager.DestroyAllMaterials();
+        m_modelManager.DestroyAllModels();
     }
 }

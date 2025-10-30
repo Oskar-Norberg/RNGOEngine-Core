@@ -58,6 +58,10 @@ namespace RNGOEngine::AssetHandling
         // TODO: Make this return an optional or expected?
         const RuntimeModelData& GetRuntimeModelData(AssetHandle handle) const;
 
+        // Engine Internals
+    public:
+        void DestroyAllModels();
+
     private:
         bool m_doFlipUVs;
         std::unordered_map<AssetHandle, RuntimeModelData> m_models;

@@ -99,6 +99,18 @@ namespace RNGOEngine::AssetHandling
         return m_models.at(handle);
     }
 
+    void ModelManager::DestroyAllModels()
+    {
+        for (const auto& [assetHandle, modelData] : m_models)
+        {
+            const auto& [meshKeys] = modelData;
+            for (const auto& meshKey : meshKeys)
+            {
+                m_resourceManager.MarkMeshForDestruction(meshKey);
+            }
+        }
+    }
+
     RuntimeModelData ModelManager::UploadModel(ModelLoading::ModelHandle modelHandle)
     {
         RuntimeModelData modelData;
