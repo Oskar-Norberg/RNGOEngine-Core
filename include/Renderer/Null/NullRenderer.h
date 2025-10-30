@@ -103,48 +103,63 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        void SetBool(std::string_view name, bool value) override
+        void SetBool(ShaderProgramID programID, std::string_view name, bool value) override
         {
         }
 
-        void SetInt(std::string_view name, int value) override
+        void SetInt(ShaderProgramID programID, std::string_view name, int value) override
         {
         }
 
-        void SetFloat(std::string_view name, float value) override
+        void SetFloat(ShaderProgramID programID, std::string_view name, float value) override
         {
         }
 
-        void SetVec2(std::string_view name, std::span<const float, 2> value) override
+        void SetVec2(
+            ShaderProgramID programID, std::string_view name, std::span<const float, 2> value
+        ) override
         {
         }
 
-        void SetVec3(std::string_view name, std::span<const float, 3> value) override
+        void SetVec3(
+            ShaderProgramID programID, std::string_view name, std::span<const float, 3> value
+        ) override
         {
         }
 
-        void SetVec4(std::string_view name, std::span<const float, 4> value) override
+        void SetVec4(
+            ShaderProgramID programID, std::string_view name, std::span<const float, 4> value
+        ) override
         {
         }
 
-        void SetMat2(std::string_view name, std::span<const float, 4> value) override
+        void SetMat2(
+            ShaderProgramID programID, std::string_view name, std::span<const float, 4> value
+        ) override
         {
         }
 
-        void SetMat3(std::string_view name, std::span<const float, 9> value) override
+        void SetMat3(
+            ShaderProgramID programID, std::string_view name, std::span<const float, 9> value
+        ) override
         {
         }
 
-        void SetMat4(std::string_view name, std::span<const float, 16> value) override
+        void SetMat4(
+            ShaderProgramID programID, std::string_view name, std::span<const float, 16> value
+        ) override
         {
         }
 
-        void SetTexture(std::string_view name, TextureID texture, unsigned slot) override
+        void SetTexture(
+            ShaderProgramID programID, std::string_view name, TextureID texture, unsigned slot
+        ) override
         {
         }
 
-        TextureID CreateTexture(unsigned width, unsigned height, unsigned nrChannels,
-                                std::span<const std::byte> data) override
+        TextureID CreateTexture(
+            unsigned width, unsigned height, unsigned nrChannels, std::span<const std::byte> data
+        ) override
         {
             return INVALID_TEXTURE_ID;
         }

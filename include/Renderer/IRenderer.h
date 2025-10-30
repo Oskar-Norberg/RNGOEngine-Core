@@ -80,22 +80,24 @@ namespace RNGOEngine::Core::Renderer
     public:
         // TODO: Support uniform buffer objects.
         // TODO: Expose function to get uniform location. This can then be cached at a higher level.
-        virtual void SetBool(std::string_view name, bool value) = 0;
-        virtual void SetInt(std::string_view name, int value) = 0;
-        virtual void SetFloat(std::string_view name, float value) = 0;
-        virtual void SetVec2(std::string_view name, std::span<const float, 2> value) = 0;
-        virtual void SetVec3(std::string_view name, std::span<const float, 3> value) = 0;
-        virtual void SetVec4(std::string_view name, std::span<const float, 4> value) = 0;
-        virtual void SetMat2(std::string_view name, std::span<const float, 4> value) = 0;
-        virtual void SetMat3(std::string_view name, std::span<const float, 9> value) = 0;
-        virtual void SetMat4(std::string_view name, std::span<const float, 16> value) = 0;
-        virtual void SetTexture(std::string_view name, TextureID texture, unsigned int slot) = 0;
+        virtual void SetBool(ShaderProgramID programID, std::string_view name, bool value) = 0;
+        virtual void SetInt(ShaderProgramID programID, std::string_view name, int value) = 0;
+        virtual void SetFloat(ShaderProgramID programID, std::string_view name, float value) = 0;
+        virtual void SetVec2(ShaderProgramID programID, std::string_view name, std::span<const float, 2> value) = 0;
+        virtual void SetVec3(ShaderProgramID programID, std::string_view name, std::span<const float, 3> value) = 0;
+        virtual void SetVec4(ShaderProgramID programID, std::string_view name, std::span<const float, 4> value) = 0;
+        virtual void SetMat2(ShaderProgramID programID, std::string_view name, std::span<const float, 4> value) = 0;
+        virtual void SetMat3(ShaderProgramID programID, std::string_view name, std::span<const float, 9> value) = 0;
+        virtual void SetMat4(ShaderProgramID programID, std::string_view name, std::span<const float, 16> value) = 0;
+        virtual void SetTexture(ShaderProgramID programID, std::string_view name, TextureID texture, unsigned int slot) = 0;
 
         // Create texture
     public:
         // TODO: Assumes 2D texture.
         // TODO: Pass in format, filtering, wrapping etc.
-        virtual TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels, std::span<const std::byte> data) = 0;
+        virtual TextureID CreateTexture(
+            unsigned int width, unsigned int height, unsigned int nrChannels, std::span<const std::byte> data
+        ) = 0;
 
         // Destroy texture
     public:
