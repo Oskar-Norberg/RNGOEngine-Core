@@ -31,7 +31,7 @@ namespace RNGOEngine::AssetHandling
 
     struct RuntimeTextureData
     {
-        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureKey;
+        Containers::GenerationalKey<Core::Renderer::TextureID> TextureKey;
     };
 
     class TextureManager

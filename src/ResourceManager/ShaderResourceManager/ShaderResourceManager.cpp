@@ -12,7 +12,7 @@ RNGOEngine::Resources::ShaderResourceManager::ShaderResourceManager(
 {
 }
 
-RNGOEngine::Containers::Vectors::GenerationalKey<unsigned> RNGOEngine::Resources::ShaderResourceManager::
+RNGOEngine::Containers::GenerationalKey<unsigned> RNGOEngine::Resources::ShaderResourceManager::
 CreateShader(const std::string_view source, const Core::Renderer::ShaderType type)
 {
     const auto shaderID = m_renderer.CreateShader(source, type);
@@ -21,9 +21,9 @@ CreateShader(const std::string_view source, const Core::Renderer::ShaderType typ
     return shaderKey;
 }
 
-RNGOEngine::Containers::Vectors::GenerationalKey<unsigned> RNGOEngine::Resources::ShaderResourceManager::
-CreateShaderProgram(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
-                    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader)
+RNGOEngine::Containers::GenerationalKey<unsigned> RNGOEngine::Resources::ShaderResourceManager::
+CreateShaderProgram(Containers::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
+                    Containers::GenerationalKey<Core::Renderer::ShaderID> fragmentShader)
 {
     const auto vertexShaderID = m_shaders.GetUnmarkedValidated(vertexShader);
     const auto fragmentShaderID = m_shaders.GetUnmarkedValidated(fragmentShader);
@@ -42,7 +42,7 @@ CreateShaderProgram(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderI
 }
 
 void RNGOEngine::Resources::ShaderResourceManager::MarkShaderForDestruction(
-    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader)
+    Containers::GenerationalKey<Core::Renderer::ShaderID> shader)
 {
     if (!m_shaders.IsValidUnmarked(shader))
     {
@@ -54,7 +54,7 @@ void RNGOEngine::Resources::ShaderResourceManager::MarkShaderForDestruction(
 }
 
 void RNGOEngine::Resources::ShaderResourceManager::MarkShaderProgramForDestruction(
-    Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program)
+    Containers::GenerationalKey<Core::Renderer::ShaderProgramID> program)
 {
     if (!m_shaderPrograms.IsValidUnmarked(program))
     {
@@ -66,13 +66,13 @@ void RNGOEngine::Resources::ShaderResourceManager::MarkShaderProgramForDestructi
 }
 
 std::optional<RNGOEngine::Core::Renderer::ShaderID> RNGOEngine::Resources::ShaderResourceManager::GetShader(
-    const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>& key) const
+    const Containers::GenerationalKey<Core::Renderer::ShaderID>& key) const
 {
     return m_shaders.GetUnmarkedValidated(key);
 }
 
 std::optional<RNGOEngine::Core::Renderer::ShaderProgramID> RNGOEngine::Resources::ShaderResourceManager::
-GetShaderProgram(const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const
+GetShaderProgram(const Containers::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const
 {
     return m_shaderPrograms.GetUnmarkedValidated(key);
 }

@@ -22,34 +22,34 @@ namespace RNGOEngine::Resources
         explicit ShaderResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
     public:
-        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> CreateShader(
+        Containers::GenerationalKey<Core::Renderer::ShaderID> CreateShader(
             std::string_view source, Core::Renderer::ShaderType type);
-        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> CreateShaderProgram(
-            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
-            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
+        Containers::GenerationalKey<Core::Renderer::ShaderProgramID> CreateShaderProgram(
+            Containers::GenerationalKey<Core::Renderer::ShaderID> vertexShader,
+            Containers::GenerationalKey<Core::Renderer::ShaderID> fragmentShader);
 
     public:
-        void MarkShaderForDestruction(Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> shader);
+        void MarkShaderForDestruction(Containers::GenerationalKey<Core::Renderer::ShaderID> shader);
         void MarkShaderProgramForDestruction(
-            Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> program);
+            Containers::GenerationalKey<Core::Renderer::ShaderProgramID> program);
 
     public:
         std::optional<Core::Renderer::ShaderID> GetShader(
-            const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID>& key) const;
+            const Containers::GenerationalKey<Core::Renderer::ShaderID>& key) const;
         std::optional<Core::Renderer::ShaderProgramID> GetShaderProgram(
-            const Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const;
+            const Containers::GenerationalKey<Core::Renderer::ShaderProgramID>& key) const;
 
         // Engine Internals
     public:
         void MarkAllShaders();
         void DestroyMarkedShaders();
-        
+
         void MarkAllShaderPrograms();
         void DestroyMarkedShadersPrograms();
 
     private:
-        Containers::Vectors::GenerationalVector<Core::Renderer::ShaderID> m_shaders;
-        Containers::Vectors::GenerationalVector<Core::Renderer::ShaderProgramID> m_shaderPrograms;
+        Containers::GenerationalVector<Core::Renderer::ShaderID> m_shaders;
+        Containers::GenerationalVector<Core::Renderer::ShaderProgramID> m_shaderPrograms;
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;

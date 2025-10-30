@@ -12,7 +12,7 @@ namespace RNGOEngine::Resources
     template<typename T>
     struct ResourceCollection
     {
-        std::vector<Containers::Vectors::GenerationalKey<T>> Resources;
+        std::vector<Containers::GenerationalKey<T>> Resources;
 
         // Should I add helper methods here for adding?
         // Meh, feels like bloat. Just access the vector directly for now.

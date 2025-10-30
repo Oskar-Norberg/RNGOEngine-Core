@@ -14,7 +14,7 @@ namespace RNGOEngine::AssetHandling
     struct RuntimeMaterial
     {
         Utilities::UUID materialUUID;
-        Containers::Vectors::GenerationalKey<RuntimeShaderProgramData> shaderProgramKey;
+        Containers::GenerationalKey<RuntimeShaderProgramData> shaderProgramKey;
     };
 
     struct ResolvedMaterial

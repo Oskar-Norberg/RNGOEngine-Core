@@ -32,11 +32,12 @@ namespace RNGOEngine::AssetHandling
         // TODO: Storing the TextureHandle here means the Database is tied to asset loading. Is this necessary?
         std::optional<Textures::TextureHandle> texture;
     };
-    
+
     class TextureDatabase
     {
     public:
-        Utilities::UUID Insert(Textures::TextureHandle textureHandle, const std::filesystem::path& texturePath);
+        Utilities::UUID Insert(Textures::TextureHandle textureHandle,
+                               const std::filesystem::path& texturePath);
         std::optional<Utilities::UUID> TryGetTextureUUID(const std::filesystem::path& texturePath) const;
         // TODO: Unload textures.
 
@@ -50,7 +51,7 @@ namespace RNGOEngine::AssetHandling
 
     private:
         std::unordered_map<std::filesystem::path, Utilities::UUID> m_texturePathToUUIDMap;
-        std::unordered_map<Utilities::UUID, Containers::Vectors::GenerationalKey<TextureRecord>> m_textureUUIDToKeyMap;
-        Containers::Vectors::GenerationalVector<TextureRecord> m_textureRecords;
+        std::unordered_map<Utilities::UUID, Containers::GenerationalKey<TextureRecord>> m_textureUUIDToKeyMap;
+        Containers::GenerationalVector<TextureRecord> m_textureRecords;
     };
 }

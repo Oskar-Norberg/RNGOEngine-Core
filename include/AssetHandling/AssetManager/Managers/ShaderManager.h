@@ -43,12 +43,12 @@ namespace RNGOEngine::AssetHandling
     struct RuntimeShaderData
     {
         Core::Renderer::ShaderType Type;
-        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderID> ShaderKey;
+        Containers::GenerationalKey<Core::Renderer::ShaderID> ShaderKey;
     };
 
     struct RuntimeShaderProgramData
     {
-        Containers::Vectors::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
+        Containers::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
     };
 
     // TODO: Separate Shader and ShaderProgram into separate managers.
@@ -63,12 +63,13 @@ namespace RNGOEngine::AssetHandling
         AssetHandle CreateShader(const std::filesystem::path& path, Core::Renderer::ShaderType type);
 
     public:
-        Containers::Vectors::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(
+        Containers::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(
             const AssetHandle& vertexShader,
             const AssetHandle& fragmentShader);
 
     public:
-        Core::Renderer::ShaderProgramID GetShaderProgram(const Containers::Vectors::GenerationalKey<RuntimeShaderProgramData>& key);
+        Core::Renderer::ShaderProgramID GetShaderProgram(
+            const Containers::GenerationalKey<RuntimeShaderProgramData>& key);
 
         // Engine Internal
     public:
@@ -81,11 +82,11 @@ namespace RNGOEngine::AssetHandling
         ShaderLoader m_shaderLoader;
 
     private:
-        Containers::Vectors::GenerationalVector<RuntimeShaderData> m_shaders;
-        Containers::Vectors::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
+        Containers::GenerationalVector<RuntimeShaderData> m_shaders;
+        Containers::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
 
     private:
-        std::unordered_map<AssetHandle, Containers::Vectors::GenerationalKey<RuntimeShaderData>>
+        std::unordered_map<AssetHandle, Containers::GenerationalKey<RuntimeShaderData>>
         m_handleToShader;
     };
 }

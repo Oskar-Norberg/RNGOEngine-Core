@@ -56,7 +56,7 @@ namespace RNGOEngine::AssetHandling
     }
 
     // TODO: Long function, clean up.
-    Containers::Vectors::GenerationalKey<RuntimeShaderProgramData> ShaderManager::CreateShaderProgram(
+    Containers::GenerationalKey<RuntimeShaderProgramData> ShaderManager::CreateShaderProgram(
         const AssetHandle& vertexShader, const AssetHandle& fragmentShader)
     {
         // Lots of double work on the vert/frag shaders here, make a helper function / lambda.
@@ -102,7 +102,7 @@ namespace RNGOEngine::AssetHandling
     }
 
     Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(
-        const Containers::Vectors::GenerationalKey<RuntimeShaderProgramData>& key)
+        const Containers::GenerationalKey<RuntimeShaderProgramData>& key)
     {
         const auto validated = m_shaderPrograms.GetUnmarkedValidated(key);
 

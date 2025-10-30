@@ -13,7 +13,7 @@ namespace RNGOEngine::Resources
     {
     }
 
-    Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> TextureResourceManager::CreateTexture(
+    Containers::GenerationalKey<Core::Renderer::TextureID> TextureResourceManager::CreateTexture(
         const AssetHandling::Textures::TextureHandle textureHandle)
     {
         const auto textureID = UploadTexture(textureHandle);
@@ -23,7 +23,7 @@ namespace RNGOEngine::Resources
     }
 
     void TextureResourceManager::MarkTextureForDeletion(
-        Containers::Vectors::GenerationalKey<Core::Renderer::TextureID> key)
+        Containers::GenerationalKey<Core::Renderer::TextureID> key)
     {
         m_textures.MarkForRemoval(key);
     }
@@ -47,7 +47,7 @@ namespace RNGOEngine::Resources
     }
 
     std::optional<Core::Renderer::TextureID> TextureResourceManager::GetTexture(
-        const Containers::Vectors::GenerationalKey<Core::Renderer::TextureID>& key) const
+        const Containers::GenerationalKey<Core::Renderer::TextureID>& key) const
     {
         return m_textures.GetUnmarkedValidated(key);
     }

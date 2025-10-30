@@ -13,7 +13,7 @@
 #include "Utilities/RNGOAsserts.h"
 #include "Utilities/Hash/PairHash.h"
 
-namespace RNGOEngine::Containers::Vectors
+namespace RNGOEngine::Containers
 {
     enum class GenerationalKeyStatus
     {
@@ -69,7 +69,8 @@ namespace RNGOEngine::Containers::Vectors
         const T& GetUnmarked(const GenerationalKey<T>& key) const;
         T& GetUnmarked(const GenerationalKey<T>& key);
 
-        std::optional<std::reference_wrapper<const T>> GetUnmarkedValidated(const GenerationalKey<T>& key) const;
+        std::optional<std::reference_wrapper<const T>> GetUnmarkedValidated(
+            const GenerationalKey<T>& key) const;
         std::optional<std::reference_wrapper<T>> GetUnmarkedValidated(const GenerationalKey<T>& key);
 
         // Get Marked
@@ -77,7 +78,8 @@ namespace RNGOEngine::Containers::Vectors
         const T& GetMarked(const GenerationalKey<T>& key) const;
         T& GetMarked(const GenerationalKey<T>& key);
 
-        std::optional<std::reference_wrapper<const T>> GetMarkedValidated(const GenerationalKey<T>& key) const;
+        std::optional<std::reference_wrapper<const T>>
+        GetMarkedValidated(const GenerationalKey<T>& key) const;
         std::optional<std::reference_wrapper<T>> GetMarkedValidated(const GenerationalKey<T>& key);
 
         // All Iterators
@@ -137,9 +139,9 @@ namespace RNGOEngine::Containers::Vectors
 namespace std
 {
     template<typename T>
-    struct hash<RNGOEngine::Containers::Vectors::GenerationalKey<T>>
+    struct hash<RNGOEngine::Containers::GenerationalKey<T>>
     {
-        size_t operator()(const RNGOEngine::Containers::Vectors::GenerationalKey<T>& key) const noexcept
+        size_t operator()(const RNGOEngine::Containers::GenerationalKey<T>& key) const noexcept
         {
             return RNGOEngine::Utilities::Hash::CombineHashes(std::hash<size_t>{}(key.ID),
                                                               std::hash<size_t>{}(key.Generation));

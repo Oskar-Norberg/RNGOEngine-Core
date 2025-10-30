@@ -14,7 +14,7 @@ namespace RNGOEngine::Resources
     {
     }
 
-    Containers::Vectors::GenerationalKey<MeshResource> ModelResourceManager::CreateMesh(
+    Containers::GenerationalKey<MeshResource> ModelResourceManager::CreateMesh(
         const Data::Rendering::MeshData& meshData)
     {
         const auto VAO = m_renderer.CreateVAO();
@@ -47,13 +47,13 @@ namespace RNGOEngine::Resources
     }
 
     void ModelResourceManager::MarkMeshForDestruction(
-        const Containers::Vectors::GenerationalKey<MeshResource>& meshKey)
+        const Containers::GenerationalKey<MeshResource>& meshKey)
     {
         m_meshes.MarkForRemoval(meshKey);
     }
 
     std::optional<std::reference_wrapper<const MeshResource>> ModelResourceManager::GetMeshResource(
-        const Containers::Vectors::GenerationalKey<MeshResource>& key) const
+        const Containers::GenerationalKey<MeshResource>& key) const
     {
         return m_meshes.GetUnmarkedValidated(key);
     }

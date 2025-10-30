@@ -30,7 +30,7 @@ namespace RNGOEngine::AssetHandling
 {
     struct RuntimeModelData
     {
-        std::vector<Containers::Vectors::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
+        std::vector<Containers::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
     };
 
     enum class ModelCreationError

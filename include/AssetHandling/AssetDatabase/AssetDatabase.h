@@ -58,10 +58,10 @@ namespace RNGOEngine::AssetHandling
         // Material Database
     public:
         AssetHandle InsertMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader,
-                               const std::filesystem::path& materialPath);
+                                   const std::filesystem::path& materialPath);
         std::optional<AssetHandle> TryGetMaterialUUID(const std::filesystem::path& shaderPath) const;
         std::optional<std::reference_wrapper<MaterialParameters>> GetMaterialParameters(
-    const AssetHandle& materialHandle);
+            const AssetHandle& materialHandle);
         std::optional<std::reference_wrapper<const MaterialParameters>> GetMaterialParameters(
             const AssetHandle& materialHandle) const;
 

@@ -39,8 +39,8 @@ namespace RNGOEngine::AssetHandling
             const AssetHandle& materialHandle) const;
 
     private:
-        Containers::Vectors::GenerationalVector<MaterialRecord> m_materials;
-        std::unordered_map<AssetHandle, Containers::Vectors::GenerationalKey<MaterialRecord>>
+        Containers::GenerationalVector<MaterialRecord> m_materials;
+        std::unordered_map<AssetHandle, Containers::GenerationalKey<MaterialRecord>>
         m_materialsByPath;
     };
 }

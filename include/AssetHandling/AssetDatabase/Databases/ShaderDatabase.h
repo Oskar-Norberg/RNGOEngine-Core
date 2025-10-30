@@ -32,9 +32,9 @@ namespace RNGOEngine::AssetHandling
         void SetAssetState(const Utilities::UUID& uuid, AssetState state);
 
     private:
-        Containers::Vectors::GenerationalVector<ShaderRecord> m_shaderRecords;
+        Containers::GenerationalVector<ShaderRecord> m_shaderRecords;
         std::unordered_map<std::filesystem::path, Utilities::UUID> m_shaderPathToUUID;
-        std::unordered_map<Utilities::UUID, Containers::Vectors::GenerationalKey<ShaderRecord>>
+        std::unordered_map<Utilities::UUID, Containers::GenerationalKey<ShaderRecord>>
         m_shaderUUIDToKey;
     };
 }
