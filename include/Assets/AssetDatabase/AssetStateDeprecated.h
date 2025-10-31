@@ -4,7 +4,7 @@
 
 #pragma once
 
-enum class AssetState
+enum class AssetStateDeprecated
 {
     Unregistered, // Database is not aware of asset.
     Registered, // Registered to Database, but not loaded.

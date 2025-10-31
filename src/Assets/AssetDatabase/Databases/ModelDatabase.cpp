@@ -15,7 +15,7 @@ namespace RNGOEngine::AssetHandling
         ModelRecord record{
             .uuid = uuid,
             .path = modelPath,
-            .state = AssetState::Registered,
+            .state = AssetStateDeprecated::Registered,
             .model = modelHandle,
         };
 
@@ -65,7 +65,7 @@ namespace RNGOEngine::AssetHandling
         return std::unexpected(ModelDatabaseError::ModelNotFound);
     }
 
-    AssetState ModelDatabase::GetAssetState(const Utilities::UUID& uuid) const
+    AssetStateDeprecated ModelDatabase::GetAssetState(const Utilities::UUID& uuid) const
     {
         const auto modelOpt = m_modelRecords.GetUnmarkedValidated(
             m_modelUUIDToIndexMap.at(uuid));
@@ -75,10 +75,10 @@ namespace RNGOEngine::AssetHandling
             return modelOpt->get().state;
         }
 
-        return AssetState::Unregistered;
+        return AssetStateDeprecated::Unregistered;
     }
 
-    void ModelDatabase::SetAssetState(const Utilities::UUID& uuid, AssetState state)
+    void ModelDatabase::SetAssetState(const Utilities::UUID& uuid, AssetStateDeprecated state)
     {
         const auto modelOpt = m_modelRecords.GetUnmarkedValidated(
             m_modelUUIDToIndexMap.at(uuid));

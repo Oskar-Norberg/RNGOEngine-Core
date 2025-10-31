@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <filesystem>
 #include <expected>
+#include <filesystem>
 #include <optional>
 #include <unordered_map>
 
-#include "Assets/AssetDatabase/AssetState.h"
+#include "Assets/AssetDatabase/AssetStateDeprecated.h"
 #include "Assets/AssetLoaders/ModelLoader.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 #include "Utilities/UUID/UUID.h"
@@ -22,7 +22,7 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID uuid;
         std::filesystem::path path;
         // State
-        AssetState state = AssetState::Unregistered;
+        AssetStateDeprecated state = AssetStateDeprecated::Unregistered;
         // Data
         std::optional<ModelLoading::ModelHandle> model;
     };
@@ -52,8 +52,8 @@ namespace RNGOEngine::AssetHandling
         std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
             const std::filesystem::path& modelPath) const;
 
-        AssetState GetAssetState(const Utilities::UUID& uuid) const;
-        void SetAssetState(const Utilities::UUID& uuid, AssetState state);
+        AssetStateDeprecated GetAssetState(const Utilities::UUID& uuid) const;
+        void SetAssetState(const Utilities::UUID& uuid, AssetStateDeprecated state);
 
     private:
         Containers::GenerationalVector<ModelRecord> m_modelRecords;

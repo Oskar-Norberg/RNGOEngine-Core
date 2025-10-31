@@ -13,7 +13,7 @@ namespace RNGOEngine::AssetHandling
         MaterialRecord record{
             .uuid = uuid,
             .path = materialPath,
-            .state = AssetState::Registered,
+            .state = AssetStateDeprecated::Registered,
             .vertexShader = vertexShader,
             . fragmentShader = fragmentShader,
             .parameters = {}

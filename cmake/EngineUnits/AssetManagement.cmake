@@ -5,8 +5,11 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/Asset.h
 
         include/Assets/AssetTypes/ModelAsset.h
-        
-        include/Assets/AssetDatabase/AssetState.h
+        include/Assets/AssetTypes/TextureAsset.h
+        include/Assets/AssetTypes/ShaderAsset.h
+        include/Assets/AssetTypes/MaterialAsset.h
+
+        include/Assets/AssetDatabase/AssetStateDeprecated.h
         include/Assets/AssetDatabase/AssetDatabase.h
         src/Assets/AssetDatabase/AssetDatabase.cpp
 

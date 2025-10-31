@@ -7,7 +7,7 @@
 #include <filesystem>
 
 #include "Assets/Asset.h"
-#include "Assets/AssetDatabase/AssetState.h"
+#include "Assets/AssetDatabase/AssetStateDeprecated.h"
 #include "Assets/AssetManager/Managers/Material/Material.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
@@ -20,7 +20,7 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID uuid;
         std::filesystem::path path;
         // State
-        AssetState state = AssetState::Unregistered;
+        AssetStateDeprecated state = AssetStateDeprecated::Unregistered;
         // Data
         Utilities::UUID vertexShader;
         Utilities::UUID fragmentShader;

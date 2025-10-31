@@ -13,7 +13,7 @@ namespace RNGOEngine::AssetHandling
         TextureRecord record{
             .uuid = uuid,
             .path = texturePath,
-            .state = AssetState::Registered,
+            .state = AssetStateDeprecated::Registered,
             .texture = textureHandle,
         };
 
@@ -62,7 +62,7 @@ namespace RNGOEngine::AssetHandling
         return std::unexpected(TextureDatabaseError::TextureNotFound);
     }
 
-    AssetState TextureDatabase::GetAssetState(const Utilities::UUID& uuid) const
+    AssetStateDeprecated TextureDatabase::GetAssetState(const Utilities::UUID& uuid) const
     {
         const auto textureRecordOpt = m_textureRecords.GetUnmarkedValidated(
             m_textureUUIDToKeyMap.at(uuid)
@@ -70,13 +70,13 @@ namespace RNGOEngine::AssetHandling
 
         if (!textureRecordOpt)
         {
-            return AssetState::Unregistered;
+            return AssetStateDeprecated::Unregistered;
         }
 
         return textureRecordOpt->get().state;
     }
 
-    void TextureDatabase::SetAssetState(const Utilities::UUID& uuid, AssetState state)
+    void TextureDatabase::SetAssetState(const Utilities::UUID& uuid, AssetStateDeprecated state)
     {
         const auto textureRecordOpt = m_textureRecords.GetUnmarkedValidated(
             m_textureUUIDToKeyMap.at(uuid)

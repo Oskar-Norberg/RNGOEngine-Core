@@ -6,8 +6,8 @@
 
 #include <filesystem>
 
+#include "AssetStateDeprecated.h"
 #include "Assets/Asset.h"
-#include "AssetState.h"
 #include "Databases/MaterialDatabase.h"
 #include "Databases/ModelDatabase.h"
 #include "Databases/ShaderDatabase.h"
@@ -21,8 +21,8 @@ namespace RNGOEngine::AssetHandling
     {
         // Asset State
     public:
-        AssetState GetAssetState(const AssetHandle& uuid) const;
-        void SetAssetState(const AssetHandle& uuid, AssetState state);
+        AssetStateDeprecated GetAssetState(const AssetHandle& uuid) const;
+        void SetAssetState(const AssetHandle& uuid, AssetStateDeprecated state);
         // TODO: Will probably need some QOL helpers.
 
         // Model Database

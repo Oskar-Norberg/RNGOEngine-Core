@@ -12,7 +12,7 @@ namespace RNGOEngine::AssetHandling
         ShaderRecord record{
             .uuid = uuid,
             .path = shaderPath,
-            .state = AssetState::Registered,
+            .state = AssetStateDeprecated::Registered,
         };
 
         const auto key = m_shaderRecords.Insert(std::move(record));
@@ -33,7 +33,7 @@ namespace RNGOEngine::AssetHandling
         return std::nullopt;
     }
 
-    AssetState ShaderDatabase::GetAssetState(const Utilities::UUID& uuid) const
+    AssetStateDeprecated ShaderDatabase::GetAssetState(const Utilities::UUID& uuid) const
     {
         const auto key = m_shaderUUIDToKey.at(uuid);
         const auto recordOpt = m_shaderRecords.GetUnmarkedValidated(key);
@@ -43,10 +43,10 @@ namespace RNGOEngine::AssetHandling
             return recordOpt->get().state;
         }
 
-        return AssetState::Unregistered;
+        return AssetStateDeprecated::Unregistered;
     }
 
-    void ShaderDatabase::SetAssetState(const Utilities::UUID& uuid, AssetState state)
+    void ShaderDatabase::SetAssetState(const Utilities::UUID& uuid, AssetStateDeprecated state)
     {
         const auto key = m_shaderUUIDToKey.at(uuid);
         const auto recordOpt = m_shaderRecords.GetUnmarkedValidated(key);

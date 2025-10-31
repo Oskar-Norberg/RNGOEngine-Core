@@ -46,7 +46,7 @@ namespace RNGOEngine::AssetHandling
         m_textures.insert({uuid, textureIDData});
 
         // Mark Asset as consumed
-        m_assetDatabase.SetAssetState(uuid, AssetState::Consumed);
+        m_assetDatabase.SetAssetState(uuid, AssetStateDeprecated::Consumed);
 
         return uuid;
     }

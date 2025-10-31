@@ -6,9 +6,9 @@
 
 #include <filesystem>
 
-#include "Assets/AssetDatabase/AssetState.h"
-#include "Utilities/UUID/UUID.h"
+#include "Assets/AssetDatabase/AssetStateDeprecated.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
+#include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -18,7 +18,7 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID uuid;
         std::filesystem::path path;
         // State
-        AssetState state = AssetState::Unregistered;
+        AssetStateDeprecated state = AssetStateDeprecated::Unregistered;
     };
 
     class ShaderDatabase
@@ -28,8 +28,8 @@ namespace RNGOEngine::AssetHandling
         std::optional<Utilities::UUID> TryGetShaderUUID(const std::filesystem::path& shaderPath) const;
 
     public:
-        AssetState GetAssetState(const Utilities::UUID& uuid) const;
-        void SetAssetState(const Utilities::UUID& uuid, AssetState state);
+        AssetStateDeprecated GetAssetState(const Utilities::UUID& uuid) const;
+        void SetAssetState(const Utilities::UUID& uuid, AssetStateDeprecated state);
 
     private:
         Containers::GenerationalVector<ShaderRecord> m_shaderRecords;

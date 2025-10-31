@@ -6,7 +6,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetState AssetDatabase::GetAssetState(const AssetHandle& uuid) const
+    AssetStateDeprecated AssetDatabase::GetAssetState(const AssetHandle& uuid) const
     {
         if (m_handleToDatabaseType.contains(uuid))
         {
@@ -18,7 +18,7 @@ namespace RNGOEngine::AssetHandling
                     break;
                 case DatabaseType::Material:
                     // TODO:
-                    return AssetState::Registered;
+                    return AssetStateDeprecated::Registered;
                     break;
                 case DatabaseType::Model:
                     return m_modelDatabase.GetAssetState(uuid);
@@ -32,10 +32,10 @@ namespace RNGOEngine::AssetHandling
             }
         }
 
-        return AssetState::Unregistered;
+        return AssetStateDeprecated::Unregistered;
     }
 
-    void AssetDatabase::SetAssetState(const AssetHandle& uuid, AssetState state)
+    void AssetDatabase::SetAssetState(const AssetHandle& uuid, AssetStateDeprecated state)
     {
         if (m_handleToDatabaseType.contains(uuid))
         {

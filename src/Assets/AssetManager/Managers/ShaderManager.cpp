@@ -22,7 +22,7 @@ namespace RNGOEngine::AssetHandling
         // Exists in database
         if (const auto uuid = m_assetDatabase.TryGetShaderUUID(path); uuid)
         {
-            if (m_assetDatabase.GetAssetState(uuid.value()) == AssetState::Consumed)
+            if (m_assetDatabase.GetAssetState(uuid.value()) == AssetStateDeprecated::Consumed)
             {
                 return uuid.value();
             }
@@ -49,7 +49,7 @@ namespace RNGOEngine::AssetHandling
         // Insert into Asset Database
         const auto shaderHandle = m_assetDatabase.InsertShader(path);
 
-        m_assetDatabase.SetAssetState(shaderHandle, AssetState::Consumed);
+        m_assetDatabase.SetAssetState(shaderHandle, AssetStateDeprecated::Consumed);
         m_handleToShader.insert({shaderHandle, runtimeShaderKey});
 
         return shaderHandle;
