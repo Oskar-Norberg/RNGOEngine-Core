@@ -6,9 +6,9 @@
 
 #include <filesystem>
 
-#include "AssetHandling/AssetDatabase/AssetHandle.h"
 #include "AssetHandling/AssetDatabase/AssetState.h"
 #include "AssetHandling/AssetManager/Managers/Material/Material.h"
+#include "AssetHandling/Assets/Asset.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::AssetHandling

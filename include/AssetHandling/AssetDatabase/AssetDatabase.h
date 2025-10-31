@@ -6,7 +6,7 @@
 
 #include <filesystem>
 
-#include "AssetHandle.h"
+#include "AssetHandling/Assets/Asset.h"
 #include "AssetState.h"
 #include "Databases/MaterialDatabase.h"
 #include "Databases/ModelDatabase.h"

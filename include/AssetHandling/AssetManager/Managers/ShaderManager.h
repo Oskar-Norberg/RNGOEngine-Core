@@ -7,7 +7,6 @@
 #include <expected>
 
 #include "AssetHandling/AssetDatabase/AssetDatabase.h"
-#include "AssetHandling/AssetDatabase/AssetHandle.h"
 #include "AssetHandling/AssetLoaders/ShaderLoader.h"
 #include "Renderer/RenderID.h"
 #include "Utilities/AssetCache/AssetCache.h"

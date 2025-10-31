@@ -9,7 +9,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-#include "AssetHandling/AssetDatabase/AssetHandle.h"
+#include "AssetHandling/Assets/Asset.h"
 
 namespace RNGOEngine::AssetHandling
 {
