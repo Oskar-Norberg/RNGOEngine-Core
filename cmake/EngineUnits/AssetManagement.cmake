@@ -3,8 +3,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         # Asset Database
         include/Assets/Asset.h
 
-        include/Assets/AssetTypes/ModelAsset.h
         include/Assets/AssetTypes/TextureAsset.h
+        include/Assets/AssetTypes/ModelAsset.h
         include/Assets/AssetTypes/ShaderAsset.h
         include/Assets/AssetTypes/MaterialAsset.h
 
