@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "AssetMetadata.h"
+#include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
@@ -18,9 +20,31 @@ namespace RNGOEngine::AssetHandling
         Shader,
         Material,
     };
-    
+
+    template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
     class Asset
     {
+    public:
+        explicit Asset(const AssetType type)
+            : type(type)
+        {
+        }
+
+        Asset() = delete;
+        
+        virtual ~Asset() = default;
+
+        const AssetHandle& GetHandle() const
+        {
+            return handle;
+        }
+
+        AssetType GetType() const
+        {
+            return type;
+        }
+
+    protected:
         AssetHandle handle;
         AssetType type = AssetType::None;
     };
