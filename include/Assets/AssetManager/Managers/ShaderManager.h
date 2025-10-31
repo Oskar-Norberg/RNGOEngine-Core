@@ -85,6 +85,7 @@ namespace RNGOEngine::AssetHandling
         Containers::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
 
     private:
+        // TODO: Why exactly is this map pointing to a genkey instead of the actual data?
         std::unordered_map<AssetHandle, Containers::GenerationalKey<RuntimeShaderData>>
         m_handleToShader;
     };

@@ -4,6 +4,8 @@
 
 #include "Assets/AssetManager/Managers/MaterialManager.h"
 
+#include "Assets/AssetTypes/MaterialAsset.h"
+
 namespace RNGOEngine::AssetHandling
 {
     MaterialManager::MaterialManager(AssetDatabase& assetDatabase, ShaderManager& shaderManager,
@@ -18,7 +20,17 @@ namespace RNGOEngine::AssetHandling
                                                 const AssetHandle& fragmentShader)
     {
         // TODO: Path is currently not used.
-        const auto materialHandle = m_assetDatabase.InsertMaterial(vertexShader, fragmentShader, {});
+        auto& materialMetadata = m_assetDatabase.RegisterAsset<MaterialMetadata>(
+            AssetType::Material, std::filesystem::path{});
+
+        // Set up metadata
+        materialMetadata.vertexShader = vertexShader;
+        materialMetadata.fragmentShader = fragmentShader;
+        // TODO: In the future when this is loaded from a file. Set the persistent parameters in here.
+        // materialMetadata.parameters = /* LOADED PARAMS */
+
+        const auto& materialHandle = materialMetadata.UUID;
+
         const auto programID = m_shaderManager.CreateShaderProgram(vertexShader, fragmentShader);
 
         const auto runtimeMaterialData = RuntimeMaterial{
@@ -27,6 +39,10 @@ namespace RNGOEngine::AssetHandling
         };
 
         m_materials.insert({materialHandle, runtimeMaterialData});
+
+        // Mark Asset as valid
+        materialMetadata.State = AssetState::Valid;
+
         return materialHandle;
     }
 
@@ -38,14 +54,14 @@ namespace RNGOEngine::AssetHandling
             // TODO: Return error material / Try to reload material?
             return {};
         }
-        
+
         const auto& [materialUUID, shaderProgramKey] = m_materials.at(handle);
-        
+
         const ResolvedMaterial mat{
             .shaderProgram = m_shaderManager.GetShaderProgram(shaderProgramKey),
             .uniforms = params->get().uniforms
         };
-        
+
         return mat;
     }
 
@@ -185,27 +201,29 @@ namespace RNGOEngine::AssetHandling
     std::optional<std::reference_wrapper<const MaterialParameters>>
     MaterialManager::GetValidatedMaterialParameters(const AssetHandle& materialHandle) const
     {
-        // TODO: Duplicate code
-        auto materialParameters = m_assetDatabase.GetMaterialParameters(materialHandle);
-
-        if (!materialParameters)
+        if (m_assetDatabase.IsRegistered(materialHandle))
         {
-            return std::nullopt;
+            // Unsafe, but we check registration above. This should really be done with a templated getter in the AssetDatabase.
+            const auto& materialMetadata = static_cast<MaterialMetadata&>(m_assetDatabase.GetAssetMetadata(
+                materialHandle));
+
+            return std::cref(materialMetadata.parameters);
         }
 
-        return materialParameters;
+        return std::nullopt;
     }
 
     std::optional<std::reference_wrapper<MaterialParameters>> MaterialManager::GetValidatedMaterialParameters(
         const AssetHandle& materialHandle)
     {
-        auto materialParameters = m_assetDatabase.GetMaterialParameters(materialHandle);
-        if (!materialParameters)
+        const auto& materialMetadata = static_cast<const MaterialManager*>(this)->
+            GetValidatedMaterialParameters(materialHandle);
+
+        if (materialMetadata)
         {
-            return std::nullopt;
+            return std::ref(const_cast<MaterialParameters&>(materialMetadata->get()));
         }
 
-        auto& nonConstRef = const_cast<MaterialParameters&>(materialParameters->get());
-        return std::ref(nonConstRef);
+        return std::nullopt;
     }
 }

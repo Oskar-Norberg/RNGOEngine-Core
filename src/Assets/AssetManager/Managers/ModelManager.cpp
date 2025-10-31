@@ -3,6 +3,8 @@
 //
 
 #include "Assets/AssetManager/Managers/ModelManager.h"
+
+#include "Assets/AssetTypes/ModelAsset.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -20,10 +22,9 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& path)
     {
         // Check Database
-        const auto handleOpt = m_assetDatabase.TryGetModelUUID(path);
-        if (handleOpt.has_value())
+        if (m_assetDatabase.IsRegistered(path))
         {
-            return handleOpt.value();
+            return m_assetDatabase.GetAssetHandle(path);
         }
 
         // Load Model into RAM
@@ -40,9 +41,11 @@ namespace RNGOEngine::AssetHandling
         UnloadModel(modelHandle.value());
 
         // Add model to database
-        auto assetHandle = m_assetDatabase.Insert(modelHandle.value(), path);
-        // Mark Asset as consumed
-        m_assetDatabase.SetAssetState(assetHandle, AssetStateDeprecated::Consumed);
+        auto& metadata = m_assetDatabase.RegisterAsset<ModelMetadata>(AssetType::Model, path);
+        const auto& assetHandle = metadata.UUID;
+        
+        // Mark Asset as valid
+        metadata.State = AssetState::Valid;
 
         // Add model to runtime data
         m_models.insert({assetHandle, std::move(modelData)});

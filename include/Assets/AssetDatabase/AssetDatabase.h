@@ -6,12 +6,8 @@
 
 #include <filesystem>
 
-#include "AssetStateDeprecated.h"
 #include "Assets/Asset.h"
-#include "Databases/MaterialDatabase.h"
-#include "Databases/ModelDatabase.h"
-#include "Databases/ShaderDatabase.h"
-#include "Databases/TextureDatabase.h"
+#include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
@@ -19,68 +15,32 @@ namespace RNGOEngine::AssetHandling
     // TODO: This should really be a singleton.
     class AssetDatabase
     {
-        // Asset State
     public:
-        AssetStateDeprecated GetAssetState(const AssetHandle& uuid) const;
-        void SetAssetState(const AssetHandle& uuid, AssetStateDeprecated state);
-        // TODO: Will probably need some QOL helpers.
+        // Register / Unregister
+        // TODO: I don't like how the consumer has to specify the type and the metadata type.
+        template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
+        TMetadata& RegisterAsset(AssetType type, const std::filesystem::path& assetPath);
 
-        // Model Database
+        void UnregisterAsset(const AssetHandle& uuid);
+
+        // State
     public:
-        // TODO: Rename to InsertModel to avoid overload collisions. Don't pass ModelHandle. Keep that in RuntimeModelManager.
-        AssetHandle Insert(ModelLoading::ModelHandle modelHandle, const std::filesystem::path& modelPath);
-        std::optional<AssetHandle> TryGetModelUUID(const std::filesystem::path& modelPath) const;
-        // TODO: Destruction of models
+        bool IsRegistered(const AssetHandle& handle) const;
+        AssetState GetAssetState(const AssetHandle& handle) const;
 
-        std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
-            const AssetHandle& uuid) const;
-        std::expected<ModelLoading::ModelHandle, ModelDatabaseError> GetModelData(
-            const std::filesystem::path& modelPath) const;
+        bool IsRegistered(const std::filesystem::path& path) const;
+        AssetHandle GetAssetHandle(const std::filesystem::path& path) const;
 
-        // Texture Database
-    public:
-        // TODO: Make these return AssetHandle instead of UUID. It's the same thing, but semantics.
-        Utilities::UUID Insert(Textures::TextureHandle textureHandle,
-                               const std::filesystem::path& texturePath);
-        std::optional<Utilities::UUID> TryGetTextureUUID(const std::filesystem::path& texturePath) const;
-        // TODO: Unload textures.
+        AssetMetadata& GetAssetMetadata(const AssetHandle& handle);
+        // TODO: Make a const version and add a try-get version wrapped in std::optional
+        // TODO: Consumer has to cast AssetMetadata, implement templated version.
 
-        std::expected<Textures::TextureHandle, TextureDatabaseError> GetTextureData(
-            const Utilities::UUID& uuid) const;
-        std::expected<Textures::TextureHandle, TextureDatabaseError> GetTextureData(
-            const std::filesystem::path& texturePath) const;
-
-        // Shader Database
-    public:
-        Utilities::UUID InsertShader(const std::filesystem::path& shaderPath);
-        std::optional<AssetHandle> TryGetShaderUUID(const std::filesystem::path& shaderPath) const;
-
-        // Material Database
-    public:
-        AssetHandle InsertMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader,
-                                   const std::filesystem::path& materialPath);
-        std::optional<AssetHandle> TryGetMaterialUUID(const std::filesystem::path& shaderPath) const;
-        std::optional<std::reference_wrapper<MaterialParameters>> GetMaterialParameters(
-            const AssetHandle& materialHandle);
-        std::optional<std::reference_wrapper<const MaterialParameters>> GetMaterialParameters(
-            const AssetHandle& materialHandle) const;
 
     private:
-        ShaderDatabase m_shaderDatabase;
-        MaterialDatabase m_materialDatabase;
-        ModelDatabase m_modelDatabase;
-        TextureDatabase m_textureDatabase;
-
-    private:
-        enum class DatabaseType
-        {
-            Shader,
-            Material,
-            Model,
-            Texture,
-        };
-
-        // Stores which database an asset belongs to.
-        std::unordered_map<AssetHandle, DatabaseType> m_handleToDatabaseType;
+        // TODO: These uniqueptrs NEED to be stored contiguously based on their type. This is going to perform terribly.
+        std::unordered_map<AssetHandle, std::unique_ptr<AssetMetadata>> m_assetMetadataMap;
+        std::unordered_map<std::filesystem::path, AssetHandle> m_pathToHandle;
     };
+
+#include "AssetDatabase.tpp"
 }

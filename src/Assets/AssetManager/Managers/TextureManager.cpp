@@ -5,6 +5,7 @@
 #include "Assets/AssetManager/Managers/TextureManager.h"
 
 #include "Assets/AssetLoaders/TextureLoader.h"
+#include "Assets/AssetTypes/TextureAsset.h"
 #include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
@@ -19,9 +20,9 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& path)
     {
         // Check database
-        if (const auto textureUUID = m_assetDatabase.TryGetTextureUUID(path); textureUUID)
+        if (m_assetDatabase.IsRegistered(path))
         {
-            return textureUUID.value();
+            return m_assetDatabase.GetAssetHandle(path);
         }
 
         // Load Texture to RAM
@@ -38,15 +39,14 @@ namespace RNGOEngine::AssetHandling
         UnloadTexture(textureHandle.value());
 
         // Upload to Database
-        RuntimeTextureData textureIDData = {
-            .TextureKey = textureKey
-        };
+        auto& metadata = m_assetDatabase.RegisterAsset<TextureMetadata>(AssetType::Texture, path);
+        const auto& uuid = metadata.UUID;
 
-        auto uuid = m_assetDatabase.Insert(textureHandle.value(), path);
-        m_textures.insert({uuid, textureIDData});
+        // Store Runtime Data
+        m_textures.insert({uuid, {textureKey}});
 
-        // Mark Asset as consumed
-        m_assetDatabase.SetAssetState(uuid, AssetStateDeprecated::Consumed);
+        // Mark Asset as valid
+        metadata.State = AssetState::Valid;
 
         return uuid;
     }

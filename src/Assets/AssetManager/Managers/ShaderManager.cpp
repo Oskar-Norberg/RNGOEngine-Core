@@ -4,6 +4,7 @@
 
 #include "Assets/AssetManager/Managers/ShaderManager.h"
 
+#include "Assets/AssetTypes/ShaderAsset.h"
 #include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
@@ -20,12 +21,9 @@ namespace RNGOEngine::AssetHandling
                                             Core::Renderer::ShaderType type)
     {
         // Exists in database
-        if (const auto uuid = m_assetDatabase.TryGetShaderUUID(path); uuid)
+        if (m_assetDatabase.IsRegistered(path))
         {
-            if (m_assetDatabase.GetAssetState(uuid.value()) == AssetStateDeprecated::Consumed)
-            {
-                return uuid.value();
-            }
+            return m_assetDatabase.GetAssetHandle(path);
         }
 
         // Load Shader
@@ -47,9 +45,11 @@ namespace RNGOEngine::AssetHandling
         auto runtimeShaderKey = m_shaders.Insert(runtimeShaderData);
 
         // Insert into Asset Database
-        const auto shaderHandle = m_assetDatabase.InsertShader(path);
+        auto& shaderMetadata = m_assetDatabase.RegisterAsset<ShaderMetadata>(AssetType::Shader, path);
+        const auto& shaderHandle = shaderMetadata.UUID;
+        // Mark Asset as valid
+        shaderMetadata.State = AssetState::Valid;
 
-        m_assetDatabase.SetAssetState(shaderHandle, AssetStateDeprecated::Consumed);
         m_handleToShader.insert({shaderHandle, runtimeShaderKey});
 
         return shaderHandle;
