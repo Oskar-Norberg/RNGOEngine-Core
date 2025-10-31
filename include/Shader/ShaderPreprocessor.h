@@ -11,7 +11,7 @@
 #include <string_view>
 #include <unordered_map>
 
-#include "AssetHandling/AssetFetcher/AssetFetcher.h"
+#include "Assets/AssetFetcher/AssetFetcher.h"
 
 namespace RNGOEngine::Shaders
 {

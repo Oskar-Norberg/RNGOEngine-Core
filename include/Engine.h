@@ -6,8 +6,8 @@
 
 #include <memory>
 
-#include "AssetHandling/AssetDatabase/AssetDatabase.h"
-#include "AssetHandling/AssetManager/AssetManager.h"
+#include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetManager/AssetManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"
