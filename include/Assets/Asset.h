@@ -4,8 +4,6 @@
 
 #pragma once
 
-#include "AssetMetadata.h"
-#include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
@@ -21,31 +19,21 @@ namespace RNGOEngine::AssetHandling
         Material,
     };
 
-    template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
-    class Asset
+    enum class AssetState
     {
-    public:
-        explicit Asset(const AssetType type)
-            : type(type)
-        {
-        }
-
-        Asset() = delete;
-        
-        virtual ~Asset() = default;
-
-        const AssetHandle& GetHandle() const
-        {
-            return handle;
-        }
-
-        AssetType GetType() const
-        {
-            return type;
-        }
-
-    protected:
-        AssetHandle handle;
-        AssetType type = AssetType::None;
+        None,
+        Invalid,
+        Valid
     };
+
+    struct AssetMetadata
+    {
+        Utilities::UUID UUID;
+        std::filesystem::path Path;
+        AssetState State = AssetState::None;
+        AssetType Type = AssetType::None;
+    };
+
+    // TODO: For now there is no Asset base class. Assets can be whatever their corresponding Runtime Manager wants them to be.
+    // This might need to change in the future.
 }
