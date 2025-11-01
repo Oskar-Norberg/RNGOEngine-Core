@@ -45,14 +45,14 @@ namespace RNGOEngine::AssetHandling
         auto runtimeShaderKey = m_shaders.Insert(runtimeShaderData);
 
         // Insert into Asset Database
-        auto& shaderMetadata = m_assetDatabase.RegisterAsset<ShaderMetadata>(AssetType::Shader, path);
-        const auto& shaderHandle = shaderMetadata.UUID;
+        auto assetHandle = m_assetDatabase.RegisterAsset<ShaderMetadata>( path);
+        auto& shaderMetadata = m_assetDatabase.GetAssetMetadata(assetHandle);
         // Mark Asset as valid
         shaderMetadata.State = AssetState::Valid;
 
-        m_handleToShader.insert({shaderHandle, runtimeShaderKey});
+        m_handleToShader.insert({assetHandle, runtimeShaderKey});
 
-        return shaderHandle;
+        return assetHandle;
     }
 
     // TODO: Long function, clean up.

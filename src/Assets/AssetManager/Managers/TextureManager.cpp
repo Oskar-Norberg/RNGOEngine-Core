@@ -39,8 +39,8 @@ namespace RNGOEngine::AssetHandling
         UnloadTexture(textureHandle.value());
 
         // Upload to Database
-        auto& metadata = m_assetDatabase.RegisterAsset<TextureMetadata>(AssetType::Texture, path);
-        const auto& uuid = metadata.UUID;
+        auto uuid = m_assetDatabase.RegisterAsset<TextureMetadata>(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadata(uuid);
 
         // Store Runtime Data
         m_textures.insert({uuid, {textureKey}});

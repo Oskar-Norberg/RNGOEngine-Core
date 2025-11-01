@@ -6,16 +6,6 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void AssetDatabase::UnregisterAsset(const AssetHandle& uuid)
-    {
-        if (m_assetMetadataMap.contains(uuid))
-        {
-            const auto& path = m_assetMetadataMap.at(uuid)->Path;
-            m_pathToHandle.erase(path);
-            m_assetMetadataMap.erase(uuid);
-        }
-    }
-
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {
         return m_assetMetadataMap.contains(handle);

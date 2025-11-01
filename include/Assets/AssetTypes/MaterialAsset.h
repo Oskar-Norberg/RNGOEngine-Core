@@ -3,7 +3,10 @@
 //
 
 #pragma once
+
 #include "Assets/Asset.h"
+// TODO: SHit ass include path, the material should not inherently be tied to the system that manages it.
+#include "Assets/AssetManager/Managers/Material/Material.h"
 
 namespace RNGOEngine::AssetHandling
 {

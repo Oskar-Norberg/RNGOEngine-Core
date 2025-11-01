@@ -20,8 +20,9 @@ namespace RNGOEngine::AssetHandling
                                                 const AssetHandle& fragmentShader)
     {
         // TODO: Path is currently not used.
-        auto& materialMetadata = m_assetDatabase.RegisterAsset<MaterialMetadata>(
-            AssetType::Material, std::filesystem::path{});
+        auto assetHandle = m_assetDatabase.RegisterAsset<MaterialMetadata>(std::filesystem::path{});
+        // TODO: Really digusting downcast, make a templated function in the Database.
+        auto& materialMetadata = static_cast<MaterialMetadata&>(m_assetDatabase.GetAssetMetadata(assetHandle));
 
         // Set up metadata
         materialMetadata.vertexShader = vertexShader;

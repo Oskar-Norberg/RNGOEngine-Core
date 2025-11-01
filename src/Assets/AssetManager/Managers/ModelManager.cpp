@@ -41,8 +41,8 @@ namespace RNGOEngine::AssetHandling
         UnloadModel(modelHandle.value());
 
         // Add model to database
-        auto& metadata = m_assetDatabase.RegisterAsset<ModelMetadata>(AssetType::Model, path);
-        const auto& assetHandle = metadata.UUID;
+        auto assetHandle = m_assetDatabase.RegisterAsset<ModelMetadata>(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadata(assetHandle);
         
         // Mark Asset as valid
         metadata.State = AssetState::Valid;

@@ -7,6 +7,7 @@
 #include <filesystem>
 
 #include "Assets/Asset.h"
+#include  "Assets/AssetMetadataTypes.h"
 #include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
 
@@ -19,8 +20,9 @@ namespace RNGOEngine::AssetHandling
         // Register / Unregister
         // TODO: I don't like how the consumer has to specify the type and the metadata type.
         template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
-        TMetadata& RegisterAsset(AssetType type, const std::filesystem::path& assetPath);
+        AssetHandle RegisterAsset(const std::filesystem::path& assetPath);
 
+        template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
         void UnregisterAsset(const AssetHandle& uuid);
 
         // State
