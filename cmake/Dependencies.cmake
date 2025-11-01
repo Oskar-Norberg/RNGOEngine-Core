@@ -15,9 +15,19 @@ CPMAddPackage(
         NAME assimp
         GITHUB_REPOSITORY assimp/assimp
         GIT_TAG v6.0.2
-        OPTIONS "ASSIMP_BUILD_ASSIMP_TOOLS OFF"
-        "ASSIMP_BUILD_TESTS OFF"
+        OPTIONS "ASSIMP_BUILD_TESTS OFF"
         "BUILD_SHARED_LIBS OFF"
+        
+        # Dont need exporters for now.
+        "ASSIMP_NO_EXPORT ON"
+        "ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF"
+        
+        # Build only required importers.
+        "ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF"
+        "ASSIMP_BUILD_OBJ_IMPORTER ON"
+        "ASSIMP_BUILD_FBX_IMPORTER ON"
+        "ASSIMP_BUILD_GLTF_IMPORTER ON"
+        
 )
 
 if (RNGOENGINE_TRACY_ENABLE)
