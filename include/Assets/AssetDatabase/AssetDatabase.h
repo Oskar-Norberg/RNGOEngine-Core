@@ -7,6 +7,7 @@
 #include <filesystem>
 
 #include "Assets/Asset.h"
+#include "Assets/AssetMetadataStorage.h"
 #include  "Assets/AssetMetadataTypes.h"
 #include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
@@ -58,8 +59,9 @@ namespace RNGOEngine::AssetHandling
             const AssetHandle& handle) const;
 
     private:
-        // TODO: These uniqueptrs NEED to be stored contiguously based on their type. This is going to perform terribly.
-        std::unordered_map<AssetHandle, std::unique_ptr<AssetMetadata>> m_assetMetadataMap;
+        std::unordered_map<AssetType, std::unique_ptr<AssetMetadataStorage>> m_metadataStorages;
+        // TODO: Slight memory waste storing the AssetType again here.
+        std::unordered_map<AssetHandle, std::pair<AssetType, size_t>> m_handleToStorageIndex;
         std::unordered_map<std::filesystem::path, AssetHandle> m_pathToHandle;
 
     private:

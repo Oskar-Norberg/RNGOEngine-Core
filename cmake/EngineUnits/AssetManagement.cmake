@@ -8,6 +8,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetTypes/ModelAsset.h
         include/Assets/AssetTypes/ShaderAsset.h
         include/Assets/AssetTypes/MaterialAsset.h
+
+        include/Assets/AssetMetadataStorage.h
         
         include/Assets/AssetDatabase/AssetDatabase.h
         include/Assets/AssetDatabase/AssetDatabase.tpp

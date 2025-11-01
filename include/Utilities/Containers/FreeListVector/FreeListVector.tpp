@@ -4,7 +4,7 @@ size_t FreeListVector<T>::Insert(U&& data)
 {
     if (m_freeIndices.empty())
     {
-        m_data.push_back(std::forward<U>(data));
+        m_data.push_back(Record{std::forward<U>(data), true});
         m_data.back().isAlive = true;
         return m_data.size() - 1;
     }

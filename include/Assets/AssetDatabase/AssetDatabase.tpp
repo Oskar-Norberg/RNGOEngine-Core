@@ -10,16 +10,30 @@ AssetHandle AssetDatabase::RegisterAsset(const std::filesystem::path& assetPath)
         "AssetDatabase::RegisterAsset Metadata Type has no corresponding AssetType defined. Add it to Assets/AssetMetadataTypes.h"
     );
 
+    if (!m_metadataStorages.contains(AssetTypeForMetadata<TMetadata>::value))
+    {
+        m_metadataStorages.insert({
+            AssetTypeForMetadata<TMetadata>::value,
+            std::make_unique<AssetMetadataStorageTyped<TMetadata>>()
+        });
+    }
+
+    auto& storageTyped = static_cast<AssetMetadataStorageTyped<TMetadata>&>(
+        *m_metadataStorages.at(AssetTypeForMetadata<TMetadata>::value)
+    );
+
     const auto uuid = Utilities::UUID();
 
-    auto metadata = std::make_unique<TMetadata>();
+    TMetadata metadata;
     // Set common metadata fields. Consumer sets type-specifics.
-    metadata->UUID = uuid;
-    metadata->Path = assetPath;
-    metadata->State = AssetState::Invalid; // State is driven by the Runtime Manager. Invalid on register.
-    metadata->Type = AssetTypeForMetadata<TMetadata>::value;
+    metadata.UUID = uuid;
+    metadata.Path = assetPath;
+    metadata.State = AssetState::Invalid; // State is driven by the Runtime Manager. Invalid on register.
+    metadata.Type = AssetTypeForMetadata<TMetadata>::value;
 
-    m_assetMetadataMap.insert({uuid, std::move(metadata)});
+    const auto index = storageTyped.Storage.Insert(std::move(metadata));
+    m_handleToStorageIndex.insert({uuid, std::make_pair(AssetTypeForMetadata<TMetadata>::value, index)});
+
     m_pathToHandle.insert({assetPath, uuid});
 
     return uuid;
@@ -28,11 +42,20 @@ AssetHandle AssetDatabase::RegisterAsset(const std::filesystem::path& assetPath)
 template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
 void AssetDatabase::UnregisterAsset(const AssetHandle& uuid)
 {
-    if (m_assetMetadataMap.contains(uuid))
+    if (m_handleToStorageIndex.contains(uuid))
     {
-        const auto& path = m_assetMetadataMap.at(uuid)->Path;
+        const auto& storageIndex = m_handleToStorageIndex.at(uuid);
+        const auto& storageTyped = static_cast<AssetMetadataStorageTyped<TMetadata>&>(
+            *m_metadataStorages.at(AssetTypeForMetadata<TMetadata>::value)
+        );
+
+        const auto* metadataPtr = storageTyped.Storage.Get(storageIndex);
+        RNGO_ASSERT(metadataPtr && "AssetDatabase::UnregisterAsset - Metadata pointer is null.");
+
+        const auto& path = metadataPtr->Path;
         m_pathToHandle.erase(path);
-        m_assetMetadataMap.erase(uuid);
+        m_handleToStorageIndex.erase(uuid);
+        storageTyped.Storage.Remove(storageIndex);
     }
 }
 

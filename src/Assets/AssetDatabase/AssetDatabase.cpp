@@ -8,15 +8,25 @@ namespace RNGOEngine::AssetHandling
 {
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {
-        return m_assetMetadataMap.contains(handle)
-               && m_assetMetadataMap.at(handle).get()->State != AssetState::None;
+        const auto* metadata = GetMetadataOrNullptr(handle);
+
+        if (metadata)
+        {
+            return metadata->State != AssetState::None;
+        }
+
+        return false;
     }
 
     AssetState AssetDatabase::GetAssetState(const AssetHandle& handle) const
     {
-        return m_assetMetadataMap.contains(handle)
-                   ? m_assetMetadataMap.at(handle).get()->State
-                   : AssetState::None;
+        const auto* metadata = GetMetadataOrNullptr(handle);
+        if (metadata)
+        {
+            return metadata->State;
+        }
+
+        return AssetState::None;
     }
 
     bool AssetDatabase::IsRegistered(const std::filesystem::path& path) const
@@ -81,9 +91,11 @@ namespace RNGOEngine::AssetHandling
 
     const AssetMetadata* AssetDatabase::GetMetadataOrNullptr(const AssetHandle& handle) const
     {
-        if (m_assetMetadataMap.contains(handle))
+        if (m_handleToStorageIndex.contains(handle))
         {
-            return m_assetMetadataMap.at(handle).get();
+            const auto& [type, index] = m_handleToStorageIndex.at(handle);
+            const auto& storage = m_metadataStorages.at(type);
+            return storage->GetAssetMetadata(index);
         }
 
         return nullptr;
