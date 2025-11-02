@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <filesystem>
 #include <vector>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
@@ -36,48 +35,30 @@ namespace RNGOEngine::AssetHandling
     enum class ModelCreationError
     {
         None,
-        FileNotFound,
-        FailedToLoad,
-        NoMeshesFound,
-        UnsupportedFormat,
+        // TODO:
     };
 
     class ModelManager
     {
     public:
-        explicit ModelManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager,
-                              bool flipUVs = false);
+        explicit ModelManager(Resources::ResourceManager& resourceManager);
 
-        std::expected<AssetHandle, ModelCreationError> CreateModel(const std::filesystem::path& path);
+        ModelCreationError UploadModel(const AssetHandle& assetHandle, ModelLoading::ModelHandle modelHandle);
 
     public:
         AssetHandle GetInvalidModel() const;
 
-        // Only really relevant for the RenderAPI/ResourceTracker, use friends?
     public:
         // TODO: Make this return an optional or expected?
         const RuntimeModelData& GetRuntimeModelData(AssetHandle handle) const;
 
-        // Engine Internals
-    public:
-        void BeginDestroyAllModels();
+    private:
+        Resources::ResourceManager& m_resourceManager;
 
     private:
-        bool m_doFlipUVs;
         std::unordered_map<AssetHandle, RuntimeModelData> m_models;
 
     private:
-        AssetDatabase& m_assetDatabase;
-        Resources::ResourceManager& m_resourceManager;
-
-        // Model Loading
-    private:
-        std::expected<ModelLoading::ModelHandle, ModelCreationError> LoadModel(
-            const std::filesystem::path& path) const;
-        void UnloadModel(ModelLoading::ModelHandle modelHandle);
-
-        // GPU Interfacing
-    private:
-        RuntimeModelData UploadModel(ModelLoading::ModelHandle modelHandle);
+        RuntimeModelData UploadModelResources(ModelLoading::ModelHandle modelHandle);
     };
 }

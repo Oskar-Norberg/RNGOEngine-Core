@@ -10,85 +10,19 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    ModelManager::ModelManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager,
-                               const bool flipUVs)
-        : m_doFlipUVs(flipUVs),
-          m_assetDatabase(assetDatabase),
-          m_resourceManager(resourceManager)
+    ModelManager::ModelManager(Resources::ResourceManager& resourceManager)
+        : m_resourceManager(resourceManager)
     {
     }
 
-    std::expected<AssetHandle, ModelCreationError> ModelManager::CreateModel(
-        const std::filesystem::path& path)
+    ModelCreationError ModelManager::UploadModel(const AssetHandle& assetHandle,
+                                                 const ModelLoading::ModelHandle modelHandle)
     {
-        // Check Database
-        if (m_assetDatabase.IsRegistered(path))
-        {
-            return m_assetDatabase.GetAssetHandle(path);
-        }
+        auto runtimeData = UploadModelResources(modelHandle);
+        m_models.insert({assetHandle, std::move(runtimeData)});
 
-        // Load Model into RAM
-        const auto modelHandle = LoadModel(path);
-        if (!modelHandle)
-        {
-            return std::unexpected(modelHandle.error());
-        }
-
-        // Upload model to GPU
-        auto modelData = UploadModel(modelHandle.value());
-
-        // Unload model from RAM
-        UnloadModel(modelHandle.value());
-
-        // Add model to database
-        auto assetHandle = m_assetDatabase.RegisterAsset<ModelMetadata>(path);
-        auto& metadata = m_assetDatabase.GetAssetMetadata(assetHandle);
-        
-        // Mark Asset as valid
-        metadata.State = AssetState::Valid;
-
-        // Add model to runtime data
-        m_models.insert({assetHandle, std::move(modelData)});
-
-        return assetHandle;
-    }
-
-    std::expected<ModelLoading::ModelHandle, ModelCreationError> ModelManager::LoadModel(
-        const std::filesystem::path& path) const
-    {
-        auto modelHandle = ModelLoading::LoadModel(path, m_doFlipUVs);
-
-        if (!modelHandle)
-        {
-            // Unholy enum-conversion
-            switch (modelHandle.error())
-            {
-                case ModelLoading::ModelLoadingError::None:
-                    return std::unexpected(ModelCreationError::FailedToLoad);
-
-                case ModelLoading::ModelLoadingError::FileNotFound:
-                    return std::unexpected(ModelCreationError::FileNotFound);
-
-                case ModelLoading::ModelLoadingError::FailedToLoad:
-                    return std::unexpected(ModelCreationError::FailedToLoad);
-
-                case ModelLoading::ModelLoadingError::NoMeshesFound:
-                    return std::unexpected(ModelCreationError::NoMeshesFound);
-
-                case ModelLoading::ModelLoadingError::UnsupportedFormat:
-                    return std::unexpected(ModelCreationError::UnsupportedFormat);
-
-                default:
-                    return std::unexpected(ModelCreationError::FailedToLoad);
-            }
-        }
-
-        return modelHandle.value();
-    }
-
-    void ModelManager::UnloadModel(const ModelLoading::ModelHandle modelHandle)
-    {
-        ModelLoading::UnloadModel(modelHandle);
+        // TODO:
+        return ModelCreationError::None;
     }
 
     AssetHandle ModelManager::GetInvalidModel() const
@@ -102,19 +36,7 @@ namespace RNGOEngine::AssetHandling
         return m_models.at(handle);
     }
 
-    void ModelManager::BeginDestroyAllModels()
-    {
-        for (const auto& [assetHandle, modelData] : m_models)
-        {
-            const auto& [meshKeys] = modelData;
-            for (const auto& meshKey : meshKeys)
-            {
-                m_resourceManager.MarkMeshForDestruction(meshKey);
-            }
-        }
-    }
-
-    RuntimeModelData ModelManager::UploadModel(ModelLoading::ModelHandle modelHandle)
+    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelHandle modelHandle)
     {
         RuntimeModelData modelData;
         modelData.meshKeys.reserve(modelHandle.data->meshes.size());
