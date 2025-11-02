@@ -12,7 +12,8 @@ namespace RNGOEngine::AssetHandling
     {
     public:
         // TODO: This ugly construct wouldn't have to be here if they were just singletons...
-        ModelAssetImporter(AssetDatabase& assetDatabase, AssetManager& assetManager, const bool doFlipUVs);
+        ModelAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
+                           AssetManager& assetManager, bool doFlipUVs);
 
         AssetHandle Load(const std::filesystem::path& path) override;
 

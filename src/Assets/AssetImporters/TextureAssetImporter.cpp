@@ -9,6 +9,12 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    TextureAssetImporter::TextureAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
+                                               AssetManager& assetManager)
+        : AssetImporter(assetFetcher, assetDatabase, assetManager)
+    {
+    }
+
     AssetHandle TextureAssetImporter::Load(const std::filesystem::path& path)
     {
         // Already in database?

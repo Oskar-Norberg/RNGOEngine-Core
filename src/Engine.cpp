@@ -7,6 +7,7 @@
 #include <chrono>
 
 #include "Assets/AssetImporters/ModelAssetImporter.h"
+#include "Assets/AssetImporters/ShaderAssetImporter.h"
 #include "Assets/AssetImporters/TextureAssetImporter.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
@@ -64,10 +65,14 @@ namespace RNGOEngine::Core
         {
             // Register Importer Types
             m_assetLoader->RegisterImporter<AssetHandling::ModelAssetImporter>(
-                AssetHandling::AssetType::Model, m_assetDatabase, *m_assetManager, doFlipTexturesVertically
+                AssetHandling::AssetType::Model, m_assetFetcher, m_assetDatabase, *m_assetManager,
+                doFlipTexturesVertically
             );
             m_assetLoader->RegisterImporter<AssetHandling::TextureAssetImporter>(
-                AssetHandling::AssetType::Texture, m_assetDatabase, *m_assetManager
+                AssetHandling::AssetType::Texture, m_assetFetcher, m_assetDatabase, *m_assetManager
+            );
+            m_assetLoader->RegisterImporter<AssetHandling::ShaderAssetImporter>(
+                AssetHandling::AssetType::Shader, m_assetFetcher, m_assetDatabase, *m_assetManager
             );
         }
 

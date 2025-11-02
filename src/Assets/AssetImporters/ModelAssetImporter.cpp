@@ -11,9 +11,9 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    ModelAssetImporter::ModelAssetImporter(AssetDatabase& assetDatabase, AssetManager& assetManager,
-                                           const bool doFlipUVs)
-        : AssetImporter(assetDatabase, assetManager), m_doFlipUVs(doFlipUVs)
+    ModelAssetImporter::ModelAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
+                                           AssetManager& assetManager, const bool doFlipUVs)
+        : AssetImporter(assetFetcher, assetDatabase, assetManager), m_doFlipUVs(doFlipUVs)
     {
     }
 
@@ -38,7 +38,8 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload to GPU
-        const auto errorMessage = m_assetManager.GetModelManager().UploadModel(assetHandle, modelHandle.value());
+        const auto errorMessage = m_assetManager.GetModelManager().UploadModel(
+            assetHandle, modelHandle.value());
         if (errorMessage != ModelCreationError::None)
         {
             // TODO: Error handling

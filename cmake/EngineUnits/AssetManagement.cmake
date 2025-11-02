@@ -13,7 +13,10 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetImporters/TextureAssetImporter.h
         src/Assets/AssetImporters/TextureAssetImporter.cpp
 
-        
+        include/Assets/AssetImporters/ShaderAssetImporter.h
+        src/Assets/AssetImporters/ShaderAssetImporter.cpp
+
+
         include/Assets/AssetLoader.h
         src/Assets/AssetLoader.cpp
 

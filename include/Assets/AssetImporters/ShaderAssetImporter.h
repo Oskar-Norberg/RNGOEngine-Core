@@ -8,11 +8,12 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class TextureAssetImporter : public AssetImporter
+    class ShaderAssetImporter : public AssetImporter
     {
     public:
-        TextureAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager);
+        ShaderAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager);
 
+    public:
         AssetHandle Load(const std::filesystem::path& path) override;
     };
 }
