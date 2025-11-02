@@ -15,7 +15,7 @@ namespace RNGOEngine::AssetHandling
           m_assetFileFetcher(assetFetcher),
           m_shaderManager(assetDatabase, resourceManager, m_assetFileFetcher),
           m_modelManager(resourceManager),
-          m_textureManager(assetDatabase, resourceManager),
+          m_textureManager(resourceManager),
           m_materialManager(assetDatabase, m_shaderManager, m_textureManager)
     {
     }
@@ -53,26 +53,6 @@ namespace RNGOEngine::AssetHandling
         return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
 
-    AssetHandle AssetManager::LoadTexture(
-        const std::string_view texturePath)
-    {
-        const auto fullPath = m_assetFileFetcher.GetPath(AssetType::Texture, texturePath);
-        if (!fullPath.has_value())
-        {
-            RNGO_ASSERT(false && "Texture not found!");
-            return m_textureManager.GetInvalidTexture();
-        }
-
-        const auto textureID = m_textureManager.CreateTexture(fullPath.value());
-        if (!textureID.has_value())
-        {
-            RNGO_ASSERT(false && "Texture creation failed!");
-            return m_textureManager.GetInvalidTexture();
-        }
-
-        return textureID.value();
-    }
-
     void AssetManager::BeginDestroyAllAssets()
     {
         // TODO: Save persistent database changes?
@@ -80,7 +60,7 @@ namespace RNGOEngine::AssetHandling
         m_shaderManager.BeginDestroyAllShaderPrograms();
 
         // m_modelManager.BeginDestroyAllModels();
-        m_textureManager.BeginDestroyAllTextures();
+        // m_textureManager.BeginDestroyAllTextures();
         m_materialManager.BeginDestroyAllMaterials();
     }
 }

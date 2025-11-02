@@ -32,15 +32,10 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
                               Resources::ResourceManager& resourceManager, bool doFlipUVs);
-
-    // public:
-    //     AssetHandle LoadModel(const std::filesystem::path& modelPath);
-
+        
     public:
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
                                                       const std::filesystem::path& fragmentSourcePath);
-
-        AssetHandle LoadTexture(std::string_view texturePath);
 
         // Non-const Getters
     public:

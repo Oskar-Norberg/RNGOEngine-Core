@@ -25,8 +25,7 @@ namespace RNGOEngine::AssetHandling
     enum class TextureManagerError
     {
         None,
-        FileNotFound,
-        FailedToLoad,
+        // TODO:
     };
 
     struct RuntimeTextureData
@@ -37,10 +36,11 @@ namespace RNGOEngine::AssetHandling
     class TextureManager
     {
     public:
-        explicit TextureManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager);
+        explicit TextureManager(Resources::ResourceManager& resourceManager);
 
     public:
-        std::expected<AssetHandle, TextureManagerError> CreateTexture(const std::filesystem::path& path);
+        TextureManagerError UploadTexture(const AssetHandle& assetHandle,
+                                          Textures::TextureHandle textureHandle);
 
     public:
         AssetHandle GetInvalidTexture() const;
@@ -48,22 +48,10 @@ namespace RNGOEngine::AssetHandling
     public:
         Core::Renderer::TextureID GetTexture(const AssetHandle& uuid) const;
 
-        // Engine Internals
-    public:
-        void BeginDestroyAllTextures();
-
     private:
         std::unordered_map<AssetHandle, RuntimeTextureData> m_textures;
 
     private:
         Resources::ResourceManager& m_resourceManager;
-        AssetDatabase& m_assetDatabase;
-
-        // Load to RAM
-    private:
-        std::expected<Textures::TextureHandle, TextureManagerError> LoadFromDisk(
-            const std::filesystem::path& path);
-
-        void UnloadTexture(Textures::TextureHandle handle);
     };
 }

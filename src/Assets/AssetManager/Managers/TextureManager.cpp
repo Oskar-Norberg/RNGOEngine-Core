@@ -3,52 +3,27 @@
 //
 
 #include "Assets/AssetManager/Managers/TextureManager.h"
-
 #include "Assets/AssetLoaders/TextureLoader.h"
-#include "Assets/AssetTypes/TextureAsset.h"
 #include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    TextureManager::TextureManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager)
-        : m_resourceManager(resourceManager),
-          m_assetDatabase(assetDatabase)
+    TextureManager::TextureManager(Resources::ResourceManager& resourceManager)
+        : m_resourceManager(resourceManager)
     {
     }
 
-    std::expected<AssetHandle, TextureManagerError> TextureManager::CreateTexture(
-        const std::filesystem::path& path)
+    TextureManagerError TextureManager::UploadTexture(const AssetHandle& assetHandle,
+                                                      const Textures::TextureHandle textureHandle)
     {
-        // Check database
-        if (m_assetDatabase.IsRegistered(path))
-        {
-            return m_assetDatabase.GetAssetHandle(path);
-        }
-
-        // Load Texture to RAM
-        const auto textureHandle = LoadFromDisk(path);
-        if (!textureHandle.has_value())
-        {
-            return std::unexpected(textureHandle.error());
-        }
-
-        // Upload to GPU
-        const auto textureKey = m_resourceManager.CreateTexture(textureHandle.value());
-
-        // Unload from RAM
-        UnloadTexture(textureHandle.value());
-
-        // Upload to Database
-        auto uuid = m_assetDatabase.RegisterAsset<TextureMetadata>(path);
-        auto& metadata = m_assetDatabase.GetAssetMetadata(uuid);
+        // Upload Resources
+        const auto textureKey = m_resourceManager.CreateTexture(textureHandle);
 
         // Store Runtime Data
-        m_textures.insert({uuid, {textureKey}});
+        m_textures.insert({assetHandle, {textureKey}});
 
-        // Mark Asset as valid
-        metadata.State = AssetState::Valid;
-
-        return uuid;
+        // TODO:
+        return TextureManagerError::None;
     }
 
     AssetHandle TextureManager::GetInvalidTexture() const
@@ -74,41 +49,5 @@ namespace RNGOEngine::AssetHandling
         }
 
         return textureOpt.value();
-    }
-
-    void TextureManager::BeginDestroyAllTextures()
-    {
-        for (const auto& [handle, textureData] : m_textures)
-        {
-            m_resourceManager.MarkTextureForDestruction(textureData.TextureKey);
-        }
-    }
-
-    std::expected<Textures::TextureHandle, TextureManagerError> TextureManager::LoadFromDisk(
-        const std::filesystem::path& path)
-    {
-        const auto textureHandle = TextureLoader::LoadTexture(path);
-
-        if (!textureHandle.has_value())
-        {
-            switch (textureHandle.error())
-            {
-                case TextureLoader::TextureLoadingError::None:
-                    return std::unexpected(TextureManagerError::None);
-                case TextureLoader::TextureLoadingError::FileNotFound:
-                    return std::unexpected(TextureManagerError::FileNotFound);
-                case TextureLoader::TextureLoadingError::FailedToLoad:
-                    return std::unexpected(TextureManagerError::FailedToLoad);
-                default:
-                    return std::unexpected(TextureManagerError::FailedToLoad);
-            }
-        }
-
-        return textureHandle.value();
-    }
-
-    void TextureManager::UnloadTexture(Textures::TextureHandle handle)
-    {
-        TextureLoader::FreeTexture(handle);
     }
 }

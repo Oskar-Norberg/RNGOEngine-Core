@@ -4,7 +4,6 @@
 
 #include "Assets/AssetManager/Managers/ModelManager.h"
 
-#include "Assets/AssetTypes/ModelAsset.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/RNGOAsserts.h"
 
