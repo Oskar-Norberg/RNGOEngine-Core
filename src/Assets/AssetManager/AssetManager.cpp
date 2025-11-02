@@ -4,6 +4,8 @@
 
 #include "Assets/AssetManager/AssetManager.h"
 
+// TODO: TEMPORARY TEMPORARY TEMPORARY
+#include "Assets/AssetImporters/ShaderAssetImporter.h"
 #include "Renderer/IRenderer.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -23,16 +25,13 @@ namespace RNGOEngine::AssetHandling
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
-        // const auto vertexShader = m_shaderManager.CreateShader(vertexSourcePath,
-        //                                                        Core::Renderer::ShaderType::Vertex);
-        // const auto fragmentShader = m_shaderManager.CreateShader(fragmentSourcePath,
-        //                                                          Core::Renderer::ShaderType::Fragment);
-        //
-        // const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
-        //
-        // return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
+        // TODO: Horrible
+        const auto vertexShader = m_shaderAssetImporter->Load(vertexSourcePath);
+        const auto fragmentShader = m_shaderAssetImporter->Load(fragmentSourcePath);
+
+        const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
         
-        return Core::Renderer::MaterialHandle({}, m_materialManager);
+        return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
 
     void AssetManager::BeginDestroyAllAssets()

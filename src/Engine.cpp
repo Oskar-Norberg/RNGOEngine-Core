@@ -76,6 +76,9 @@ namespace RNGOEngine::Core
             );
         }
 
+        // TODO: TEMPORARY
+        m_assetManager->SetShaderImporter(m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader));
+
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
             *m_renderer,
             m_resourceTracker,

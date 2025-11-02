@@ -13,7 +13,8 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class AssetDatabase;
+    // TEMPORARY
+    class ShaderAssetImporter;
 }
 
 namespace RNGOEngine
@@ -80,6 +81,15 @@ namespace RNGOEngine::AssetHandling
         {
             return m_textureManager;
         }
+
+        // TODO: TEMPORARY SOLUTION
+        // The AssetManager should never be responsible for importing.
+        // But since there is currently no stable UUID system in which a material could reference shaders, these need to be loaded at runtime.
+        void SetShaderImporter(ShaderAssetImporter* importer)
+        {
+            m_shaderAssetImporter = importer;
+        }
+        ShaderAssetImporter* m_shaderAssetImporter;
 
         // Engine Internal
     public:
