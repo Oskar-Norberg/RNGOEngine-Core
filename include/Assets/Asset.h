@@ -12,6 +12,8 @@ namespace RNGOEngine::AssetHandling
 
     // NOTE: To add new AssetType, add here and create corresponding Metadata struct inheriting from AssetMetadata.
     // Then update AssetMetadataTypes.h to map Metadata to AssetType.
+    // Also create corresponding AssetImporter and register it in AssetLoader.
+    // Finally, update the AssetFetcher with the new AssetType.
     // TODO: If we are using template values for AssetMetadataTypes, this doesn't really need to exist. Assets can just "be their metadata".
     // And then whatever runtime manager handles them can store the runtime data.
     enum class AssetType

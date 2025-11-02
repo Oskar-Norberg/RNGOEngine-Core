@@ -26,14 +26,15 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: Refactor this into a service-locator like-pattern.
     class AssetManager
     {
     public:
         explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
                               Resources::ResourceManager& resourceManager, bool doFlipUVs);
 
-    public:
-        AssetHandle LoadModel(const std::filesystem::path& modelPath);
+    // public:
+    //     AssetHandle LoadModel(const std::filesystem::path& modelPath);
 
     public:
         Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
@@ -41,6 +42,29 @@ namespace RNGOEngine::AssetHandling
 
         AssetHandle LoadTexture(std::string_view texturePath);
 
+        // Non-const Getters
+    public:
+        ShaderManager& GetShaderManager()
+        {
+            return m_shaderManager;
+        }
+
+        MaterialManager& GetMaterialManager()
+        {
+            return m_materialManager;
+        }
+
+        ModelManager& GetModelManager()
+        {
+            return m_modelManager;
+        }
+
+        TextureManager& GetTextureManager()
+        {
+            return m_textureManager;
+        }
+
+        // Const Getters
     public:
         const ShaderManager& GetShaderManager() const
         {

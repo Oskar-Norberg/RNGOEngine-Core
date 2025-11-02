@@ -26,7 +26,7 @@ namespace RNGOEngine::Shaders
     std::expected<std::string, ShaderPreProcessingError> ShaderPreProcessor::Parse(
         const std::filesystem::path& source) const
     {
-        const auto foundPath = m_assetFetcher.GetShaderPath(source);
+        const auto foundPath = m_assetFetcher.GetPath(AssetHandling::AssetType::Shader, source);
 
         if (!foundPath.has_value())
         {
@@ -125,7 +125,8 @@ namespace RNGOEngine::Shaders
             {
                 includedFiles.insert(std::string(includePath));
 
-                const auto includeFilePath = m_assetFetcher.GetShaderPath(includePath);
+                const auto includeFilePath = m_assetFetcher.GetPath(
+                    AssetHandling::AssetType::Shader, includePath);
 
                 if (!includeFilePath.has_value())
                 {

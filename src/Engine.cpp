@@ -6,6 +6,7 @@
 
 #include <chrono>
 
+#include "Assets/AssetImporters/ModelAssetImporter.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
@@ -27,6 +28,7 @@ namespace RNGOEngine::Core
     {
         bool doFlipTexturesVertically = false;
 
+        // Set Up Renderer
         switch (config.renderType)
         {
             case RenderType::GLFW_OpenGL:
@@ -45,15 +47,24 @@ namespace RNGOEngine::Core
             }
         }
 
+        // Resource and Runtime Asset Managers
         m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(
             m_assetFetcher, m_assetDatabase, *m_resourceManager,
             doFlipTexturesVertically
         );
-
         for (const auto& [path, type] : config.assetPaths)
         {
-            m_assetFetcher.AddAssetPath(path, type);
+            m_assetFetcher.AddAssetPath(type, path);
+        }
+
+        // Asset Importers
+        m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_assetFetcher);
+        {
+            // Register Importer Types
+            m_assetLoader->RegisterImporter<AssetHandling::ModelAssetImporter>(
+                AssetHandling::AssetType::Model, m_assetDatabase, *m_assetManager, doFlipTexturesVertically
+            );
         }
 
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
@@ -111,9 +122,9 @@ namespace RNGOEngine::Core
         CleanUp();
     }
 
-    void Engine::AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type)
+    void Engine::AddAssetPath(AssetHandling::AssetType type, const std::filesystem::path& path)
     {
-        m_assetFetcher.AddAssetPath(path, type);
+        m_assetFetcher.AddAssetPath(type, path);
     }
 
     void Engine::PollWindowEvents()

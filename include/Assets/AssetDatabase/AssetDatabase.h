@@ -15,6 +15,7 @@
 namespace RNGOEngine::AssetHandling
 {
     // TODO: This should really be a singleton.
+    // TODO: Callback on asset state change? Could be used for hot-reload.
     class AssetDatabase
     {
     public:
