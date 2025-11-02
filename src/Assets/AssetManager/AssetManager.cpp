@@ -14,31 +14,31 @@ namespace RNGOEngine::AssetHandling
         : m_assetDatabase(assetDatabase),
           m_assetFileFetcher(assetFetcher),
           m_shaderManager(assetDatabase, resourceManager, m_assetFileFetcher),
-          m_modelManager(assetDatabase, resourceManager, doFlipUVs),
+          m_modelManager(resourceManager),
           m_textureManager(assetDatabase, resourceManager),
           m_materialManager(assetDatabase, m_shaderManager, m_textureManager)
     {
     }
 
-    AssetHandle AssetManager::LoadModel(
-        const std::filesystem::path& modelPath)
-    {
-        const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
-        if (!fullPath.has_value())
-        {
-            RNGO_ASSERT(false && "Model not found!");
-            return m_modelManager.GetInvalidModel();
-        }
-
-        const auto model = m_modelManager.CreateModel(fullPath.value());
-        if (!model)
-        {
-            RNGO_ASSERT(false && "Model creation failed!");
-            return m_modelManager.GetInvalidModel();
-        }
-
-        return model.value();
-    }
+    // AssetHandle AssetManager::LoadModel(
+    //     const std::filesystem::path& modelPath)
+    // {
+    //     const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
+    //     if (!fullPath.has_value())
+    //     {
+    //         RNGO_ASSERT(false && "Model not found!");
+    //         return m_modelManager.GetInvalidModel();
+    //     }
+    //
+    //     const auto model = m_modelManager.CreateModel(fullPath.value());
+    //     if (!model)
+    //     {
+    //         RNGO_ASSERT(false && "Model creation failed!");
+    //         return m_modelManager.GetInvalidModel();
+    //     }
+    //
+    //     return model.value();
+    // }
 
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
@@ -56,7 +56,7 @@ namespace RNGOEngine::AssetHandling
     AssetHandle AssetManager::LoadTexture(
         const std::string_view texturePath)
     {
-        const auto fullPath = m_assetFileFetcher.GetTexturePath(texturePath);
+        const auto fullPath = m_assetFileFetcher.GetPath(AssetType::Texture, texturePath);
         if (!fullPath.has_value())
         {
             RNGO_ASSERT(false && "Texture not found!");
@@ -79,7 +79,7 @@ namespace RNGOEngine::AssetHandling
         m_shaderManager.BeginDestroyAllShaders();
         m_shaderManager.BeginDestroyAllShaderPrograms();
 
-        m_modelManager.BeginDestroyAllModels();
+        // m_modelManager.BeginDestroyAllModels();
         m_textureManager.BeginDestroyAllTextures();
         m_materialManager.BeginDestroyAllMaterials();
     }
