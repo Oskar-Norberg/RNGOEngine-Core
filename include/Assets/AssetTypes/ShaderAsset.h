@@ -4,11 +4,12 @@
 
 #pragma once
 #include "Assets/Asset.h"
+#include "Renderer/RenderID.h"
 
 namespace RNGOEngine::AssetHandling
 {
     struct ShaderMetadata : AssetMetadata
     {
-        // TODO:
+        Core::Renderer::ShaderType ShaderType;
     };
 }

@@ -13,51 +13,33 @@ namespace RNGOEngine::AssetHandling
                                Resources::ResourceManager& resourceManager, bool doFlipUVs)
         : m_assetDatabase(assetDatabase),
           m_assetFileFetcher(assetFetcher),
-          m_shaderManager(assetDatabase, resourceManager, m_assetFileFetcher),
+          m_shaderManager(resourceManager),
           m_modelManager(resourceManager),
           m_textureManager(resourceManager),
           m_materialManager(assetDatabase, m_shaderManager, m_textureManager)
     {
     }
 
-    // AssetHandle AssetManager::LoadModel(
-    //     const std::filesystem::path& modelPath)
-    // {
-    //     const auto fullPath = m_assetFileFetcher.GetMeshPath(modelPath);
-    //     if (!fullPath.has_value())
-    //     {
-    //         RNGO_ASSERT(false && "Model not found!");
-    //         return m_modelManager.GetInvalidModel();
-    //     }
-    //
-    //     const auto model = m_modelManager.CreateModel(fullPath.value());
-    //     if (!model)
-    //     {
-    //         RNGO_ASSERT(false && "Model creation failed!");
-    //         return m_modelManager.GetInvalidModel();
-    //     }
-    //
-    //     return model.value();
-    // }
-
     Core::Renderer::MaterialHandle AssetManager::CreateMaterial(
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
-        const auto vertexShader = m_shaderManager.CreateShader(vertexSourcePath,
-                                                               Core::Renderer::ShaderType::Vertex);
-        const auto fragmentShader = m_shaderManager.CreateShader(fragmentSourcePath,
-                                                                 Core::Renderer::ShaderType::Fragment);
-
-        const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
-
-        return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
+        // const auto vertexShader = m_shaderManager.CreateShader(vertexSourcePath,
+        //                                                        Core::Renderer::ShaderType::Vertex);
+        // const auto fragmentShader = m_shaderManager.CreateShader(fragmentSourcePath,
+        //                                                          Core::Renderer::ShaderType::Fragment);
+        //
+        // const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
+        //
+        // return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
+        
+        return Core::Renderer::MaterialHandle({}, m_materialManager);
     }
 
     void AssetManager::BeginDestroyAllAssets()
     {
         // TODO: Save persistent database changes?
-        m_shaderManager.BeginDestroyAllShaders();
-        m_shaderManager.BeginDestroyAllShaderPrograms();
+        // m_shaderManager.BeginDestroyAllShaders();
+        // m_shaderManager.BeginDestroyAllShaderPrograms();
 
         // m_modelManager.BeginDestroyAllModels();
         // m_textureManager.BeginDestroyAllTextures();

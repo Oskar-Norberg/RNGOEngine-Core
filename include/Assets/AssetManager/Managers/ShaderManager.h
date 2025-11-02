@@ -27,16 +27,7 @@ namespace RNGOEngine::AssetHandling
     enum class ShaderManagerError
     {
         None,
-
-        // Resources
-        ShaderNotFound,
-        CompilationFailed,
-        LinkingFailed,
-
-        // Preprocessing
-        FileNotFound,
-        MalformedInclude,
-        TokenNotFound,
+        // TODO:
     };
 
     struct RuntimeShaderData
@@ -54,12 +45,11 @@ namespace RNGOEngine::AssetHandling
     class ShaderManager
     {
     public:
-        explicit ShaderManager(AssetDatabase& assetDatabase,
-                               Resources::ResourceManager& resourceManager,
-                               const AssetFetcher& assetFetcher);
+        explicit ShaderManager(Resources::ResourceManager& resourceManager);
 
     public:
-        AssetHandle CreateShader(const std::filesystem::path& path, Core::Renderer::ShaderType type);
+        ShaderManagerError UploadShader(const AssetHandle& assetHandle,
+                                        std::string_view shaderSource, Core::Renderer::ShaderType type);
 
     public:
         Containers::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(
@@ -70,15 +60,8 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::ShaderProgramID GetShaderProgram(
             const Containers::GenerationalKey<RuntimeShaderProgramData>& key);
 
-        // Engine Internal
-    public:
-        void BeginDestroyAllShaders();
-        void BeginDestroyAllShaderPrograms();
-
     private:
-        AssetDatabase& m_assetDatabase;
         Resources::ResourceManager& m_resourceManager;
-        ShaderLoader m_shaderLoader;
 
     private:
         Containers::GenerationalVector<RuntimeShaderData> m_shaders;

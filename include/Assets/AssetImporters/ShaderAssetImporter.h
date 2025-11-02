@@ -5,6 +5,7 @@
 #pragma once
 
 #include "AssetImporter.h"
+#include "Assets/AssetLoaders/ShaderLoader.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -15,5 +16,8 @@ namespace RNGOEngine::AssetHandling
 
     public:
         AssetHandle Load(const std::filesystem::path& path) override;
+
+    private:
+        ShaderLoader m_shaderLoader;
     };
 }

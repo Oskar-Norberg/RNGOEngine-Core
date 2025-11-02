@@ -9,34 +9,17 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    ShaderManager::ShaderManager(AssetDatabase& assetDatabase, Resources::ResourceManager& resourceManager,
-                                 const AssetFetcher& assetFetcher)
-        : m_assetDatabase(assetDatabase),
-          m_resourceManager(resourceManager),
-          m_shaderLoader(assetFetcher)
+    ShaderManager::ShaderManager(Resources::ResourceManager& resourceManager)
+        : m_resourceManager(resourceManager)
     {
     }
 
-    AssetHandle ShaderManager::CreateShader(const std::filesystem::path& path,
-                                            Core::Renderer::ShaderType type)
+    ShaderManagerError ShaderManager::UploadShader(const AssetHandle& assetHandle,
+                                                   const std::string_view shaderSource,
+                                                   const Core::Renderer::ShaderType type)
     {
-        // Exists in database
-        if (m_assetDatabase.IsRegistered(path))
-        {
-            return m_assetDatabase.GetAssetHandle(path);
-        }
-
-        // Load Shader
-        const auto shaderResult = m_shaderLoader.LoadShader(path);
-        if (!shaderResult)
-        {
-            RNGO_ASSERT(false && "ShaderManager::CreateShader failed to load shader.");
-            // TODO: Return error handle or expected.
-            return {};
-        }
-
         // Create Shader Resource
-        const auto shaderID = m_resourceManager.CreateShader(shaderResult.value(), type);
+        const auto shaderID = m_resourceManager.CreateShader(shaderSource, type);
         const auto runtimeShaderData = RuntimeShaderData{
             .Type = type,
             .ShaderKey = shaderID
@@ -44,15 +27,10 @@ namespace RNGOEngine::AssetHandling
         // Store Runtime shader data
         auto runtimeShaderKey = m_shaders.Insert(runtimeShaderData);
 
-        // Insert into Asset Database
-        auto assetHandle = m_assetDatabase.RegisterAsset<ShaderMetadata>( path);
-        auto& shaderMetadata = m_assetDatabase.GetAssetMetadata(assetHandle);
-        // Mark Asset as valid
-        shaderMetadata.State = AssetState::Valid;
-
         m_handleToShader.insert({assetHandle, runtimeShaderKey});
 
-        return assetHandle;
+        // TODO:
+        return ShaderManagerError::None;
     }
 
     // TODO: Long function, clean up.
@@ -121,29 +99,5 @@ namespace RNGOEngine::AssetHandling
         }
 
         return shaderProgramOpt.value();
-    }
-
-    void ShaderManager::BeginDestroyAllShaders()
-    {
-        for (const auto shader : m_shaders.Live())
-        {
-            const auto validated = m_shaders.GetUnmarkedValidated(shader);
-            if (validated)
-            {
-                m_resourceManager.MarkShaderForDestruction(validated->get().ShaderKey);
-            }
-        }
-    }
-
-    void ShaderManager::BeginDestroyAllShaderPrograms()
-    {
-        for (const auto program : m_shaderPrograms.Live())
-        {
-            const auto validated = m_shaderPrograms.GetUnmarkedValidated(program);
-            if (validated)
-            {
-                m_resourceManager.MarkShaderProgramForDestruction(validated->get().ProgramKey);
-            }
-        }
     }
 }
