@@ -37,6 +37,22 @@ namespace RNGOEngine::AssetHandling
     Containers::GenerationalKey<RuntimeShaderProgramData> ShaderManager::CreateShaderProgram(
         const AssetHandle& vertexShader, const AssetHandle& fragmentShader)
     {
+        // Check cache first
+        const auto pair = std::make_pair(vertexShader, fragmentShader);
+        if (m_shaderProgramCache.contains(pair))
+        {
+            const auto& cachedKey = m_shaderProgramCache.at(pair);
+            // Validate cached key
+            if (m_shaderPrograms.IsValidUnmarked(cachedKey))
+            {
+                return cachedKey;
+            }
+            else
+            {
+                m_shaderProgramCache.erase(pair);
+            }
+        }
+
         // Lots of double work on the vert/frag shaders here, make a helper function / lambda.
         // Invalid Shader AssetHandles
         if (!m_handleToShader.contains(vertexShader) || !m_handleToShader.contains(fragmentShader))
@@ -76,7 +92,12 @@ namespace RNGOEngine::AssetHandling
         };
 
         // Add to runtime storage.
-        return m_shaderPrograms.Insert(runtimeShaderProgramData);
+        const auto key = m_shaderPrograms.Insert(runtimeShaderProgramData);
+
+        // Add to program cache
+        m_shaderProgramCache.insert({pair, key});
+
+        return key;
     }
 
     Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(
