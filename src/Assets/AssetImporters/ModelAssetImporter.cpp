@@ -37,7 +37,16 @@ namespace RNGOEngine::AssetHandling
             RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
         }
 
-        m_assetManager.GetModelManager().UploadModel(assetHandle, modelHandle.value());
+        // Upload to GPU
+        const auto errorMessage = m_assetManager.GetModelManager().UploadModel(assetHandle, modelHandle.value());
+        if (errorMessage != ModelCreationError::None)
+        {
+            // TODO: Error handling
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
+        }
+
+        // Unload Model from RAM
+        ModelLoading::UnloadModel(modelHandle.value());
 
         // Mark Valid
         auto& metadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(assetHandle);
