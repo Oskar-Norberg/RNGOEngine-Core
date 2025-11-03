@@ -3,6 +3,7 @@
 //
 
 #include "Assets/AssetManager/Managers/TextureManager.h"
+
 #include "Assets/AssetLoaders/TextureLoader.h"
 #include "ResourceManager/ResourceManager.h"
 
@@ -13,8 +14,9 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    TextureManagerError TextureManager::UploadTexture(const AssetHandle& assetHandle,
-                                                      const Textures::TextureHandle textureHandle)
+    TextureManagerError TextureManager::UploadTexture(
+        const AssetHandle& assetHandle, const Textures::TextureHandle textureHandle
+    )
     {
         // Upload Resources
         const auto textureKey = m_resourceManager.CreateTexture(textureHandle);
@@ -24,6 +26,15 @@ namespace RNGOEngine::AssetHandling
 
         // TODO:
         return TextureManagerError::None;
+    }
+    void TextureManager::UnloadTexture(const AssetHandle& assetHandle)
+    {
+        if (m_textures.contains(assetHandle))
+        {
+            const auto& runtimeTextureData = m_textures.at(assetHandle);
+            m_resourceManager.MarkTextureForDestruction(runtimeTextureData.TextureKey);
+            m_textures.erase(assetHandle);
+        }
     }
 
     AssetHandle TextureManager::GetInvalidTexture() const

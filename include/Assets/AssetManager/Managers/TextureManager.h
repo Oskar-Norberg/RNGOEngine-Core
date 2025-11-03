@@ -41,6 +41,7 @@ namespace RNGOEngine::AssetHandling
     public:
         TextureManagerError UploadTexture(const AssetHandle& assetHandle,
                                           Textures::TextureHandle textureHandle);
+        void UnloadTexture(const AssetHandle& assetHandle);
 
     public:
         AssetHandle GetInvalidTexture() const;

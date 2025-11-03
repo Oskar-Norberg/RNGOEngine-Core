@@ -19,23 +19,48 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle TextureAssetImporter::Register(const std::filesystem::path& path)
     {
+        // Already in database?
+        if (m_assetDatabase.IsRegistered(path))
+        {
+            // TODO: Check for valid type.
+            return m_assetDatabase.GetAssetHandle(path);
+        }
+
+        const auto& assetHandle = m_assetDatabase.RegisterAsset<TextureMetadata>(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(assetHandle);
+        metadata.State = AssetState::Invalid;
+        metadata.Type = AssetType::Texture;
+        metadata.Path = path;
+
+        return assetHandle;
     }
 
     void TextureAssetImporter::Unregister(const AssetHandle& handle)
     {
+        // TODO: Move this to AssetLoader, duplicate code.
+        // All types will function the same. Unload if valid, then unregister.
+
+        if (m_assetDatabase.IsRegistered(handle))
+        {
+            if (const auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(handle);
+                metadata.State == AssetState::Valid)
+            {
+                Unload(handle);
+            }
+
+            m_assetDatabase.UnregisterAsset<TextureMetadata>(handle);
+        }
     }
 
     AssetHandle TextureAssetImporter::Load(const std::filesystem::path& path)
     {
-        // Already in database?
-        if (m_assetDatabase.IsRegistered(path))
-        {
-            // TODO: Reload if invalid?
-            return m_assetDatabase.GetAssetHandle(path);
-        }
+        const auto& assetHandle = Register(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(assetHandle);
 
-        // Register in Database
-        const auto& assetHandle = m_assetDatabase.RegisterAsset<TextureMetadata>(path);
+        if (metadata.State == AssetState::Valid)
+        {
+            return assetHandle;
+        }
 
         // Load Texture to RAM
         const auto textureHandle = TextureLoader::LoadTexture(path);
@@ -58,7 +83,6 @@ namespace RNGOEngine::AssetHandling
         TextureLoader::FreeTexture(textureHandle.value());
 
         // Mark Valid
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(assetHandle);
         metadata.State = AssetState::Valid;
 
         return assetHandle;
@@ -66,5 +90,14 @@ namespace RNGOEngine::AssetHandling
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)
     {
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(handle);
+
+        if (metadata.State != AssetState::Valid)
+        {
+            return;
+        }
+
+        m_assetManager.GetTextureManager().UnloadTexture(handle);
+        metadata.State = AssetState::Invalid;
     }
 }
