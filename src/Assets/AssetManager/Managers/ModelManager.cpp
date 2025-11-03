@@ -14,14 +14,24 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    ModelCreationError ModelManager::UploadModel(const AssetHandle& assetHandle,
-                                                 const ModelLoading::ModelHandle modelHandle)
+    ModelCreationError ModelManager::UploadModel(
+        const AssetHandle& assetHandle, const ModelLoading::ModelHandle modelHandle
+    )
     {
         auto runtimeData = UploadModelResources(modelHandle);
         m_models.insert({assetHandle, std::move(runtimeData)});
 
         // TODO:
         return ModelCreationError::None;
+    }
+    void ModelManager::UnloadModel(const AssetHandle& assetHandle)
+    {
+        if (m_models.contains(assetHandle))
+        {
+            const auto& modelData = m_models.at(assetHandle);
+            UnloadModelResources(modelData);
+            m_models.erase(assetHandle);
+        }
     }
 
     AssetHandle ModelManager::GetInvalidModel() const
@@ -30,7 +40,7 @@ namespace RNGOEngine::AssetHandling
         return Utilities::UUID(0);
     }
 
-    const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle handle) const
+    const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
     {
         return m_models.at(handle);
     }
@@ -46,5 +56,12 @@ namespace RNGOEngine::AssetHandling
         }
 
         return modelData;
+    }
+    void ModelManager::UnloadModelResources(const RuntimeModelData& modelData)
+    {
+        for (const auto& meshKey : modelData.meshKeys)
+        {
+            m_resourceManager.MarkMeshForDestruction(meshKey);
+        }
     }
 }

@@ -44,13 +44,14 @@ namespace RNGOEngine::AssetHandling
         explicit ModelManager(Resources::ResourceManager& resourceManager);
 
         ModelCreationError UploadModel(const AssetHandle& assetHandle, ModelLoading::ModelHandle modelHandle);
+        void UnloadModel(const AssetHandle& assetHandle);
 
     public:
         AssetHandle GetInvalidModel() const;
 
     public:
         // TODO: Make this return an optional or expected?
-        const RuntimeModelData& GetRuntimeModelData(AssetHandle handle) const;
+        const RuntimeModelData& GetRuntimeModelData(const AssetHandle& handle) const;
 
     private:
         Resources::ResourceManager& m_resourceManager;
@@ -60,5 +61,6 @@ namespace RNGOEngine::AssetHandling
 
     private:
         RuntimeModelData UploadModelResources(ModelLoading::ModelHandle modelHandle);
+        void UnloadModelResources(const RuntimeModelData& modelData);
     };
 }

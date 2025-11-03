@@ -24,17 +24,45 @@ namespace RNGOEngine::AssetHandling
         // Already in database?
         if (m_assetDatabase.IsRegistered(path))
         {
-            // TODO: Reload if invalid?
+            // TODO: Check for valid type?
             return m_assetDatabase.GetAssetHandle(path);
         }
 
         // Register in Database
+        // TODO: What happens if a path is registered with a different type?
         const auto& assetHandle = m_assetDatabase.RegisterAsset<ModelMetadata>(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(assetHandle);
+        metadata.State = AssetState::Invalid;
+        metadata.Path = path;
+        metadata.Type = AssetType::Model;
+
+        return assetHandle;
+    }
+
     void ModelAssetImporter::Unregister(const AssetHandle& handle)
     {
+        if (m_assetDatabase.IsRegistered(handle))
+        {
+            if (const auto& metadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(handle);
+                metadata.State == AssetState::Valid)
+            {
+                Unload(handle);
+            }
+
+            m_assetDatabase.UnregisterAsset<ModelMetadata>(handle);
+        }
     }
+
     AssetHandle ModelAssetImporter::Load(const std::filesystem::path& path)
     {
+        const auto& assetHandle = Register(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(assetHandle);
+
+        // Already Loaded.
+        if (metadata.State == AssetState::Valid)
+        {
+            return assetHandle;
+        }
 
         // Load Model into RAM
         const auto modelHandle = ModelLoading::LoadModel(path, m_doFlipUVs);
@@ -45,8 +73,8 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload to GPU
-        const auto errorMessage = m_assetManager.GetModelManager().UploadModel(
-            assetHandle, modelHandle.value());
+        const auto errorMessage =
+            m_assetManager.GetModelManager().UploadModel(assetHandle, modelHandle.value());
         if (errorMessage != ModelCreationError::None)
         {
             // TODO: Error handling
@@ -57,12 +85,20 @@ namespace RNGOEngine::AssetHandling
         ModelLoading::UnloadModel(modelHandle.value());
 
         // Mark Valid
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(assetHandle);
         metadata.State = AssetState::Valid;
 
         return assetHandle;
     }
 
     void ModelAssetImporter::Unload(const AssetHandle& handle)
+    {
+        if (!m_assetDatabase.IsRegistered(handle))
+        {
+            return;
+        }
+
+        auto& assetMetadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(handle);
+        m_assetManager.GetModelManager().UnloadModel(handle);
+        assetMetadata.State = AssetState::Invalid;
     }
 }
