@@ -16,7 +16,7 @@
 #include "ResourceManager/ResourceTracker.h"
 #include "Utilities/RNGOAsserts.h"
 
-#include "glm/gtc/type_ptr.inl"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace RNGOEngine::Core::Renderer
 {

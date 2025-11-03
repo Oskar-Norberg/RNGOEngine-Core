@@ -13,7 +13,6 @@ namespace RNGOEngine
     namespace AssetHandling
     {
         class AssetFetcher;
-
         class AssetDatabase;
         class AssetManager;
     }
@@ -33,8 +32,12 @@ namespace RNGOEngine::AssetHandling
         virtual ~AssetImporter() = default;
 
     public:
+        virtual AssetHandle Register(const std::filesystem::path& path) = 0;
+        virtual void Unregister(const AssetHandle& handle) = 0;
+        
         virtual AssetHandle Load(const std::filesystem::path& path) = 0;
-
+        virtual void Unload(const AssetHandle& handle) = 0;
+        
     protected:
         AssetFetcher& m_assetFetcher;
         AssetDatabase& m_assetDatabase;

@@ -15,7 +15,10 @@ namespace RNGOEngine::AssetHandling
         ModelAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
                            AssetManager& assetManager, bool doFlipUVs);
 
+        AssetHandle Register(const std::filesystem::path& path) override;
+        void Unregister(const AssetHandle& handle) override;
         AssetHandle Load(const std::filesystem::path& path) override;
+        void Unload(const AssetHandle& handle) override;
 
     private:
         bool m_doFlipUVs;

@@ -10,10 +10,18 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    ShaderAssetImporter::ShaderAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
-                                             AssetManager& assetManager)
-        : AssetImporter(assetFetcher, assetDatabase, assetManager),
-          m_shaderLoader(assetFetcher)
+    ShaderAssetImporter::ShaderAssetImporter(
+        AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager
+    )
+        : AssetImporter(assetFetcher, assetDatabase, assetManager), m_shaderLoader(assetFetcher)
+    {
+    }
+
+    AssetHandle ShaderAssetImporter::Register(const std::filesystem::path& path)
+    {
+    }
+
+    void ShaderAssetImporter::Unregister(const AssetHandle& handle)
     {
     }
 
@@ -39,9 +47,8 @@ namespace RNGOEngine::AssetHandling
         }
 
         // TODO: Really, really, really, unstable way to determine shader type. Works for now!
-        const auto type = path.extension() == ".vert"
-                              ? Core::Renderer::ShaderType::Vertex
-                              : Core::Renderer::ShaderType::Fragment;
+        const auto type = path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
+                                                      : Core::Renderer::ShaderType::Fragment;
 
         // Upload Resources
         m_assetManager.GetShaderManager().UploadShader(assetHandle, shaderResult.value(), type);
@@ -52,5 +59,9 @@ namespace RNGOEngine::AssetHandling
         metadata.ShaderType = type;
 
         return assetHandle;
+    }
+
+    void ShaderAssetImporter::Unload(const AssetHandle& handle)
+    {
     }
 }

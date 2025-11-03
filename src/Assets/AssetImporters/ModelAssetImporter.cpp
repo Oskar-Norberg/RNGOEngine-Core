@@ -11,13 +11,15 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    ModelAssetImporter::ModelAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
-                                           AssetManager& assetManager, const bool doFlipUVs)
+    ModelAssetImporter::ModelAssetImporter(
+        AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager,
+        const bool doFlipUVs
+    )
         : AssetImporter(assetFetcher, assetDatabase, assetManager), m_doFlipUVs(doFlipUVs)
     {
     }
 
-    AssetHandle ModelAssetImporter::Load(const std::filesystem::path& path)
+    AssetHandle ModelAssetImporter::Register(const std::filesystem::path& path)
     {
         // Already in database?
         if (m_assetDatabase.IsRegistered(path))
@@ -28,6 +30,11 @@ namespace RNGOEngine::AssetHandling
 
         // Register in Database
         const auto& assetHandle = m_assetDatabase.RegisterAsset<ModelMetadata>(path);
+    void ModelAssetImporter::Unregister(const AssetHandle& handle)
+    {
+    }
+    AssetHandle ModelAssetImporter::Load(const std::filesystem::path& path)
+    {
 
         // Load Model into RAM
         const auto modelHandle = ModelLoading::LoadModel(path, m_doFlipUVs);
@@ -54,5 +61,8 @@ namespace RNGOEngine::AssetHandling
         metadata.State = AssetState::Valid;
 
         return assetHandle;
+    }
+
+    void ModelAssetImporter::Unload(const AssetHandle& handle)
     }
 }

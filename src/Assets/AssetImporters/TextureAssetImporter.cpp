@@ -3,15 +3,25 @@
 //
 
 #include "Assets/AssetImporters/TextureAssetImporter.h"
+
 #include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Assets/AssetLoaders/TextureLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    TextureAssetImporter::TextureAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
-                                               AssetManager& assetManager)
+    TextureAssetImporter::TextureAssetImporter(
+        AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager
+    )
         : AssetImporter(assetFetcher, assetDatabase, assetManager)
+    {
+    }
+
+    AssetHandle TextureAssetImporter::Register(const std::filesystem::path& path)
+    {
+    }
+
+    void TextureAssetImporter::Unregister(const AssetHandle& handle)
     {
     }
 
@@ -36,8 +46,8 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload to GPU
-        const auto errorMessage = m_assetManager.GetTextureManager().UploadTexture(
-            assetHandle, textureHandle.value());
+        const auto errorMessage =
+            m_assetManager.GetTextureManager().UploadTexture(assetHandle, textureHandle.value());
         if (errorMessage != TextureManagerError::None)
         {
             // TODO: Error handling
@@ -52,5 +62,9 @@ namespace RNGOEngine::AssetHandling
         metadata.State = AssetState::Valid;
 
         return assetHandle;
+    }
+
+    void TextureAssetImporter::Unload(const AssetHandle& handle)
+    {
     }
 }
