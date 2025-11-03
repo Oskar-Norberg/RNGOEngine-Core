@@ -12,7 +12,7 @@ namespace RNGOEngine::AssetHandling
     class ModelAssetSerializer : public AssetSerializer
     {
     public:
-        void Serialize(AssetMetadata& metadata, YAML::Emitter& emitter) override
+        void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter) override
         {
             AssetSerializer::Serialize(metadata, emitter);
 

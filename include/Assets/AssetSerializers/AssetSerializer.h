@@ -15,12 +15,6 @@ namespace RNGOEngine::AssetHandling
     public:
         virtual ~AssetSerializer() = default;
 
-        virtual void Serialize(AssetMetadata& metadata, YAML::Emitter& emitter)
-        {
-            emitter << YAML::BeginMap;
-            emitter << YAML::Key << "UUID" << YAML::Value << metadata.UUID.GetValue();
-            emitter << YAML::Key << "Type" << YAML::Value << static_cast<int>(metadata.Type);
-            emitter << YAML::EndMap;
-        }
+        virtual void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter);
     };
 }

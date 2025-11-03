@@ -12,7 +12,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
 
         # Serializer
         include/Assets/AssetSerializers/AssetSerializer.h
-        
+        src/Assets/AssetSerializers/AssetSerializer.cpp
+
         # Serializer Types
         include/Assets/AssetSerializers/TextureAssetSerializer.h
         include/Assets/AssetSerializers/ShaderAssetSerializer.h
