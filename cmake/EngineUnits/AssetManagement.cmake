@@ -1,8 +1,23 @@
 set(ASSET_MANAGER_PROJECT_NAME RNGOEngine_AssetManager)
 add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
-        # Asset Database
+        # Asset
         include/Assets/Asset.h
         include/Assets/AssetMetadataTypes.h
+
+        # Asset Types
+        include/Assets/AssetTypes/TextureAsset.h
+        include/Assets/AssetTypes/ModelAsset.h
+        include/Assets/AssetTypes/ShaderAsset.h
+        include/Assets/AssetTypes/MaterialAsset.h
+
+        # Serializer
+        include/Assets/AssetSerializers/AssetSerializer.h
+        
+        # Serializer Types
+        include/Assets/AssetSerializers/TextureAssetSerializer.h
+        include/Assets/AssetSerializers/ShaderAssetSerializer.h
+        include/Assets/AssetSerializers/ModelAssetSerializer.h
+
 
         # Asset Importers
         include/Assets/AssetImporters/AssetImporter.h
