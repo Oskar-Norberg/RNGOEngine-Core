@@ -19,23 +19,49 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle ShaderAssetImporter::Register(const std::filesystem::path& path)
     {
-    }
-
-    void ShaderAssetImporter::Unregister(const AssetHandle& handle)
-    {
-    }
-
-    AssetHandle ShaderAssetImporter::Load(const std::filesystem::path& path)
-    {
-        // Already in database?
         if (m_assetDatabase.IsRegistered(path))
         {
-            // TODO: Check validity, reload if invalid.
+            // TODO: Check for valid type?
             return m_assetDatabase.GetAssetHandle(path);
         }
 
         // Register in Database
         const auto& assetHandle = m_assetDatabase.RegisterAsset<ShaderMetadata>(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
+
+        metadata.Path = path;
+        metadata.State = AssetState::Invalid;
+        metadata.Type = AssetType::Shader;
+
+        return assetHandle;
+    }
+
+    void ShaderAssetImporter::Unregister(const AssetHandle& handle)
+    {
+        if (!m_assetDatabase.IsRegistered(handle))
+        {
+            return;
+        }
+
+        auto& assetMetadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(handle);
+        if (assetMetadata.State == AssetState::Valid)
+        {
+            Unload(handle);
+        }
+
+        m_assetDatabase.UnregisterAsset<ShaderMetadata>(handle);
+    }
+
+    AssetHandle ShaderAssetImporter::Load(const std::filesystem::path& path)
+    {
+        auto assetHandle = Register(path);
+        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
+
+        // Already Loaded?
+        if (metadata.State == AssetState::Valid)
+        {
+            return assetHandle;
+        }
 
         // Preprocess Shader
         const auto shaderResult = m_shaderLoader.LoadShader(path);
@@ -54,7 +80,6 @@ namespace RNGOEngine::AssetHandling
         m_assetManager.GetShaderManager().UploadShader(assetHandle, shaderResult.value(), type);
 
         // Mark Valid
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
         metadata.State = AssetState::Valid;
         metadata.ShaderType = type;
 
@@ -63,5 +88,19 @@ namespace RNGOEngine::AssetHandling
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
     {
+        if (!m_assetDatabase.IsRegistered(handle))
+        {
+            return;
+        }
+
+        auto& assetMetadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(handle);
+        if (assetMetadata.State != AssetState::Valid)
+        {
+            // Shader already unloaded.
+            return;
+        }
+        
+        m_assetManager.GetShaderManager().DestroyShader(handle);
+        assetMetadata.State = AssetState::Invalid;
     }
 }

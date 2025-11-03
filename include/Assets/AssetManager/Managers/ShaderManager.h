@@ -50,6 +50,7 @@ namespace RNGOEngine::AssetHandling
     public:
         ShaderManagerError UploadShader(const AssetHandle& assetHandle,
                                         std::string_view shaderSource, Core::Renderer::ShaderType type);
+        void DestroyShader(const AssetHandle& assetHandle);
 
     public:
         Containers::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(

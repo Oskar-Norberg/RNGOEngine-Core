@@ -14,16 +14,14 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    ShaderManagerError ShaderManager::UploadShader(const AssetHandle& assetHandle,
-                                                   const std::string_view shaderSource,
-                                                   const Core::Renderer::ShaderType type)
+    ShaderManagerError ShaderManager::UploadShader(
+        const AssetHandle& assetHandle, const std::string_view shaderSource,
+        const Core::Renderer::ShaderType type
+    )
     {
         // Create Shader Resource
         const auto shaderID = m_resourceManager.CreateShader(shaderSource, type);
-        const auto runtimeShaderData = RuntimeShaderData{
-            .Type = type,
-            .ShaderKey = shaderID
-        };
+        const auto runtimeShaderData = RuntimeShaderData{.Type = type, .ShaderKey = shaderID};
         // Store Runtime shader data
         auto runtimeShaderKey = m_shaders.Insert(runtimeShaderData);
 
@@ -33,9 +31,27 @@ namespace RNGOEngine::AssetHandling
         return ShaderManagerError::None;
     }
 
+    void ShaderManager::DestroyShader(const AssetHandle& assetHandle)
+    {
+        if (m_handleToShader.contains(assetHandle))
+        {
+            const auto& runtimeShaderKey = m_handleToShader.at(assetHandle);
+            const auto runtimeShaderDataOpt = m_shaders.GetUnmarkedValidated(runtimeShaderKey);
+
+            if (runtimeShaderDataOpt)
+            {
+                m_resourceManager.MarkShaderForDestruction(runtimeShaderDataOpt->get().ShaderKey);
+            }
+
+            m_shaders.Remove(runtimeShaderKey);
+            m_handleToShader.erase(assetHandle);
+        }
+    }
+
     // TODO: Long function, clean up.
     Containers::GenerationalKey<RuntimeShaderProgramData> ShaderManager::CreateShaderProgram(
-        const AssetHandle& vertexShader, const AssetHandle& fragmentShader)
+        const AssetHandle& vertexShader, const AssetHandle& fragmentShader
+    )
     {
         // Check cache first
         const auto pair = std::make_pair(vertexShader, fragmentShader);
@@ -84,12 +100,10 @@ namespace RNGOEngine::AssetHandling
 
         // Create ShaderProgram
         const auto shaderProgramKey = m_resourceManager.CreateShaderProgram(
-            vertexRuntimeShader->get().ShaderKey,
-            fragmentRuntimeShader->get().ShaderKey);
+            vertexRuntimeShader->get().ShaderKey, fragmentRuntimeShader->get().ShaderKey
+        );
 
-        const auto runtimeShaderProgramData = RuntimeShaderProgramData{
-            .ProgramKey = shaderProgramKey
-        };
+        const auto runtimeShaderProgramData = RuntimeShaderProgramData{.ProgramKey = shaderProgramKey};
 
         // Add to runtime storage.
         const auto key = m_shaderPrograms.Insert(runtimeShaderProgramData);
@@ -101,7 +115,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     Core::Renderer::ShaderProgramID ShaderManager::GetShaderProgram(
-        const Containers::GenerationalKey<RuntimeShaderProgramData>& key)
+        const Containers::GenerationalKey<RuntimeShaderProgramData>& key
+    )
     {
         const auto validated = m_shaderPrograms.GetUnmarkedValidated(key);
 

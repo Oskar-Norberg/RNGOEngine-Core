@@ -98,6 +98,12 @@ namespace RNGOEngine::AssetHandling
         }
 
         auto& assetMetadata = m_assetDatabase.GetAssetMetadataAs<ModelMetadata>(handle);
+        if (assetMetadata.State != AssetState::Valid)
+        {
+            // Model already unloaded.
+            return;
+        }
+        
         m_assetManager.GetModelManager().UnloadModel(handle);
         assetMetadata.State = AssetState::Invalid;
     }
