@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     class AssetLoader
     {
     public:
-        explicit AssetLoader(AssetFetcher& m_asset_fetcher);
+        explicit AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher);
 
         AssetHandle Load(AssetType type, const std::filesystem::path& path) const;
 
@@ -49,6 +49,7 @@ namespace RNGOEngine::AssetHandling
         }
 
     private:
+        AssetDatabase& m_assetDatabase;
         AssetFetcher& m_assetFetcher;
         std::unordered_map<AssetType, std::unique_ptr<AssetImporter>> m_loaders;
     };

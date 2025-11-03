@@ -26,6 +26,11 @@ namespace RNGOEngine::Utilities
 
         bool operator==(const UUID& other) const;
 
+        std::uint64_t GetValue() const
+        {
+            return m_uuid;
+        }
+
         explicit constexpr operator uint64_t() const
         {
             return m_uuid;

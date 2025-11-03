@@ -8,8 +8,8 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetLoader::AssetLoader(AssetFetcher& m_asset_fetcher)
-        : m_assetFetcher(m_asset_fetcher)
+    AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
+        : m_assetDatabase(assetDatabase), m_assetFetcher(assetFetcher)
     {
     }
 

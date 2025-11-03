@@ -61,7 +61,7 @@ namespace RNGOEngine::Core
         }
 
         // Asset Importers
-        m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_assetFetcher);
+        m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_assetDatabase, m_assetFetcher);
         {
             // Register Importer Types
             m_assetLoader->RegisterImporter<AssetHandling::ModelAssetImporter>(

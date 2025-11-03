@@ -63,7 +63,7 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         src/Assets/AssetManager/Managers/ShaderManager.cpp
 )
 target_include_directories(${ASSET_MANAGER_PROJECT_NAME} PUBLIC include)
-target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC ${RENDERING_PROJECT_NAME} ${RESOURCE_MANAGEMENT_PROJECT_NAME} assimp stb_image)
+target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC yaml-cpp ${RENDERING_PROJECT_NAME} ${RESOURCE_MANAGEMENT_PROJECT_NAME} assimp stb_image)
 target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_NAME} ${UTILITIES_PROJECT_NAME})
 
 
