@@ -18,9 +18,14 @@ namespace RNGOEngine::Utilities
             SetInstance(instance);
         }
 
+        ~Singleton()
+        {
+            SetInstance(nullptr);
+        }
+
         static T& GetInstance()
         {
-            RNGO_ASSERT(m_instance && "Singleton<T>::GetInstance() called before instance was set.");
+            RNGO_ASSERT(m_instance && "Singleton<T>::GetInstance() called on invalid instance.");
             return *m_instance;
         }
 
