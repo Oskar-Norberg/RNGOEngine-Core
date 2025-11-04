@@ -6,13 +6,20 @@
 
 #include <chrono>
 
+// TODO: REMOVE THIS
+#include "Assets/AssetImporters/TextureAssetImporter.h"
+#include "Assets/AssetSerializers/ModelAssetSerializer.h"
+#include "Assets/AssetSerializers/ShaderAssetSerializer.h"
+#include "Assets/AssetSerializers/TextureAssetSerializer.h"
+#include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
+
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Systems/SystemContext.h"
 #include "Systems/Core/RenderSystem.h"
+#include "Systems/SystemContext.h"
 #include "Utilities/RNGOAsserts.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
@@ -20,13 +27,11 @@
 namespace RNGOEngine::Core
 {
     Engine::Engine(const EngineConfig& config)
-        : m_running(true),
-          m_window(nullptr),
-          m_renderer(nullptr),
-          m_assetManager(nullptr)
+        : m_running(true), m_window(nullptr), m_renderer(nullptr), m_assetManager(nullptr)
     {
         bool doFlipTexturesVertically = false;
 
+        // Set Up Renderer
         switch (config.renderType)
         {
             case RenderType::GLFW_OpenGL:
@@ -45,26 +50,30 @@ namespace RNGOEngine::Core
             }
         }
 
+        // Resource and Runtime Asset Managers
         m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(
-            m_assetFetcher, m_assetDatabase, *m_resourceManager,
-            doFlipTexturesVertically
+            m_assetFetcher, m_assetDatabase, *m_resourceManager, doFlipTexturesVertically
         );
-
         for (const auto& [path, type] : config.assetPaths)
         {
-            m_assetFetcher.AddAssetPath(path, type);
+            m_assetFetcher.AddAssetPath(type, path);
         }
 
+        // Asset Loader and Importers
+        m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_assetDatabase, m_assetFetcher);
+        AssetHandling::BootstrapContext context = {*m_assetLoader, doFlipTexturesVertically};
+        AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
+
+        // TODO: TEMPORARY
+        m_assetManager->SetShaderImporter(
+            m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
+        );
+
         m_rendererAPI = std::make_unique<Renderer::RenderAPI>(
-            *m_renderer,
-            m_resourceTracker,
-            *m_resourceManager,
-            m_assetManager->GetModelManager(),
-            m_assetManager->GetShaderManager(),
-            m_assetManager->GetMaterialManager(),
-            m_assetManager->GetTextureManager(),
-            config.width, config.height
+            *m_renderer, m_resourceTracker, *m_resourceManager, m_assetManager->GetModelManager(),
+            m_assetManager->GetShaderManager(), m_assetManager->GetMaterialManager(),
+            m_assetManager->GetTextureManager(), config.width, config.height
         );
 
         AddEngineSystems();
@@ -83,8 +92,8 @@ namespace RNGOEngine::Core
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_C("Engine::Run - Main Loop");
 
-            float deltaTime = std::chrono::duration<float>(
-                std::chrono::high_resolution_clock::now() - lastFrame).count();
+            float deltaTime =
+                std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
             // TODO: Make a load pending scene function instead. Keep implementation details out of game loop.
@@ -111,9 +120,9 @@ namespace RNGOEngine::Core
         CleanUp();
     }
 
-    void Engine::AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type)
+    void Engine::AddAssetPath(AssetHandling::AssetType type, const std::filesystem::path& path)
     {
-        m_assetFetcher.AddAssetPath(path, type);
+        m_assetFetcher.AddAssetPath(type, path);
     }
 
     void Engine::PollWindowEvents()

@@ -1,58 +1,84 @@
 set(ASSET_MANAGER_PROJECT_NAME RNGOEngine_AssetManager)
 add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
-        # Asset Database
-        include/AssetHandling/AssetDatabase/AssetHandle.h
+        # Asset
+        include/Assets/Asset.h
+        include/Assets/AssetMetadataTypes.h
+
+        # Asset Types
+        include/Assets/AssetTypes/TextureAsset.h
+        include/Assets/AssetTypes/ModelAsset.h
+        include/Assets/AssetTypes/ShaderAsset.h
+        include/Assets/AssetTypes/MaterialAsset.h
+
+        # Serializer
+        include/Assets/AssetSerializers/AssetSerializer.h
+        src/Assets/AssetSerializers/AssetSerializer.cpp
+
+        # Serializer Types
+        include/Assets/AssetSerializers/TextureAssetSerializer.h
+        include/Assets/AssetSerializers/ShaderAssetSerializer.h
+        include/Assets/AssetSerializers/ModelAssetSerializer.h
+
+
+        # Asset Importers
+        include/Assets/AssetImporters/AssetImporter.h
         
-        include/AssetHandling/AssetDatabase/AssetState.h
-        include/AssetHandling/AssetDatabase/AssetDatabase.h
-        src/AssetHandling/AssetDatabase/AssetDatabase.cpp
+        include/Assets/AssetImporters/ModelAssetImporter.h
+        src/Assets/AssetImporters/ModelAssetImporter.cpp
 
-        include/AssetHandling/AssetDatabase/Databases/ShaderDatabase.h
-        src/AssetHandling/AssetDatabase/Databases/ShaderDatabase.cpp
+        include/Assets/AssetImporters/TextureAssetImporter.h
+        src/Assets/AssetImporters/TextureAssetImporter.cpp
 
-        include/AssetHandling/AssetDatabase/Databases/MaterialDatabase.h
-        src/AssetHandling/AssetDatabase/Databases/MaterialDatabase.cpp
+        include/Assets/AssetImporters/ShaderAssetImporter.h
+        src/Assets/AssetImporters/ShaderAssetImporter.cpp
 
-        include/AssetHandling/AssetDatabase/Databases/ModelDatabase.h
-        src/AssetHandling/AssetDatabase/Databases/ModelDatabase.cpp
+        include/Assets/AssetLoader.h
+        src/Assets/AssetLoader.cpp
 
-        include/AssetHandling/AssetDatabase/Databases/TextureDatabase.h
-        src/AssetHandling/AssetDatabase/Databases/TextureDatabase.cpp
+        # Asset Importer Bootstrapper
+        include/Assets/Bootstrapper/AssetImporterBootstrapper.h
+        src/Assets/Bootstrapper/AssetImporterBootstrapper.cpp
 
+        
+        include/Assets/AssetMetadataStorage.h
+        
+        include/Assets/AssetDatabase/AssetDatabase.h
+        include/Assets/AssetDatabase/AssetDatabase.tpp
+        src/Assets/AssetDatabase/AssetDatabase.cpp
 
-        include/AssetHandling/AssetManager/AssetManager.h
-        src/AssetHandling/AssetManager/AssetManager.cpp
+        include/Assets/AssetManager/AssetManager.h
+        src/Assets/AssetManager/AssetManager.cpp
         
         include/Shader/ShaderPreprocessor.h
         src/Shader/ShaderPreprocessor.cpp
         
-        include/AssetHandling/AssetFetcher/AssetFetcher.h
-        src/AssetHandling/AssetFetcher/AssetFetcher.cpp
+        include/Assets/AssetFetcher/AssetFetcher.h
+        src/Assets/AssetFetcher/AssetFetcher.cpp
         
-        include/AssetHandling/AssetLoaders/TextureLoader.h
-        src/AssetHandling/AssetLoaders/TextureLoader.cpp
+        include/Assets/AssetLoaders/TextureLoader.h
+        src/Assets/AssetLoaders/TextureLoader.cpp
         
-        include/AssetHandling/AssetLoaders/ShaderLoader.h
-        src/AssetHandling/AssetLoaders/ShaderLoader.cpp
+        include/Assets/AssetLoaders/ShaderLoader.h
+        src/Assets/AssetLoaders/ShaderLoader.cpp
         
-        include/AssetHandling/AssetLoaders/ModelLoader.h
-        src/AssetHandling/AssetLoaders/ModelLoader.cpp
+        include/Assets/AssetLoaders/ModelLoader.h
+        src/Assets/AssetLoaders/ModelLoader.cpp
         
-        include/AssetHandling/AssetManager/Managers/ModelManager.h
-        src/AssetHandling/AssetManager/Managers/ModelManager.cpp
+        include/Assets/AssetManager/Managers/ModelManager.h
+        src/Assets/AssetManager/Managers/ModelManager.cpp
 
-        include/AssetHandling/AssetManager/Managers/TextureManager.h
-        src/AssetHandling/AssetManager/Managers/TextureManager.cpp
+        include/Assets/AssetManager/Managers/TextureManager.h
+        src/Assets/AssetManager/Managers/TextureManager.cpp
 
-        include/AssetHandling/AssetManager/Managers/Material/Material.h
-        include/AssetHandling/AssetManager/Managers/MaterialManager.h
-        src/AssetHandling/AssetManager/Managers/MaterialManager.cpp
+        include/Assets/AssetManager/Managers/Material/Material.h
+        include/Assets/AssetManager/Managers/MaterialManager.h
+        src/Assets/AssetManager/Managers/MaterialManager.cpp
 
-        include/AssetHandling/AssetManager/Managers/ShaderManager.h
-        src/AssetHandling/AssetManager/Managers/ShaderManager.cpp
+        include/Assets/AssetManager/Managers/ShaderManager.h
+        src/Assets/AssetManager/Managers/ShaderManager.cpp
 )
 target_include_directories(${ASSET_MANAGER_PROJECT_NAME} PUBLIC include)
-target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC ${RENDERING_PROJECT_NAME} ${RESOURCE_MANAGEMENT_PROJECT_NAME} assimp stb_image)
+target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC yaml-cpp ${RENDERING_PROJECT_NAME} ${RESOURCE_MANAGEMENT_PROJECT_NAME} assimp stb_image)
 target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_NAME} ${UTILITIES_PROJECT_NAME})
 
 

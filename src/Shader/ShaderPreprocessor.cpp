@@ -16,8 +16,7 @@
 
 namespace RNGOEngine::Shaders
 {
-    ShaderPreProcessor::ShaderPreProcessor(const AssetHandling::AssetFetcher& assetFetcher)
-        : m_assetFetcher(assetFetcher)
+    ShaderPreProcessor::ShaderPreProcessor()
     {
         AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
         AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
@@ -26,7 +25,7 @@ namespace RNGOEngine::Shaders
     std::expected<std::string, ShaderPreProcessingError> ShaderPreProcessor::Parse(
         const std::filesystem::path& source) const
     {
-        const auto foundPath = m_assetFetcher.GetShaderPath(source);
+        const auto foundPath = AssetHandling::AssetFetcher::GetInstance().GetPath(AssetHandling::AssetType::Shader, source);
 
         if (!foundPath.has_value())
         {
@@ -125,7 +124,8 @@ namespace RNGOEngine::Shaders
             {
                 includedFiles.insert(std::string(includePath));
 
-                const auto includeFilePath = m_assetFetcher.GetShaderPath(includePath);
+                const auto includeFilePath = AssetHandling::AssetFetcher::GetInstance().GetPath(
+                    AssetHandling::AssetType::Shader, includePath);
 
                 if (!includeFilePath.has_value())
                 {

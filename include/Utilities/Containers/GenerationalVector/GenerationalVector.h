@@ -33,6 +33,11 @@ namespace RNGOEngine::Containers
         {
             return ID == other.ID && Generation == other.Generation;
         }
+
+        static GenerationalKey<T> InvalidKey()
+        {
+            return {static_cast<size_t>(-1), static_cast<size_t>(-1)};
+        }
     };
 
     template<typename T>

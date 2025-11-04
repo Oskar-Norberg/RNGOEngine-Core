@@ -15,15 +15,31 @@ CPMAddPackage(
         NAME assimp
         GITHUB_REPOSITORY assimp/assimp
         GIT_TAG v6.0.2
-        OPTIONS "ASSIMP_BUILD_ASSIMP_TOOLS OFF"
-        "ASSIMP_BUILD_TESTS OFF"
+        OPTIONS "ASSIMP_BUILD_TESTS OFF"
         "BUILD_SHARED_LIBS OFF"
+        
+        # Dont need exporters for now.
+        "ASSIMP_NO_EXPORT ON"
+        "ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF"
+        
+        # Build only required importers.
+        "ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF"
+        "ASSIMP_BUILD_OBJ_IMPORTER ON"
+        "ASSIMP_BUILD_FBX_IMPORTER ON"
+        "ASSIMP_BUILD_GLTF_IMPORTER ON"
+        
 )
 
 if (RNGOENGINE_TRACY_ENABLE)
     CPMAddPackage("gh:wolfpld/tracy@0.12.2")
 endif ()
 CPMAddPackage("gh:skypjack/entt@3.15.0")
+
+CPMAddPackage(
+        NAME yaml-cpp
+        GITHUB_REPOSITORY jbeder/yaml-cpp
+        GIT_TAG 0.8.0
+)
 
 add_subdirectory(./vendor/glad)
 add_subdirectory(./vendor/stb_image)

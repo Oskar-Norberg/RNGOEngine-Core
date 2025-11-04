@@ -6,9 +6,9 @@
 
 #include "Renderer/API/RenderAPI.h"
 
-#include "AssetHandling/AssetManager/Managers/MaterialManager.h"
-#include "AssetHandling/AssetManager/Managers/ShaderManager.h"
-#include "AssetHandling/AssetManager/Managers/TextureManager.h"
+#include "Assets/AssetManager/Managers/MaterialManager.h"
+#include "Assets/AssetManager/Managers/ShaderManager.h"
+#include "Assets/AssetManager/Managers/TextureManager.h"
 #include "EventQueue/EventQueue.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Renderer/IRenderer.h"
@@ -16,7 +16,7 @@
 #include "ResourceManager/ResourceTracker.h"
 #include "Utilities/RNGOAsserts.h"
 
-#include "glm/gtc/type_ptr.inl"
+#include "glm/gtc/type_ptr.hpp"
 
 namespace RNGOEngine::Core::Renderer
 {

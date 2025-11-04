@@ -6,8 +6,9 @@
 
 #include <memory>
 
-#include "AssetHandling/AssetDatabase/AssetDatabase.h"
-#include "AssetHandling/AssetManager/AssetManager.h"
+#include "Assets/AssetLoader.h"
+#include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetManager/AssetManager.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Concepts/Concepts.h"
 #include "Window/IWindow.h"
@@ -36,7 +37,7 @@ namespace RNGOEngine::Core
         size_t height = 600;
         std::string_view name = "RNGOEngine";
 
-        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetPathType>> assetPaths;
+        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> assetPaths;
     };
 
     class Engine
@@ -61,12 +62,18 @@ namespace RNGOEngine::Core
 
         // Asset Management
     public:
+        AssetHandling::AssetLoader& GetAssetLoader() const
+        {
+            return *m_assetLoader;
+        }
+
+        // Deprecated
         AssetHandling::AssetManager& GetAssetManager() const
         {
             return *m_assetManager;
         }
 
-        void AddAssetPath(const std::filesystem::path& path, AssetHandling::AssetPathType type);
+        void AddAssetPath(AssetHandling::AssetType type, const std::filesystem::path& path);
 
     private:
         // TODO: Break into EngineSettings data-only header?
@@ -83,9 +90,10 @@ namespace RNGOEngine::Core
         std::unique_ptr<Renderer::IRenderer> m_renderer;
         std::unique_ptr<Renderer::RenderAPI> m_rendererAPI;
 
+        AssetHandling::AssetFetcher m_assetFetcher;
+        std::unique_ptr<AssetHandling::AssetLoader> m_assetLoader;
         std::unique_ptr<Resources::ResourceManager> m_resourceManager;
         Resources::ResourceTracker m_resourceTracker;
-        AssetHandling::AssetFetcher m_assetFetcher;
         AssetHandling::AssetDatabase m_assetDatabase;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
         Utilities::JobSystem m_jobSystem;
