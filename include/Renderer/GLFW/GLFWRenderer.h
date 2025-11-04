@@ -47,18 +47,18 @@ namespace RNGOEngine::Core::Renderer
         void BindShaderProgram(ShaderProgramID program) override;
 
     public:
-        void SetBool(std::string_view name, bool value) override;
-        void SetInt(std::string_view name, int value) override;
-        void SetFloat(std::string_view name, float value) override;
-        void SetVec2(std::string_view name, std::span<const float, 2> value) override;
-        void SetVec3(std::string_view name, std::span<const float, 3> value) override;
-        void SetVec4(std::string_view name, std::span<const float, 4> value) override;
-        void SetMat2(std::string_view name, std::span<const float, 4> value) override;
-        void SetMat3(std::string_view name, std::span<const float, 9> value) override;
-        void SetMat4(std::string_view name, std::span<const float, 16> value) override;
-        void SetTexture(std::string_view name, TextureID texture, unsigned slot) override;
+        void SetBool(ShaderProgramID shader, std::string_view name, bool value) override;
+        void SetInt(ShaderProgramID shader, std::string_view name, int value) override;
+        void SetFloat(ShaderProgramID shader, std::string_view name, float value) override;
+        void SetVec2(ShaderProgramID shader, std::string_view name, std::span<const float, 2> value) override;
+        void SetVec3(ShaderProgramID shader, std::string_view name, std::span<const float, 3> value) override;
+        void SetVec4(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) override;
+        void SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) override;
+        void SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value) override;
+        void SetMat4(ShaderProgramID shader, std::string_view name, std::span<const float, 16> value) override;
+        void SetTexture(ShaderProgramID shader, std::string_view name, TextureID texture,
+                        unsigned slot) override;
 
-    public:
         TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels,
                                 std::span<const std::byte> data) override;
         void DestroyTexture(TextureID texture) override;

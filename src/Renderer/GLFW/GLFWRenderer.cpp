@@ -162,87 +162,60 @@ namespace RNGOEngine::Core::Renderer
         glUseProgram(program);
     }
 
-    void GLFWRenderer::SetBool(const std::string_view name, const bool value)
+    void GLFWRenderer::SetBool(ShaderProgramID shader, std::string_view name, bool value)
     {
-        // TODO: Cache the current program?
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniform1i(glGetUniformLocation(currentProgram, name.data()), static_cast<int>(value));
+        glUniform1i(glGetUniformLocation(shader, name.data()), static_cast<int>(value));
     }
 
-    void GLFWRenderer::SetInt(const std::string_view name, const int value)
+    void GLFWRenderer::SetInt(ShaderProgramID shader, std::string_view name, int value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniform1i(glGetUniformLocation(currentProgram, name.data()), value);
+        glUniform1i(glGetUniformLocation(shader, name.data()), value);
     }
 
-    void GLFWRenderer::SetFloat(const std::string_view name, const float value)
+    void GLFWRenderer::SetFloat(ShaderProgramID shader, std::string_view name, float value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniform1f(glGetUniformLocation(currentProgram, name.data()), value);
+        glUniform1f(glGetUniformLocation(shader, name.data()), value);
     }
 
-    void GLFWRenderer::SetVec2(const std::string_view name, const std::span<const float, 2> value)
+    void GLFWRenderer::SetVec2(ShaderProgramID shader, std::string_view name, std::span<const float, 2> value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniform2fv(glGetUniformLocation(currentProgram, name.data()), 1, value.data());
+        glUniform2fv(glGetUniformLocation(shader, name.data()), 1, value.data());
     }
 
-    void GLFWRenderer::SetVec3(const std::string_view name, const std::span<const float, 3> value)
+    void GLFWRenderer::SetVec3(ShaderProgramID shader, std::string_view name, std::span<const float, 3> value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniform3fv(glGetUniformLocation(currentProgram, name.data()), 1, value.data());
+        glUniform3fv(glGetUniformLocation(shader, name.data()), 1, value.data());
     }
 
-    void GLFWRenderer::SetVec4(const std::string_view name, const std::span<const float, 4> value)
+    void GLFWRenderer::SetVec4(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniform4fv(glGetUniformLocation(currentProgram, name.data()), 1, value.data());
+        glUniform4fv(glGetUniformLocation(shader, name.data()), 1, value.data());
     }
 
-    void GLFWRenderer::SetMat2(std::string_view name, std::span<const float, 4> value)
+    void GLFWRenderer::SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniformMatrix2fv(glGetUniformLocation(currentProgram, name.data()), 1, GL_FALSE, value.data());
+        glUniformMatrix2fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetMat3(const std::string_view name, const std::span<const float, 9> value)
+    void GLFWRenderer::SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniformMatrix3fv(glGetUniformLocation(currentProgram, name.data()), 1, GL_FALSE, value.data());
+        glUniformMatrix3fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetMat4(const std::string_view name, const std::span<const float, 16> value)
+    void GLFWRenderer::SetMat4(ShaderProgramID shader, std::string_view name,
+                               std::span<const float, 16> value)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-        glUniformMatrix4fv(glGetUniformLocation(currentProgram, name.data()), 1, GL_FALSE, value.data());
+        glUniformMatrix4fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetTexture(const std::string_view name, const TextureID texture, const unsigned slot)
+    void GLFWRenderer::SetTexture(ShaderProgramID shader, std::string_view name, TextureID texture,
+                                  unsigned slot)
     {
-        GLint currentProgram = 0;
-        glGetIntegerv(GL_CURRENT_PROGRAM, &currentProgram);
-
-        const auto uniformLocation = glGetUniformLocation(
-            currentProgram, name.data());
-        if (uniformLocation == -1)
-        {
-            RNGO_ASSERT(false && "Texture Uniform not found in shader.");
-            return;
-        }
-
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture);
-        glUniform1i(uniformLocation, slot);
+        glUniform1i(glGetUniformLocation(shader, name.data()), slot);
     }
+
 
     TextureID GLFWRenderer::CreateTexture(const unsigned int width, const unsigned int height,
                                           const unsigned int nrChannels,
