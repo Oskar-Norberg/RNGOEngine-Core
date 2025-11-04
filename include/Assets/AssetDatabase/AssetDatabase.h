@@ -12,6 +12,7 @@
 #include "Concepts/Concepts.h"
 #include "Utilities/Singleton/Singleton.h"
 #include "Utilities/UUID/UUID.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -27,6 +28,9 @@ namespace RNGOEngine::AssetHandling
         // Register / Unregister
         template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
         AssetHandle RegisterAsset(const std::filesystem::path& assetPath);
+
+        template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
+        void RegisterAsset(TMetadata metadata);
 
         template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
         void UnregisterAsset(const AssetHandle& uuid);

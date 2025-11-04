@@ -57,10 +57,15 @@ namespace RNGOEngine::AssetHandling
         }
 
     private:
+        void SaveMetadataToFile(const AssetHandle& handle, AssetSerializer& serializer,
+                                const std::filesystem::path& metaFilePath) const;
+
+    private:
         AssetDatabase& m_assetDatabase;
         AssetFetcher& m_assetFetcher;
 
         // TODO: Save these together as a pair
+        // TODO: Support multiple loaders per type. E.g different file formats for the same asset type.
         std::unordered_map<AssetType, std::unique_ptr<AssetImporter>> m_loaders;
         std::unordered_map<AssetType, std::unique_ptr<AssetSerializer>> m_serializers;
     };

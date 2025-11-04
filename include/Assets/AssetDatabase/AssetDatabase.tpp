@@ -1,12 +1,10 @@
-#include "Utilities/RNGOAsserts.h"
-
 template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
 AssetHandle AssetDatabase::RegisterAsset(const std::filesystem::path& assetPath)
 {
     // TODO: Custom wrapper for static_asserts
     static_assert(
         requires { AssetTypeForMetadata<TMetadata>::value; } &&
-            requires { static_cast<AssetType>(AssetTypeForMetadata<TMetadata>::value); },
+        requires { static_cast<AssetType>(AssetTypeForMetadata<TMetadata>::value); },
         "AssetDatabase::RegisterAsset Metadata Type has no corresponding AssetType defined. Add it to "
         "Assets/AssetMetadataTypes.h"
     );
@@ -28,7 +26,7 @@ AssetHandle AssetDatabase::RegisterAsset(const std::filesystem::path& assetPath)
     // Set common metadata fields. Consumer sets type-specifics.
     metadata.UUID = uuid;
     metadata.Path = assetPath;
-    metadata.State = AssetState::Invalid;  // State is driven by the Runtime Manager. Invalid on register.
+    metadata.State = AssetState::Invalid; // State is driven by the Runtime Manager. Invalid on register.
     metadata.Type = AssetTypeForMetadata<TMetadata>::value;
 
     const auto index = storageTyped.Storage.Insert(std::move(metadata));
@@ -37,6 +35,35 @@ AssetHandle AssetDatabase::RegisterAsset(const std::filesystem::path& assetPath)
     m_pathToHandle.insert({assetPath, uuid});
 
     return uuid;
+}
+
+template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
+void AssetDatabase::RegisterAsset(TMetadata metadata)
+{
+    // TODO: Duplicate code from above.
+    static_assert(
+        requires { AssetTypeForMetadata<TMetadata>::value; } &&
+        requires { static_cast<AssetType>(AssetTypeForMetadata<TMetadata>::value); },
+        "AssetDatabase::RegisterAsset Metadata Type has no corresponding AssetType defined. Add it to "
+        "Assets/AssetMetadataTypes.h"
+    );
+
+    if (!m_metadataStorages.contains(AssetTypeForMetadata<TMetadata>::value))
+    {
+        m_metadataStorages.insert(
+            {AssetTypeForMetadata<TMetadata>::value, std::make_unique<AssetMetadataStorageTyped<TMetadata>>()}
+        );
+    }
+
+    auto& storageTyped = static_cast<AssetMetadataStorageTyped<TMetadata>&>(
+        *m_metadataStorages.at(AssetTypeForMetadata<TMetadata>::value)
+    );
+    auto UUID = metadata.UUID;
+    auto assetPath = metadata.Path;
+    const auto index = storageTyped.Storage.Insert(std::move(metadata));
+    m_handleToStorageIndex.insert({UUID, std::make_pair(AssetTypeForMetadata<TMetadata>::value, index)});
+
+    m_pathToHandle.insert({assetPath, UUID});
 }
 
 template<Concepts::DerivedFrom<AssetMetadata> TMetadata>

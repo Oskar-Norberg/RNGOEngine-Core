@@ -21,5 +21,21 @@ namespace RNGOEngine::AssetHandling
 
             // Texture has no specific fields yet.
         }
+
+        AssetHandle Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) override
+        {
+            const auto uuidVal = node["UUID"].as<uint64_t>();
+            const auto type = static_cast<AssetType>(node["Type"].as<int>());
+
+            Utilities::UUID uuid = Utilities::UUID(uuidVal);
+            TextureMetadata metadata;
+            metadata.UUID = uuid;
+            metadata.Type = type;
+            metadata.Path = assetPath;
+
+            AssetDatabase::GetInstance().RegisterAsset(metadata);
+
+            return uuid;
+        }
     };
 }
