@@ -68,23 +68,21 @@ namespace RNGOEngine::Core
             // Loaders
             {
                 m_assetLoader->RegisterImporter<AssetHandling::ModelAssetImporter>(
-                    AssetHandling::AssetType::Model, m_assetFetcher, m_assetDatabase, *m_assetManager,
-                    doFlipTexturesVertically
-                );
+                    AssetHandling::AssetType::Model, doFlipTexturesVertically);
                 m_assetLoader->RegisterImporter<AssetHandling::TextureAssetImporter>(
-                    AssetHandling::AssetType::Texture, m_assetFetcher, m_assetDatabase, *m_assetManager
-                );
+                    AssetHandling::AssetType::Texture);
                 m_assetLoader->RegisterImporter<AssetHandling::ShaderAssetImporter>(
-                    AssetHandling::AssetType::Shader, m_assetFetcher, m_assetDatabase, *m_assetManager
-                );
+                    AssetHandling::AssetType::Shader);
             }
 
             // Serializers
             {
-                m_assetLoader->RegisterSerializer<AssetHandling::ModelAssetSerializer>(AssetHandling::AssetType::Model);
-                m_assetLoader->RegisterSerializer<AssetHandling::TextureAssetSerializer>(AssetHandling::AssetType::Texture);
-                m_assetLoader->RegisterSerializer<AssetHandling::ShaderAssetSerializer>(AssetHandling::AssetType::Shader);
-
+                m_assetLoader->RegisterSerializer<AssetHandling::ModelAssetSerializer>(
+                    AssetHandling::AssetType::Model);
+                m_assetLoader->RegisterSerializer<AssetHandling::TextureAssetSerializer>(
+                    AssetHandling::AssetType::Texture);
+                m_assetLoader->RegisterSerializer<AssetHandling::ShaderAssetSerializer>(
+                    AssetHandling::AssetType::Shader);
             }
         }
 

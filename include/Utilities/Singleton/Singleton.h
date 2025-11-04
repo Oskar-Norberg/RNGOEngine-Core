@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "Utilities/RNGOAsserts.h"
+
 namespace RNGOEngine::Utilities
 {
     // Non-lazy loaded singleton base class.

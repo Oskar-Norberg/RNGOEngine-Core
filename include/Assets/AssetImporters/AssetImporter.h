@@ -23,12 +23,6 @@ namespace RNGOEngine::AssetHandling
     class AssetImporter
     {
     public:
-        // TODO: Jesus christ just make these singletons already.
-        AssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager)
-            : m_assetFetcher(assetFetcher), m_assetDatabase(assetDatabase), m_assetManager(assetManager)
-        {
-        }
-
         virtual ~AssetImporter() = default;
 
     public:
@@ -37,10 +31,5 @@ namespace RNGOEngine::AssetHandling
         
         virtual AssetHandle Load(const std::filesystem::path& path) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
-        
-    protected:
-        AssetFetcher& m_assetFetcher;
-        AssetDatabase& m_assetDatabase;
-        AssetManager& m_assetManager;
     };
 }

@@ -10,24 +10,19 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    ShaderAssetImporter::ShaderAssetImporter(
-        AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager
-    )
-        : AssetImporter(assetFetcher, assetDatabase, assetManager), m_shaderLoader(assetFetcher)
-    {
-    }
-
     AssetHandle ShaderAssetImporter::Register(const std::filesystem::path& path)
     {
-        if (m_assetDatabase.IsRegistered(path))
+        auto& databaseRef = AssetDatabase::GetInstance();
+        
+        if (databaseRef.IsRegistered(path))
         {
             // TODO: Check for valid type?
-            return m_assetDatabase.GetAssetHandle(path);
+            return databaseRef.GetAssetHandle(path);
         }
 
         // Register in Database
-        const auto& assetHandle = m_assetDatabase.RegisterAsset<ShaderMetadata>(path);
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
+        const auto& assetHandle = databaseRef.RegisterAsset<ShaderMetadata>(path);
+        auto& metadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
 
         metadata.Path = path;
         metadata.State = AssetState::Invalid;
@@ -38,24 +33,28 @@ namespace RNGOEngine::AssetHandling
 
     void ShaderAssetImporter::Unregister(const AssetHandle& handle)
     {
-        if (!m_assetDatabase.IsRegistered(handle))
+        auto& databaseRef = AssetDatabase::GetInstance();
+        
+        if (!databaseRef.IsRegistered(handle))
         {
             return;
         }
 
-        auto& assetMetadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(handle);
+        auto& assetMetadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(handle);
         if (assetMetadata.State == AssetState::Valid)
         {
             Unload(handle);
         }
 
-        m_assetDatabase.UnregisterAsset<ShaderMetadata>(handle);
+        databaseRef.UnregisterAsset<ShaderMetadata>(handle);
     }
 
     AssetHandle ShaderAssetImporter::Load(const std::filesystem::path& path)
     {
+        auto& databaseRef = AssetDatabase::GetInstance();
+
         auto assetHandle = Register(path);
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
+        auto& metadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
 
         // Already Loaded?
         if (metadata.State == AssetState::Valid)
@@ -77,7 +76,7 @@ namespace RNGOEngine::AssetHandling
                                                       : Core::Renderer::ShaderType::Fragment;
 
         // Upload Resources
-        m_assetManager.GetShaderManager().UploadShader(assetHandle, shaderResult.value(), type);
+        AssetManager::GetInstance().GetShaderManager().UploadShader(assetHandle, shaderResult.value(), type);
 
         // Mark Valid
         metadata.State = AssetState::Valid;
@@ -88,19 +87,21 @@ namespace RNGOEngine::AssetHandling
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
     {
-        if (!m_assetDatabase.IsRegistered(handle))
+        auto& databaseRef = AssetDatabase::GetInstance();
+
+        if (!databaseRef.IsRegistered(handle))
         {
             return;
         }
 
-        auto& assetMetadata = m_assetDatabase.GetAssetMetadataAs<ShaderMetadata>(handle);
+        auto& assetMetadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(handle);
         if (assetMetadata.State != AssetState::Valid)
         {
             // Shader already unloaded.
             return;
         }
         
-        m_assetManager.GetShaderManager().DestroyShader(handle);
+        AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
         assetMetadata.State = AssetState::Invalid;
     }
 }

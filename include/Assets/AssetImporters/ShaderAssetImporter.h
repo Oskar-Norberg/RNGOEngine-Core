@@ -12,9 +12,6 @@ namespace RNGOEngine::AssetHandling
     class ShaderAssetImporter : public AssetImporter
     {
     public:
-        ShaderAssetImporter(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager);
-
-    public:
         AssetHandle Register(const std::filesystem::path& path) override;
         void Unregister(const AssetHandle& handle) override;
         AssetHandle Load(const std::filesystem::path& path) override;

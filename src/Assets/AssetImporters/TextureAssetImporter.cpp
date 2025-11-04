@@ -10,24 +10,18 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    TextureAssetImporter::TextureAssetImporter(
-        AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager
-    )
-        : AssetImporter(assetFetcher, assetDatabase, assetManager)
-    {
-    }
-
     AssetHandle TextureAssetImporter::Register(const std::filesystem::path& path)
     {
+        auto& databaseRef = AssetDatabase::GetInstance();
         // Already in database?
-        if (m_assetDatabase.IsRegistered(path))
+        if (databaseRef.IsRegistered(path))
         {
             // TODO: Check for valid type.
-            return m_assetDatabase.GetAssetHandle(path);
+            return databaseRef.GetAssetHandle(path);
         }
 
-        const auto& assetHandle = m_assetDatabase.RegisterAsset<TextureMetadata>(path);
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(assetHandle);
+        const auto& assetHandle = databaseRef.RegisterAsset<TextureMetadata>(path);
+        auto& metadata = databaseRef.GetAssetMetadataAs<TextureMetadata>(assetHandle);
         metadata.State = AssetState::Invalid;
         metadata.Type = AssetType::Texture;
         metadata.Path = path;
@@ -37,25 +31,29 @@ namespace RNGOEngine::AssetHandling
 
     void TextureAssetImporter::Unregister(const AssetHandle& handle)
     {
+        auto& databaseRef = AssetDatabase::GetInstance();
+
         // TODO: Move this to AssetLoader, duplicate code.
         // All types will function the same. Unload if valid, then unregister.
 
-        if (m_assetDatabase.IsRegistered(handle))
+        if (databaseRef.IsRegistered(handle))
         {
-            if (const auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(handle);
+            if (const auto& metadata = databaseRef.GetAssetMetadataAs<TextureMetadata>(handle);
                 metadata.State == AssetState::Valid)
             {
                 Unload(handle);
             }
 
-            m_assetDatabase.UnregisterAsset<TextureMetadata>(handle);
+            databaseRef.UnregisterAsset<TextureMetadata>(handle);
         }
     }
 
     AssetHandle TextureAssetImporter::Load(const std::filesystem::path& path)
     {
+        auto& databaseRef = AssetDatabase::GetInstance();
+
         const auto& assetHandle = Register(path);
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(assetHandle);
+        auto& metadata = databaseRef.GetAssetMetadataAs<TextureMetadata>(assetHandle);
 
         if (metadata.State == AssetState::Valid)
         {
@@ -72,7 +70,7 @@ namespace RNGOEngine::AssetHandling
 
         // Upload to GPU
         const auto errorMessage =
-            m_assetManager.GetTextureManager().UploadTexture(assetHandle, textureHandle.value());
+            AssetManager::GetInstance().GetTextureManager().UploadTexture(assetHandle, textureHandle.value());
         if (errorMessage != TextureManagerError::None)
         {
             // TODO: Error handling
@@ -90,14 +88,14 @@ namespace RNGOEngine::AssetHandling
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)
     {
-        auto& metadata = m_assetDatabase.GetAssetMetadataAs<TextureMetadata>(handle);
+        auto& metadata = AssetDatabase::GetInstance().GetAssetMetadataAs<TextureMetadata>(handle);
 
         if (metadata.State != AssetState::Valid)
         {
             return;
         }
 
-        m_assetManager.GetTextureManager().UnloadTexture(handle);
+        AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
         metadata.State = AssetState::Invalid;
     }
 }

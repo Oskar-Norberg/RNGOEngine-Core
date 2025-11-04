@@ -12,11 +12,6 @@ namespace RNGOEngine::AssetHandling
     class ShaderLoader
     {
     public:
-        explicit ShaderLoader(const AssetFetcher& assetFetcher)
-            : shaderPreprocessor(assetFetcher)
-        {
-        }
-
         std::expected<std::string, Shaders::ShaderPreProcessingError> LoadShader(const std::filesystem::path& path) const;
 
     private:

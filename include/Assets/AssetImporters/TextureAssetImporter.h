@@ -11,10 +11,6 @@ namespace RNGOEngine::AssetHandling
     class TextureAssetImporter : public AssetImporter
     {
     public:
-        TextureAssetImporter(
-            AssetFetcher& assetFetcher, AssetDatabase& assetDatabase, AssetManager& assetManager
-        );
-
         AssetHandle Register(const std::filesystem::path& path) override;
         void Unregister(const AssetHandle& handle) override;
         AssetHandle Load(const std::filesystem::path& path) override;
