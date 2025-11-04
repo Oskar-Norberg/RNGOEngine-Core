@@ -10,6 +10,7 @@
 namespace RNGOEngine::AssetHandling
 {
     AssetFetcher::AssetFetcher()
+        : Singleton(this)
     {
         using enum AssetType;
 

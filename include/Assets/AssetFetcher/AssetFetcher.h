@@ -10,10 +10,11 @@
 #include <vector>
 
 #include "Assets/Asset.h"
+#include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    class AssetFetcher
+    class AssetFetcher : public Utilities::Singleton<AssetFetcher>
     {
     public:
         AssetFetcher();
