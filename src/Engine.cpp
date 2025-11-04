@@ -6,13 +6,12 @@
 
 #include <chrono>
 
-// TODO: Move to a static map of some sort please
-#include "Assets/AssetImporters/ModelAssetImporter.h"
-#include "Assets/AssetImporters/ShaderAssetImporter.h"
+// TODO: REMOVE THIS
 #include "Assets/AssetImporters/TextureAssetImporter.h"
 #include "Assets/AssetSerializers/ModelAssetSerializer.h"
 #include "Assets/AssetSerializers/ShaderAssetSerializer.h"
 #include "Assets/AssetSerializers/TextureAssetSerializer.h"
+#include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Profiling/Profiling.h"
@@ -63,28 +62,8 @@ namespace RNGOEngine::Core
 
         // Asset Loader and Importers
         m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_assetDatabase, m_assetFetcher);
-        // TODO: I hate this
-        {
-            // Loaders
-            {
-                m_assetLoader->RegisterImporter<AssetHandling::ModelAssetImporter>(
-                    AssetHandling::AssetType::Model, doFlipTexturesVertically);
-                m_assetLoader->RegisterImporter<AssetHandling::TextureAssetImporter>(
-                    AssetHandling::AssetType::Texture);
-                m_assetLoader->RegisterImporter<AssetHandling::ShaderAssetImporter>(
-                    AssetHandling::AssetType::Shader);
-            }
-
-            // Serializers
-            {
-                m_assetLoader->RegisterSerializer<AssetHandling::ModelAssetSerializer>(
-                    AssetHandling::AssetType::Model);
-                m_assetLoader->RegisterSerializer<AssetHandling::TextureAssetSerializer>(
-                    AssetHandling::AssetType::Texture);
-                m_assetLoader->RegisterSerializer<AssetHandling::ShaderAssetSerializer>(
-                    AssetHandling::AssetType::Shader);
-            }
-        }
+        AssetHandling::BootstrapContext context = {*m_assetLoader, doFlipTexturesVertically};
+        AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
 
         // TODO: TEMPORARY
         m_assetManager->SetShaderImporter(

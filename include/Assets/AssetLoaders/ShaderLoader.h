@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Shader/ShaderPreprocessor.h"
 
 namespace RNGOEngine::AssetHandling

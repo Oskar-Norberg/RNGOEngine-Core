@@ -4,18 +4,15 @@
 
 #pragma once
 
+// TODO: This should not be here
+#include "Assets/AssetImporters/ShaderAssetImporter.h"
+
 #include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/AssetManager/Managers/ModelManager.h"
 #include "Assets/AssetManager/Managers/MaterialManager.h"
 #include "Assets/AssetManager/Managers/ShaderManager.h"
 #include "Assets/AssetManager/Managers/TextureManager.h"
 #include "Renderer/Handles/MaterialHandle.h"
-
-namespace RNGOEngine::AssetHandling
-{
-    // TEMPORARY
-    class ShaderAssetImporter;
-}
 
 namespace RNGOEngine
 {

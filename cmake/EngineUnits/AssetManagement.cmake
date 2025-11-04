@@ -34,8 +34,12 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
 
         include/Assets/AssetLoader.h
         src/Assets/AssetLoader.cpp
-        
 
+        # Asset Importer Bootstrapper
+        include/Assets/Bootstrapper/AssetImporterBootstrapper.h
+        src/Assets/Bootstrapper/AssetImporterBootstrapper.cpp
+
+        
         include/Assets/AssetMetadataStorage.h
         
         include/Assets/AssetDatabase/AssetDatabase.h
