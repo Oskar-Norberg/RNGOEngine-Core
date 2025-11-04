@@ -28,7 +28,7 @@ namespace RNGOEngine
 namespace RNGOEngine::AssetHandling
 {
     // TODO: Refactor this into a service-locator like-pattern.
-    class AssetManager
+    class AssetManager : public Utilities::Singleton<AssetManager>
     {
     public:
         explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,

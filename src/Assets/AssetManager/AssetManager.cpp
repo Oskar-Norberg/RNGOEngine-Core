@@ -13,7 +13,8 @@ namespace RNGOEngine::AssetHandling
 {
     AssetManager::AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
                                Resources::ResourceManager& resourceManager, bool doFlipUVs)
-        : m_assetDatabase(assetDatabase),
+        : Singleton(this), m_shaderAssetImporter(nullptr),
+          m_assetDatabase(assetDatabase),
           m_assetFileFetcher(assetFetcher),
           m_shaderManager(resourceManager),
           m_modelManager(resourceManager),
@@ -30,7 +31,7 @@ namespace RNGOEngine::AssetHandling
         const auto fragmentShader = m_shaderAssetImporter->Load(fragmentSourcePath);
 
         const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
-        
+
         return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
 
