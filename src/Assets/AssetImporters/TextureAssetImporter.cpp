@@ -98,4 +98,15 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
         metadata.State = AssetState::Invalid;
     }
+
+    std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {
+            ".png",
+            ".jpg",
+            ".jpeg",
+        };
+
+        return supportedTypes;
+    }
 }

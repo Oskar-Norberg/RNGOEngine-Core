@@ -104,4 +104,14 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
         assetMetadata.State = AssetState::Invalid;
     }
+
+    std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {
+            ".frag",
+            ".vert"
+        };
+        
+        return supportedTypes;
+    }
 }

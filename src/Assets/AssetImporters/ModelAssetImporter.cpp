@@ -110,4 +110,15 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
         assetMetadata.State = AssetState::Invalid;
     }
+
+    std::span<const std::string_view> ModelAssetImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {
+            ".obj",
+            ".fbx",
+            ".gltf"
+        };
+        
+        return supportedTypes;
+    }
 }

@@ -15,5 +15,7 @@ namespace RNGOEngine::AssetHandling
         void Unregister(const AssetHandle& handle) override;
         AssetHandle Load(const std::filesystem::path& path) override;
         void Unload(const AssetHandle& handle) override;
+
+        std::span<const std::string_view> GetSupportedExtensions() const override;
     };
 }

@@ -31,5 +31,8 @@ namespace RNGOEngine::AssetHandling
         
         virtual AssetHandle Load(const std::filesystem::path& path) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
+
+    public:
+        virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
     };
 }

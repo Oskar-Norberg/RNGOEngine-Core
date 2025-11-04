@@ -17,6 +17,8 @@ namespace RNGOEngine::AssetHandling
         AssetHandle Load(const std::filesystem::path& path) override;
         void Unload(const AssetHandle& handle) override;
 
+        std::span<const std::string_view> GetSupportedExtensions() const override;
+
     private:
         ShaderLoader m_shaderLoader;
     };
