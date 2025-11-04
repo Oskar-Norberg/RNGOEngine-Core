@@ -6,6 +6,11 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    AssetDatabase::AssetDatabase()
+        : Singleton(this)
+    {
+    }
+
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {
         const auto* metadata = GetMetadataOrNullptr(handle);
