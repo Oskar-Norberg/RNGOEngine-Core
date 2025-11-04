@@ -10,6 +10,8 @@ add_library(${UTILITIES_PROJECT_NAME} STATIC
         
         include/Utilities/UUID/UUID.h
         src/Utilities/UUID/UUID.cpp
+        
+        include/Utilities/Singleton/Singleton.h
 )
 target_include_directories(${UTILITIES_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${UTILITIES_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_NAME})

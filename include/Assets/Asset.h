@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <filesystem>
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
