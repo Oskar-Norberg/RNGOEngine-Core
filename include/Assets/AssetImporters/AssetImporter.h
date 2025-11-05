@@ -26,12 +26,10 @@ namespace RNGOEngine::AssetHandling
     public:
         virtual ~AssetImporter() = default;
 
-    public:
-        virtual AssetHandle Register(const std::filesystem::path& path) = 0;
-        virtual void Unregister(const AssetHandle& handle) = 0;
-        
-        virtual AssetHandle Load(const std::filesystem::path& path) = 0;
+        virtual void Load(const AssetMetadata& metadata) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
+
+        virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata() const = 0;
 
     public:
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
