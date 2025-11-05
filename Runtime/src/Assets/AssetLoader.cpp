@@ -16,13 +16,13 @@ namespace RNGOEngine::AssetHandling
 {
     // TODO: Annoying clang warning about initialization order. But it looks fine??
     AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
-        : Singleton(*this),
+        : Singleton(this),
           m_assetDatabase(assetDatabase),
           m_assetFetcher(assetFetcher)
     {
     }
 
-    AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& path) const
+    AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
     {
         const auto& serializer = m_serializers.at(type);
         const auto& importer = m_loaders.at(type);
@@ -30,7 +30,7 @@ namespace RNGOEngine::AssetHandling
         RNGO_ASSERT(
             serializer && importer && "AssetLoader::Load - No serializer/importer registered for type.");
 
-        const auto fullPath = m_assetFetcher.GetPath(type, path);
+        const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
         if (!fullPath)
         {
             RNGO_ASSERT(false && "AssetLoader::Load - Asset not found!");
@@ -63,6 +63,7 @@ namespace RNGOEngine::AssetHandling
             else
             {
                 std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata();
+                metadata->Path = fullPath.value();
                 AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
             }
         }

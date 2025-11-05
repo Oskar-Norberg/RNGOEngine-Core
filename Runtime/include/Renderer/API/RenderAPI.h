@@ -41,6 +41,7 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Core::Renderer
 {
+    // TODO: There really needs to be explicit Begin/End frame function so we can clear out DrawQueues and draw imgui properly.
     class RenderAPI
     {
     public:

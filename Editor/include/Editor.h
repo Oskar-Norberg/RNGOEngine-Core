@@ -3,18 +3,22 @@
 //
 
 #pragma once
-#include "Engine.h"
+
+#include <Application/Application.h>
 
 namespace RNGOEngine::Editor
 {
-    class Editor
+    class Editor : public Application
     {
     public:
-        Editor();
+        explicit Editor(const EngineConfig& config);
 
-        void Run();
+    public:
+        void OnUpdate(float deltaTime) override;
+        void OnRender() override;
 
     private:
-        std::unique_ptr<Core::Engine> m_engine;
+        void UpdateEngineSystems(float deltaTime);
+        void UpdateGameSystems(float deltaTime);
     };
 }

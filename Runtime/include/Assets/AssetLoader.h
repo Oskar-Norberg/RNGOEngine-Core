@@ -19,7 +19,7 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher);
 
-        AssetHandle Load(AssetType type, const std::filesystem::path& path) const;
+        AssetHandle Load(AssetType type, const std::filesystem::path& searchPath) const;
 
         // Loader Registration
     public:

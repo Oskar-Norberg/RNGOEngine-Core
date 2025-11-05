@@ -4,34 +4,39 @@
 
 #include "Editor.h"
 
-#include "Engine.h"
-#include "Assets/Asset.h"
+#include "TestScene.h"
 
 namespace RNGOEngine::Editor
 {
-    Editor::Editor()
+    Editor::Editor(const EngineConfig& config)
+        : Application(config)
     {
-        using enum AssetHandling::AssetType;
-
-        static const std::pair<std::filesystem::path, AssetHandling::AssetType> assetPaths[] = {
-            {"assets", None},
-            {"assets/textures", Texture},
-            {"assets/models", Model}
-        };
-
-        constexpr Core::EngineConfig config{
-            Core::RenderType::GLFW_OpenGL,
-            1280,
-            720,
-            "The Renderer",
-            assetPaths
-        };
-
-        m_engine = std::make_unique<Core::Engine>(config);
+        m_sceneManager.LoadScene<Temporary::TestScene>();
     }
 
-    void Editor::Run()
+    void Editor::OnUpdate(const float deltaTime)
     {
-        m_engine->Run();
+        Application::OnUpdate(deltaTime);
+        UpdateEngineSystems(deltaTime);
+        UpdateGameSystems(deltaTime);
+    }
+
+    void Editor::OnRender()
+    {
+        Application::OnRender();
+        m_rendererAPI->Render(*m_window, m_frameCount);
+        m_window->SwapBuffers();
+    }
+
+    void Editor::UpdateEngineSystems(float deltaTime)
+    {
+        m_engineSystemContext.deltaTime = deltaTime;
+        m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineSystemContext);
+    }
+
+    void Editor::UpdateGameSystems(float deltaTime)
+    {
+        m_gameSystemContext.deltaTime = deltaTime;
+        m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameSystemContext);
     }
 }

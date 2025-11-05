@@ -9,9 +9,10 @@ int main()
     using enum RNGOEngine::AssetHandling::AssetType;
 
     static const std::pair<std::filesystem::path, RNGOEngine::AssetHandling::AssetType> assetPaths[] = {
-        {"assets", None},
-        {"assets/textures", Texture},
-        {"assets/models", Model}
+        {EDITOR_ASSETS_DIR, None},
+        {EDITOR_TEXTURES_DIR, Texture},
+        {EDITOR_SHADERS_DIR, Texture},
+        {EDITOR_MODELS_DIR, Model}
     };
 
     constexpr RNGOEngine::EngineConfig config{
@@ -21,9 +22,9 @@ int main()
         "The Renderer",
         assetPaths
     };
-    
+
     RNGOEngine::Editor::Editor editor(config);
     editor.Run();
-    
+
     return 0;
 }
