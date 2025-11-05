@@ -11,6 +11,38 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
+    void AssetDatabase::RegisterAsset(AssetType type, std::unique_ptr<AssetMetadata> metadata)
+    {
+        if (!m_metadataStorages.contains(type))
+        {
+            m_metadataStorages[type] = CreateTyped(type);
+        }
+
+        const auto uuid = metadata->UUID;
+        const auto path = metadata->Path;
+        
+        const auto& storage = m_metadataStorages.at(type);
+        const auto index = storage->Insert(std::move(metadata));
+
+        m_handleToStorageIndex.insert({uuid, std::make_pair(type, index)});
+        m_pathToHandle.insert({path, uuid});
+    }
+
+    void AssetDatabase::UnregisterAsset(const AssetHandle& uuid)
+    {
+        if (!m_handleToStorageIndex.contains(uuid))
+        {
+            return;
+        }
+
+        const auto& [type, index] = m_handleToStorageIndex.at(uuid);
+        const auto& storage = m_metadataStorages.at(type);
+        const auto path = storage->GetAssetMetadata(index)->Path;
+        storage->Remove(index);
+        m_handleToStorageIndex.erase(uuid);
+        m_pathToHandle.erase(path);
+    }
+
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {
         const auto* metadata = GetMetadataOrNullptr(handle);

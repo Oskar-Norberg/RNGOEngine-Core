@@ -21,23 +21,21 @@ namespace RNGOEngine::AssetHandling
                 << static_cast<int>(shaderMetadata.ShaderType);
         }
 
-        AssetHandle Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) override
+        std::unique_ptr<AssetMetadata> Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) override
         {
             const auto uuidVal = node["UUID"].as<uint64_t>();
             const auto type = static_cast<AssetType>(node["Type"].as<int>());
             const auto shaderType = static_cast<Core::Renderer::ShaderType>(
                 node["ShaderType"].as<int>());
 
-            Utilities::UUID uuid = Utilities::UUID(uuidVal);
-            ShaderMetadata metadata;
-            metadata.UUID = uuid;
-            metadata.Type = type;
-            metadata.Path = assetPath;
-            metadata.ShaderType = shaderType;
+            auto metadata = std::make_unique<ShaderMetadata>();
+            metadata->UUID = Utilities::UUID(uuidVal);
+            metadata->Type = type;
+            metadata->Path = assetPath;
+            metadata->ShaderType = shaderType;
 
-            AssetDatabase::GetInstance().RegisterAsset(metadata);
 
-            return uuid;
+            return std::move(metadata);
         }
     };
 }

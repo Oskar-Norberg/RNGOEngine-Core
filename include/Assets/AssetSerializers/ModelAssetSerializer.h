@@ -22,20 +22,17 @@ namespace RNGOEngine::AssetHandling
             // ModelMetadata has no specific fields yet.
         }
 
-        AssetHandle Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) override
+        std::unique_ptr<AssetMetadata> Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) override
         {
             const auto uuidVal = node["UUID"].as<uint64_t>();
             const auto type = static_cast<AssetType>(node["Type"].as<int>());
 
-            Utilities::UUID uuid = Utilities::UUID(uuidVal);
-            ModelMetadata metadata;
-            metadata.UUID = uuid;
-            metadata.Type = type;
-            metadata.Path = assetPath;
+            auto metadata = std::make_unique<ModelMetadata>();
+            metadata->UUID = Utilities::UUID(uuidVal);
+            metadata->Type = type;
+            metadata->Path = assetPath;
 
-            AssetDatabase::GetInstance().RegisterAsset(metadata);
-
-            return uuid;
+            return std::move(metadata);
         }
     };
 }

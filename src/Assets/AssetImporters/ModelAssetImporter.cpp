@@ -16,58 +16,12 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    AssetHandle ModelAssetImporter::Register(const std::filesystem::path& path)
+    void ModelAssetImporter::Load(const AssetMetadata& metadata)
     {
-        auto& assetDatabase = AssetDatabase::GetInstance();
-        // Already in database?
-        if (assetDatabase.IsRegistered(path))
-        {
-            // TODO: Check for valid type?
-            return assetDatabase.GetAssetHandle(path);
-        }
-
-        // Register in Database
-        // TODO: What happens if a path is registered with a different type?
-        const auto& assetHandle = AssetDatabase::GetInstance().RegisterAsset<ModelMetadata>(path);
-        auto& metadata = assetDatabase.GetAssetMetadataAs<ModelMetadata>(assetHandle);
-        metadata.State = AssetState::Invalid;
-        metadata.Path = path;
-        metadata.Type = AssetType::Model;
-
-        return assetHandle;
-    }
-
-    void ModelAssetImporter::Unregister(const AssetHandle& handle)
-    {
-        auto& assetDatabase = AssetDatabase::GetInstance();
-
-        if (assetDatabase.IsRegistered(handle))
-        {
-            if (const auto& metadata = assetDatabase.GetAssetMetadataAs<ModelMetadata>(handle);
-                metadata.State == AssetState::Valid)
-            {
-                Unload(handle);
-            }
-
-            assetDatabase.UnregisterAsset<ModelMetadata>(handle);
-        }
-    }
-
-    AssetHandle ModelAssetImporter::Load(const std::filesystem::path& path)
-    {
-        auto& assetDatabase = AssetDatabase::GetInstance();
-
-        const auto& assetHandle = Register(path);
-        auto& metadata = assetDatabase.GetAssetMetadataAs<ModelMetadata>(assetHandle);
-
-        // Already Loaded.
-        if (metadata.State == AssetState::Valid)
-        {
-            return assetHandle;
-        }
+        const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
         // Load Model into RAM
-        const auto modelHandle = ModelLoading::LoadModel(path, m_doFlipUVs);
+        const auto modelHandle = ModelLoading::LoadModel(typedMetadata.Path, m_doFlipUVs);
         if (!modelHandle)
         {
             // TODO: Return expected instead of directly returning handle?
@@ -76,7 +30,8 @@ namespace RNGOEngine::AssetHandling
 
         // Upload to GPU
         const auto errorMessage =
-            AssetManager::GetInstance().GetModelManager().UploadModel(assetHandle, modelHandle.value());
+            AssetManager::GetInstance().GetModelManager().
+                                        UploadModel(typedMetadata.UUID, modelHandle.value());
         if (errorMessage != ModelCreationError::None)
         {
             // TODO: Error handling
@@ -85,30 +40,16 @@ namespace RNGOEngine::AssetHandling
 
         // Unload Model from RAM
         ModelLoading::UnloadModel(modelHandle.value());
-
-        // Mark Valid
-        metadata.State = AssetState::Valid;
-
-        return assetHandle;
     }
 
     void ModelAssetImporter::Unload(const AssetHandle& handle)
     {
-        auto& assetDatabase = AssetDatabase::GetInstance();
-        if (!assetDatabase.IsRegistered(handle))
-        {
-            return;
-        }
-
-        auto& assetMetadata = assetDatabase.GetAssetMetadataAs<ModelMetadata>(handle);
-        if (assetMetadata.State != AssetState::Valid)
-        {
-            // Model already unloaded.
-            return;
-        }
-
         AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
-        assetMetadata.State = AssetState::Invalid;
+    }
+
+    std::unique_ptr<AssetMetadata> ModelAssetImporter::CreateDefaultMetadata() const
+    {
+        return std::make_unique<ModelMetadata>();
     }
 
     std::span<const std::string_view> ModelAssetImporter::GetSupportedExtensions() const
@@ -118,7 +59,7 @@ namespace RNGOEngine::AssetHandling
             ".fbx",
             ".gltf"
         };
-        
+
         return supportedTypes;
     }
 }

@@ -10,99 +10,36 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    AssetHandle ShaderAssetImporter::Register(const std::filesystem::path& path)
+    void ShaderAssetImporter::Load(const AssetMetadata& metadata)
     {
-        auto& databaseRef = AssetDatabase::GetInstance();
-        
-        if (databaseRef.IsRegistered(path))
-        {
-            // TODO: Check for valid type?
-            return databaseRef.GetAssetHandle(path);
-        }
-
-        // Register in Database
-        const auto& assetHandle = databaseRef.RegisterAsset<ShaderMetadata>(path);
-        auto& metadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
-
-        metadata.Path = path;
-        metadata.State = AssetState::Invalid;
-        metadata.Type = AssetType::Shader;
-
-        return assetHandle;
-    }
-
-    void ShaderAssetImporter::Unregister(const AssetHandle& handle)
-    {
-        auto& databaseRef = AssetDatabase::GetInstance();
-        
-        if (!databaseRef.IsRegistered(handle))
-        {
-            return;
-        }
-
-        auto& assetMetadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(handle);
-        if (assetMetadata.State == AssetState::Valid)
-        {
-            Unload(handle);
-        }
-
-        databaseRef.UnregisterAsset<ShaderMetadata>(handle);
-    }
-
-    AssetHandle ShaderAssetImporter::Load(const std::filesystem::path& path)
-    {
-        auto& databaseRef = AssetDatabase::GetInstance();
-
-        auto assetHandle = Register(path);
-        auto& metadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(assetHandle);
-
-        // Already Loaded?
-        if (metadata.State == AssetState::Valid)
-        {
-            return assetHandle;
-        }
+        auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
 
         // Preprocess Shader
-        const auto shaderResult = m_shaderLoader.LoadShader(path);
+        const auto shaderResult = m_shaderLoader.LoadShader(typedMetadata.Path);
         if (!shaderResult)
         {
             RNGO_ASSERT(false && "ShaderAssetImporter::Load failed to load shader.");
-            // TODO: Return error handle or expected.
-            return {};
+            // TODO: Return expected?
+            return;
         }
 
         // TODO: Really, really, really, unstable way to determine shader type. Works for now!
-        const auto type = path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
-                                                      : Core::Renderer::ShaderType::Fragment;
+        // const auto type = typedMetadata.Path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
+        //                                               : Core::Renderer::ShaderType::Fragment;
 
         // Upload Resources
-        AssetManager::GetInstance().GetShaderManager().UploadShader(assetHandle, shaderResult.value(), type);
-
-        // Mark Valid
-        metadata.State = AssetState::Valid;
-        metadata.ShaderType = type;
-
-        return assetHandle;
+        AssetManager::GetInstance().GetShaderManager().UploadShader(
+            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType);
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
     {
-        auto& databaseRef = AssetDatabase::GetInstance();
-
-        if (!databaseRef.IsRegistered(handle))
-        {
-            return;
-        }
-
-        auto& assetMetadata = databaseRef.GetAssetMetadataAs<ShaderMetadata>(handle);
-        if (assetMetadata.State != AssetState::Valid)
-        {
-            // Shader already unloaded.
-            return;
-        }
-        
         AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
-        assetMetadata.State = AssetState::Invalid;
+    }
+
+    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata() const
+    {
+        return std::make_unique<ShaderMetadata>();
     }
 
     std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const
@@ -111,7 +48,7 @@ namespace RNGOEngine::AssetHandling
             ".frag",
             ".vert"
         };
-        
+
         return supportedTypes;
     }
 }
