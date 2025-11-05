@@ -6,19 +6,19 @@
 
 namespace RNGOEngine::Core
 {
-    void SceneManager::SwitchToPendingScene(Engine& engine)
+    void SceneManager::SwitchToPendingScene()
     {
         if (!m_pendingScene)
         {
             return;
         }
-        
+
         if (m_currentScene)
         {
-            m_currentScene->Exit(engine);
+            m_currentScene->Exit();
         }
         m_currentScene = std::move(m_pendingScene);
-        m_currentScene->Initialize(engine);
+        m_currentScene->Initialize();
     }
 
     Scene* SceneManager::GetCurrentScene() const

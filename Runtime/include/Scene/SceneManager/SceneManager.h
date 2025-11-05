@@ -15,11 +15,10 @@ namespace RNGOEngine::Core
         template<Concepts::DerivedFrom<Scene> T>
         void LoadScene();
 
-        void SwitchToPendingScene(Engine& engine);
+        void SwitchToPendingScene();
 
         Scene* GetCurrentScene() const;
         World* GetCurrentWorld() const;
-        
 
     private:
         std::unique_ptr<Scene> m_currentScene;

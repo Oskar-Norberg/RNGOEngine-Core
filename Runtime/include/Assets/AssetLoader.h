@@ -14,7 +14,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class AssetLoader
+    class AssetLoader : public Utilities::Singleton<AssetLoader>
     {
     public:
         explicit AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher);

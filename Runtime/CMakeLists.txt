@@ -49,8 +49,8 @@ include(cmake/Testing.cmake)
 
 # Engine Core / Entry Point
 add_library(${CORE_PROJECT_NAME} STATIC
-        include/Engine.h
-        src/Engine.cpp
+        include/Application/Application.h
+        src/Application/Application.cpp
 )
 target_precompile_headers(${CORE_PROJECT_NAME} PRIVATE include/PCH/PCH.h)
 target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
