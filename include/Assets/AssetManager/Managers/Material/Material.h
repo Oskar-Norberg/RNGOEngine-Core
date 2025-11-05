@@ -29,6 +29,6 @@ namespace RNGOEngine::AssetHandling
     struct MaterialParameters
     {
         // Consider stack allocated array with max size?
-        std::vector<MaterialParameter> uniforms;
+        std::vector<MaterialParameter> uniforms {};
     };
 }

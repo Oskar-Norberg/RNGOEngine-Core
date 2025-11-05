@@ -35,6 +35,8 @@ namespace RNGOEngine::AssetHandling
 
     struct AssetMetadata
     {
+        virtual ~AssetMetadata() = default;
+        
         Utilities::UUID UUID;
         std::filesystem::path Path;
         AssetState State = AssetState::None;

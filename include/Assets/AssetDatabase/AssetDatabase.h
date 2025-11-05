@@ -23,16 +23,9 @@ namespace RNGOEngine::AssetHandling
     public:
         AssetDatabase();
 
-        // TODO: Would it be nicer for the user to provide the AssetType and have the database create the correct metadata type internally?
         // Instead of templated functions?
         // Register / Unregister
-        template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
-        AssetHandle RegisterAsset(const std::filesystem::path& assetPath);
-
-        template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
-        void RegisterAsset(TMetadata metadata);
-
-        template<Concepts::DerivedFrom<AssetMetadata> TMetadata>
+        void RegisterAsset(AssetType type, std::unique_ptr<AssetMetadata> metadata);
         void UnregisterAsset(const AssetHandle& uuid);
 
         // State

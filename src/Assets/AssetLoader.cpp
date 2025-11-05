@@ -21,7 +21,11 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& path) const
     {
-        RNGO_ASSERT(m_loaders.contains(type) && "No loader registered for the specified asset type.");
+        const auto& serializer = m_serializers.at(type);
+        const auto& importer = m_loaders.at(type);
+
+        RNGO_ASSERT(
+            serializer && importer && "AssetLoader::Load - No serializer/importer registered for type.");
 
         const auto fullPath = m_assetFetcher.GetPath(type, path);
         if (!fullPath)
@@ -29,33 +33,49 @@ namespace RNGOEngine::AssetHandling
             RNGO_ASSERT(false && "AssetLoader::Load - Asset not found!");
             // TODO: What to return here?
             // TODO: UB
+            return {};
         }
 
-        // TODO: Add support for multiple importers per asset type.
-        // Ensure Importer supports extension.
-        // TODO: Lowercase extension? Will allocate a bit of memory.
-        // const std::string_view extension = path.extension().string();
-        // const auto supportedExtensions = m_loaders.at(type)->GetSupportedExtensions();
-        // if (std::ranges::find(supportedExtensions, extension) == supportedExtensions.end())
-        // {
-        //     RNGO_ASSERT(
-        //         false && "AssetLoader::Load - Unsupported file extension for the specified asset type.");
-        // }
-
-        // Check for existing metadata.
-        const auto& serializer = m_serializers.at(type);
-        RNGO_ASSERT(serializer && "AssetLoader::Load No serializer for the specified asset type.");
-        const std::string metaFilePath = fullPath->string() + ".meta";
-        if (Utilities::IO::FileExists(metaFilePath))
+        if (AssetDatabase::GetInstance().IsRegistered(fullPath.value()))
         {
-            // Try to load existing metadata.
-            YAML::Node node = YAML::LoadFile(metaFilePath.data());
-            const AssetHandle handle = m_serializers.at(type)->Deserialize(node, fullPath.value());
+            const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
+            auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(handle);
+
+            RNGO_ASSERT(metadata.Type == type && "AssetLoader::Load - Asset type mismatch.");
+            if (metadata.State == AssetState::Valid)
+            {
+                return handle;
+            }
+        }
+        else
+        {
+            const std::string metaFilePath = fullPath.value().string() + ".meta";
+            // Load Metadata if it exists, otherwise create a default and register it.
+            if (Utilities::IO::FileExists(metaFilePath))
+            {
+                YAML::Node node = YAML::LoadFile(metaFilePath);
+                std::unique_ptr<AssetMetadata> metadata = serializer->Deserialize(node, fullPath.value());
+                AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
+            }
+            else
+            {
+                std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata();
+                AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
+            }
         }
 
-        const auto handle = m_loaders.at(type)->Load(fullPath.value());
-        // Update or create new metadata
-        SaveMetadataToFile(handle, *serializer, metaFilePath);
+        // Safe to assume asset is registered.
+        auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(
+            AssetDatabase::GetInstance().GetAssetHandle(fullPath.value())
+        );
+
+        metadata.Path = fullPath.value();
+        const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
+        importer->Load(metadata);
+        metadata.State = AssetState::Valid;
+        
+        // Save metadata to file?
+        SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
 
         return handle;
     }

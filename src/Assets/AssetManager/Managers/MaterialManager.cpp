@@ -20,31 +20,27 @@ namespace RNGOEngine::AssetHandling
                                                 const AssetHandle& fragmentShader)
     {
         // TODO: Path is currently not used.
-        auto assetHandle = m_assetDatabase.RegisterAsset<MaterialMetadata>(std::filesystem::path{});
-        // Uses the "unsafe" getter, but we just registered it so it's fine.
-        auto& materialMetadata = m_assetDatabase.GetAssetMetadataAs<MaterialMetadata>(assetHandle);
-
-        // Set up metadata
-        materialMetadata.vertexShader = vertexShader;
-        materialMetadata.fragmentShader = fragmentShader;
-        // TODO: In the future when this is loaded from a file. Set the persistent parameters in here.
-        // materialMetadata.parameters = /* LOADED PARAMS */
-
-        const auto& materialHandle = materialMetadata.UUID;
-
         const auto programID = m_shaderManager.CreateShaderProgram(vertexShader, fragmentShader);
+        const auto uuid = Utilities::UUID();
 
         const auto runtimeMaterialData = RuntimeMaterial{
-            .materialUUID = materialHandle,
+            .materialUUID = uuid,
             .shaderProgramKey = programID
         };
 
-        m_materials.insert({materialHandle, runtimeMaterialData});
+        m_materials.insert({uuid, runtimeMaterialData});
 
-        // Mark Asset as valid
-        materialMetadata.State = AssetState::Valid;
+        std::unique_ptr<MaterialMetadata> metadata = std::make_unique<MaterialMetadata>();
+        metadata->UUID = uuid;
+        metadata->parameters = MaterialParameters{};
+        metadata->State = AssetState::Valid;
+        metadata->vertexShader = vertexShader;
+        metadata->fragmentShader = fragmentShader;
+        metadata->Type = AssetType::Material;
 
-        return materialHandle;
+        AssetDatabase::GetInstance().RegisterAsset(AssetType::Material, std::move(metadata));
+
+        return uuid;
     }
 
     ResolvedMaterial MaterialManager::GetMaterial(const AssetHandle& handle) const
@@ -53,6 +49,7 @@ namespace RNGOEngine::AssetHandling
         if (!params || !m_materials.contains(handle))
         {
             // TODO: Return error material / Try to reload material?
+            RNGO_ASSERT(false && "MaterialManager::GetMaterial - Invalid material handle.");
             return {};
         }
 
@@ -205,7 +202,7 @@ namespace RNGOEngine::AssetHandling
         if (m_assetDatabase.IsRegistered(materialHandle))
         {
             // Unsafe, but we check registration above. This should really be done with a templated getter in the AssetDatabase.
-            const auto& materialMetadata = static_cast<MaterialMetadata&>(m_assetDatabase.GetAssetMetadata(
+             const auto& materialMetadata = static_cast<MaterialMetadata&>(m_assetDatabase.GetAssetMetadata(
                 materialHandle));
 
             return std::cref(materialMetadata.parameters);

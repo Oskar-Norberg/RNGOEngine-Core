@@ -27,10 +27,17 @@ namespace RNGOEngine::AssetHandling
         const std::filesystem::path& vertexSourcePath, const std::filesystem::path& fragmentSourcePath)
     {
         // TODO: Horrible
-        const auto vertexShader = m_shaderAssetImporter->Load(vertexSourcePath);
-        const auto fragmentShader = m_shaderAssetImporter->Load(fragmentSourcePath);
+        ShaderMetadata vertexMetadata;
+        vertexMetadata.Path = vertexSourcePath;
+        vertexMetadata.ShaderType = Core::Renderer::ShaderType::Vertex;
+        m_shaderAssetImporter->Load(vertexMetadata);
 
-        const auto materialKey = m_materialManager.CreateMaterial(vertexShader, fragmentShader);
+        ShaderMetadata fragmentMetadata;
+        fragmentMetadata.Path = fragmentSourcePath;
+        fragmentMetadata.ShaderType = Core::Renderer::ShaderType::Fragment;
+        m_shaderAssetImporter->Load(fragmentMetadata);
+
+        const auto materialKey = m_materialManager.CreateMaterial(vertexMetadata.UUID, fragmentMetadata.UUID);
 
         return Core::Renderer::MaterialHandle(materialKey, m_materialManager);
     }
