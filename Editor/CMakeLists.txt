@@ -11,6 +11,11 @@ add_subdirectory(
 )
 
 add_executable(${EDITOR_PROJECT_NAME} main.cpp
+        include/Editor.h
+        src/Editor.cpp
 )
 
+target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
+
+target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC RNGOEngine_Core)
 target_compile_features(${EDITOR_PROJECT_NAME} PUBLIC cxx_std_23)

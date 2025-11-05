@@ -2,10 +2,12 @@
 // Created by Oskar.Norberg on 2025-08-25.
 //
 
-#include <iostream>
+#include "Editor.h"
 
 int main()
 {
-    std::cout << "Hello, World!" << std::endl;
+    RNGOEngine::Editor::Editor editor;
+    editor.Run();
+    
     return 0;
 }
