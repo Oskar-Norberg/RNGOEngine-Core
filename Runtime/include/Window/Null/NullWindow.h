@@ -49,5 +49,10 @@ namespace RNGOEngine::Core::Window
         void SetName(std::string_view name) override
         {
         }
+
+        void* GetNativeWindow() const override
+        {
+            return nullptr;
+        }
     };
 }

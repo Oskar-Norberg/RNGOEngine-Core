@@ -40,6 +40,9 @@ namespace RNGOEngine::Core::Window
             return m_height;
         }
 
+    public:
+        void* GetNativeWindow() const override;
+
     private:
         GLFWwindow* m_window;
         int m_width, m_height;

@@ -15,6 +15,9 @@ add_subdirectory(
         ${CMAKE_CURRENT_BINARY_DIR}/Runtime
 )
 
+# Dependencies
+include(cmake/Dependencies.cmake)
+
 add_executable(${EDITOR_PROJECT_NAME} main.cpp
         include/Editor.h
         src/Editor.cpp
@@ -30,7 +33,7 @@ target_compile_definitions(${EDITOR_PROJECT_NAME} PRIVATE
 
 target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
 
-target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC RNGOEngine_Core)
+target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC RNGOEngine_Core imgui-cmake)
 target_compile_features(${EDITOR_PROJECT_NAME} PUBLIC cxx_std_23)
 
 # Include assets in build.

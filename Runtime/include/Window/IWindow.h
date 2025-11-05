@@ -34,5 +34,8 @@ namespace RNGOEngine::Core::Window
     public:
         virtual int GetWidth() const = 0;
         virtual int GetHeight() const = 0;
+
+    public:
+        virtual void* GetNativeWindow() const = 0;
     };
 }

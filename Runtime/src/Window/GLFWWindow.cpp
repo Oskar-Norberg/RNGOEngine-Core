@@ -114,6 +114,11 @@ namespace RNGOEngine::Core::Window
         glfwSetWindowTitle(m_window, name.data());
     }
 
+    void* GLFWWindow::GetNativeWindow() const
+    {
+        return m_window;
+    }
+
     void GLFWWindow::PollKeyboardEvents(Events::EventQueue& eventQueue)
     {
         eventQueue.PushEventMultiple(m_keyEvents);
