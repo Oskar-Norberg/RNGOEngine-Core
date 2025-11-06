@@ -38,6 +38,14 @@ namespace RNGOEngine::Core::Renderer
           m_height(height)
     {
         m_renderer.SetViewPortSize(width, height);
+        m_renderer.EnableFeature(
+            // TODO: This cast is so ass.
+            static_cast<RenderFeature>(
+                static_cast<unsigned int>(DepthTesting) |
+                static_cast<unsigned int>(BackFaceCulling) |
+                static_cast<unsigned int>(Blending)
+            )
+        );
     }
 
     void RenderAPI::SubmitDrawQueue(DrawQueue&& drawQueue)
@@ -255,7 +263,8 @@ namespace RNGOEngine::Core::Renderer
                     else if constexpr (std::is_same_v<T, AssetHandling::MaterialTextureSpecification>)
                     {
                         const auto textureHandle = m_textureManager.GetTexture(arg.textureHandle);
-                        m_renderer.SetTexture(shaderProgramID, name, textureHandle, arg.slot);
+                        m_renderer.BindTexture(shaderProgramID, textureHandle);
+                        m_renderer.SetTexture(shaderProgramID, name, arg.slot);
                     }
                     else
                     {

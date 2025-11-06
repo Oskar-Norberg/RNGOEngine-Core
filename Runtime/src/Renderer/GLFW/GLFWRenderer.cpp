@@ -21,8 +21,16 @@ namespace RNGOEngine::Core::Renderer
         {
             RNGO_ASSERT(false && "Failed to initialize GLAD");
         }
+    }
 
-        glEnable(GL_DEPTH_TEST);
+    void GLFWRenderer::EnableFeature(RenderFeature feature)
+    {
+        glEnable(GetGLFeature(feature));
+    }
+
+    void GLFWRenderer::DisableFeature(RenderFeature feature)
+    {
+        glDisable(GetGLFeature(feature));
     }
 
     void GLFWRenderer::SetViewPortSize(const int width, const int height)
@@ -208,11 +216,9 @@ namespace RNGOEngine::Core::Renderer
         glUniformMatrix4fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetTexture(ShaderProgramID shader, std::string_view name, TextureID texture,
-                                  unsigned slot)
+    void GLFWRenderer::SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
-        glBindTexture(GL_TEXTURE_2D, texture);
         glUniform1i(glGetUniformLocation(shader, name.data()), slot);
     }
 
@@ -254,5 +260,128 @@ namespace RNGOEngine::Core::Renderer
     void GLFWRenderer::DestroyTexture(const TextureID texture)
     {
         glDeleteTextures(1, &texture);
+    }
+
+    void GLFWRenderer::BindTexture(const TextureID texture, unsigned slot)
+    {
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
+
+    FrameBufferID GLFWRenderer::CreateFrameBuffer()
+    {
+        unsigned int framebuffer;
+        glGenFramebuffers(1, &framebuffer);
+        return framebuffer;
+    }
+
+    void GLFWRenderer::DestroyFrameBuffer(const FrameBufferID framebuffer)
+    {
+        glDeleteFramebuffers(1, &framebuffer);
+    }
+
+    void GLFWRenderer::BindFrameBuffer(const FrameBufferID frameBuffer)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    }
+
+    void GLFWRenderer::AttachTextureToFrameBuffer(const TextureID texture,
+                                                  const FrameBufferAttachmentPoint attachmentPoint)
+    {
+        const unsigned int glAttachmentPoint = GetGLAttachmentPoint(attachmentPoint);
+
+        // TODO: Assumes 2D, would this ever be different?
+        glFramebufferTexture2D(GL_FRAMEBUFFER, glAttachmentPoint, GL_TEXTURE_2D, texture, 0);
+    }
+
+    RenderBufferID GLFWRenderer::CreateRenderBuffer(const RenderBufferFormat format, const unsigned width,
+                                                    const unsigned height)
+    {
+        unsigned int rbo;
+        glGenRenderbuffers(1, &rbo);
+
+        const auto glRenderBufferFormat = GetGLRenderBufferFormat(format);
+        glRenderbufferStorage(GL_RENDERBUFFER, glRenderBufferFormat, width, height);
+
+        return rbo;
+    }
+
+    void GLFWRenderer::DestroyRenderBuffer(const RenderBufferID renderBuffer)
+    {
+        glDeleteRenderbuffers(1, &renderBuffer);
+    }
+
+    void GLFWRenderer::BindRenderBuffer(RenderBufferID renderBuffer)
+    {
+        glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+    }
+
+    void GLFWRenderer::AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
+                                                       FrameBufferAttachmentPoint attachmentPoint)
+    {
+        const unsigned int glAttachmentPoint = GetGLAttachmentPoint(attachmentPoint);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, glAttachmentPoint, GL_RENDERBUFFER, renderBuffer);
+    }
+
+    unsigned int GLFWRenderer::GetGLFeature(RenderFeature feature)
+    {
+        unsigned int glFeature = 0;
+
+        if (DepthTesting & feature)
+        {
+            glFeature = glFeature | GL_DEPTH_TEST;
+        }
+
+        if (Blending & feature)
+        {
+            glFeature = glFeature | GL_BLEND;
+        }
+
+        if (BackFaceCulling & feature)
+        {
+            glFeature = glFeature | GL_CULL_FACE;
+        }
+
+        return glFeature;
+    }
+
+    unsigned int GLFWRenderer::GetGLAttachmentPoint(FrameBufferAttachmentPoint attachmentPoint)
+    {
+        switch (attachmentPoint)
+        {
+            case FrameBufferAttachmentPoint::DEPTH_ATTACHMENT:
+                return GL_DEPTH_ATTACHMENT;
+            case FrameBufferAttachmentPoint::STENCIL_ATTACHMENT:
+                return GL_STENCIL_ATTACHMENT;
+            case FrameBufferAttachmentPoint::COLOR_ATTACHMENT0:
+                return GL_COLOR_ATTACHMENT0;
+            case FrameBufferAttachmentPoint::COLOR_ATTACHMENT1:
+                return GL_COLOR_ATTACHMENT1;
+            case FrameBufferAttachmentPoint::COLOR_ATTACHMENT2:
+                return GL_COLOR_ATTACHMENT2;
+            case FrameBufferAttachmentPoint::COLOR_ATTACHMENT3:
+                return GL_COLOR_ATTACHMENT3;
+            case FrameBufferAttachmentPoint::COLOR_ATTACHMENT4:
+                return GL_COLOR_ATTACHMENT4;
+            case FrameBufferAttachmentPoint::COLOR_ATTACHMENT5:
+                return GL_COLOR_ATTACHMENT5;
+            default:
+                RNGO_ASSERT(
+                    false &&
+                    "GLFWRenderer::AttachTextureToFrameBuffer - Unsupported FrameBufferAttachmentPoint");
+        }
+    }
+
+    unsigned int GLFWRenderer::GetGLRenderBufferFormat(RenderBufferFormat renderBufferFormat)
+    {
+        switch (renderBufferFormat)
+        {
+            case RenderBufferFormat::DEPTH24_STENCIL8:
+                return GL_DEPTH24_STENCIL8;
+            case RenderBufferFormat::DEPTH32F_STENCIL8:
+                return GL_DEPTH32F_STENCIL8;
+            default:
+                RNGO_ASSERT(
+                    false && "GLFWRenderer::GetGLRenderBufferFormat - Unsupported RenderBufferFormat");
+        }
     }
 }

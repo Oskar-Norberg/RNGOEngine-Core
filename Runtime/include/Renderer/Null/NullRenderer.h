@@ -10,6 +10,14 @@ namespace RNGOEngine::Core::Renderer
     class NullRenderer : public IRenderer
     {
     public:
+        void EnableFeature(RenderFeature feature) override
+        {
+        }
+
+        void DisableFeature(RenderFeature feature) override
+        {
+        }
+
         void SetViewPortSize(int width, int height) override
         {
         }
@@ -139,8 +147,7 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        void SetTexture(ShaderProgramID shader, std::string_view name,
-                        TextureID texture, unsigned slot) override
+        void SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot) override
         {
         }
 
@@ -151,6 +158,46 @@ namespace RNGOEngine::Core::Renderer
         }
 
         void DestroyTexture(TextureID texture) override
+        {
+        }
+
+        void BindTexture(TextureID texture, unsigned slot) override
+        {
+        }
+
+        FrameBufferID CreateFrameBuffer() override
+        {
+            return INVALID_FRAMEBUFFER_ID;
+        }
+
+        void DestroyFrameBuffer(FrameBufferID framebuffer) override
+        {
+        }
+
+        void BindFrameBuffer(FrameBufferID frameBuffer) override
+        {
+        }
+
+        void AttachTextureToFrameBuffer(TextureID texture,
+                                        FrameBufferAttachmentPoint attachmentPoint) override
+        {
+        }
+
+        RenderBufferID CreateRenderBuffer(RenderBufferFormat format, unsigned width, unsigned height) override
+        {
+            return INVALID_RENDERBUFFER_ID;
+        }
+
+        void DestroyRenderBuffer(RenderBufferID renderBuffer) override
+        {
+        }
+
+        void BindRenderBuffer(RenderBufferID renderBuffer) override
+        {
+        }
+
+        void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
+                                             FrameBufferAttachmentPoint attachmentPoint) override
         {
         }
     };
