@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 23)
 set(CORE_PROJECT_NAME RNGOEngine_Core)
 project(${CORE_PROJECT_NAME})

@@ -35,11 +35,6 @@ if (RNGOENGINE_TRACY_ENABLE)
 endif ()
 CPMAddPackage("gh:skypjack/entt@3.15.0")
 
-CPMAddPackage(
-        NAME yaml-cpp
-        GITHUB_REPOSITORY jbeder/yaml-cpp
-        GIT_TAG 0.8.0
-)
-
 add_subdirectory(./vendor/glad)
 add_subdirectory(./vendor/stb_image)
+add_subdirectory(./vendor/yaml-cpp)
