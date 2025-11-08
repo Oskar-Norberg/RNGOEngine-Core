@@ -19,15 +19,19 @@ namespace RNGOEngine::Core::Renderer
         PercentOfScreen, // Size relative to current screen
     };
 
+    struct AttachmentSize
+    {
+        AttachmentSizeType SizeType = AttachmentSizeType::Absolute;
+        int width, height;
+    };
+
     // Higher level abstraction of FrameBuffers, Attachments and RBOs.
     struct FrameBufferAttachment
     {
         std::variant<TextureID, RenderBufferID> Resource;
         TextureFormat Format;
         FrameBufferAttachmentPoint AttachmentPoint;
-        
-        AttachmentSizeType SizeType = AttachmentSizeType::Absolute;
-        int width, height;
+        AttachmentSize Size;
 
         bool DoClearColor = false;
         bool DoClearDepth = false;
@@ -40,5 +44,33 @@ namespace RNGOEngine::Core::Renderer
         FrameBufferID FrameBuffer = INVALID_FRAMEBUFFER_ID;
 
         std::vector<FrameBufferAttachment> Attachments;
+    };
+
+
+    enum FrameBufferAttachmentSpecificationType
+    {
+        Texture,
+        RenderBuffer,
+    };
+
+    struct FrameBufferAttachmentSpecification
+    {
+        FrameBufferAttachmentSpecificationType Type;
+        TextureFormat Format;
+        FrameBufferAttachmentPoint AttachmentPoint;
+
+        AttachmentSizeType SizeType = AttachmentSizeType::Absolute;
+
+        bool DoClearColor = false;
+        bool DoClearDepth = false;
+        glm::vec4 ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    };
+
+    // Specifications for creation of runtime RenderTargets.
+    struct RenderTargetSpecification
+    {
+        std::string Name = "Unnamed Render Target";
+        std::vector<std::string> InputNames;
+        std::vector<FrameBufferAttachmentSpecification> Attachments;
     };
 }
