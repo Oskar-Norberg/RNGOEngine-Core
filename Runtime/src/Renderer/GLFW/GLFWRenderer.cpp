@@ -326,6 +326,7 @@ namespace RNGOEngine::Core::Renderer
     {
         unsigned int glFeature = 0;
 
+        // TODO: I forgor about |= when writing this.
         if (DepthTesting & feature)
         {
             glFeature = glFeature | GL_DEPTH_TEST;

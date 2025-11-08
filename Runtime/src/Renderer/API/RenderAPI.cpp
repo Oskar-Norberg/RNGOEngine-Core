@@ -14,19 +14,9 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    RenderAPI::RenderAPI(IRenderer& renderer, Resources::ResourceTracker& resourceTracker,
-                         const Resources::ResourceManager& resourceManager,
-                         const AssetHandling::ModelManager& modelManager,
-                         const AssetHandling::ShaderManager& shaderManager,
-                         const AssetHandling::MaterialManager& materialManager,
-                         const AssetHandling::TextureManager& textureManager, int width, int height)
+    RenderAPI::RenderAPI(IRenderer& renderer, const int width, const int height)
+
         : m_renderer(renderer),
-          m_resourceManager(resourceManager),
-          m_resourceTracker(resourceTracker),
-          m_modelManager(modelManager),
-          m_shaderManager(shaderManager),
-          m_materialManager(materialManager),
-          m_textureManager(textureManager),
           context(),
           m_width(width),
           m_height(height)

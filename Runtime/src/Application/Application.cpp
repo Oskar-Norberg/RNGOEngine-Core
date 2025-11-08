@@ -59,9 +59,7 @@ namespace RNGOEngine
         );
 
         m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(
-            *m_renderer, m_resourceTracker, *m_resourceManager, m_assetManager->GetModelManager(),
-            m_assetManager->GetShaderManager(), m_assetManager->GetMaterialManager(),
-            m_assetManager->GetTextureManager(), config.width, config.height
+            *m_renderer, config.width, config.height
         );
 
         AddEngineSystems();

@@ -8,36 +8,11 @@
 #include "RenderPass/RenderPass.h"
 #include "Renderer/DrawQueue.h"
 
-namespace RNGOEngine::AssetHandling
-{
-    class ShaderManager;
-}
-
 namespace RNGOEngine
 {
     namespace Events
     {
         class EventQueue;
-    }
-
-    namespace Resources
-    {
-        class ResourceManager;
-        class ResourceTracker;
-    }
-
-    namespace Core
-    {
-        namespace Window
-        {
-            class IWindow;
-        }
-    }
-
-    namespace AssetHandling
-    {
-        class TextureManager;
-        class MaterialManager;
     }
 }
 
@@ -47,15 +22,7 @@ namespace RNGOEngine::Core::Renderer
     class RenderAPI
     {
     public:
-        explicit RenderAPI(IRenderer& renderer,
-                           Resources::ResourceTracker& resourceTracker,
-                           const Resources::ResourceManager& resourceManager,
-                           const AssetHandling::ModelManager& modelManager,
-                           const AssetHandling::ShaderManager& shaderManager,
-                           const AssetHandling::MaterialManager& materialManager,
-                           const AssetHandling::TextureManager& textureManager,
-                           int width,
-                           int height);
+        explicit RenderAPI(IRenderer& renderer, int width, int height);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
         // TODO: I kind of dislike this not being const.
@@ -79,13 +46,6 @@ namespace RNGOEngine::Core::Renderer
 
     private:
         IRenderer& m_renderer;
-
-        const Resources::ResourceManager& m_resourceManager;
-        Resources::ResourceTracker& m_resourceTracker;
-        const AssetHandling::ModelManager& m_modelManager;
-        const AssetHandling::ShaderManager& m_shaderManager;
-        const AssetHandling::MaterialManager& m_materialManager;
-        const AssetHandling::TextureManager& m_textureManager;
 
     private:
         RenderContext context;

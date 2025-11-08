@@ -15,6 +15,7 @@ namespace RNGOEngine::Core::Renderer
     ///
     /// <summary>Low-Level abstraction for a renderer interface.</summary>
     ///
+    // TODO: This is more so an RHI than a renderer. Rename?
     class IRenderer
     {
     public:
