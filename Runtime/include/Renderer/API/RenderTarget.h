@@ -13,14 +13,21 @@
 
 namespace RNGOEngine::Core::Renderer
 {
+    enum class AttachmentSizeType
+    {
+        Absolute, // Fixed size
+        PercentOfScreen, // Size relative to current screen
+    };
+
     // Higher level abstraction of FrameBuffers, Attachments and RBOs.
     struct FrameBufferAttachment
     {
         std::variant<TextureID, RenderBufferID> Resource;
         TextureFormat Format;
-        int width, height;
         FrameBufferAttachmentPoint AttachmentPoint;
-
+        
+        AttachmentSizeType SizeType = AttachmentSizeType::Absolute;
+        int width, height;
 
         bool DoClearColor = false;
         bool DoClearDepth = false;
@@ -29,7 +36,7 @@ namespace RNGOEngine::Core::Renderer
 
     struct RenderTarget
     {
-        std::string DebugName = "Unnamed Render Target";
+        std::string TargetName = "Unnamed Render Target";
         FrameBufferID FrameBuffer = INVALID_FRAMEBUFFER_ID;
 
         std::vector<FrameBufferAttachment> Attachments;
