@@ -11,6 +11,10 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
         include/Renderer/API/RenderPass/RenderPassResources.h 
         src/Renderer/API/RenderPass/RenderPassResources.cpp
 
+        include/Renderer/API/Passes/ForwardPass.h
+        src/Renderer/API/Passes/ForwardPass.cpp
+
+
         include/Systems/Core/RenderSystem.h
         src/Systems/Core/RenderSystem.cpp
 )

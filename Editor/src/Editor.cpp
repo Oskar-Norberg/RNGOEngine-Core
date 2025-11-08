@@ -5,6 +5,7 @@
 #include "Editor.h"
 
 #include "TestScene.h"
+#include "Renderer/API/Passes/ForwardPass.h"
 
 namespace RNGOEngine::Editor
 {
@@ -12,6 +13,11 @@ namespace RNGOEngine::Editor
         : Application(config)
     {
         m_sceneManager.LoadScene<Temporary::TestScene>();
+
+        // Should this really be the editor's responsibility?
+        // TODO: Add a RenderPipelineConfiguration to the EngineConfig?
+        m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(*m_renderer, m_window->GetWidth(),
+                                                                 m_window->GetHeight());
     }
 
     void Editor::OnUpdate(const float deltaTime)
@@ -24,7 +30,7 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         Application::OnRender();
-        m_rendererAPI->Render(*m_window, m_frameCount);
+        m_rendererAPI->Render();
         m_window->SwapBuffers();
     }
 

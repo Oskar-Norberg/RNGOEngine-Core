@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "RenderPass/RenderContext.h"
+#include "RenderPass/RenderPass.h"
 #include "Renderer/DrawQueue.h"
 
 namespace RNGOEngine::AssetHandling
@@ -56,7 +58,17 @@ namespace RNGOEngine::Core::Renderer
                            int height);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
-        void Render(Window::IWindow& window, size_t frameCount) const;
+        // TODO: I kind of dislike this not being const.
+        // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
+        void Render();
+
+    public:
+        template<typename T, typename... Args>
+        T& RegisterPass(Args&&... args)
+        {
+            m_passes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+            return static_cast<T&>(*m_passes.back());
+        }
 
     public:
         /// 
@@ -67,7 +79,6 @@ namespace RNGOEngine::Core::Renderer
 
     private:
         IRenderer& m_renderer;
-        DrawQueue m_drawQueue;
 
         const Resources::ResourceManager& m_resourceManager;
         Resources::ResourceTracker& m_resourceTracker;
@@ -77,13 +88,10 @@ namespace RNGOEngine::Core::Renderer
         const AssetHandling::TextureManager& m_textureManager;
 
     private:
+        RenderContext context;
+        std::vector<std::unique_ptr<RenderPass>> m_passes;
+
+    private:
         int m_width, m_height;
-
-    private:
-        void ClearAmbientColor(Window::IWindow& window) const;
-        void RenderOpaque(Window::IWindow& window) const;
-
-    private:
-        void MarkOpaqueUsed(size_t frameCount) const;
     };
 }
