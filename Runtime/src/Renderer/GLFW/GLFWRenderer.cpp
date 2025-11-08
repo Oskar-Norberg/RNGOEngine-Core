@@ -23,14 +23,14 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    void GLFWRenderer::EnableFeature(RenderFeature feature)
+    void GLFWRenderer::EnableFeature(const RenderFeature feature)
     {
-        glEnable(GetGLFeature(feature));
+        EnableFeatures(feature);
     }
 
-    void GLFWRenderer::DisableFeature(RenderFeature feature)
+    void GLFWRenderer::DisableFeature(const RenderFeature feature)
     {
-        glDisable(GetGLFeature(feature));
+        DisableFeatures(feature);
     }
 
     void GLFWRenderer::SetViewPortSize(const int width, const int height)
@@ -328,27 +328,41 @@ namespace RNGOEngine::Core::Renderer
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, glAttachmentPoint, GL_RENDERBUFFER, renderBuffer);
     }
 
-    unsigned int GLFWRenderer::GetGLFeature(RenderFeature feature)
+    void GLFWRenderer::EnableFeatures(const RenderFeature feature)
     {
-        unsigned int glFeature = 0;
-
-        // TODO: I forgor about |= when writing this.
+        // TODO: Duplicate code.
         if (DepthTesting & feature)
         {
-            glFeature = glFeature | GL_DEPTH_TEST;
+            glEnable(GL_DEPTH_TEST);
         }
 
         if (Blending & feature)
         {
-            glFeature = glFeature | GL_BLEND;
+            glEnable(GL_BLEND);
         }
 
         if (BackFaceCulling & feature)
         {
-            glFeature = glFeature | GL_CULL_FACE;
+            glEnable(GL_CULL_FACE);
+        }
+    }
+
+    void GLFWRenderer::DisableFeatures(const RenderFeature feature)
+    {
+        if (DepthTesting & feature)
+        {
+            glDisable(GL_DEPTH_TEST);
         }
 
-        return glFeature;
+        if (Blending & feature)
+        {
+            glDisable(GL_BLEND);
+        }
+
+        if (BackFaceCulling & feature)
+        {
+            glDisable(GL_CULL_FACE);
+        }
     }
 
     unsigned int GLFWRenderer::GetGLTextureFiltering(const TextureFiltering filtering)

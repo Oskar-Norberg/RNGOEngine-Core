@@ -83,8 +83,10 @@ namespace RNGOEngine::Core::Renderer
                                              FrameBufferAttachmentPoint attachmentPoint) override;
 
     private:
-        static unsigned int GetGLFeature(RenderFeature feature);
+        void EnableFeatures(RenderFeature feature);
+        void DisableFeatures(RenderFeature feature);
 
+    private:
         static unsigned int GetGLTextureFiltering(TextureFiltering filtering);
         static bool GetGLUsingMipMaps(TextureFiltering minifying, TextureFiltering magnifying);
         static unsigned int GetGLTextureWrapping(TextureWrapping wrapping);
