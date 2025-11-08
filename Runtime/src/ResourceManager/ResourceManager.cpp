@@ -12,7 +12,8 @@ namespace RNGOEngine::Resources
         : Singleton(this),
           m_meshResourceManager(renderer),
           m_shaderResourceManager(renderer),
-          m_textureResourceManager(renderer)
+          m_textureResourceManager(renderer),
+          m_renderTargetManager(renderer)
     {
     }
 

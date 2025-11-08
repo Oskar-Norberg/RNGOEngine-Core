@@ -14,6 +14,7 @@
 #include "Renderer/RenderID.h"
 #include "ResourceCollection.h"
 #include "ResourceTracker.h"
+#include "FrameTargetManager/RenderTargetManager.h"
 #include "ShaderResourceManager/ShaderResourceManager.h"
 #include "TextureResourceManager/TextureResourceManager.h"
 #include "Utilities/Singleton/Singleton.h"
@@ -30,6 +31,7 @@ namespace RNGOEngine
 }
 
 // TODO: should probably be in Core namespace. Maybe even RNGOEngine::Core::Renderer::Resources?
+// TODO: This should really work something like a service locator, instead of being a facade for all resource managers.
 namespace RNGOEngine::Resources
 {
     class ResourceManager : public Utilities::Singleton<ResourceManager>
@@ -79,6 +81,17 @@ namespace RNGOEngine::Resources
         // Mark for Destruction
         void MarkForDestruction(const TrackedCollection& resources);
 
+    public:
+        RenderTargetManager& GetRenderTargetManager()
+        {
+            return m_renderTargetManager;
+        }
+
+        const RenderTargetManager& GetRenderTargetManager() const
+        {
+            return m_renderTargetManager;
+        }
+
         // # Clean Up
     public:
         void DestroyMarkedResources();
@@ -87,5 +100,6 @@ namespace RNGOEngine::Resources
         MeshResourceManager m_meshResourceManager;
         ShaderResourceManager m_shaderResourceManager;
         TextureResourceManager m_textureResourceManager;
+        RenderTargetManager m_renderTargetManager;
     };
 }
