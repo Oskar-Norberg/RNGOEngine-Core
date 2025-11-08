@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "Renderer/API/RenderTarget.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -26,6 +27,9 @@ namespace RNGOEngine::Core::Renderer
 
     public:
         virtual ~RenderPass() = default;
+
+    public:
+        virtual RenderTargetSpecification GetRenderTargetSpecification() const = 0;
 
     public:
         virtual void Execute(RenderContext& context) = 0;

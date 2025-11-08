@@ -18,6 +18,33 @@ namespace RNGOEngine::Core::Renderer
     {
     }
 
+    RenderTargetSpecification ForwardPass::GetRenderTargetSpecification() const
+    {
+        RenderTargetSpecification specification{
+            .Name = "Forward Pass",
+            .CreateFrameBuffer = true,
+            .InputNames = {},
+            .Attachments = {
+                FrameBufferAttachmentSpecification{
+                    .Name = "Color0",
+                    .Type = Texture,
+                    .Format = TextureFormat::RGBA,
+                    .AttachmentPoint = FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
+                    .Size = AttachmentSize{
+                        .SizeType = AttachmentSizeType::PercentOfScreen,
+                        .width = 100,
+                        .height = 100,
+                    },
+                    .DoClearColor = true,
+                    .DoClearDepth = true,
+                    .ClearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
+                }
+            },
+        };
+
+        return specification;
+    }
+
     void ForwardPass::Execute(RenderContext& context)
     {
         // TODO: For now, just render to the default framebuffer.

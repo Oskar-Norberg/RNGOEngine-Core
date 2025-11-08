@@ -10,6 +10,14 @@
 
 namespace RNGOEngine
 {
+    namespace Core
+    {
+        namespace Renderer
+        {
+            struct RenderTarget;
+        }
+    }
+
     namespace Events
     {
         class EventQueue;
@@ -27,13 +35,16 @@ namespace RNGOEngine::Core::Renderer
         void SubmitDrawQueue(DrawQueue&& drawQueue);
         // TODO: I kind of dislike this not being const.
         // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
-        void Render();
+        void RenderToScreen();
 
     public:
         template<typename T, typename... Args>
         T& RegisterPass(Args&&... args)
         {
             m_passes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+
+            const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
+            
             return static_cast<T&>(*m_passes.back());
         }
 

@@ -37,7 +37,7 @@ namespace RNGOEngine::Core::Renderer
         context.drawQueue = std::move(drawQueue);
     }
 
-    void RenderAPI::Render()
+    void RenderAPI::RenderToScreen()
     {
         for (const auto& pass : m_passes)
         {

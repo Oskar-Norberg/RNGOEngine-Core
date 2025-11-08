@@ -45,8 +45,9 @@ namespace RNGOEngine::Core::Renderer
 
         std::vector<FrameBufferAttachment> Attachments;
     };
+    
 
-
+    // Specifications for creation of Targets/Attachments
     enum FrameBufferAttachmentSpecificationType
     {
         Texture,
@@ -55,11 +56,12 @@ namespace RNGOEngine::Core::Renderer
 
     struct FrameBufferAttachmentSpecification
     {
+        std::string Name;
         FrameBufferAttachmentSpecificationType Type;
         TextureFormat Format;
         FrameBufferAttachmentPoint AttachmentPoint;
 
-        AttachmentSizeType SizeType = AttachmentSizeType::Absolute;
+        AttachmentSize Size;
 
         bool DoClearColor = false;
         bool DoClearDepth = false;
@@ -70,6 +72,7 @@ namespace RNGOEngine::Core::Renderer
     struct RenderTargetSpecification
     {
         std::string Name = "Unnamed Render Target";
+        bool CreateFrameBuffer = true;
         std::vector<std::string> InputNames;
         std::vector<FrameBufferAttachmentSpecification> Attachments;
     };

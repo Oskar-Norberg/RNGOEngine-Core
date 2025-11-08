@@ -30,7 +30,7 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         Application::OnRender();
-        m_rendererAPI->Render();
+        m_rendererAPI->RenderToScreen();
         m_window->SwapBuffers();
     }
 
