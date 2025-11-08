@@ -140,7 +140,6 @@ namespace RNGOEngine::Core::Renderer
 
         // Attach RenderBuffer to FrameBuffer
     public:
-        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
-                                                     FrameBufferAttachmentPoint attachmentPoint) = 0;
+        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer, FrameBufferAttachmentPoint attachmentPoint) = 0;
     };
 }

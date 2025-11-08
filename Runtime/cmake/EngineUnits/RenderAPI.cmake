@@ -2,6 +2,8 @@
 add_library(${RENDER_API_PROJECT_NAME} STATIC
         include/Renderer/DrawQueue.h
         
+        include/Renderer/API/RenderTarget.h
+        
         include/Renderer/API/RenderAPI.h
         src/Renderer/API/RenderAPI.cpp
 
