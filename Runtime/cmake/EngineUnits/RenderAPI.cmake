@@ -5,6 +5,9 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
         include/Renderer/API/RenderAPI.h
         src/Renderer/API/RenderAPI.cpp
 
+        include/Renderer/API/RenderPass/RenderContext.h
+        include/Renderer/API/RenderPass/RenderPass.h
+
         include/Renderer/API/RenderPass/RenderPassResources.h 
         src/Renderer/API/RenderPass/RenderPassResources.cpp
 
