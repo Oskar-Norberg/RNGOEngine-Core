@@ -27,6 +27,7 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::OnResize(int width, int height)
     {
+        RenderPass::OnResize(width, height);
     }
 
     void ForwardPass::ClearAmbientColor(DrawQueue& queue) const
