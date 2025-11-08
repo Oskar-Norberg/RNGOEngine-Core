@@ -16,6 +16,7 @@
 #include "ResourceTracker.h"
 #include "ShaderResourceManager/ShaderResourceManager.h"
 #include "TextureResourceManager/TextureResourceManager.h"
+#include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine
 {
@@ -31,7 +32,7 @@ namespace RNGOEngine
 // TODO: should probably be in Core namespace. Maybe even RNGOEngine::Core::Renderer::Resources?
 namespace RNGOEngine::Resources
 {
-    class ResourceManager
+    class ResourceManager : public Utilities::Singleton<ResourceManager>
     {
     public:
         explicit ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
