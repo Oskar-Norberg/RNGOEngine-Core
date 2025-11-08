@@ -25,11 +25,51 @@ namespace RNGOEngine::Core::Renderer
 
     using ShaderID = unsigned int;
     using ShaderProgramID = unsigned int;
-    using TextureID = unsigned int;
 
     constexpr auto INVALID_SHADER_ID = std::numeric_limits<ShaderID>::max();
     constexpr auto INVALID_SHADER_PROGRAM_ID = std::numeric_limits<ShaderProgramID>::max();
+
+    // Textures
+    using TextureID = unsigned int;
     constexpr auto INVALID_TEXTURE_ID = std::numeric_limits<TextureID>::max();
+
+    enum class TextureFormat
+    {
+        RGB,
+        RGBA,
+        
+        DEPTH24_STENCIL8,
+        DEPTH32F_STENCIL8,
+    };
+
+    enum class TextureFiltering
+    {
+        NEAREST,
+        LINEAR,
+        
+        NEAREST_MIPMAP_NEAREST,
+        NEAREST_MIPMAP_LINEAR,
+        LINEAR_MIPMAP_NEAREST,
+        LINEAR_MIPMAP_LINEAR,
+    };
+
+    enum class TextureWrapping
+    {
+        REPEAT,
+        MIRRORED_REPEAT,
+        CLAMP_TO_EDGE,
+        CLAMP_TO_BORDER,
+    };
+
+    struct Texture2DProperties
+    {
+        TextureFormat format;
+        TextureFiltering minifyingFilter;
+        TextureFiltering magnifyingFilter;
+        TextureWrapping wrappingMode;
+        unsigned int width;
+        unsigned int height;
+    };
 
     // FrameBuffers
     using FrameBufferID = unsigned int;
@@ -54,6 +94,7 @@ namespace RNGOEngine::Core::Renderer
     using RenderBufferID = unsigned int;
     constexpr auto INVALID_RENDERBUFFER_ID = std::numeric_limits<RenderBufferID>::max();
 
+    // TODO: Is this the same as TextureFormat?
     enum class RenderBufferFormat
     {
         DEPTH24_STENCIL8,

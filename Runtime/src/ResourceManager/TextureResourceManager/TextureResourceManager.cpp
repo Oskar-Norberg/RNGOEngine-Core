@@ -38,7 +38,22 @@ namespace RNGOEngine::Resources
         const auto textureData = std::as_bytes(
             std::span<const unsigned char>(data->data, width * height * nrChannels));
 
-        return m_renderer.CreateTexture(width, height, nrChannels, textureData);
+        // TODO: These should be passed as parameters.
+        Core::Renderer::Texture2DProperties properties{
+            .format = (nrChannels == 4)
+                          ? Core::Renderer::TextureFormat::RGBA
+                          : Core::Renderer::TextureFormat::RGB,
+            
+            .minifyingFilter = Core::Renderer::TextureFiltering::LINEAR_MIPMAP_LINEAR,
+            .magnifyingFilter = Core::Renderer::TextureFiltering::LINEAR,
+            
+            .wrappingMode = Core::Renderer::TextureWrapping::REPEAT,
+            
+            .width = width,
+            .height = height,
+        };
+
+        return m_renderer.CreateTexture2D(properties, textureData);
     }
 
     void TextureResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)

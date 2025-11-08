@@ -222,37 +222,43 @@ namespace RNGOEngine::Core::Renderer
         glUniform1i(glGetUniformLocation(shader, name.data()), slot);
     }
 
-
-    TextureID GLFWRenderer::CreateTexture(const unsigned int width, const unsigned int height,
-                                          const unsigned int nrChannels,
-                                          const std::span<const std::byte> data)
+    TextureID GLFWRenderer::CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data)
     {
         unsigned int textureHandle;
         glGenTextures(1, &textureHandle);
         glBindTexture(GL_TEXTURE_2D, textureHandle);
 
-        // TODO: These should probably be passed in as parameters.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        // Wrapping mode same for both axis for now.
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGLTextureWrapping(properties.wrappingMode));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGLTextureWrapping(properties.wrappingMode));
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+                        GetGLTextureFiltering(properties.minifyingFilter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
+                        GetGLTextureFiltering(properties.magnifyingFilter));
 
         const auto* textureData = data.data();
-        if (nrChannels == 4)
+        const auto width = properties.width;
+        const auto height = properties.height;
+        
+        switch (properties.format)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-        }
-        else if (nrChannels == 3)
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, textureData);
-        }
-        else
-        {
-            RNGO_ASSERT(false && "Unsupported number of channels in texture");
-            return INVALID_TEXTURE_ID;
+            case TextureFormat::RGBA:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                             textureData);
+                break;
+            case TextureFormat::RGB:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                             textureData);
+                break;
+            default:
+                break;
         }
 
-        glGenerateMipmap(GL_TEXTURE_2D);
+        if (GetGLUsingMipMaps(properties.minifyingFilter, properties.magnifyingFilter))
+        {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
 
         return textureHandle;
     }
@@ -345,7 +351,61 @@ namespace RNGOEngine::Core::Renderer
         return glFeature;
     }
 
-    unsigned int GLFWRenderer::GetGLAttachmentPoint(FrameBufferAttachmentPoint attachmentPoint)
+    unsigned int GLFWRenderer::GetGLTextureFiltering(const TextureFiltering filtering)
+    {
+        switch (filtering)
+        {
+            case TextureFiltering::NEAREST:
+                return GL_NEAREST;
+            case TextureFiltering::LINEAR:
+                return GL_LINEAR;
+            case TextureFiltering::NEAREST_MIPMAP_NEAREST:
+                return GL_NEAREST_MIPMAP_NEAREST;
+            case TextureFiltering::NEAREST_MIPMAP_LINEAR:
+                return GL_NEAREST_MIPMAP_LINEAR;
+            case TextureFiltering::LINEAR_MIPMAP_NEAREST:
+                return GL_LINEAR_MIPMAP_NEAREST;
+            case TextureFiltering::LINEAR_MIPMAP_LINEAR:
+                return GL_LINEAR_MIPMAP_LINEAR;
+            default:
+                RNGO_ASSERT(false && "GLFWRenderer::GetGLTextureFiltering - Unsupported TextureFiltering");
+        }
+    }
+
+    bool GLFWRenderer::GetGLUsingMipMaps(const TextureFiltering minifying, const TextureFiltering magnifying)
+    {
+        auto isMipmapped = [](const TextureFiltering filter)
+        {
+            return filter == TextureFiltering::LINEAR_MIPMAP_LINEAR ||
+                   filter == TextureFiltering::LINEAR_MIPMAP_NEAREST ||
+                   filter == TextureFiltering::NEAREST_MIPMAP_LINEAR ||
+                   filter == TextureFiltering::NEAREST_MIPMAP_NEAREST;
+        };
+
+        return isMipmapped(minifying) || isMipmapped(magnifying);
+    }
+
+    unsigned int GLFWRenderer::GetGLTextureWrapping(const TextureWrapping wrapping)
+    {
+        switch (wrapping)
+        {
+            case TextureWrapping::REPEAT:
+                return GL_REPEAT;
+            case TextureWrapping::MIRRORED_REPEAT:
+                return GL_MIRRORED_REPEAT;
+            case TextureWrapping::CLAMP_TO_EDGE:
+                return GL_CLAMP_TO_EDGE;
+            case TextureWrapping::CLAMP_TO_BORDER:
+                return GL_CLAMP_TO_BORDER;
+            default:
+                RNGO_ASSERT(
+                    false &&
+                    "GLFWRenderer::GetGLTextureWrapping - Unsupported TextureWrapping");
+                return GL_REPEAT;
+        }
+    }
+
+    unsigned int GLFWRenderer::GetGLAttachmentPoint(const FrameBufferAttachmentPoint attachmentPoint)
     {
         switch (attachmentPoint)
         {
@@ -369,10 +429,11 @@ namespace RNGOEngine::Core::Renderer
                 RNGO_ASSERT(
                     false &&
                     "GLFWRenderer::AttachTextureToFrameBuffer - Unsupported FrameBufferAttachmentPoint");
+                return GL_COLOR_ATTACHMENT0;
         }
     }
 
-    unsigned int GLFWRenderer::GetGLRenderBufferFormat(RenderBufferFormat renderBufferFormat)
+    unsigned int GLFWRenderer::GetGLRenderBufferFormat(const RenderBufferFormat renderBufferFormat)
     {
         switch (renderBufferFormat)
         {
@@ -383,6 +444,26 @@ namespace RNGOEngine::Core::Renderer
             default:
                 RNGO_ASSERT(
                     false && "GLFWRenderer::GetGLRenderBufferFormat - Unsupported RenderBufferFormat");
+                return GL_DEPTH24_STENCIL8;
+        }
+    }
+
+    unsigned int GLFWRenderer::GetGLTextureFormat(TextureFormat format)
+    {
+        switch (format)
+        {
+            case TextureFormat::RGB:
+                return GL_RGB;
+            case TextureFormat::RGBA:
+                return GL_RGBA;
+            case TextureFormat::DEPTH24_STENCIL8:
+                return GL_DEPTH24_STENCIL8;
+            case TextureFormat::DEPTH32F_STENCIL8:
+                return GL_DEPTH32F_STENCIL8;
+            default:
+                RNGO_ASSERT(
+                    false && "GLFWRenderer::GetGLTextureFormat - Unsupported TextureFormat");
+                return GL_RGBA;
         }
     }
 }

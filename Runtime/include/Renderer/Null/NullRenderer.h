@@ -151,8 +151,7 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
-        TextureID CreateTexture(unsigned width, unsigned height, unsigned nrChannels,
-                                std::span<const std::byte> data) override
+        TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data) override
         {
             return INVALID_TEXTURE_ID;
         }

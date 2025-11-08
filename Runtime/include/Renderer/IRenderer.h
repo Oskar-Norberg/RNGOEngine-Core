@@ -24,7 +24,7 @@ namespace RNGOEngine::Core::Renderer
     public:
         virtual void EnableFeature(RenderFeature feature) = 0;
         virtual void DisableFeature(RenderFeature feature) = 0;
-        
+
         // TODO: Explicit function to enable depth testing etc.
         // Viewport properties
     public:
@@ -89,20 +89,18 @@ namespace RNGOEngine::Core::Renderer
         virtual void SetBool(ShaderProgramID shader, std::string_view name, bool value) = 0;
         virtual void SetInt(ShaderProgramID shader, std::string_view name, int value) = 0;
         virtual void SetFloat(ShaderProgramID shader, std::string_view name, float value) = 0;
-        virtual void SetVec2(ShaderProgramID shader, std::string_view name,std::span<const float, 2> value) = 0;
-        virtual void SetVec3(ShaderProgramID shader, std::string_view name,std::span<const float, 3> value) = 0;
-        virtual void SetVec4(ShaderProgramID shader, std::string_view name,std::span<const float, 4> value) = 0;
-        virtual void SetMat2(ShaderProgramID shader, std::string_view name,std::span<const float, 4> value) = 0;
-        virtual void SetMat3(ShaderProgramID shader, std::string_view name,std::span<const float, 9> value) = 0;
-        virtual void SetMat4(ShaderProgramID shader, std::string_view name,std::span<const float, 16> value) = 0;
+        virtual void SetVec2(ShaderProgramID shader, std::string_view name, std::span<const float, 2> value) = 0;
+        virtual void SetVec3(ShaderProgramID shader, std::string_view name, std::span<const float, 3> value) = 0;
+        virtual void SetVec4(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) = 0;
+        virtual void SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) = 0;
+        virtual void SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value) = 0;
+        virtual void SetMat4(ShaderProgramID shader, std::string_view name, std::span<const float, 16> value) = 0;
         virtual void SetTexture(ShaderProgramID shader, std::string_view name, unsigned int slot) = 0;
 
         // Create Texture
     public:
-        // TODO: Assumes 2D texture.
-        // TODO: Pass in format, filtering, wrapping etc.
-        virtual TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels,
-                                        std::span<const std::byte> data) = 0;
+        // TODO: Unify more texture types into one function? Or have separate functions for different types?
+        virtual TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data = {}) = 0;
 
         // Destroy Texture
     public:
@@ -130,8 +128,7 @@ namespace RNGOEngine::Core::Renderer
 
         // Create RenderBuffer
     public:
-        virtual RenderBufferID CreateRenderBuffer(RenderBufferFormat format, unsigned int width,
-                                                  unsigned int height) = 0;
+        virtual RenderBufferID CreateRenderBuffer(RenderBufferFormat format, unsigned int width, unsigned int height) = 0;
 
         // Destroy RenderBuffer
     public:
@@ -143,6 +140,7 @@ namespace RNGOEngine::Core::Renderer
 
         // Attach RenderBuffer to FrameBuffer
     public:
-        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer, FrameBufferAttachmentPoint attachmentPoint) = 0;
+        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
+                                                     FrameBufferAttachmentPoint attachmentPoint) = 0;
     };
 }

@@ -63,8 +63,7 @@ namespace RNGOEngine::Core::Renderer
         void SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot) override;
 
     public:
-        TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels,
-                                std::span<const std::byte> data) override;
+        TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data) override;
         void DestroyTexture(TextureID texture) override;
         void BindTexture(TextureID texture, unsigned slot) override;
 
@@ -85,7 +84,14 @@ namespace RNGOEngine::Core::Renderer
 
     private:
         static unsigned int GetGLFeature(RenderFeature feature);
+
+        static unsigned int GetGLTextureFiltering(TextureFiltering filtering);
+        static bool GetGLUsingMipMaps(TextureFiltering minifying, TextureFiltering magnifying);
+        static unsigned int GetGLTextureWrapping(TextureWrapping wrapping);
+        
         static unsigned int GetGLAttachmentPoint(FrameBufferAttachmentPoint attachmentPoint);
         static unsigned int GetGLRenderBufferFormat(RenderBufferFormat renderBufferFormat);
+
+        static unsigned int GetGLTextureFormat(TextureFormat format);
     };
 }
