@@ -2,7 +2,6 @@ set(RENDERING_PROJECT_NAME RNGOEngine_Rendering)
 add_library(${RENDERING_PROJECT_NAME} STATIC
         include/Renderer/IRenderer.h
         
-        include/Renderer/DrawQueue.h
         include/Renderer/RenderID.h
         include/Renderer/RenderFeatures.h
         
