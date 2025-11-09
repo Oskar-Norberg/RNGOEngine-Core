@@ -19,7 +19,7 @@ namespace RNGOEngine::Core::Renderer
         explicit ForwardPass(IRenderer& renderer, int width, int height);
 
     public:
-        RenderTargetSpecification GetRenderTargetSpecification() const override;
+        Resources::RenderTargetSpecification GetRenderTargetSpecification() const override;
 
         void Execute(RenderContext& context) override;
 

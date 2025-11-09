@@ -18,24 +18,38 @@ namespace RNGOEngine::Core::Renderer
     {
     }
 
-    RenderTargetSpecification ForwardPass::GetRenderTargetSpecification() const
+    Resources::RenderTargetSpecification ForwardPass::GetRenderTargetSpecification() const
     {
-        RenderTargetSpecification specification{
+        Resources::RenderTargetSpecification specification{
             .Name = "Forward Pass",
             .CreateFrameBuffer = true,
             .InputNames = {},
             .Attachments = {
-                FrameBufferAttachmentSpecification{
-                    .Name = "Color0",
-                    .Type = Texture,
-                    .Format = TextureFormat::RGBA,
+                Resources::FrameBufferAttachmentSpecification{
+                    .Name = "ForwardOutput",
+                    .Type = Resources::Texture,
+                    .Format = TextureFormat::RGB,
                     .AttachmentPoint = FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
-                    .Size = AttachmentSize{
-                        .SizeType = AttachmentSizeType::PercentOfScreen,
+                    .Size = Resources::AttachmentSize{
+                        .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
                         .width = 100,
                         .height = 100,
                     },
                     .DoClearColor = true,
+                    .DoClearDepth = true,
+                    .ClearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
+                },
+                Resources::FrameBufferAttachmentSpecification{
+                    .Name = "ForwardDepth",
+                    .Type = Resources::Texture,
+                    .Format = TextureFormat::DEPTH24_STENCIL8,
+                    .AttachmentPoint = FrameBufferAttachmentPoint::DEPTH_STENCIL_ATTACHMENT,
+                    .Size = Resources::AttachmentSize{
+                        .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
+                        .width = 100,
+                        .height = 100,
+                    },
+                    .DoClearColor = false,
                     .DoClearDepth = true,
                     .ClearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
                 }
@@ -47,6 +61,8 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::Execute(RenderContext& context)
     {
+        const auto renderTarget = context.renderPassResources.GetRenderTarget("Forward Pass");
+        m_renderer.BindFrameBuffer(renderTarget.FrameBuffer.value());
         // TODO: For now, just render to the default framebuffer.
         ClearAmbientColor(context.drawQueue);
         RenderOpaque(context.drawQueue);

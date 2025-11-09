@@ -10,14 +10,6 @@
 
 namespace RNGOEngine
 {
-    namespace Core
-    {
-        namespace Renderer
-        {
-            struct RenderTarget;
-        }
-    }
-
     namespace Events
     {
         class EventQueue;
@@ -43,8 +35,22 @@ namespace RNGOEngine::Core::Renderer
         {
             m_passes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
 
-            const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
-            
+            auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
+            for (auto& attachment : passSpecification.Attachments)
+            {
+                if (attachment.Size.SizeType == Resources::AttachmentSizeType::PercentOfScreen)
+                {
+                    attachment.Size.width = static_cast<unsigned int>(
+                        (static_cast<float>(attachment.Size.width) / 100.0f) * static_cast<float>(m_width));
+                    attachment.Size.height = static_cast<unsigned int>(
+                        (static_cast<float>(attachment.Size.height) / 100.0f) * static_cast<float>(m_height));
+                }
+            }
+
+            const auto key = Resources::ResourceManager::GetInstance().GetRenderTargetManager().CreateFrameTarget(
+                passSpecification);
+            context.renderPassResources.RegisterRenderTarget(passSpecification.Name, key);
+
             return static_cast<T&>(*m_passes.back());
         }
 

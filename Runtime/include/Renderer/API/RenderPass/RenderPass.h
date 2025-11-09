@@ -29,7 +29,7 @@ namespace RNGOEngine::Core::Renderer
         virtual ~RenderPass() = default;
 
     public:
-        virtual RenderTargetSpecification GetRenderTargetSpecification() const = 0;
+        virtual Resources::RenderTargetSpecification GetRenderTargetSpecification() const = 0;
 
     public:
         virtual void Execute(RenderContext& context) = 0;
