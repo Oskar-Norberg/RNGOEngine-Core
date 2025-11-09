@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <optional>
 #include <string>
 #include <variant>
 #include <vector>
@@ -11,7 +12,7 @@
 #include "Renderer/RenderID.h"
 #include "glm/vec4.hpp"
 
-namespace RNGOEngine::Core::Renderer
+namespace RNGOEngine::Resources
 {
     enum class AttachmentSizeType
     {
@@ -22,15 +23,20 @@ namespace RNGOEngine::Core::Renderer
     struct AttachmentSize
     {
         AttachmentSizeType SizeType = AttachmentSizeType::Absolute;
-        int width, height;
+        unsigned int width, height;
     };
+
+    enum class AttachmentType { Texture, RenderBuffer };
 
     // Higher level abstraction of FrameBuffers, Attachments and RBOs.
     struct FrameBufferAttachment
     {
-        std::variant<TextureID, RenderBufferID> Resource;
-        TextureFormat Format;
-        FrameBufferAttachmentPoint AttachmentPoint;
+        std::string AttachmentName = "Unnamed Attachment";
+        // TODO: Make TextureID and RenderBufferID strongly typed to make use of variant.
+        AttachmentType Type = AttachmentType::Texture;
+        unsigned int ID = 0; // TextureID or RenderBufferID
+        Core::Renderer::TextureFormat Format;
+        Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
         AttachmentSize Size;
 
         bool DoClearColor = false;
@@ -41,11 +47,11 @@ namespace RNGOEngine::Core::Renderer
     struct RenderTarget
     {
         std::string TargetName = "Unnamed Render Target";
-        FrameBufferID FrameBuffer = INVALID_FRAMEBUFFER_ID;
+        std::optional<Core::Renderer::FrameBufferID> FrameBuffer;
 
         std::vector<FrameBufferAttachment> Attachments;
     };
-    
+
 
     // Specifications for creation of Targets/Attachments
     enum FrameBufferAttachmentSpecificationType
@@ -58,8 +64,11 @@ namespace RNGOEngine::Core::Renderer
     {
         std::string Name;
         FrameBufferAttachmentSpecificationType Type;
-        TextureFormat Format;
-        FrameBufferAttachmentPoint AttachmentPoint;
+        // TODO: This does not work for RenderBuffers
+        Core::Renderer::TextureFormat Format;
+        Core::Renderer::TextureFiltering minifyingFilter;
+        Core::Renderer::TextureFiltering magnifyingFilter;
+        Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
 
         AttachmentSize Size;
 
