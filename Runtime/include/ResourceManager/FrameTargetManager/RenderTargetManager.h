@@ -26,6 +26,8 @@ namespace RNGOEngine::Resources
 
     public:
         std::optional<std::reference_wrapper<RenderTarget>> GetFrameTarget(Containers::GenerationalKey<RenderTarget> key);
+        std::optional<std::reference_wrapper<const RenderTarget>> GetFrameTarget(Containers::GenerationalKey<RenderTarget> key) const;
+
 
     private:
         Containers::GenerationalVector<RenderTarget> m_renderTargets;
