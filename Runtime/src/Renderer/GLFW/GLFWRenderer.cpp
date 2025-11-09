@@ -251,8 +251,18 @@ namespace RNGOEngine::Core::Renderer
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
                              textureData);
                 break;
-            default:
+            case TextureFormat::DEPTH24_STENCIL8:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL,
+                             GL_UNSIGNED_INT_24_8,
+                             textureData);
                 break;
+            case TextureFormat::DEPTH32F_STENCIL8:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, width, height, 0, GL_DEPTH_STENCIL,
+                             GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+                             textureData);
+                break;
+            default:
+                RNGO_ASSERT(false && "GLFWRenderer::CreateTexture2D - Unsupported TextureFormat");
         }
 
         if (GetGLUsingMipMaps(properties.minifyingFilter, properties.magnifyingFilter))
