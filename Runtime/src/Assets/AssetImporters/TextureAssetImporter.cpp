@@ -41,7 +41,7 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
     }
 
-    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata() const
+    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
     {
         return std::make_unique<TextureMetadata>();
     }

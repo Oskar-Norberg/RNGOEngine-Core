@@ -62,7 +62,7 @@ namespace RNGOEngine::AssetHandling
             }
             else
             {
-                std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata();
+                std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata(fullPath.value());
                 metadata->Path = fullPath.value();
                 AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
             }
@@ -79,7 +79,7 @@ namespace RNGOEngine::AssetHandling
         metadata.State = AssetState::Valid;
 
         // Save metadata to file?
-        SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
+        // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
 
         return handle;
     }

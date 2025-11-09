@@ -28,6 +28,7 @@ namespace RNGOEngine::Core::Renderer
         // TODO: I kind of dislike this not being const.
         // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
         void RenderToScreen();
+        void RenderToTarget(Containers::GenerationalKey<Resources::RenderTarget> targetKey);
 
     public:
         template<typename T, typename... Args>
@@ -47,9 +48,13 @@ namespace RNGOEngine::Core::Renderer
                 }
             }
 
-            const auto key = Resources::ResourceManager::GetInstance().GetRenderTargetManager().CreateFrameTarget(
-                passSpecification);
-            context.renderPassResources.RegisterRenderTarget(passSpecification.Name, key);
+            if (passSpecification.Attachments.size() > 0)
+            {
+                const auto key = Resources::ResourceManager::GetInstance().GetRenderTargetManager().
+                    CreateFrameTarget(
+                        passSpecification);
+                m_context.renderPassResources.RegisterRenderTarget(passSpecification.Name, key);
+            }
 
             return static_cast<T&>(*m_passes.back());
         }
@@ -65,10 +70,13 @@ namespace RNGOEngine::Core::Renderer
         IRenderer& m_renderer;
 
     private:
-        RenderContext context;
+        RenderContext m_context;
         std::vector<std::unique_ptr<RenderPass>> m_passes;
 
     private:
         int m_width, m_height;
+
+    private:
+        void Render(std::optional<std::reference_wrapper<Resources::RenderTarget>> target);
     };
 }

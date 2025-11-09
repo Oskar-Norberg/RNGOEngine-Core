@@ -47,7 +47,7 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
     }
 
-    std::unique_ptr<AssetMetadata> ModelAssetImporter::CreateDefaultMetadata() const
+    std::unique_ptr<AssetMetadata> ModelAssetImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
     {
         return std::make_unique<ModelMetadata>();
     }

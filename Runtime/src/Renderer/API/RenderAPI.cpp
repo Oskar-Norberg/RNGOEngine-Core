@@ -17,7 +17,7 @@ namespace RNGOEngine::Core::Renderer
     RenderAPI::RenderAPI(IRenderer& renderer, const int width, const int height)
 
         : m_renderer(renderer),
-          context(),
+          m_context(),
           m_width(width),
           m_height(height)
     {
@@ -34,15 +34,26 @@ namespace RNGOEngine::Core::Renderer
 
     void RenderAPI::SubmitDrawQueue(DrawQueue&& drawQueue)
     {
-        context.drawQueue = std::move(drawQueue);
+        m_context.drawQueue = std::move(drawQueue);
     }
 
     void RenderAPI::RenderToScreen()
     {
-        for (const auto& pass : m_passes)
-        {
-            pass->Execute(context);
-        }
+        Render(std::nullopt);
+    }
+
+    void RenderAPI::RenderToTarget(const Containers::GenerationalKey<Resources::RenderTarget> targetKey)
+    {
+        const auto renderTarget = Resources::ResourceManager::GetInstance().GetRenderTargetManager().
+            GetFrameTarget(targetKey);
+
+        RNGO_ASSERT(renderTarget && "RenderAPI::RenderToTarget - Invalid Render Target supplied.");
+        RNGO_ASSERT(
+            renderTarget->get().FrameBuffer &&
+            "RenderAPI::RenderToTarget - Render Target has no FrameBuffer. Not suitable for Scene Render"
+        );
+
+        Render(renderTarget->get());
     }
 
     bool RenderAPI::ListenSendEvents(Events::EventQueue& eventQueue)
@@ -60,5 +71,30 @@ namespace RNGOEngine::Core::Renderer
         }
 
         return false;
+    }
+
+    void RenderAPI::Render(std::optional<std::reference_wrapper<Resources::RenderTarget>> target)
+    {
+        if (target)
+        {
+            // TODO: Magic string, make configurable
+            m_context.renderPassResources.RegisterExternalRenderTarget("Final Output", target->get());
+        }
+        else
+        {
+            m_context.renderPassResources.RegisterExternalRenderTarget(
+                "Final Output", Resources::RenderTarget{
+                    .TargetName = "Default FrameBuffer",
+                    .FrameBuffer = 0,
+                    .Attachments = {}
+                });
+        }
+
+        for (const auto& pass : m_passes)
+        {
+            pass->Execute(m_context);
+        }
+
+        m_context.renderPassResources.UnregisterExternalRenderTarget("Final Output");
     }
 }

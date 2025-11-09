@@ -29,34 +29,48 @@ namespace RNGOEngine::Temporary
             auto cirnoMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
             cirnoMaterial.SetTexture(cirnoTexture, 0);
 
-            for (size_t x = 0; x < ROWS; x++)
-            {
-                for (size_t y = 0; y < COLS; y++)
-                {
-                    const auto box = world.CreateEntity();
-
-                    world.GetRegistry().emplace<Components::MeshRenderer>(
-                        box, cirnoMesh, cirnoMaterial.GetMaterialAssetHandle()
-                    );
-
-                    Components::Transform transform{
-                        .position = glm::vec3(x * DISTANCE_BETWEEN, 0.0f, y * DISTANCE_BETWEEN),
-                        .rotation = glm::quat{},
-                        .scale = glm::vec3(0.1f)
-                    };
-
-                    transform.rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-                    world.GetRegistry().emplace<Components::Transform>(box, transform);
+            const auto cirnoEntity = world.CreateEntity();
+            world.GetRegistry().emplace<Components::MeshRenderer>(
+                cirnoEntity, cirnoMesh, cirnoMaterial.GetMaterialAssetHandle()
+            );
+            world.GetRegistry().emplace<Components::Transform>(
+                cirnoEntity,
+                Components::Transform{
+                    .position = glm::vec3(0.0f, 0.0f, -10.0f),
+                    .rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
+                    .scale = glm::vec3(.1f)
                 }
-            }
+            );;
+
+            // for (size_t x = 0; x < ROWS; x++)
+            // {
+            //     for (size_t y = 0; y < COLS; y++)
+            //     {
+            //         const auto box = world.CreateEntity();
+            //
+            //         world.GetRegistry().emplace<Components::MeshRenderer>(
+            //             box, cirnoMesh, cirnoMaterial.GetMaterialAssetHandle()
+            //         );
+            //
+            //         Components::Transform transform{
+            //             .position = glm::vec3(x * DISTANCE_BETWEEN, 0.0f, y * DISTANCE_BETWEEN),
+            //             .rotation = glm::quat{},
+            //             .scale = glm::vec3(0.1f)
+            //         };
+            //
+            //         transform.rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            //
+            //         world.GetRegistry().emplace<Components::Transform>(box, transform);
+            //     }
+            // }
 
             const auto camera = world.CreateEntity();
             world.GetRegistry().emplace<Components::Camera>(camera);
             world.GetRegistry().emplace<Components::Transform>(
                 camera,
                 Components::Transform{
-                    .position = {ROWS * DISTANCE_BETWEEN / 2.0f, 7.5f, COLS * DISTANCE_BETWEEN / 2.0f},
+                    // .position = {ROWS * DISTANCE_BETWEEN / 2.0f, 7.5f, COLS * DISTANCE_BETWEEN / 2.0f},
+                    .position = glm::vec3(0.0f),
                     .rotation = glm::quat{},
                     .scale = {1.0f, 1.0f, 1.0f}
                 }
@@ -74,7 +88,7 @@ namespace RNGOEngine::Temporary
             world.GetRegistry().emplace<Components::Color>(directionalLight);
 
             const auto pointLight = world.CreateEntity();
-            
+
             world.GetRegistry().emplace<Components::PointLight>(pointLight);
             world.GetRegistry().emplace<Components::Transform>(
                 pointLight,

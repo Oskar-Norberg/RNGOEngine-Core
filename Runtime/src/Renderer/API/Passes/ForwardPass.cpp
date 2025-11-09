@@ -265,7 +265,7 @@ namespace RNGOEngine::Core::Renderer
                     {
                         const auto textureHandle = assetManager.GetTextureManager().GetTexture(
                             arg.textureHandle);
-                        m_renderer.BindTexture(shaderProgramID, textureHandle);
+                        m_renderer.BindTexture(textureHandle, arg.slot);
                         m_renderer.SetTexture(shaderProgramID, name, arg.slot);
                     }
                     else

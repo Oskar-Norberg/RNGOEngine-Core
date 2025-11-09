@@ -8,23 +8,30 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    Resources::RenderTarget& RenderPassResources::GetRenderTarget(const std::string_view name) const
+    const Resources::RenderTarget& RenderPassResources::GetRenderTarget(const std::string_view name) const
     {
         const auto string = std::string(name);
-        if (!m_renderTargets.contains(string))
-        {
-            RNGO_ASSERT(
-                false &&
-                "RenderPassResources::GetRenderTarget: No RenderTarget found."
-            );
-            // TODO: UB
-        }
-        const auto key = m_renderTargets.at(string);
-        const auto renderTarget = Resources::ResourceManager::GetInstance().GetRenderTargetManager().
-                                                                      GetFrameTarget(key);
 
-        RNGO_ASSERT(renderTarget && "RenderPassResources::GetRenderTarget: Invalid render target key.");
-        return renderTarget.value().get();
+        // Internal Targets
+        if (m_renderTargets.contains(string))
+        {
+            const auto key = m_renderTargets.at(string);
+            const auto renderTarget = Resources::ResourceManager::GetInstance().GetRenderTargetManager().
+                                                                          GetFrameTarget(key);
+
+            RNGO_ASSERT(renderTarget && "RenderPassResources::GetRenderTarget: Invalid render target key.");
+            return renderTarget.value().get();
+        }
+
+        // External Targets
+        if (m_externalRenderTargets.contains(string))
+        {
+            return m_externalRenderTargets.at(string);
+        }
+
+        // TODO:
+        RNGO_ASSERT(false && "RenderPassResources::GetRenderTarget: No render target found.");
+        return {};
     }
 
     TextureID RenderPassResources::GetTextureAttachment(const std::string_view name) const
@@ -131,5 +138,18 @@ namespace RNGOEngine::Core::Renderer
                     break;
             }
         }
+    }
+
+    void RenderPassResources::RegisterExternalRenderTarget(const std::string_view name,
+        const Resources::RenderTarget& renderTarget)
+    {
+        // TODO: Memory allocations.
+        // NOTE: Assume external targets dont have any named attachments for now.
+        m_externalRenderTargets.emplace(std::string(name), renderTarget);
+    }
+
+    void RenderPassResources::UnregisterExternalRenderTarget(const std::string_view name)
+    {
+        m_externalRenderTargets.erase(std::string(name));
     }
 }

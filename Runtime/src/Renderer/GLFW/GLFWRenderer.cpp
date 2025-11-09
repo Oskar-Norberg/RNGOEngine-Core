@@ -280,6 +280,7 @@ namespace RNGOEngine::Core::Renderer
 
     void GLFWRenderer::BindTexture(const TextureID texture, unsigned slot)
     {
+        glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
@@ -326,7 +327,7 @@ namespace RNGOEngine::Core::Renderer
         glDeleteRenderbuffers(1, &renderBuffer);
     }
 
-    void GLFWRenderer::BindRenderBuffer(RenderBufferID renderBuffer)
+    void GLFWRenderer::BindRenderBuffer(const RenderBufferID renderBuffer)
     {
         glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
     }
@@ -336,8 +337,8 @@ namespace RNGOEngine::Core::Renderer
         return GetFrameBufferStatusFromGL(glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
 
-    void GLFWRenderer::AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
-                                                       FrameBufferAttachmentPoint attachmentPoint)
+    void GLFWRenderer::AttachRenderBufferToFrameBuffer(const RenderBufferID renderBuffer,
+                                                       const FrameBufferAttachmentPoint attachmentPoint)
     {
         const unsigned int glAttachmentPoint = GetGLAttachmentPoint(attachmentPoint);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, glAttachmentPoint, GL_RENDERBUFFER, renderBuffer);

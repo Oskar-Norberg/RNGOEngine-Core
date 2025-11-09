@@ -64,8 +64,8 @@ namespace RNGOEngine::Resources
     {
         std::string Name;
         FrameBufferAttachmentSpecificationType Type;
-        // TODO: This does not work for RenderBuffers
         Core::Renderer::TextureFormat Format;
+        // TODO: This does not work for RenderBuffers
         Core::Renderer::TextureFiltering minifyingFilter;
         Core::Renderer::TextureFiltering magnifyingFilter;
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
