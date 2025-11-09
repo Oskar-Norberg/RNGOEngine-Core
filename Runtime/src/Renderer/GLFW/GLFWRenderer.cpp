@@ -240,7 +240,7 @@ namespace RNGOEngine::Core::Renderer
         const auto* textureData = data.data();
         const auto width = properties.width;
         const auto height = properties.height;
-        
+
         switch (properties.format)
         {
             case TextureFormat::RGBA:
@@ -319,6 +319,11 @@ namespace RNGOEngine::Core::Renderer
     void GLFWRenderer::BindRenderBuffer(RenderBufferID renderBuffer)
     {
         glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
+    }
+
+    FrameBufferStatus GLFWRenderer::GetFrameBufferStatus()
+    {
+        return GetFrameBufferStatusFromGL(glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
 
     void GLFWRenderer::AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
@@ -427,6 +432,8 @@ namespace RNGOEngine::Core::Renderer
                 return GL_DEPTH_ATTACHMENT;
             case FrameBufferAttachmentPoint::STENCIL_ATTACHMENT:
                 return GL_STENCIL_ATTACHMENT;
+            case FrameBufferAttachmentPoint::DEPTH_STENCIL_ATTACHMENT:
+                return GL_DEPTH_STENCIL_ATTACHMENT;
             case FrameBufferAttachmentPoint::COLOR_ATTACHMENT0:
                 return GL_COLOR_ATTACHMENT0;
             case FrameBufferAttachmentPoint::COLOR_ATTACHMENT1:
@@ -478,6 +485,33 @@ namespace RNGOEngine::Core::Renderer
                 RNGO_ASSERT(
                     false && "GLFWRenderer::GetGLTextureFormat - Unsupported TextureFormat");
                 return GL_RGBA;
+        }
+    }
+
+    FrameBufferStatus GLFWRenderer::GetFrameBufferStatusFromGL(unsigned int status)
+    {
+        switch (status)
+        {
+            case GL_FRAMEBUFFER_COMPLETE:
+                return FrameBufferStatus::COMPLETE;
+            case GL_FRAMEBUFFER_UNDEFINED:
+                return FrameBufferStatus::UNDEFINED;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                return FrameBufferStatus::INCOMPLETE_ATTACHMENT;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                return FrameBufferStatus::MISSING_ATTACHMENT;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                return FrameBufferStatus::INCOMPLETE_DRAW_BUFFER;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                return FrameBufferStatus::INCOMPLETE_READ_BUFFER;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                return FrameBufferStatus::UNSUPPORTED;
+            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+                return FrameBufferStatus::INCOMPLETE_MULTISAMPLE;
+            case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+                return FrameBufferStatus::INCOMPLETE_LAYER_TARGETS;
+            default:
+                return FrameBufferStatus::UNDEFINED;
         }
     }
 }

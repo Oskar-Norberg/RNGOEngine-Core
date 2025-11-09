@@ -79,6 +79,7 @@ namespace RNGOEngine::Core::Renderer
         CreateRenderBuffer(RenderBufferFormat format, unsigned width, unsigned height) override;
         void DestroyRenderBuffer(RenderBufferID renderBuffer) override;
         void BindRenderBuffer(RenderBufferID renderBuffer) override;
+        FrameBufferStatus GetFrameBufferStatus() override;
         void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
                                              FrameBufferAttachmentPoint attachmentPoint) override;
 
@@ -95,5 +96,7 @@ namespace RNGOEngine::Core::Renderer
         static unsigned int GetGLRenderBufferFormat(RenderBufferFormat renderBufferFormat);
 
         static unsigned int GetGLTextureFormat(TextureFormat format);
+
+        static FrameBufferStatus GetFrameBufferStatusFromGL(unsigned int status);
     };
 }

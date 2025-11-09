@@ -122,6 +122,9 @@ namespace RNGOEngine::Core::Renderer
     public:
         virtual void BindFrameBuffer(FrameBufferID frameBuffer) = 0;
 
+    public:
+        virtual FrameBufferStatus GetFrameBufferStatus() = 0;
+
         // Attach Texture to FrameBuffer
     public:
         virtual void AttachTextureToFrameBuffer(TextureID texture, FrameBufferAttachmentPoint attachmentPoint) = 0;
