@@ -41,7 +41,7 @@ namespace RNGOEngine::Core::Renderer
                 },
                 Resources::FrameBufferAttachmentSpecification{
                     .Name = "ForwardDepth",
-                    .Type = Resources::Texture,
+                    .Type = Resources::RenderBuffer,
                     .Format = TextureFormat::DEPTH24_STENCIL8,
                     .AttachmentPoint = FrameBufferAttachmentPoint::DEPTH_STENCIL_ATTACHMENT,
                     .Size = Resources::AttachmentSize{

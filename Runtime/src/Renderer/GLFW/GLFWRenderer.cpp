@@ -138,6 +138,8 @@ namespace RNGOEngine::Core::Renderer
         const char* sourcePtr = source.data();
         glShaderSource(shaderID, 1, &sourcePtr, nullptr);
         glCompileShader(shaderID);
+
+        
         // TODO: Error handling.
 
         return shaderID;
@@ -315,9 +317,13 @@ namespace RNGOEngine::Core::Renderer
     {
         unsigned int rbo;
         glGenRenderbuffers(1, &rbo);
+        
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 
         const auto glRenderBufferFormat = GetGLRenderBufferFormat(format);
         glRenderbufferStorage(GL_RENDERBUFFER, glRenderBufferFormat, width, height);
+
+        // TODO: A lot of these functions should really unbind at the end.
 
         return rbo;
     }
