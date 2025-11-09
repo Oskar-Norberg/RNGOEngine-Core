@@ -139,8 +139,15 @@ namespace RNGOEngine::Core::Renderer
         glShaderSource(shaderID, 1, &sourcePtr, nullptr);
         glCompileShader(shaderID);
 
-        
-        // TODO: Error handling.
+        int success;
+        static char ShaderCompileInfoLog[512];
+        glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+
+        if (success == GL_FALSE)
+        {
+            glGetShaderInfoLog(shaderID, 512, nullptr, ShaderCompileInfoLog);
+            RNGO_ASSERT(false && "GLFWRenderer::CreateShader - Shader compilation failed.");
+        }
 
         return shaderID;
     }
@@ -152,7 +159,16 @@ namespace RNGOEngine::Core::Renderer
         glAttachShader(shaderProgram, vertexShader);
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
-        // TODO: Error handling.
+        
+        int success;
+        static char ShaderProgramLinkInfoLog[512];
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+        if (success == GL_FALSE)
+        {
+            // TODO: Return expected?
+            glGetProgramInfoLog(shaderProgram, 512, nullptr, ShaderProgramLinkInfoLog);
+            RNGO_ASSERT(false && "GLFWRenderer::CreateShaderProgram - Shader program linking failed.");
+        }
 
         return shaderProgram;
     }
@@ -317,7 +333,7 @@ namespace RNGOEngine::Core::Renderer
     {
         unsigned int rbo;
         glGenRenderbuffers(1, &rbo);
-        
+
         glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 
         const auto glRenderBufferFormat = GetGLRenderBufferFormat(format);
