@@ -11,7 +11,7 @@
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config)
+        : Application(config), m_UIManager(*m_window)
     {
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
@@ -20,7 +20,7 @@ namespace RNGOEngine::Editor
         m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(*m_renderer, m_window->GetWidth(),
                                                                  m_window->GetHeight());
         m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(*m_renderer, m_window->GetWidth(),
-                                                         m_window->GetHeight());
+                                                                       m_window->GetHeight());
     }
 
     void Editor::OnUpdate(const float deltaTime)
@@ -33,7 +33,13 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         Application::OnRender();
+        m_UIManager.BeginFrame();
+        
         m_rendererAPI->RenderToScreen();
+        
+        m_UIManager.Render();
+        m_UIManager.EndFrame();
+        
         m_window->SwapBuffers();
     }
 

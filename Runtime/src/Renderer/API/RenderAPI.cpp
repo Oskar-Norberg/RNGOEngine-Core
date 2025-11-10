@@ -75,16 +75,18 @@ namespace RNGOEngine::Core::Renderer
 
     void RenderAPI::Render(std::optional<std::reference_wrapper<Resources::RenderTarget>> target)
     {
+        // TODO: Add documentation / put this in a configuration file.
+        constexpr std::string_view finalOutputTargetName = "Final Output";
         if (target)
         {
-            // TODO: Magic string, make configurable
-            m_context.renderPassResources.RegisterExternalRenderTarget("Final Output", target->get());
+            m_context.renderPassResources.RegisterExternalRenderTarget(finalOutputTargetName, target->get());
         }
         else
         {
             m_context.renderPassResources.RegisterExternalRenderTarget(
                 "Final Output", Resources::RenderTarget{
                     .TargetName = "Default FrameBuffer",
+                    // 0 is default screen buffer FBO.
                     .FrameBuffer = 0,
                     .Attachments = {}
                 });
@@ -95,6 +97,6 @@ namespace RNGOEngine::Core::Renderer
             pass->Execute(m_context);
         }
 
-        m_context.renderPassResources.UnregisterExternalRenderTarget("Final Output");
+        m_context.renderPassResources.UnregisterExternalRenderTarget(finalOutputTargetName);
     }
 }

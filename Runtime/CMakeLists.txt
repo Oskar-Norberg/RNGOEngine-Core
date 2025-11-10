@@ -55,7 +55,6 @@ add_library(${CORE_PROJECT_NAME} STATIC
 target_precompile_headers(${CORE_PROJECT_NAME} PRIVATE include/PCH/PCH.h)
 target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
 
-
 target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${DATA_PROJECT_NAME}
         
