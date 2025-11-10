@@ -37,9 +37,9 @@ namespace RNGOEngine::AssetHandling
         const Core::Renderer::Texture2DProperties properties
         {
             .format = format,
-            .minifyingFilter = typedMetadata.minifyingFilter,
-            .magnifyingFilter = typedMetadata.magnifyingFilter,
-            .wrappingMode = typedMetadata.wrappingMode,
+            .minifyingFilter = typedMetadata.MinifyingFilter,
+            .magnifyingFilter = typedMetadata.MagnifyingFilter,
+            .wrappingMode = typedMetadata.WrappingMode,
             .width = textureHandle.value().width,
             .height = textureHandle.value().height,
         };

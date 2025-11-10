@@ -10,6 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: NEED VERSIONING SYSTEM. METADATA SHITS ITSELF WHEN I ADD/REMOVE FIELDS.
     class AssetSerializer
     {
     public:

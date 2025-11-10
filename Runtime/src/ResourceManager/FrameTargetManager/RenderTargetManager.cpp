@@ -34,6 +34,7 @@ namespace RNGOEngine::Resources
         for (const auto& attachment : specification.Attachments)
         {
             unsigned int resourceID = 0;
+            // TODO: Unused??????
             AttachmentType registeredType;
             const auto [width, height] = CalculateAttachmentSize(attachment.Size, viewportWidth,
                                                                  viewportHeight);
