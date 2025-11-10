@@ -29,7 +29,9 @@ namespace RNGOEngine::Editor
                         },
                     },
                 },
-            }
+            },
+            // Garbage default values. Will be resized in Render().
+            500, 500
         );
     }
 

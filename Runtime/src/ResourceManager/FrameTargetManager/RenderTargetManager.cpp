@@ -13,21 +13,18 @@ namespace RNGOEngine::Resources
     {
     }
 
-    // TODO: Really ugly function.
     Containers::GenerationalKey<RenderTarget> RenderTargetManager::CreateFrameTarget(
-        const RenderTargetSpecification& specification)
+        const RenderTargetSpecification& specification, const int viewportWidth, const int viewportHeight)
     {
         RenderTarget target{
             .TargetName = specification.Name,
-            .FrameBuffer = std::nullopt,
+            .FrameBuffer = specification.CreateFrameBuffer
+                               ? std::optional(m_renderer.CreateFrameBuffer())
+                               : std::nullopt,
             .Attachments = {},
         };
 
-        // Frame Buffer
-        target.FrameBuffer = specification.CreateFrameBuffer
-                                 ? std::optional(m_renderer.CreateFrameBuffer())
-                                 : std::nullopt;
-
+        // Bind to framebuffer if created
         if (target.FrameBuffer)
         {
             m_renderer.BindFrameBuffer(target.FrameBuffer.value());
@@ -38,6 +35,7 @@ namespace RNGOEngine::Resources
         {
             unsigned int resourceID = 0;
             AttachmentType registeredType;
+            const auto [width, height] = CalculateAttachmentSize(attachment.Size, viewportWidth, viewportHeight);
 
             // Texture
             switch (attachment.Type)
@@ -52,8 +50,8 @@ namespace RNGOEngine::Resources
                             .magnifyingFilter = attachment.magnifyingFilter,
                             // TODO: Would this ever need to be defined?
                             .wrappingMode = Core::Renderer::TextureWrapping::CLAMP_TO_EDGE,
-                            .width = attachment.Size.width,
-                            .height = attachment.Size.height,
+                            .width = static_cast<unsigned int>(width),
+                            .height = static_cast<unsigned int>(height),
                         },
                         {}
                     );
@@ -71,8 +69,8 @@ namespace RNGOEngine::Resources
                     registeredType = AttachmentType::RenderBuffer;
                     const auto renderBufferID = m_renderer.CreateRenderBuffer(
                         Core::Renderer::RenderBufferFormat::DEPTH24_STENCIL8,
-                        attachment.Size.width,
-                        attachment.Size.height
+                        width,
+                        height
                     );
 
                     if (target.FrameBuffer)
@@ -94,7 +92,8 @@ namespace RNGOEngine::Resources
                 .ID = resourceID,
                 .Format = attachment.Format,
                 .AttachmentPoint = attachment.AttachmentPoint,
-                .Size = attachment.Size,
+                .width = width,
+                .height = height
             };
 
             target.Attachments.push_back(std::move(frameBufferAttachment));
@@ -123,5 +122,24 @@ namespace RNGOEngine::Resources
         const Containers::GenerationalKey<RenderTarget> key) const
     {
         return m_renderTargets.GetUnmarkedValidated(key);
+    }
+
+    std::pair<int, int> RenderTargetManager::CalculateAttachmentSize(const AttachmentSize& sizeSpecification,
+                                                                     const int viewportWidth,
+                                                                     const int viewportHeight) const
+    {
+        switch (sizeSpecification.SizeType)
+        {
+            case AttachmentSizeType::Absolute:
+                return {sizeSpecification.width, sizeSpecification.height};
+            case AttachmentSizeType::PercentOfScreen:
+                return {
+                    (viewportWidth * sizeSpecification.width) / 100,
+                    (viewportHeight * sizeSpecification.height) / 100
+                };
+        }
+
+        RNGO_ASSERT(false && "RenderTargetManager::CalculateAttachmentSize: Invalid sizeType.");
+        return {};
     }
 }

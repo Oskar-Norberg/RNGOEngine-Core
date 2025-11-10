@@ -20,19 +20,20 @@ namespace RNGOEngine::Resources
         explicit RenderTargetManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
     public:
-        Containers::GenerationalKey<RenderTarget> CreateFrameTarget(
-            const RenderTargetSpecification& specification);
+        Containers::GenerationalKey<RenderTarget> CreateFrameTarget(const RenderTargetSpecification& specification, int viewportWidth, int viewportHeight);
         void DestroyFrameTarget(Containers::GenerationalKey<RenderTarget> key);
 
     public:
         std::optional<std::reference_wrapper<RenderTarget>> GetFrameTarget(Containers::GenerationalKey<RenderTarget> key);
         std::optional<std::reference_wrapper<const RenderTarget>> GetFrameTarget(Containers::GenerationalKey<RenderTarget> key) const;
 
-
     private:
         Containers::GenerationalVector<RenderTarget> m_renderTargets;
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
+
+    private:
+        std::pair<int, int> CalculateAttachmentSize(const AttachmentSize& sizeSpecification, int viewportWidth, int viewportHeight) const;
     };
 }

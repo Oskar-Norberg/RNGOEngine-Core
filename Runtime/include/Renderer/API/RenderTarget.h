@@ -37,14 +37,13 @@ namespace RNGOEngine::Resources
         unsigned int ID = 0; // TextureID or RenderBufferID
         Core::Renderer::TextureFormat Format;
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
-        AttachmentSize Size;
+        int width, height;
     };
 
     struct RenderTarget
     {
         std::string TargetName = "Unnamed Render Target";
         std::optional<Core::Renderer::FrameBufferID> FrameBuffer;
-
         std::vector<FrameBufferAttachment> Attachments;
     };
 

@@ -40,7 +40,7 @@ namespace RNGOEngine::Temporary
                     .rotation = glm::angleAxis(glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
                     .scale = glm::vec3(.1f)
                 }
-            );;
+            );
 
             // for (size_t x = 0; x < ROWS; x++)
             // {
