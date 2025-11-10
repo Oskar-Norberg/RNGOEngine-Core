@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "Renderer/RenderID.h"
-#include "glm/vec4.hpp"
 
 namespace RNGOEngine::Resources
 {

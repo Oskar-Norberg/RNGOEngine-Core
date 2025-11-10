@@ -10,7 +10,6 @@
 
 #include "Data/MeshData.h"
 #include "MeshResourceManager/MeshResourceManager.h"
-#include "Renderer/Handles/TextureHandle.h"
 #include "Renderer/RenderID.h"
 #include "ResourceCollection.h"
 #include "ResourceTracker.h"
@@ -69,15 +68,17 @@ namespace RNGOEngine::Resources
 
         // # TextureResourceManagement
     public:
-        Containers::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
-            AssetHandling::Textures::TextureHandle textureHandle);
+        TextureResourceManager& GetTextureResourceManager()
+        {
+            return m_textureResourceManager;
+        }
 
-        void MarkTextureForDestruction(
-            const Containers::GenerationalKey<Core::Renderer::TextureID>& key);
+        const TextureResourceManager& GetTextureResourceManager() const
+        {
+            return m_textureResourceManager;
+        }
 
-        std::optional<Core::Renderer::TextureID> GetTexture(
-            const Containers::GenerationalKey<Core::Renderer::TextureID>& key) const;
-
+    public:
         // Mark for Destruction
         void MarkForDestruction(const TrackedCollection& resources);
 

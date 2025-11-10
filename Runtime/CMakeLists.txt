@@ -17,8 +17,6 @@ include(cmake/UnityBuild.cmake)
 include(cmake/CPM.cmake)
 include(cmake/Dependencies.cmake)
 
-# TODO: Apparently the TextureHandle.h is not included anywhere. It is header only, so its fine. But it should be included somewhere.
-# ^ For some unknown reason I put it in the core renderer. resource manager depends on it... it should be in AssetManager and its data should be passed as parameters.
 # Engine Units
 include(cmake/EngineUnits/Data.cmake)
 
