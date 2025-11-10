@@ -7,6 +7,7 @@
 #include "TestScene.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
+#include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/ViewportPanel.h"
 
 namespace RNGOEngine::Editor
@@ -25,6 +26,7 @@ namespace RNGOEngine::Editor
 
         // Set up UI Panels
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
+        m_UIManager.RegisterPanel<HierarchyPanel>(m_sceneManager);
     }
 
     void Editor::OnUpdate(const float deltaTime)
