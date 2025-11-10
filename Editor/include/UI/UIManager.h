@@ -4,6 +4,10 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
+#include "UI/Panels/IDockablePanel.h"
 
 namespace RNGOEngine
 {
@@ -23,12 +27,17 @@ namespace RNGOEngine::Editor
     public:
         explicit UIManager(Core::Window::IWindow& window);
 
+        void Update(float deltaTime);
+
         void BeginFrame();
         void Render();
         void EndFrame();
 
-        // Reference means this cannot be moved/unbound, but that's probably fine.
     private:
+        std::vector<std::unique_ptr<IDockablePanel>> m_panels;
+
+    private:
+        // Reference means this cannot be moved/unbound, but that's probably fine.
         Core::Window::IWindow& m_window;
     };
 }

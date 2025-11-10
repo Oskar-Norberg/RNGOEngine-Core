@@ -29,15 +29,29 @@ namespace RNGOEngine::Editor
         ImGui_ImplOpenGL3_Init();
     }
 
+    void UIManager::Update(const float deltaTime)
+    {
+        for (const auto& panel : m_panels)
+        {
+            panel->Update(deltaTime);
+        }
+    }
+
     void UIManager::BeginFrame()
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+
+        ImGui::DockSpaceOverViewport();
     }
 
     void UIManager::Render()
     {
+        for (const auto& panel : m_panels)
+        {
+            panel->Render();
+        }
     }
 
     void UIManager::EndFrame()
