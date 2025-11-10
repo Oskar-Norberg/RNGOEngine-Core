@@ -27,6 +27,11 @@ namespace RNGOEngine::Core::Renderer
         void RegisterExternalRenderTarget(std::string_view name,
                                       const Resources::RenderTarget& renderTarget);
         void UnregisterExternalRenderTarget(std::string_view name);
+
+        const auto& GetAllRenderTargets() const
+        {
+            return m_renderTargets;
+        }
         
     private:
         std::unordered_map<std::string, Containers::GenerationalKey<Resources::RenderTarget>> m_renderTargets;

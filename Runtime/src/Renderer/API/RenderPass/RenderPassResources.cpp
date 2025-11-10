@@ -17,7 +17,7 @@ namespace RNGOEngine::Core::Renderer
         {
             const auto key = m_renderTargets.at(string);
             const auto renderTarget = Resources::ResourceManager::GetInstance().GetRenderTargetManager().
-                                                                          GetFrameTarget(key);
+                GetFrameTarget(key);
 
             RNGO_ASSERT(renderTarget && "RenderPassResources::GetRenderTarget: Invalid render target key.");
             return renderTarget.value().get();
@@ -85,19 +85,17 @@ namespace RNGOEngine::Core::Renderer
 
         for (const auto& attachment : renderTarget->get().Attachments)
         {
-            switch (attachment.Type)
+            if (std::holds_alternative<TextureFormat>(attachment.Format))
             {
-                case Resources::AttachmentType::Texture:
-                    m_textureAttachments.emplace(std::string(attachment.AttachmentName), attachment.ID);
-                    break;
-                case Resources::AttachmentType::RenderBuffer:
-                    m_rboAttachments.emplace(std::string(attachment.AttachmentName), attachment.ID);
-                    break;
-                default:
-                    RNGO_ASSERT(
-                        renderTarget &&
-                        "RenderPassResources::RegisterRenderTarget: Invalid attachment type.");
-                    break;
+                m_textureAttachments.emplace(std::string(attachment.AttachmentName), attachment.ID);
+            }
+            else if (std::holds_alternative<RenderBufferFormat>(attachment.Format))
+            {
+                m_rboAttachments.emplace(std::string(attachment.AttachmentName), attachment.ID);
+            }
+            else
+            {
+                RNGO_ASSERT(false && "RenderTargetManager::CreateFrameTarget - Invalid attachment format.");
             }
         }
     }
@@ -123,25 +121,25 @@ namespace RNGOEngine::Core::Renderer
             renderTarget && "RenderPassResources::UnregisterRenderTarget: Invalid render target key.");
         for (const auto& attachment : renderTarget->get().Attachments)
         {
-            switch (attachment.Type)
+            if (std::holds_alternative<TextureFormat>(attachment.Format))
             {
-                case Resources::AttachmentType::Texture:
-                    m_textureAttachments.erase(std::string(attachment.AttachmentName));
-                    break;
-                case Resources::AttachmentType::RenderBuffer:
-                    m_rboAttachments.erase(std::string(attachment.AttachmentName));
-                    break;
-                default:
-                    RNGO_ASSERT(
-                        renderTarget &&
-                        "RenderPassResources::UnregisterRenderTarget: Invalid attachment type.");
-                    break;
+                m_textureAttachments.erase(std::string(attachment.AttachmentName));
+            }
+            else if (std::holds_alternative<RenderBufferFormat>(attachment.Format))
+            {
+                m_rboAttachments.erase(std::string(attachment.AttachmentName));
+            }
+            else
+            {
+                RNGO_ASSERT(
+                    renderTarget &&
+                    "RenderPassResources::UnregisterRenderTarget: Invalid attachment type.");
             }
         }
     }
 
     void RenderPassResources::RegisterExternalRenderTarget(const std::string_view name,
-        const Resources::RenderTarget& renderTarget)
+                                                           const Resources::RenderTarget& renderTarget)
     {
         // TODO: Memory allocations.
         // NOTE: Assume external targets dont have any named attachments for now.

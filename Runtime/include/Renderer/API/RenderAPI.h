@@ -27,8 +27,8 @@ namespace RNGOEngine::Core::Renderer
         void SubmitDrawQueue(DrawQueue&& drawQueue);
         // TODO: I kind of dislike this not being const.
         // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
-        void RenderToScreen();
-        void RenderToTarget(Containers::GenerationalKey<Resources::RenderTarget> targetKey);
+        void RenderToScreen(int width, int height);
+        void RenderToTarget(int width, int height, Containers::GenerationalKey<Resources::RenderTarget> targetKey);
 
     public:
         template<typename T, typename... Args>
@@ -38,6 +38,7 @@ namespace RNGOEngine::Core::Renderer
 
             const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
 
+            // TODO: Should you not be able to create an empty RenderTarget?
             if (passSpecification.Attachments.size() > 0)
             {
                 auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
@@ -66,6 +67,6 @@ namespace RNGOEngine::Core::Renderer
         int m_width, m_height;
 
     private:
-        void Render(std::optional<std::reference_wrapper<Resources::RenderTarget>> target);
+        void Render(int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target);
     };
 }
