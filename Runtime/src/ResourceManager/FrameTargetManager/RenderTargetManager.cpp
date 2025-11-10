@@ -35,62 +35,46 @@ namespace RNGOEngine::Resources
         {
             unsigned int resourceID = 0;
             AttachmentType registeredType;
-            const auto [width, height] = CalculateAttachmentSize(attachment.Size, viewportWidth, viewportHeight);
+            std::optional<Core::Renderer::TextureFormat> textureFormat = std::nullopt;
+            const auto [width, height] = CalculateAttachmentSize(attachment.Size, viewportWidth,
+                                                                 viewportHeight);
 
             // Texture
-            switch (attachment.Type)
+            if (std::holds_alternative<Core::Renderer::TextureFormat>(attachment.Format))
             {
-                case Texture:
+                registeredType = AttachmentType::Texture;
+                resourceID = CreateTextureAttachment(attachment, viewportWidth, viewportHeight);
+
+                if (target.FrameBuffer)
                 {
-                    registeredType = AttachmentType::Texture;
-                    const auto textureID = m_renderer.CreateTexture2D(
-                        Core::Renderer::Texture2DProperties{
-                            .format = attachment.Format,
-                            .minifyingFilter = attachment.minifyingFilter,
-                            .magnifyingFilter = attachment.magnifyingFilter,
-                            // TODO: Would this ever need to be defined?
-                            .wrappingMode = Core::Renderer::TextureWrapping::CLAMP_TO_EDGE,
-                            .width = static_cast<unsigned int>(width),
-                            .height = static_cast<unsigned int>(height),
-                        },
-                        {}
-                    );
-
-                    if (target.FrameBuffer)
-                    {
-                        m_renderer.AttachTextureToFrameBuffer(textureID, attachment.AttachmentPoint);
-                    }
-
-                    resourceID = textureID;
+                    m_renderer.AttachTextureToFrameBuffer(resourceID, attachment.AttachmentPoint);
                 }
-                break;
-                case RenderBuffer:
+                textureFormat = std::get<Core::Renderer::TextureFormat>(attachment.Format);
+            }
+            else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(attachment.Format))
+            {
+                registeredType = AttachmentType::RenderBuffer;
+                const auto renderBufferID = CreateRenderBufferAttachment(
+                    attachment, viewportWidth, viewportHeight);
+
+                if (target.FrameBuffer)
                 {
-                    registeredType = AttachmentType::RenderBuffer;
-                    const auto renderBufferID = m_renderer.CreateRenderBuffer(
-                        Core::Renderer::RenderBufferFormat::DEPTH24_STENCIL8,
-                        width,
-                        height
-                    );
-
-                    if (target.FrameBuffer)
-                    {
-                        m_renderer.
-                            AttachRenderBufferToFrameBuffer(renderBufferID, attachment.AttachmentPoint);
-                    }
-
-                    resourceID = renderBufferID;
+                    m_renderer.
+                        AttachRenderBufferToFrameBuffer(renderBufferID, attachment.AttachmentPoint);
                 }
-                break;
-                default:
-                    RNGO_ASSERT(false && "RenderTargetManager::CreateFrameTarget: Invalid attachment type.");
+
+                resourceID = renderBufferID;
+            }
+            else
+            {
+                RNGO_ASSERT(false && "RenderTargetManager::CreateFrameTarget - Invalid attachment format.");
             }
 
             FrameBufferAttachment frameBufferAttachment{
                 .AttachmentName = attachment.Name,
                 .Type = registeredType,
                 .ID = resourceID,
-                .Format = attachment.Format,
+                .TextureFormat = textureFormat,
                 .AttachmentPoint = attachment.AttachmentPoint,
                 .width = width,
                 .height = height
@@ -107,7 +91,7 @@ namespace RNGOEngine::Resources
         return m_renderTargets.Insert(std::move(target));
     }
 
-    void RenderTargetManager::DestroyFrameTarget(Containers::GenerationalKey<RenderTarget> key)
+    void RenderTargetManager::DestroyFrameTarget(const Containers::GenerationalKey<RenderTarget> key)
     {
         m_renderTargets.MarkForRemoval(key);
     }
@@ -131,15 +115,47 @@ namespace RNGOEngine::Resources
         switch (sizeSpecification.SizeType)
         {
             case AttachmentSizeType::Absolute:
-                return {sizeSpecification.width, sizeSpecification.height};
+                return std::make_pair(sizeSpecification.width, sizeSpecification.height);
             case AttachmentSizeType::PercentOfScreen:
-                return {
-                    (viewportWidth * sizeSpecification.width) / 100,
-                    (viewportHeight * sizeSpecification.height) / 100
-                };
+                return std::make_pair(viewportWidth * sizeSpecification.width / 100,
+                                      viewportHeight * sizeSpecification.height / 100);
         }
 
         RNGO_ASSERT(false && "RenderTargetManager::CalculateAttachmentSize: Invalid sizeType.");
-        return {};
+        return std::make_pair(0, 0);
+    }
+
+    Core::Renderer::TextureID RenderTargetManager::CreateTextureAttachment(
+        const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const
+    {
+        const auto [width, height] = CalculateAttachmentSize(attachmentSpec.Size, viewportWidth,
+                                                             viewportHeight);
+
+        // TODO: Assumes caller has validated that Format is TextureFormat. Slightly ugly
+        return m_renderer.CreateTexture2D(
+            Core::Renderer::Texture2DProperties{
+                .format = std::get<Core::Renderer::TextureFormat>(attachmentSpec.Format),
+                .minifyingFilter = attachmentSpec.minifyingFilter,
+                .magnifyingFilter = attachmentSpec.magnifyingFilter,
+                // TODO: Would this ever need to be defined?
+                .wrappingMode = Core::Renderer::TextureWrapping::CLAMP_TO_EDGE,
+                .width = static_cast<unsigned int>(width),
+                .height = static_cast<unsigned int>(height),
+            },
+            {}
+        );
+    }
+
+    Core::Renderer::RenderBufferID RenderTargetManager::CreateRenderBufferAttachment(
+        const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const
+    {
+        const auto [width, height] = CalculateAttachmentSize(attachmentSpec.Size, viewportWidth,
+                                                             viewportHeight);
+        // TODO: Assumes caller has validated that Format is RenderBufferFormat. Slightly ugly.
+        return m_renderer.CreateRenderBuffer(
+            std::get<Core::Renderer::RenderBufferFormat>(attachmentSpec.Format),
+            width,
+            height
+        );
     }
 }

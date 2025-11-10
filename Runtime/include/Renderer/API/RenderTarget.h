@@ -35,7 +35,7 @@ namespace RNGOEngine::Resources
         // TODO: Make TextureID and RenderBufferID strongly typed to make use of variant.
         AttachmentType Type = AttachmentType::Texture;
         unsigned int ID = 0; // TextureID or RenderBufferID
-        Core::Renderer::TextureFormat Format;
+        std::optional<Core::Renderer::TextureFormat> TextureFormat; // Only valid if Type is Texture
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
         int width, height;
     };
@@ -46,20 +46,12 @@ namespace RNGOEngine::Resources
         std::optional<Core::Renderer::FrameBufferID> FrameBuffer;
         std::vector<FrameBufferAttachment> Attachments;
     };
-
-
-    // Specifications for creation of Targets/Attachments
-    enum FrameBufferAttachmentSpecificationType
-    {
-        Texture,
-        RenderBuffer,
-    };
+    
 
     struct FrameBufferAttachmentSpecification
     {
         std::string Name;
-        FrameBufferAttachmentSpecificationType Type;
-        Core::Renderer::TextureFormat Format;
+        std::variant<Core::Renderer::TextureFormat, Core::Renderer::RenderBufferFormat> Format;
         // TODO: This does not work for RenderBuffers
         Core::Renderer::TextureFiltering minifyingFilter;
         Core::Renderer::TextureFiltering magnifyingFilter;

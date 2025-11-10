@@ -18,7 +18,6 @@ namespace RNGOEngine::Editor
                 .Attachments = {
                     Resources::FrameBufferAttachmentSpecification{
                         .Name = "ViewportColor",
-                        .Type = Resources::Texture,
                         .Format = Core::Renderer::TextureFormat::RGB,
                         .AttachmentPoint = Core::Renderer::FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
                         .Size = Resources::AttachmentSize{

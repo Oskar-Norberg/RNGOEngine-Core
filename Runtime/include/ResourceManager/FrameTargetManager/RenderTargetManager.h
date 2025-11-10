@@ -35,5 +35,9 @@ namespace RNGOEngine::Resources
 
     private:
         std::pair<int, int> CalculateAttachmentSize(const AttachmentSize& sizeSpecification, int viewportWidth, int viewportHeight) const;
+
+    private:
+        Core::Renderer::TextureID CreateTextureAttachment(const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const;
+        Core::Renderer::RenderBufferID CreateRenderBufferAttachment(const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const;
     };
 }
