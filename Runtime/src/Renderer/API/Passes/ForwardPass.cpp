@@ -35,9 +35,6 @@ namespace RNGOEngine::Core::Renderer
                         .width = 100,
                         .height = 100,
                     },
-                    .DoClearColor = true,
-                    .DoClearDepth = true,
-                    .ClearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
                 },
                 Resources::FrameBufferAttachmentSpecification{
                     .Name = "ForwardDepth",
@@ -49,9 +46,6 @@ namespace RNGOEngine::Core::Renderer
                         .width = 100,
                         .height = 100,
                     },
-                    .DoClearColor = false,
-                    .DoClearDepth = true,
-                    .ClearColor = glm::vec4(0.1f, 0.1f, 0.1f, 1.0f),
                 }
             },
         };
@@ -61,9 +55,10 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::Execute(RenderContext& context)
     {
+        m_renderer.EnableFeature(DepthTesting);
+        
         const auto renderTarget = context.renderPassResources.GetRenderTarget("Forward Pass");
         m_renderer.BindFrameBuffer(renderTarget.FrameBuffer.value());
-        // TODO: For now, just render to the default framebuffer.
         ClearAmbientColor(context.drawQueue);
         RenderOpaque(context.drawQueue);
     }

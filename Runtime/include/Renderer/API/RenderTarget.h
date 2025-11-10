@@ -38,10 +38,6 @@ namespace RNGOEngine::Resources
         Core::Renderer::TextureFormat Format;
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
         AttachmentSize Size;
-
-        bool DoClearColor = false;
-        bool DoClearDepth = false;
-        glm::vec4 ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     };
 
     struct RenderTarget
@@ -71,10 +67,6 @@ namespace RNGOEngine::Resources
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
 
         AttachmentSize Size;
-
-        bool DoClearColor = false;
-        bool DoClearDepth = false;
-        glm::vec4 ClearColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
     };
 
     // Specifications for creation of runtime RenderTargets.
@@ -82,6 +74,7 @@ namespace RNGOEngine::Resources
     {
         std::string Name = "Unnamed Render Target";
         bool CreateFrameBuffer = true;
+        // TODO: Having inputs doesn't belong to the RenderTarget itself. That is a RenderPass concept.
         std::vector<std::string> InputNames;
         std::vector<FrameBufferAttachmentSpecification> Attachments;
     };

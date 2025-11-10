@@ -98,5 +98,6 @@ namespace RNGOEngine::Core::Renderer
         }
 
         m_context.renderPassResources.UnregisterExternalRenderTarget(finalOutputTargetName);
+        m_renderer.BindFrameBuffer(0);
     }
 }

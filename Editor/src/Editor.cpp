@@ -7,6 +7,7 @@
 #include "TestScene.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
+#include "UI/Panels/ViewportPanel.h"
 
 namespace RNGOEngine::Editor
 {
@@ -21,11 +22,17 @@ namespace RNGOEngine::Editor
                                                                  m_window->GetHeight());
         m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(*m_renderer, m_window->GetWidth(),
                                                                        m_window->GetHeight());
+
+        // Set up UI Panels
+        m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
     }
 
     void Editor::OnUpdate(const float deltaTime)
     {
         Application::OnUpdate(deltaTime);
+        
+        m_UIManager.Update(deltaTime);
+        
         UpdateEngineSystems(deltaTime);
         UpdateGameSystems(deltaTime);
     }
@@ -33,13 +40,11 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         Application::OnRender();
+        
         m_UIManager.BeginFrame();
-        
-        m_rendererAPI->RenderToScreen();
-        
         m_UIManager.Render();
         m_UIManager.EndFrame();
-        
+
         m_window->SwapBuffers();
     }
 

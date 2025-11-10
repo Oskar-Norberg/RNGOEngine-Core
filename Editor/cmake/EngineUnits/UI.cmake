@@ -3,7 +3,10 @@ add_library(${UI_PROJECT_NAME} STATIC
         include/UI/UIManager.h
         src/UI/UIManager.cpp
         
-        include/UI/Panels/IDockablePanel.h
+        include/UI/IDockablePanel.h
+
+        include/UI/Panels/ViewportPanel.h
+        src/UI/Panels/ViewportPanel.cpp
 )
 target_include_directories(${UI_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake RNGOEngine_Core)

@@ -50,7 +50,9 @@ namespace RNGOEngine::Editor
     {
         for (const auto& panel : m_panels)
         {
+            ImGui::Begin(panel->GetPanelName().data());
             panel->Render();
+            ImGui::End();
         }
     }
 

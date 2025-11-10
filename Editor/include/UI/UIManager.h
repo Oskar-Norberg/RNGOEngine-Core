@@ -7,7 +7,7 @@
 #include <memory>
 #include <vector>
 
-#include "UI/Panels/IDockablePanel.h"
+#include "IDockablePanel.h"
 
 namespace RNGOEngine
 {
@@ -22,6 +22,7 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Editor
 {
+    // TODO: Trigger panel events (OnOpen, OnClose, OnFocusGained, OnFocusLost, OnResize)
     class UIManager
     {
     public:
@@ -32,6 +33,13 @@ namespace RNGOEngine::Editor
         void BeginFrame();
         void Render();
         void EndFrame();
+
+    public:
+        template<typename T, typename... Args>
+        void RegisterPanel(Args&&... args)
+        {
+            m_panels.emplace_back(std::make_unique<T>(std::forward<Args>(args)...));
+        }
 
     private:
         std::vector<std::unique_ptr<IDockablePanel>> m_panels;

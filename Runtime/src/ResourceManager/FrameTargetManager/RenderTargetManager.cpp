@@ -95,9 +95,6 @@ namespace RNGOEngine::Resources
                 .Format = attachment.Format,
                 .AttachmentPoint = attachment.AttachmentPoint,
                 .Size = attachment.Size,
-                .DoClearColor = attachment.DoClearColor,
-                .DoClearDepth = attachment.DoClearDepth,
-                .ClearColor = attachment.ClearColor,
             };
 
             target.Attachments.push_back(std::move(frameBufferAttachment));
