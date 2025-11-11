@@ -14,51 +14,16 @@ namespace RNGOEngine::Resources
     }
 
     Containers::GenerationalKey<Core::Renderer::TextureID> TextureResourceManager::CreateTexture(
-        const AssetHandling::Textures::TextureHandle textureHandle)
+        const Core::Renderer::Texture2DProperties& properties, const std::span<const std::byte> textureData)
     {
-        const auto textureID = UploadTexture(textureHandle);
-        const auto key = m_textures.Insert(textureID);
-
-        return key;
+        const auto textureID = m_renderer.CreateTexture2D(properties, textureData);
+        return m_textures.Insert(textureID);
     }
 
     void TextureResourceManager::MarkTextureForDeletion(
-        Containers::GenerationalKey<Core::Renderer::TextureID> key)
+        const Containers::GenerationalKey<Core::Renderer::TextureID> key)
     {
         m_textures.MarkForRemoval(key);
-    }
-
-    Core::Renderer::TextureID TextureResourceManager::UploadTexture(
-        const AssetHandling::Textures::TextureHandle textureHandle)
-    {
-        const auto* data = textureHandle.data;
-        const auto width = data->width;
-        const auto height = data->height;
-        const auto nrChannels = data->nrChannels;
-        const auto textureData = std::as_bytes(
-            std::span<const unsigned char>(data->data, width * height * nrChannels));
-
-        // TODO: These should be passed as parameters.
-        Core::Renderer::Texture2DProperties properties{
-            .format = (nrChannels == 4)
-                          ? Core::Renderer::TextureFormat::RGBA
-                          : Core::Renderer::TextureFormat::RGB,
-            
-            .minifyingFilter = Core::Renderer::TextureFiltering::LINEAR_MIPMAP_LINEAR,
-            .magnifyingFilter = Core::Renderer::TextureFiltering::LINEAR,
-            
-            .wrappingMode = Core::Renderer::TextureWrapping::REPEAT,
-            
-            .width = width,
-            .height = height,
-        };
-
-        return m_renderer.CreateTexture2D(properties, textureData);
-    }
-
-    void TextureResourceManager::DestroyTexture(const Core::Renderer::TextureID texture)
-    {
-        m_renderer.DestroyTexture(texture);
     }
 
     std::optional<Core::Renderer::TextureID> TextureResourceManager::GetTexture(
@@ -79,7 +44,11 @@ namespace RNGOEngine::Resources
     {
         for (const auto key : m_textures.Marked())
         {
-            DestroyTexture(m_textures.GetMarked(key));
+            const auto textureIDOpt = m_textures.GetUnmarkedValidated(key);
+            if (textureIDOpt.has_value())
+            {
+                m_renderer.DestroyTexture(textureIDOpt->get());
+            }
             m_textures.Remove(key);
         }
     }

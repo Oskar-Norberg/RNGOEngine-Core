@@ -18,9 +18,45 @@ namespace RNGOEngine::Core::Renderer
     {
     }
 
+    Resources::RenderTargetSpecification ForwardPass::GetRenderTargetSpecification() const
+    {
+        Resources::RenderTargetSpecification specification{
+            .Name = "Forward Pass",
+            .CreateFrameBuffer = true,
+            .InputNames = {},
+            .Attachments = {
+                Resources::FrameBufferAttachmentSpecification{
+                    .Name = "ForwardOutput",
+                    .Format = TextureFormat::RGB,
+                    .AttachmentPoint = FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
+                    .Size = Resources::AttachmentSize{
+                        .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
+                        .width = 100,
+                        .height = 100,
+                    },
+                },
+                Resources::FrameBufferAttachmentSpecification{
+                    .Name = "ForwardDepth",
+                    .Format = RenderBufferFormat::DEPTH24_STENCIL8,
+                    .AttachmentPoint = FrameBufferAttachmentPoint::DEPTH_STENCIL_ATTACHMENT,
+                    .Size = Resources::AttachmentSize{
+                        .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
+                        .width = 100,
+                        .height = 100,
+                    },
+                }
+            },
+        };
+
+        return specification;
+    }
+
     void ForwardPass::Execute(RenderContext& context)
     {
-        // TODO: For now, just render to the default framebuffer.
+        m_renderer.EnableFeature(DepthTesting);
+        
+        const auto renderTarget = context.renderPassResources.GetRenderTarget("Forward Pass");
+        m_renderer.BindFrameBuffer(renderTarget.FrameBuffer.value());
         ClearAmbientColor(context.drawQueue);
         RenderOpaque(context.drawQueue);
     }
@@ -222,7 +258,7 @@ namespace RNGOEngine::Core::Renderer
                     {
                         const auto textureHandle = assetManager.GetTextureManager().GetTexture(
                             arg.textureHandle);
-                        m_renderer.BindTexture(shaderProgramID, textureHandle);
+                        m_renderer.BindTexture(textureHandle, arg.slot);
                         m_renderer.SetTexture(shaderProgramID, name, arg.slot);
                     }
                     else

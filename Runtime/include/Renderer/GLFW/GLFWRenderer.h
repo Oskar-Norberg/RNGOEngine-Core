@@ -79,12 +79,15 @@ namespace RNGOEngine::Core::Renderer
         CreateRenderBuffer(RenderBufferFormat format, unsigned width, unsigned height) override;
         void DestroyRenderBuffer(RenderBufferID renderBuffer) override;
         void BindRenderBuffer(RenderBufferID renderBuffer) override;
+        FrameBufferStatus GetFrameBufferStatus() override;
         void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
                                              FrameBufferAttachmentPoint attachmentPoint) override;
 
     private:
-        static unsigned int GetGLFeature(RenderFeature feature);
+        void EnableFeatures(RenderFeature feature);
+        void DisableFeatures(RenderFeature feature);
 
+    private:
         static unsigned int GetGLTextureFiltering(TextureFiltering filtering);
         static bool GetGLUsingMipMaps(TextureFiltering minifying, TextureFiltering magnifying);
         static unsigned int GetGLTextureWrapping(TextureWrapping wrapping);
@@ -93,5 +96,7 @@ namespace RNGOEngine::Core::Renderer
         static unsigned int GetGLRenderBufferFormat(RenderBufferFormat renderBufferFormat);
 
         static unsigned int GetGLTextureFormat(TextureFormat format);
+
+        static FrameBufferStatus GetFrameBufferStatusFromGL(unsigned int status);
     };
 }

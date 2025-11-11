@@ -100,7 +100,7 @@ namespace RNGOEngine::Core::Renderer
         // Create Texture
     public:
         // TODO: Unify more texture types into one function? Or have separate functions for different types?
-        virtual TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data = {}) = 0;
+        virtual TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data) = 0;
 
         // Destroy Texture
     public:
@@ -122,6 +122,9 @@ namespace RNGOEngine::Core::Renderer
     public:
         virtual void BindFrameBuffer(FrameBufferID frameBuffer) = 0;
 
+    public:
+        virtual FrameBufferStatus GetFrameBufferStatus() = 0;
+
         // Attach Texture to FrameBuffer
     public:
         virtual void AttachTextureToFrameBuffer(TextureID texture, FrameBufferAttachmentPoint attachmentPoint) = 0;
@@ -140,7 +143,6 @@ namespace RNGOEngine::Core::Renderer
 
         // Attach RenderBuffer to FrameBuffer
     public:
-        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
-                                                     FrameBufferAttachmentPoint attachmentPoint) = 0;
+        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer, FrameBufferAttachmentPoint attachmentPoint) = 0;
     };
 }

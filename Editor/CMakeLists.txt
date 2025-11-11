@@ -18,23 +18,33 @@ add_subdirectory(
 # Dependencies
 include(cmake/Dependencies.cmake)
 
+# Engine Units
+include(cmake/EngineUnits/UI.cmake)
+
 add_executable(${EDITOR_PROJECT_NAME} main.cpp
         include/Editor.h
         src/Editor.cpp
         include/TestScene.h
 )
 
+target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
+
+# Link Engine Units
+target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC
+        ${UI_PROJECT_NAME}
+)
+
+# Libraries and C++ Version
+target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC RNGOEngine_Core imgui-cmake)
+target_compile_features(${EDITOR_PROJECT_NAME} PUBLIC cxx_std_23)
+
+# Editor Asset Directories
 target_compile_definitions(${EDITOR_PROJECT_NAME} PRIVATE
         EDITOR_ASSETS_DIR="${EDITOR_ASSET_DIR}"
         EDITOR_MODELS_DIR="${EDITOR_MODELS_DIR}"
         EDITOR_TEXTURES_DIR="${EDITOR_TEXTURES_DIR}"
         EDITOR_SHADERS_DIR="${EDITOR_SHADERS_DIR}"
 )
-
-target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
-
-target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC RNGOEngine_Core imgui-cmake)
-target_compile_features(${EDITOR_PROJECT_NAME} PUBLIC cxx_std_23)
 
 # Include assets in build.
 set(COPY_PROJECT_NAME RNGOEngine_Editor_Assets)

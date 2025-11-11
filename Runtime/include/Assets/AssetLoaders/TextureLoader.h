@@ -7,8 +7,6 @@
 #include <expected>
 #include <filesystem>
 
-#include "Renderer/Handles/TextureHandle.h"
-
 namespace RNGOEngine::AssetHandling::TextureLoader
 {
     enum class TextureLoadingError
@@ -18,6 +16,16 @@ namespace RNGOEngine::AssetHandling::TextureLoader
         FailedToLoad,
     };
 
-    std::expected<Textures::TextureHandle, TextureLoadingError> LoadTexture(const std::filesystem::path& path);
-    void FreeTexture(Textures::TextureHandle texture);
+    struct TextureData
+    {
+        unsigned int width;
+        unsigned int height;
+        unsigned int nrChannels;
+
+        // TODO: Wrap in unique ptr.
+        unsigned char* data;
+    };
+
+    std::expected<TextureData, TextureLoadingError> LoadTexture(const std::filesystem::path& path);
+    void FreeTexture(const TextureData& texture);
 }

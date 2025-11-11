@@ -37,7 +37,7 @@ namespace RNGOEngine::Core::Renderer
     {
         RGB,
         RGBA,
-        
+
         DEPTH24_STENCIL8,
         DEPTH32F_STENCIL8,
     };
@@ -46,7 +46,7 @@ namespace RNGOEngine::Core::Renderer
     {
         NEAREST,
         LINEAR,
-        
+
         NEAREST_MIPMAP_NEAREST,
         NEAREST_MIPMAP_LINEAR,
         LINEAR_MIPMAP_NEAREST,
@@ -79,13 +79,14 @@ namespace RNGOEngine::Core::Renderer
     {
         DEPTH_ATTACHMENT = 0,
         STENCIL_ATTACHMENT = 1,
+        DEPTH_STENCIL_ATTACHMENT = 2,
 
-        COLOR_ATTACHMENT0 = 2,
-        COLOR_ATTACHMENT1 = 3,
-        COLOR_ATTACHMENT2 = 4,
-        COLOR_ATTACHMENT3 = 5,
-        COLOR_ATTACHMENT4 = 6,
-        COLOR_ATTACHMENT5 = 7,
+        COLOR_ATTACHMENT0 = 3,
+        COLOR_ATTACHMENT1 = 4,
+        COLOR_ATTACHMENT2 = 5,
+        COLOR_ATTACHMENT3 = 6,
+        COLOR_ATTACHMENT4 = 7,
+        COLOR_ATTACHMENT5 = 8,
         // Add more if required.
         // GLAD reports supporting 31.
     };
@@ -99,5 +100,19 @@ namespace RNGOEngine::Core::Renderer
     {
         DEPTH24_STENCIL8,
         DEPTH32F_STENCIL8,
+    };
+
+    // FrameBufferStatus
+    enum class FrameBufferStatus
+    {
+        COMPLETE,
+        UNDEFINED,
+        INCOMPLETE_ATTACHMENT,
+        MISSING_ATTACHMENT,
+        INCOMPLETE_DRAW_BUFFER,
+        INCOMPLETE_READ_BUFFER,
+        UNSUPPORTED,
+        INCOMPLETE_MULTISAMPLE,
+        INCOMPLETE_LAYER_TARGETS,
     };
 }

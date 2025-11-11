@@ -19,6 +19,8 @@ namespace RNGOEngine::Core::Renderer
         explicit ForwardPass(IRenderer& renderer, int width, int height);
 
     public:
+        Resources::RenderTargetSpecification GetRenderTargetSpecification() const override;
+
         void Execute(RenderContext& context) override;
 
         void OnResize(int width, int height) override;

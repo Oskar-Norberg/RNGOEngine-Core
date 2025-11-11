@@ -16,6 +16,10 @@ add_library(${RESOURCE_MANAGEMENT_PROJECT_NAME} STATIC
         
         include/ResourceManager/ResourceTracker.h
         src/ResourceManager/ResourceTracker.cpp
+
+        include/Renderer/API/RenderTarget.h
+        include/ResourceManager/FrameTargetManager/RenderTargetManager.h
+        src/ResourceManager/FrameTargetManager/RenderTargetManager.cpp
 )
 target_include_directories(${RESOURCE_MANAGEMENT_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RESOURCE_MANAGEMENT_PROJECT_NAME} PUBLIC ${RENDERING_PROJECT_NAME})

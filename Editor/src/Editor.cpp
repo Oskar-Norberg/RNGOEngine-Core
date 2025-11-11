@@ -6,11 +6,14 @@
 
 #include "TestScene.h"
 #include "Renderer/API/Passes/ForwardPass.h"
+#include "Renderer/API/Passes/ForwardScreenPass.h"
+#include "UI/Panels/HierarchyPanel.h"
+#include "UI/Panels/ViewportPanel.h"
 
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config)
+        : Application(config), m_UIManager(*m_window)
     {
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
@@ -18,11 +21,20 @@ namespace RNGOEngine::Editor
         // TODO: Add a RenderPipelineConfiguration to the EngineConfig?
         m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(*m_renderer, m_window->GetWidth(),
                                                                  m_window->GetHeight());
+        m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(*m_renderer, m_window->GetWidth(),
+                                                                       m_window->GetHeight());
+
+        // Set up UI Panels
+        m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
+        m_UIManager.RegisterPanel<HierarchyPanel>(m_sceneManager);
     }
 
     void Editor::OnUpdate(const float deltaTime)
     {
         Application::OnUpdate(deltaTime);
+        
+        m_UIManager.Update(deltaTime);
+        
         UpdateEngineSystems(deltaTime);
         UpdateGameSystems(deltaTime);
     }
@@ -30,7 +42,11 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         Application::OnRender();
-        m_rendererAPI->Render();
+        
+        m_UIManager.BeginFrame();
+        m_UIManager.Render();
+        m_UIManager.EndFrame();
+
         m_window->SwapBuffers();
     }
 

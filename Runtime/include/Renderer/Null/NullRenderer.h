@@ -177,6 +177,11 @@ namespace RNGOEngine::Core::Renderer
         {
         }
 
+        FrameBufferStatus GetFrameBufferStatus() override
+        {
+            return FrameBufferStatus::COMPLETE;
+        }
+
         void AttachTextureToFrameBuffer(TextureID texture,
                                         FrameBufferAttachmentPoint attachmentPoint) override
         {

@@ -37,9 +37,24 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
     }
 
-    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata() const
+    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
     {
-        return std::make_unique<ShaderMetadata>();
+        auto shaderMetadata = std::make_unique<ShaderMetadata>();
+        
+        if (path.extension() == ".vert")
+        {
+            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
+        }
+        else if (path.extension() == ".frag")
+        {
+            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Fragment;
+        }
+        else
+        {
+            RNGO_ASSERT(false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension.");
+        }
+        
+        return std::move(shaderMetadata);
     }
 
     std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const

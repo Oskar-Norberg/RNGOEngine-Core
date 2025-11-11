@@ -29,7 +29,7 @@ namespace RNGOEngine::AssetHandling
         virtual void Load(const AssetMetadata& metadata) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
 
-        virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata() const = 0;
+        virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(const std::filesystem::path& path) const = 0;
 
     public:
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;

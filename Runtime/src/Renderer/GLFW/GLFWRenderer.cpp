@@ -23,14 +23,14 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    void GLFWRenderer::EnableFeature(RenderFeature feature)
+    void GLFWRenderer::EnableFeature(const RenderFeature feature)
     {
-        glEnable(GetGLFeature(feature));
+        EnableFeatures(feature);
     }
 
-    void GLFWRenderer::DisableFeature(RenderFeature feature)
+    void GLFWRenderer::DisableFeature(const RenderFeature feature)
     {
-        glDisable(GetGLFeature(feature));
+        DisableFeatures(feature);
     }
 
     void GLFWRenderer::SetViewPortSize(const int width, const int height)
@@ -138,7 +138,16 @@ namespace RNGOEngine::Core::Renderer
         const char* sourcePtr = source.data();
         glShaderSource(shaderID, 1, &sourcePtr, nullptr);
         glCompileShader(shaderID);
-        // TODO: Error handling.
+
+        int success;
+        static char ShaderCompileInfoLog[512];
+        glGetShaderiv(shaderID, GL_COMPILE_STATUS, &success);
+
+        if (success == GL_FALSE)
+        {
+            glGetShaderInfoLog(shaderID, 512, nullptr, ShaderCompileInfoLog);
+            RNGO_ASSERT(false && "GLFWRenderer::CreateShader - Shader compilation failed.");
+        }
 
         return shaderID;
     }
@@ -150,7 +159,16 @@ namespace RNGOEngine::Core::Renderer
         glAttachShader(shaderProgram, vertexShader);
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
-        // TODO: Error handling.
+        
+        int success;
+        static char ShaderProgramLinkInfoLog[512];
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+        if (success == GL_FALSE)
+        {
+            // TODO: Return expected?
+            glGetProgramInfoLog(shaderProgram, 512, nullptr, ShaderProgramLinkInfoLog);
+            RNGO_ASSERT(false && "GLFWRenderer::CreateShaderProgram - Shader program linking failed.");
+        }
 
         return shaderProgram;
     }
@@ -240,7 +258,7 @@ namespace RNGOEngine::Core::Renderer
         const auto* textureData = data.data();
         const auto width = properties.width;
         const auto height = properties.height;
-        
+
         switch (properties.format)
         {
             case TextureFormat::RGBA:
@@ -251,8 +269,18 @@ namespace RNGOEngine::Core::Renderer
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE,
                              textureData);
                 break;
-            default:
+            case TextureFormat::DEPTH24_STENCIL8:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, width, height, 0, GL_DEPTH_STENCIL,
+                             GL_UNSIGNED_INT_24_8,
+                             textureData);
                 break;
+            case TextureFormat::DEPTH32F_STENCIL8:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH32F_STENCIL8, width, height, 0, GL_DEPTH_STENCIL,
+                             GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
+                             textureData);
+                break;
+            default:
+                RNGO_ASSERT(false && "GLFWRenderer::CreateTexture2D - Unsupported TextureFormat");
         }
 
         if (GetGLUsingMipMaps(properties.minifyingFilter, properties.magnifyingFilter))
@@ -270,6 +298,7 @@ namespace RNGOEngine::Core::Renderer
 
     void GLFWRenderer::BindTexture(const TextureID texture, unsigned slot)
     {
+        glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
@@ -305,8 +334,12 @@ namespace RNGOEngine::Core::Renderer
         unsigned int rbo;
         glGenRenderbuffers(1, &rbo);
 
+        glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+
         const auto glRenderBufferFormat = GetGLRenderBufferFormat(format);
         glRenderbufferStorage(GL_RENDERBUFFER, glRenderBufferFormat, width, height);
+
+        // TODO: A lot of these functions should really unbind at the end.
 
         return rbo;
     }
@@ -316,39 +349,58 @@ namespace RNGOEngine::Core::Renderer
         glDeleteRenderbuffers(1, &renderBuffer);
     }
 
-    void GLFWRenderer::BindRenderBuffer(RenderBufferID renderBuffer)
+    void GLFWRenderer::BindRenderBuffer(const RenderBufferID renderBuffer)
     {
         glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
     }
 
-    void GLFWRenderer::AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
-                                                       FrameBufferAttachmentPoint attachmentPoint)
+    FrameBufferStatus GLFWRenderer::GetFrameBufferStatus()
+    {
+        return GetFrameBufferStatusFromGL(glCheckFramebufferStatus(GL_FRAMEBUFFER));
+    }
+
+    void GLFWRenderer::AttachRenderBufferToFrameBuffer(const RenderBufferID renderBuffer,
+                                                       const FrameBufferAttachmentPoint attachmentPoint)
     {
         const unsigned int glAttachmentPoint = GetGLAttachmentPoint(attachmentPoint);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, glAttachmentPoint, GL_RENDERBUFFER, renderBuffer);
     }
 
-    unsigned int GLFWRenderer::GetGLFeature(RenderFeature feature)
+    void GLFWRenderer::EnableFeatures(const RenderFeature feature)
     {
-        unsigned int glFeature = 0;
-
-        // TODO: I forgor about |= when writing this.
+        // TODO: Duplicate code.
         if (DepthTesting & feature)
         {
-            glFeature = glFeature | GL_DEPTH_TEST;
+            glEnable(GL_DEPTH_TEST);
         }
 
         if (Blending & feature)
         {
-            glFeature = glFeature | GL_BLEND;
+            glEnable(GL_BLEND);
         }
 
         if (BackFaceCulling & feature)
         {
-            glFeature = glFeature | GL_CULL_FACE;
+            glEnable(GL_CULL_FACE);
+        }
+    }
+
+    void GLFWRenderer::DisableFeatures(const RenderFeature feature)
+    {
+        if (DepthTesting & feature)
+        {
+            glDisable(GL_DEPTH_TEST);
         }
 
-        return glFeature;
+        if (Blending & feature)
+        {
+            glDisable(GL_BLEND);
+        }
+
+        if (BackFaceCulling & feature)
+        {
+            glDisable(GL_CULL_FACE);
+        }
     }
 
     unsigned int GLFWRenderer::GetGLTextureFiltering(const TextureFiltering filtering)
@@ -413,6 +465,8 @@ namespace RNGOEngine::Core::Renderer
                 return GL_DEPTH_ATTACHMENT;
             case FrameBufferAttachmentPoint::STENCIL_ATTACHMENT:
                 return GL_STENCIL_ATTACHMENT;
+            case FrameBufferAttachmentPoint::DEPTH_STENCIL_ATTACHMENT:
+                return GL_DEPTH_STENCIL_ATTACHMENT;
             case FrameBufferAttachmentPoint::COLOR_ATTACHMENT0:
                 return GL_COLOR_ATTACHMENT0;
             case FrameBufferAttachmentPoint::COLOR_ATTACHMENT1:
@@ -464,6 +518,33 @@ namespace RNGOEngine::Core::Renderer
                 RNGO_ASSERT(
                     false && "GLFWRenderer::GetGLTextureFormat - Unsupported TextureFormat");
                 return GL_RGBA;
+        }
+    }
+
+    FrameBufferStatus GLFWRenderer::GetFrameBufferStatusFromGL(unsigned int status)
+    {
+        switch (status)
+        {
+            case GL_FRAMEBUFFER_COMPLETE:
+                return FrameBufferStatus::COMPLETE;
+            case GL_FRAMEBUFFER_UNDEFINED:
+                return FrameBufferStatus::UNDEFINED;
+            case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+                return FrameBufferStatus::INCOMPLETE_ATTACHMENT;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+                return FrameBufferStatus::MISSING_ATTACHMENT;
+            case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+                return FrameBufferStatus::INCOMPLETE_DRAW_BUFFER;
+            case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+                return FrameBufferStatus::INCOMPLETE_READ_BUFFER;
+            case GL_FRAMEBUFFER_UNSUPPORTED:
+                return FrameBufferStatus::UNSUPPORTED;
+            case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+                return FrameBufferStatus::INCOMPLETE_MULTISAMPLE;
+            case GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS:
+                return FrameBufferStatus::INCOMPLETE_LAYER_TARGETS;
+            default:
+                return FrameBufferStatus::UNDEFINED;
         }
     }
 }

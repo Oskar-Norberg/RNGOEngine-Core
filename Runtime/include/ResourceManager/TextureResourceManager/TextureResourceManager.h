@@ -4,8 +4,9 @@
 
 #pragma once
 
+#include <span>
+
 #include "Renderer/RenderID.h"
-#include "Renderer/Handles/TextureHandle.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -22,14 +23,12 @@ namespace RNGOEngine::Resources
 
         // Creation / Destruction
     public:
-        Containers::GenerationalKey<Core::Renderer::TextureID> CreateTexture(
-            AssetHandling::Textures::TextureHandle textureHandle);
+        Containers::GenerationalKey<Core::Renderer::TextureID> CreateTexture(const Core::Renderer::Texture2DProperties& properties, std::span<const std::byte> textureData);
         void MarkTextureForDeletion(Containers::GenerationalKey<Core::Renderer::TextureID> key);
 
         // Accessors
     public:
-        std::optional<Core::Renderer::TextureID> GetTexture(
-            const Containers::GenerationalKey<Core::Renderer::TextureID>& key) const;
+        std::optional<Core::Renderer::TextureID> GetTexture(const Containers::GenerationalKey<Core::Renderer::TextureID>& key) const;
 
         // Engine Internals
     public:
@@ -41,9 +40,5 @@ namespace RNGOEngine::Resources
 
     private:
         RNGOEngine::Core::Renderer::IRenderer& m_renderer;
-
-    private:
-        Core::Renderer::TextureID UploadTexture(const AssetHandling::Textures::TextureHandle textureHandle);
-        void DestroyTexture(Core::Renderer::TextureID texture);
     };
 }

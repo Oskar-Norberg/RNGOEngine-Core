@@ -17,7 +17,7 @@ namespace RNGOEngine::Core::Renderer
     RenderAPI::RenderAPI(IRenderer& renderer, const int width, const int height)
 
         : m_renderer(renderer),
-          context(),
+          m_context(),
           m_width(width),
           m_height(height)
     {
@@ -34,15 +34,27 @@ namespace RNGOEngine::Core::Renderer
 
     void RenderAPI::SubmitDrawQueue(DrawQueue&& drawQueue)
     {
-        context.drawQueue = std::move(drawQueue);
+        m_context.drawQueue = std::move(drawQueue);
     }
 
-    void RenderAPI::Render()
+    void RenderAPI::RenderToScreen(const int width, const int height)
     {
-        for (const auto& pass : m_passes)
-        {
-            pass->Execute(context);
-        }
+        Render(width, height, std::nullopt);
+    }
+
+    void RenderAPI::RenderToTarget(const int width, const int height,
+                                   Containers::GenerationalKey<Resources::RenderTarget> targetKey)
+    {
+        const auto renderTarget = Resources::ResourceManager::GetInstance().GetRenderTargetManager().
+            GetFrameTarget(targetKey);
+
+        RNGO_ASSERT(renderTarget && "RenderAPI::RenderToTarget - Invalid Render Target supplied.");
+        RNGO_ASSERT(
+            renderTarget->get().FrameBuffer &&
+            "RenderAPI::RenderToTarget - Render Target has no FrameBuffer. Not suitable for Scene Render"
+        );
+
+        Render(width, height, renderTarget->get());
     }
 
     bool RenderAPI::ListenSendEvents(Events::EventQueue& eventQueue)
@@ -60,5 +72,46 @@ namespace RNGOEngine::Core::Renderer
         }
 
         return false;
+    }
+
+    void RenderAPI::Render(const int width, const int height,
+                           std::optional<std::reference_wrapper<Resources::RenderTarget>> target)
+    {
+        // TODO: Add documentation / put this in a configuration file.
+        constexpr std::string_view finalOutputTargetName = "Final Output";
+        if (target)
+        {
+            m_context.renderPassResources.RegisterExternalRenderTarget(finalOutputTargetName, target->get());
+        }
+        else
+        {
+            m_context.renderPassResources.RegisterExternalRenderTarget(
+                "Final Output", Resources::RenderTarget{
+                    .TargetName = "Default FrameBuffer",
+                    // 0 is default screen buffer FBO.
+                    .FrameBuffer = 0,
+                    .Attachments = {}
+                });
+        }
+
+        auto& resourceManager = Resources::ResourceManager::GetInstance();
+        auto& targetManager = resourceManager.GetRenderTargetManager();
+
+        m_renderer.SetViewPortSize(width, height);
+        for (const auto& pass : m_passes)
+        {
+            // TODO: Slightly ugly to have this here.
+            const auto specification = pass->GetRenderTargetSpecification();
+            const auto targetOpt = targetManager.GetFrameTargetKeyByName(specification.Name);
+            RNGO_ASSERT(targetOpt && "RenderAPI::Render - RenderPass RenderTarget not registered.");
+
+            targetManager.ResizeTarget(targetOpt.value(), specification, width, height);
+
+            pass->OnResize(width, height);
+            pass->Execute(m_context);
+        }
+
+        m_context.renderPassResources.UnregisterExternalRenderTarget(finalOutputTargetName);
+        m_renderer.BindFrameBuffer(0);
     }
 }
