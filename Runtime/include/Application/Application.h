@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Assets/AssetLoader.h"
+#include "Assets/AssetDatabase/AssetDatabase.h"
 #include "InputManager/InputManager.h"
 #include "Renderer/IRenderer.h"
 #include "Renderer/API/RenderAPI.h"

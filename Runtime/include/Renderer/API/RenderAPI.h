@@ -7,6 +7,7 @@
 #include "RenderPass/RenderContext.h"
 #include "RenderPass/RenderPass.h"
 #include "Renderer/DrawQueue.h"
+#include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine
 {
