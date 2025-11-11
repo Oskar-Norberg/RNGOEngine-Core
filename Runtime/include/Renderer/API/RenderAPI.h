@@ -29,7 +29,9 @@ namespace RNGOEngine::Core::Renderer
         // TODO: I kind of dislike this not being const.
         // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
         void RenderToScreen(int width, int height);
-        void RenderToTarget(int width, int height, Containers::GenerationalKey<Resources::RenderTarget> targetKey);
+        void RenderToTarget(
+            int width, int height, Containers::GenerationalKey<Resources::RenderTarget> targetKey
+        );
 
     public:
         template<typename T, typename... Args>
@@ -40,18 +42,40 @@ namespace RNGOEngine::Core::Renderer
             const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
 
             // TODO: Should you not be able to create an empty RenderTarget?
-            if (passSpecification.Attachments.size() > 0)
+            if (!passSpecification.Attachments.empty())
             {
                 auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
-                const auto key = targetManager.CreateFrameTarget(passSpecification, m_width, m_height);
+                const auto key = targetManager.CreateRenderTarget();
                 m_context.renderPassResources.RegisterRenderTarget(passSpecification.Name, key);
+
+                for (const auto& attachment : passSpecification.Attachments)
+                {
+                    const auto attachmentKey = targetManager.CreateFrameBufferAttachment(
+                        key, attachment.Format, attachment.AttachmentPoint, attachment.Size.width,
+                        attachment.Size.height
+                    );
+
+                    // Add to resource mapper
+                    if (std::holds_alternative<Texture2DProperties>(attachment.Format))
+                    {
+                        m_context.renderPassResources.RegisterTextureAttachment(
+                            attachment.Name, attachmentKey
+                        );
+                    }
+                    else if (std::holds_alternative<RenderBufferFormat>(attachment.Format))
+                    {
+                        m_context.renderPassResources.RegisterRenderBufferAttachment(
+                            attachment.Name, attachmentKey
+                        );
+                    }
+                }
             }
 
             return static_cast<T&>(*m_passes.back());
         }
 
     public:
-        /// 
+        ///
         /// @param eventQueue Engine event queue to send / listen to events from.
         /// @return True if there are more events to process, false otherwise.
         ///
@@ -68,6 +92,8 @@ namespace RNGOEngine::Core::Renderer
         int m_width, m_height;
 
     private:
-        void Render(int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target);
+        void Render(
+            int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target
+        );
     };
 }

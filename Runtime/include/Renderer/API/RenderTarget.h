@@ -15,8 +15,8 @@ namespace RNGOEngine::Resources
 {
     enum class AttachmentSizeType
     {
-        Absolute, // Fixed size
-        PercentOfScreen, // Size relative to current screen
+        Absolute,         // Fixed size
+        PercentOfScreen,  // Size relative to current screen
     };
 
     struct AttachmentSize
@@ -25,34 +25,10 @@ namespace RNGOEngine::Resources
         unsigned int width, height;
     };
 
-    enum class AttachmentType { Texture, RenderBuffer };
-
-    // Higher level abstraction of FrameBuffers, Attachments and RBOs.
-    struct FrameBufferAttachment
-    {
-        std::string AttachmentName = "Unnamed Attachment";
-        // TODO: Make TextureID and RenderBufferID strongly typed to make use of variant.
-        std::variant<Core::Renderer::TextureFormat, Core::Renderer::RenderBufferFormat> Format;
-        unsigned int ID = 0; // TextureID or RenderBufferID
-        Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
-        int width, height;
-    };
-
-    struct RenderTarget
-    {
-        std::string TargetName = "Unnamed Render Target";
-        std::optional<Core::Renderer::FrameBufferID> FrameBuffer;
-        std::vector<FrameBufferAttachment> Attachments;
-    };
-
-
     struct FrameBufferAttachmentSpecification
     {
         std::string Name;
-        std::variant<Core::Renderer::TextureFormat, Core::Renderer::RenderBufferFormat> Format;
-        // TODO: This does not work for RenderBuffers
-        Core::Renderer::TextureFiltering minifyingFilter;
-        Core::Renderer::TextureFiltering magnifyingFilter;
+        std::variant<Core::Renderer::Texture2DProperties, Core::Renderer::RenderBufferFormat> Format;
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
 
         AttachmentSize Size;

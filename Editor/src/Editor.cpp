@@ -43,9 +43,11 @@ namespace RNGOEngine::Editor
     {
         Application::OnRender();
         
-        m_UIManager.BeginFrame();
-        m_UIManager.Render();
-        m_UIManager.EndFrame();
+        // m_UIManager.BeginFrame();
+        // m_UIManager.Render();
+        // m_UIManager.EndFrame();
+
+        m_rendererAPI->RenderToScreen(m_window->GetWidth(), m_window->GetHeight());
 
         m_window->SwapBuffers();
     }

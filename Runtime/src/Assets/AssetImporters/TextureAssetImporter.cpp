@@ -36,12 +36,12 @@ namespace RNGOEngine::AssetHandling
 
         const Core::Renderer::Texture2DProperties properties
         {
-            .format = format,
-            .minifyingFilter = typedMetadata.MinifyingFilter,
-            .magnifyingFilter = typedMetadata.MagnifyingFilter,
-            .wrappingMode = typedMetadata.WrappingMode,
-            .width = textureHandle.value().width,
-            .height = textureHandle.value().height,
+            .Format = format,
+            .MinifyingFilter = typedMetadata.MinifyingFilter,
+            .MagnifyingFilter = typedMetadata.MagnifyingFilter,
+            .WrappingMode = typedMetadata.WrappingMode,
+            .Width = textureHandle.value().width,
+            .Height = textureHandle.value().height,
         };
         const auto errorMessage = AssetManager::GetInstance().GetTextureManager().UploadTexture(
             typedMetadata.UUID, properties, std::as_bytes(textureDataSpan)

@@ -14,37 +14,65 @@ namespace RNGOEngine::Core::Renderer
 
 namespace RNGOEngine::Resources
 {
+    struct FrameBufferAttachment
+    {
+        // TODO: Add key to owning FrameBuffer?
+        std::variant<Core::Renderer::Texture2DProperties, Core::Renderer::RenderBufferFormat> Format;
+        // TODO: Make variant once TextureID and RenderBufferID are proper structs.
+        unsigned int ID = 0;  // TextureID or RenderBufferID
+        Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
+        int width, height;
+    };
+
+    struct RenderTarget
+    {
+        Core::Renderer::FrameBufferID ID;
+        std::vector<Containers::GenerationalKey<FrameBufferAttachment>> Attachments;
+    };
+
     class RenderTargetManager
     {
     public:
         explicit RenderTargetManager(RNGOEngine::Core::Renderer::IRenderer& renderer);
 
+        // Render Target
     public:
-        Containers::GenerationalKey<RenderTarget> CreateFrameTarget(const RenderTargetSpecification& specification, int viewportWidth, int viewportHeight);
-        void DestroyFrameTarget(Containers::GenerationalKey<RenderTarget> key);
+        Containers::GenerationalKey<RenderTarget> CreateRenderTarget();
+        void DestroyRenderTarget(Containers::GenerationalKey<RenderTarget> targetKey);
 
+        // Attachment
     public:
-        // TODO: This should not be handled here. This belongs to a higher-level manager. This should just expose functions for destroying, creating and attaching.
-        void ResizeTarget(Containers::GenerationalKey<RenderTarget> key, const RenderTargetSpecification& specification, int viewportWidth, int viewportHeight);
+        Containers::GenerationalKey<FrameBufferAttachment> CreateFrameBufferAttachment(
+            Containers::GenerationalKey<RenderTarget> targetKey,
+            std::variant<Core::Renderer::Texture2DProperties, Core::Renderer::RenderBufferFormat> format,
+            Core::Renderer::FrameBufferAttachmentPoint attachmentPoint, int width, int height
+        );
+        void DestroyFrameBufferAttachment(
+            Containers::GenerationalKey<RenderTarget> targetKey,
+            Containers::GenerationalKey<FrameBufferAttachment> frameBufferKey
+        );
 
+        // Getters
     public:
-        std::optional<Containers::GenerationalKey<RenderTarget>> GetFrameTargetKeyByName(std::string_view name) const;
-        std::optional<std::reference_wrapper<RenderTarget>> GetFrameTarget(Containers::GenerationalKey<RenderTarget> key);
-        std::optional<std::reference_wrapper<const RenderTarget>> GetFrameTarget(Containers::GenerationalKey<RenderTarget> key) const;
+        std::optional<std::reference_wrapper<RenderTarget>> GetRenderTarget(
+            Containers::GenerationalKey<RenderTarget> targetKey
+        );
+        std::optional<std::reference_wrapper<const RenderTarget>> GetRenderTarget(
+            Containers::GenerationalKey<RenderTarget> targetKey
+        ) const;
+
+        std::optional<std::reference_wrapper<FrameBufferAttachment>> GetFrameBufferAttachment(
+            Containers::GenerationalKey<FrameBufferAttachment> targetKey
+        );
+        std::optional<std::reference_wrapper<const FrameBufferAttachment>> GetFrameBufferAttachment(
+            Containers::GenerationalKey<FrameBufferAttachment> targetKey
+        ) const;
 
     private:
         Containers::GenerationalVector<RenderTarget> m_renderTargets;
-        // TODO: I really don't like having this here. A higher-level manager should do this.
-        std::unordered_map<std::string, Containers::GenerationalKey<RenderTarget>> m_nameToKeyMap;
+        Containers::GenerationalVector<FrameBufferAttachment> m_frameBufferAttachments;
 
     private:
-        RNGOEngine::Core::Renderer::IRenderer& m_renderer;
-
-    private:
-        std::pair<int, int> CalculateAttachmentSize(const AttachmentSize& sizeSpecification, int viewportWidth, int viewportHeight) const;
-
-    private:
-        Core::Renderer::TextureID CreateTextureAttachment(const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const;
-        Core::Renderer::RenderBufferID CreateRenderBufferAttachment(const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const;
+        Core::Renderer::IRenderer& m_renderer;
     };
 }
