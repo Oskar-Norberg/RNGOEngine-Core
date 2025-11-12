@@ -19,9 +19,9 @@ namespace RNGOEngine::Editor
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImGuiIO& io = ImGui::GetIO();
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad; // Enable Gamepad Controls
-        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // IF using Docking Branch
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;   // Enable Gamepad Controls
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;      // IF using Docking Branch
 
         // Setup Platform/Renderer backends
         ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window.GetNativeWindow()), true);
@@ -51,6 +51,12 @@ namespace RNGOEngine::Editor
         for (const auto& panel : m_panels)
         {
             ImGui::Begin(panel->GetPanelName().data());
+
+            {
+                const bool hovered = ImGui::IsWindowHovered();
+                panel->SetTargetHovered(hovered);
+            }
+
             panel->Render();
             ImGui::End();
         }

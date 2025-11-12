@@ -4,9 +4,10 @@
 
 #include "Editor.h"
 
-#include "TestScene.h"
+#include "EditorECSystems/FlyCameraSystem.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
+#include "TestScene.h"
 #include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/StatsPanel.h"
 #include "UI/Panels/ViewportPanel.h"
@@ -24,6 +25,9 @@ namespace RNGOEngine::Editor
                                                                  m_window->GetHeight());
         m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(*m_renderer, m_window->GetWidth(),
                                                                        m_window->GetHeight());
+
+        // Set up Editor Systems
+        m_gameSystems.RegisterSystem<FlyCameraSystem>();
 
         // Set up UI Panels
         m_UIManager.RegisterPanel<StatsPanel>();

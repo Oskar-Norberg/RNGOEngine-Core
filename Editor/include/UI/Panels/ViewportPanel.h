@@ -22,6 +22,9 @@ namespace RNGOEngine::Editor
             return "Viewport";
         }
 
+        void OnFocusGained() override;
+        void OnFocusLost() override;
+
     private:
         Core::Renderer::RenderAPI& m_rendererAPI;
 

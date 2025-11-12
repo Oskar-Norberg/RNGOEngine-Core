@@ -22,19 +22,6 @@ namespace RNGOEngine::Editor
 
         virtual void Render()
         {
-            if (const bool newHovered = ImGui::IsWindowHovered(); newHovered != m_isHovered)
-            {
-                m_isHovered = newHovered;
-
-                if (m_isHovered)
-                {
-                    OnFocusGained();
-                }
-                else
-                {
-                    OnFocusLost();
-                }
-            }
         }
 
     public:
@@ -47,6 +34,22 @@ namespace RNGOEngine::Editor
         }
 
     public:
+        void SetTargetHovered(bool status)
+        {
+            if (m_isHovered != status)
+            {
+                m_isHovered = status;
+                if (m_isHovered)
+                {
+                    OnFocusGained();
+                }
+                else
+                {
+                    OnFocusLost();
+                }
+            }
+        }
+
         virtual void OnFocusGained()
         {
         }

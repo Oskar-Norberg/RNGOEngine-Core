@@ -4,6 +4,8 @@
 
 #include "UI/Panels/ViewportPanel.h"
 
+#include <iostream>
+
 namespace RNGOEngine::Editor
 {
     static auto ViewportPanelSpecialization = Resources::RenderTargetSpecification{
@@ -57,5 +59,16 @@ namespace RNGOEngine::Editor
         const auto texID =
             static_cast<ImTextureID>(static_cast<intptr_t>(renderTarget->get().Attachments.at(0).ID));
         ImGui::Image(texID, availableSize);
+    }
+    void ViewPortPanel::OnFocusGained()
+    {
+        IDockablePanel::OnFocusGained();
+
+
+    }
+    void ViewPortPanel::OnFocusLost()
+    {
+        IDockablePanel::OnFocusLost();
+
     }
 }
