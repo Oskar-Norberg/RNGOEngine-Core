@@ -10,6 +10,8 @@
 #include <vector>
 
 #include "Renderer/RenderID.h"
+#include "Utilities/RNGOAsserts.h"
+#include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine::Resources
 {
@@ -25,34 +27,10 @@ namespace RNGOEngine::Resources
         unsigned int width, height;
     };
 
-    enum class AttachmentType { Texture, RenderBuffer };
-
-    // Higher level abstraction of FrameBuffers, Attachments and RBOs.
-    struct FrameBufferAttachment
-    {
-        std::string AttachmentName = "Unnamed Attachment";
-        // TODO: Make TextureID and RenderBufferID strongly typed to make use of variant.
-        std::variant<Core::Renderer::TextureFormat, Core::Renderer::RenderBufferFormat> Format;
-        unsigned int ID = 0; // TextureID or RenderBufferID
-        Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
-        int width, height;
-    };
-
-    struct RenderTarget
-    {
-        std::string TargetName = "Unnamed Render Target";
-        std::optional<Core::Renderer::FrameBufferID> FrameBuffer;
-        std::vector<FrameBufferAttachment> Attachments;
-    };
-
-
     struct FrameBufferAttachmentSpecification
     {
         std::string Name;
-        std::variant<Core::Renderer::TextureFormat, Core::Renderer::RenderBufferFormat> Format;
-        // TODO: This does not work for RenderBuffers
-        Core::Renderer::TextureFiltering minifyingFilter;
-        Core::Renderer::TextureFiltering magnifyingFilter;
+        std::variant<Core::Renderer::Texture2DProperties, Core::Renderer::RenderBufferFormat> Format;
         Core::Renderer::FrameBufferAttachmentPoint AttachmentPoint;
 
         AttachmentSize Size;
@@ -62,9 +40,89 @@ namespace RNGOEngine::Resources
     struct RenderTargetSpecification
     {
         std::string Name = "Unnamed Render Target";
-        bool CreateFrameBuffer = true;
-        // TODO: Having inputs doesn't belong to the RenderTarget itself. That is a RenderPass concept.
-        std::vector<std::string> InputNames;
         std::vector<FrameBufferAttachmentSpecification> Attachments;
+
+        bool operator==(const RenderTargetSpecification& other) const
+        {
+            if (Name != other.Name)
+            {
+                return false;
+            }
+
+            const size_t size = Attachments.size();
+            if (size != other.Attachments.size())
+            {
+                return false;
+            }
+
+            for (size_t i = 0; i < size; ++i)
+            {
+                const auto& a = Attachments[i];
+                const auto& b = other.Attachments[i];
+
+                if (a.Name != b.Name ||
+                    a.AttachmentPoint != b.AttachmentPoint ||
+                    a.Size.width != b.Size.width ||
+                    a.Size.height != b.Size.height)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+    };
+}
+
+namespace RNGOEngine::Resources
+{
+    // TODO: Extremely ugly function.
+    inline std::pair<int, int> GetDesiredAttachmentSize(const AttachmentSize& attachmentSize, const int viewportWidth,
+                                                        const int viewportHeight)
+    {
+        switch (attachmentSize.SizeType)
+        {
+            case AttachmentSizeType::Absolute:
+                return std::make_pair(attachmentSize.width, attachmentSize.height);
+            case AttachmentSizeType::PercentOfScreen:
+                return std::make_pair(
+                    static_cast<int>(
+                        static_cast<float>(viewportWidth) *
+                        (static_cast<float>(attachmentSize.width) / 100.0f)),
+                    static_cast<int>(
+                        static_cast<float>(viewportHeight) * (
+                            static_cast<float>(attachmentSize.height) / 100.0f))
+                );
+            default:
+                RNGO_ASSERT(false && "GetDesiredAttachmentSize - Unsupported AttachmentSizeType");
+        }
+    }
+}
+
+// Hash Function for RenderTargetSpecification
+namespace std
+{
+    template<>
+    struct hash<RNGOEngine::Resources::RenderTargetSpecification>
+    {
+        size_t operator()(const RNGOEngine::Resources::RenderTargetSpecification& spec) const noexcept
+        {
+            // TODO: I don't like this.
+            auto nameHash = std::hash<std::string>{}(spec.Name);
+            size_t attachmentsHash = 0;
+            for (const auto& attachment : spec.Attachments)
+            {
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<std::string>{}(attachment.Name));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<int>{}(static_cast<int>(attachment.AttachmentPoint)));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.width));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.height));
+            }
+
+            return RNGOEngine::Utilities::Hash::CombineHashes(nameHash, attachmentsHash);
+        }
     };
 }

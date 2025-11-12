@@ -29,7 +29,9 @@ namespace RNGOEngine::Core::Renderer
         // TODO: I kind of dislike this not being const.
         // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
         void RenderToScreen(int width, int height);
-        void RenderToTarget(int width, int height, Containers::GenerationalKey<Resources::RenderTarget> targetKey);
+        void RenderToTarget(
+            int width, int height, Containers::GenerationalKey<Resources::RenderTarget> targetKey
+        );
 
     public:
         template<typename T, typename... Args>
@@ -37,25 +39,26 @@ namespace RNGOEngine::Core::Renderer
         {
             m_passes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
 
+            // If target defines any attachments.
             const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
-
-            // TODO: Should you not be able to create an empty RenderTarget?
-            if (passSpecification.Attachments.size() > 0)
+            if (!passSpecification.Attachments.empty())
             {
-                auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
-                const auto key = targetManager.CreateFrameTarget(passSpecification, m_width, m_height);
-                m_context.renderPassResources.RegisterRenderTarget(passSpecification.Name, key);
+                CreateRenderTarget(passSpecification, m_width, m_height);
             }
 
             return static_cast<T&>(*m_passes.back());
         }
 
     public:
-        /// 
+        ///
         /// @param eventQueue Engine event queue to send / listen to events from.
         /// @return True if there are more events to process, false otherwise.
         ///
         bool ListenSendEvents(Events::EventQueue& eventQueue);
+
+    public:
+        Containers::GenerationalKey<Resources::RenderTarget> CreateRenderTarget(
+            const Resources::RenderTargetSpecification& specification, int width, int height);
 
     private:
         IRenderer& m_renderer;
@@ -64,10 +67,18 @@ namespace RNGOEngine::Core::Renderer
         RenderContext m_context;
         std::vector<std::unique_ptr<RenderPass>> m_passes;
 
+        // TODO: Target Management needs to be split out into a separate class. I just don't know what to call it or where to put it yet.
+        std::unordered_map<Resources::RenderTargetSpecification, Containers::GenerationalKey<
+                               Resources::RenderTarget>> m_managedTargets;
+
     private:
         int m_width, m_height;
 
     private:
-        void Render(int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target);
+        void Render(
+            int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target
+        );
+
+        void EnsureTargetSizes(int width, int height);
     };
 }

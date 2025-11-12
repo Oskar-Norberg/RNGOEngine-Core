@@ -63,12 +63,10 @@ namespace RNGOEngine::Core::Renderer
 
     struct Texture2DProperties
     {
-        TextureFormat format;
-        TextureFiltering minifyingFilter;
-        TextureFiltering magnifyingFilter;
-        TextureWrapping wrappingMode;
-        unsigned int width;
-        unsigned int height;
+        TextureFormat Format;
+        TextureFiltering MinifyingFilter;
+        TextureFiltering MagnifyingFilter;
+        TextureWrapping WrappingMode;
     };
 
     // FrameBuffers

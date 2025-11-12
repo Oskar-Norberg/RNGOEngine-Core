@@ -40,6 +40,7 @@ namespace RNGOEngine::AssetHandling
     public:
         TextureManagerError UploadTexture(const AssetHandle& assetHandle,
                                           const Core::Renderer::Texture2DProperties& properties,
+                                          int width, int height,
                                           std::span<const std::byte> textureData);
         void UnloadTexture(const AssetHandle& assetHandle);
 

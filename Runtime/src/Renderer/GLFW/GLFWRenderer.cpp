@@ -240,26 +240,25 @@ namespace RNGOEngine::Core::Renderer
         glUniform1i(glGetUniformLocation(shader, name.data()), slot);
     }
 
-    TextureID GLFWRenderer::CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data)
+    TextureID GLFWRenderer::CreateTexture2D(const Texture2DProperties properties, const int width, const int height,
+        const std::span<const std::byte> data)
     {
         unsigned int textureHandle;
         glGenTextures(1, &textureHandle);
         glBindTexture(GL_TEXTURE_2D, textureHandle);
 
         // Wrapping mode same for both axis for now.
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGLTextureWrapping(properties.wrappingMode));
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGLTextureWrapping(properties.wrappingMode));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GetGLTextureWrapping(properties.WrappingMode));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GetGLTextureWrapping(properties.WrappingMode));
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                        GetGLTextureFiltering(properties.minifyingFilter));
+                        GetGLTextureFiltering(properties.MinifyingFilter));
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
-                        GetGLTextureFiltering(properties.magnifyingFilter));
+                        GetGLTextureFiltering(properties.MagnifyingFilter));
 
         const auto* textureData = data.data();
-        const auto width = properties.width;
-        const auto height = properties.height;
 
-        switch (properties.format)
+        switch (properties.Format)
         {
             case TextureFormat::RGBA:
                 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE,
@@ -283,7 +282,7 @@ namespace RNGOEngine::Core::Renderer
                 RNGO_ASSERT(false && "GLFWRenderer::CreateTexture2D - Unsupported TextureFormat");
         }
 
-        if (GetGLUsingMipMaps(properties.minifyingFilter, properties.magnifyingFilter))
+        if (GetGLUsingMipMaps(properties.MinifyingFilter, properties.MagnifyingFilter))
         {
             glGenerateMipmap(GL_TEXTURE_2D);
         }

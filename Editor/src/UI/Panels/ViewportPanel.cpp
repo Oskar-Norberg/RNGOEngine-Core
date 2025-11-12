@@ -6,35 +6,35 @@
 
 namespace RNGOEngine::Editor
 {
-    static auto ViewportPanelSpecialization = Resources::RenderTargetSpecification{
-        .Name = "Viewport",
-        .CreateFrameBuffer = true,
-        .InputNames = {},
-        .Attachments = {
-            Resources::FrameBufferAttachmentSpecification{
-                .Name = "ViewportColor",
-                .Format = Core::Renderer::TextureFormat::RGB,
-                .AttachmentPoint = Core::Renderer::FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
-                .Size = Resources::AttachmentSize{
-                    // Set to absolute size and manage it internally.
-                    .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
-                    .width = 100,
-                    .height = 100,
+    static auto ViewportPanelSpecialization =
+        Resources::RenderTargetSpecification{
+            .Name = "Viewport",
+            .Attachments =
+                {
+                    Resources::FrameBufferAttachmentSpecification{
+                        .Name = "ViewportColor",
+                        .Format =
+                            Core::Renderer::Texture2DProperties{
+                                .Format = Core::Renderer::TextureFormat::RGB,
+                                .MinifyingFilter = Core::Renderer::TextureFiltering::LINEAR,
+                                .MagnifyingFilter = Core::Renderer::TextureFiltering::LINEAR,
+                                .WrappingMode = Core::Renderer::TextureWrapping::CLAMP_TO_EDGE,
+                            },
+                        .AttachmentPoint = Core::Renderer::FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
+                        .Size =
+                            Resources::AttachmentSize{
+                                .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
+                                .width = 100,
+                                .height = 100,
+                            },
+                    },
                 },
-            },
-        },
-    };
-    
+        };
+
     ViewPortPanel::ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI)
-        : m_rendererAPI(rendererAPI)
+        : m_rendererAPI(rendererAPI), m_viewportRenderTargetKey()
     {
-        auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
-        
-        m_viewportRenderTargetKey = targetManager.CreateFrameTarget(
-            ViewportPanelSpecialization,
-            // Garbage default values. Will be resized in Render().
-            500, 500
-        );
+        m_viewportRenderTargetKey = rendererAPI.CreateRenderTarget(ViewportPanelSpecialization, 1280, 720);
     }
 
     void ViewPortPanel::Render()
@@ -42,25 +42,20 @@ namespace RNGOEngine::Editor
         IDockablePanel::Render();
 
         const ImVec2 availableSize = ImGui::GetContentRegionAvail();
-
-        // TODO: THIS IS SO ASSSSSSSSSSSSSSSSSSSSSS
+        
         m_rendererAPI.RenderToTarget(availableSize.x, availableSize.y, m_viewportRenderTargetKey);
-        auto& resourceManager = Resources::ResourceManager::GetInstance();
-        auto& targetManager = resourceManager.GetRenderTargetManager();
 
-        const auto& target = targetManager.GetFrameTarget(m_viewportRenderTargetKey);
-        const auto targetKey = targetManager.GetFrameTargetKeyByName("Viewport");
-        targetManager.ResizeTarget(targetKey.value(), ViewportPanelSpecialization, static_cast<int>(availableSize.x),
-                                   static_cast<int>(availableSize.y));
+        const auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
+        const auto renderTarget = targetManager.GetRenderTarget(m_viewportRenderTargetKey);
 
-        if (!target)
+        if (!renderTarget)
         {
-            ImGui::Text("Invalid Viewport");
+            ImGui::Text("Invalid Render Target!");
             return;
         }
 
-        const auto texID = static_cast<ImTextureID>(static_cast<intptr_t>(target->get().Attachments.at(0).
-            ID));
+        // Ugly hardcoded index 0. Assumes first attachment is color.
+        const auto texID = static_cast<ImTextureID>(static_cast<intptr_t>(renderTarget->get().Attachments.at(0).ID));
         ImGui::Image(texID, availableSize);
     }
 }

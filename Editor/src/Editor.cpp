@@ -32,9 +32,9 @@ namespace RNGOEngine::Editor
     void Editor::OnUpdate(const float deltaTime)
     {
         Application::OnUpdate(deltaTime);
-        
+
         m_UIManager.Update(deltaTime);
-        
+
         UpdateEngineSystems(deltaTime);
         UpdateGameSystems(deltaTime);
     }
@@ -42,7 +42,7 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         Application::OnRender();
-        
+
         m_UIManager.BeginFrame();
         m_UIManager.Render();
         m_UIManager.EndFrame();

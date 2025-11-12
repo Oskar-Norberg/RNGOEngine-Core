@@ -16,11 +16,12 @@ namespace RNGOEngine::AssetHandling
 
     TextureManagerError TextureManager::UploadTexture(const AssetHandle& assetHandle,
                                                       const Core::Renderer::Texture2DProperties& properties,
-                                                      std::span<const std::byte> textureData)
+                                                      const int width, const int height,
+                                                      const std::span<const std::byte> textureData)
     {
         // Upload Resources
         const auto textureKey = m_resourceManager.GetTextureResourceManager().CreateTexture(
-            properties, textureData);
+            properties, width, height, textureData);
 
         // Store Runtime Data
         m_textures.insert({assetHandle, {textureKey}});
@@ -35,7 +36,7 @@ namespace RNGOEngine::AssetHandling
         {
             const auto& runtimeTextureData = m_textures.at(assetHandle);
             const auto& textureKey = runtimeTextureData.TextureKey;
-            
+
             m_resourceManager.GetTextureResourceManager().MarkTextureForDeletion(textureKey);
             m_textures.erase(assetHandle);
         }

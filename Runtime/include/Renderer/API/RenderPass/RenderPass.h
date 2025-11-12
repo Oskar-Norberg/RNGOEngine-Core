@@ -29,6 +29,8 @@ namespace RNGOEngine::Core::Renderer
         virtual ~RenderPass() = default;
 
     public:
+        // TODO: Should this return ref?
+        // TODO: This needs to return edges for the Pass. Not just attachments.
         virtual Resources::RenderTargetSpecification GetRenderTargetSpecification() const = 0;
 
     public:

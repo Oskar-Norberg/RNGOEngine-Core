@@ -13,231 +13,209 @@ namespace RNGOEngine::Resources
     {
     }
 
-    Containers::GenerationalKey<RenderTarget> RenderTargetManager::CreateFrameTarget(
-        const RenderTargetSpecification& specification, const int viewportWidth, const int viewportHeight)
+    Containers::GenerationalKey<RenderTarget> RenderTargetManager::CreateRenderTarget()
     {
-        RenderTarget target{
-            .TargetName = specification.Name,
-            .FrameBuffer = specification.CreateFrameBuffer
-                               ? std::optional(m_renderer.CreateFrameBuffer())
-                               : std::nullopt,
+        const auto target = RenderTarget{
+            .ID = m_renderer.CreateFrameBuffer(),
             .Attachments = {},
         };
 
-        // Bind to framebuffer if created
-        if (target.FrameBuffer)
-        {
-            m_renderer.BindFrameBuffer(target.FrameBuffer.value());
-        }
-
-        // Attachments
-        for (const auto& attachment : specification.Attachments)
-        {
-            unsigned int resourceID = 0;
-            // TODO: Unused??????
-            AttachmentType registeredType;
-            const auto [width, height] = CalculateAttachmentSize(attachment.Size, viewportWidth,
-                                                                 viewportHeight);
-
-            // Texture
-            if (std::holds_alternative<Core::Renderer::TextureFormat>(attachment.Format))
-            {
-                registeredType = AttachmentType::Texture;
-                resourceID = CreateTextureAttachment(attachment, viewportWidth, viewportHeight);
-
-                if (target.FrameBuffer)
-                {
-                    m_renderer.AttachTextureToFrameBuffer(resourceID, attachment.AttachmentPoint);
-                }
-            }
-            else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(attachment.Format))
-            {
-                registeredType = AttachmentType::RenderBuffer;
-                resourceID = CreateRenderBufferAttachment(
-                    attachment, viewportWidth, viewportHeight);
-
-                if (target.FrameBuffer)
-                {
-                    m_renderer.AttachRenderBufferToFrameBuffer(resourceID, attachment.AttachmentPoint);
-                }
-            }
-            else
-            {
-                RNGO_ASSERT(false && "RenderTargetManager::CreateFrameTarget - Invalid attachment format.");
-            }
-
-            FrameBufferAttachment frameBufferAttachment{
-                .AttachmentName = attachment.Name,
-                .Format = attachment.Format,
-                .ID = resourceID,
-                .AttachmentPoint = attachment.AttachmentPoint,
-                .width = width,
-                .height = height
-            };
-
-            target.Attachments.push_back(std::move(frameBufferAttachment));
-        }
-
-        RNGO_ASSERT(m_renderer.GetFrameBufferStatus() == Core::Renderer::FrameBufferStatus::COMPLETE
-            && "RenderTargetManager::CreateFrameTarget: FrameBuffer is not complete.");
-
-        m_renderer.BindFrameBuffer(0);
-
-        const auto key = m_renderTargets.Insert(std::move(target));
-        m_nameToKeyMap.insert(std::make_pair(specification.Name, key));
-
-        return key;
+        return m_renderTargets.Insert(target);
     }
 
-    void RenderTargetManager::DestroyFrameTarget(const Containers::GenerationalKey<RenderTarget> key)
+    void RenderTargetManager::DestroyRenderTarget(Containers::GenerationalKey<RenderTarget> targetKey)
     {
-        const auto name = m_renderTargets.GetUnmarkedValidated(key)->get().TargetName;
-        RNGO_ASSERT(!name.empty() && "RenderTargetManager::DestroyFrameTarget: Target name is empty.");
-        m_renderTargets.MarkForRemoval(key);
-        m_nameToKeyMap.erase(name);
-    }
-
-    void RenderTargetManager::ResizeTarget(const Containers::GenerationalKey<RenderTarget> key,
-                                           const RenderTargetSpecification& specification,
-                                           const int viewportWidth, const int viewportHeight)
-    {
-        const auto targetOpt = m_renderTargets.GetUnmarkedValidated(key);
-        RNGO_ASSERT(targetOpt && "RenderTargetManager::ResizeTarget: Invalid RenderTarget key supplied.");
+        const auto targetOpt = GetRenderTarget(targetKey);
+        if (!targetOpt)
+        {
+            RNGO_ASSERT(false && "RenderTargetManager::DestroyRenderTarget - Invalid RenderTarget key.");
+            return;
+        }
 
         auto& target = targetOpt->get();
-        RNGO_ASSERT(target.TargetName == specification.Name
-            && "RenderTargetManager::ResizeTarget: Specification does not match target.");
 
-        for (size_t i = 0; i < specification.Attachments.size(); ++i)
+        // Destroy Attachments
+        for (const auto& attachmentKey : target.Attachments)
         {
-            // Ensure attachment matches specification.
-            // TODO: Currently not checking format. Cause variant comparison is awful.
-            RNGO_ASSERT(specification.Attachments[i].Name == target.Attachments[i].AttachmentName &&
-                specification.Attachments[i].AttachmentPoint == target.Attachments[i].AttachmentPoint &&
-                "RenderTargetManager::ResizeTarget - Attachment specification does not match target attachment."
+            DestroyFrameBufferAttachment(targetKey, attachmentKey);
+        }
+
+        // Destroy FrameBuffer
+        m_renderer.DestroyFrameBuffer(target.ID);
+
+        // Remove from Manager
+        m_renderTargets.Remove(targetKey);
+    }
+
+    Containers::GenerationalKey<FrameBufferAttachment> RenderTargetManager::CreateFrameBufferAttachment(
+        Containers::GenerationalKey<RenderTarget> targetKey,
+        std::variant<Core::Renderer::Texture2DProperties, Core::Renderer::RenderBufferFormat> format,
+        Core::Renderer::FrameBufferAttachmentPoint attachmentPoint, int width, int height
+    )
+    {
+        const auto targetOpt = GetRenderTarget(targetKey);
+
+        if (!targetOpt)
+        {
+            RNGO_ASSERT(
+                false && "RenderTargetManager::CreateFrameBufferAttachment - Invalid RenderTarget key."
             );
-
-            const auto newSize = CalculateAttachmentSize(specification.Attachments[i].Size,
-                                                         viewportWidth, viewportHeight);
-
-            if (target.FrameBuffer)
-            {
-                m_renderer.BindFrameBuffer(target.FrameBuffer.value());
-            }
-
-            // Size already matching.
-            if (newSize == std::make_pair(target.Attachments[i].width, target.Attachments[i].height))
-            {
-                continue;
-            }
-
-            if (std::holds_alternative<Core::Renderer::TextureFormat>(target.Attachments[i].Format))
-            {
-                m_renderer.DestroyTexture(target.Attachments[i].ID);
-                target.Attachments[i].ID = CreateTextureAttachment(
-                    specification.Attachments[i], viewportWidth, viewportHeight);
-                target.Attachments[i].width = newSize.first;
-                target.Attachments[i].height = newSize.second;
-
-                if (target.FrameBuffer)
-                {
-                    m_renderer.AttachTextureToFrameBuffer(target.Attachments[i].ID, target.Attachments[i].AttachmentPoint);
-                }
-            }
-            else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(target.Attachments[i].Format))
-            {
-                m_renderer.DestroyRenderBuffer(target.Attachments[i].ID);
-                target.Attachments[i].ID = CreateRenderBufferAttachment(
-                    specification.Attachments[i], viewportWidth, viewportHeight);
-                target.Attachments[i].width = newSize.first;
-                target.Attachments[i].height = newSize.second;
-
-                if (target.FrameBuffer)
-                {
-                    m_renderer.AttachRenderBufferToFrameBuffer(target.Attachments[i].ID, target.Attachments[i].AttachmentPoint);
-                }
-            }
-            else
-            {
-                RNGO_ASSERT(false && "RenderTargetManager::ResizeTarget - Invalid attachment format.");
-            }
+            return {};
         }
 
-        m_renderer.BindFrameBuffer(0);
-    }
-
-    std::optional<Containers::GenerationalKey<RenderTarget>> RenderTargetManager::GetFrameTargetKeyByName(
-        std::string_view name) const
-    {
-        // TODO: String alloc.
-        if (const auto string = std::string(name); m_nameToKeyMap.contains(string))
+        m_renderer.BindFrameBuffer(targetOpt->get().ID);
+        if (std::holds_alternative<Core::Renderer::Texture2DProperties>(format))
         {
-            return m_nameToKeyMap.at(string);
+            auto textureProperties = std::get<Core::Renderer::Texture2DProperties>(format);
+
+            const auto textureID = m_renderer.CreateTexture2D(textureProperties, width, height, {});
+
+            m_renderer.AttachTextureToFrameBuffer(textureID, attachmentPoint);
+
+            const auto attachmentKey = m_frameBufferAttachments.Insert(
+                FrameBufferAttachment{
+                    .Format = format,
+                    .ID = textureID,
+                    .AttachmentPoint = attachmentPoint,
+                    .width = width,
+                    .height = height,
+                }
+            );
+            targetOpt->get().Attachments.push_back(attachmentKey);
+            return attachmentKey;
         }
-
-        return std::nullopt;
-    }
-
-    std::optional<std::reference_wrapper<RenderTarget>> RenderTargetManager::GetFrameTarget(
-        const Containers::GenerationalKey<RenderTarget> key)
-    {
-        return m_renderTargets.GetUnmarkedValidated(key);
-    }
-
-    std::optional<std::reference_wrapper<const RenderTarget>> RenderTargetManager::GetFrameTarget(
-        const Containers::GenerationalKey<RenderTarget> key) const
-    {
-        return m_renderTargets.GetUnmarkedValidated(key);
-    }
-
-    std::pair<int, int> RenderTargetManager::CalculateAttachmentSize(const AttachmentSize& sizeSpecification,
-                                                                     const int viewportWidth,
-                                                                     const int viewportHeight) const
-    {
-        switch (sizeSpecification.SizeType)
+        else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(format))
         {
-            case AttachmentSizeType::Absolute:
-                return std::make_pair(sizeSpecification.width, sizeSpecification.height);
-            case AttachmentSizeType::PercentOfScreen:
-                return std::make_pair(viewportWidth * sizeSpecification.width / 100,
-                                      viewportHeight * sizeSpecification.height / 100);
+            const auto renderFormat = std::get<Core::Renderer::RenderBufferFormat>(format);
+
+            const auto renderBufferID = m_renderer.CreateRenderBuffer(renderFormat, width, height);
+
+            m_renderer.AttachRenderBufferToFrameBuffer(renderBufferID, attachmentPoint);
+
+            const auto attachmentKey = m_frameBufferAttachments.Insert(
+                FrameBufferAttachment{
+                    .Format = format,
+                    .ID = renderBufferID,
+                    .AttachmentPoint = attachmentPoint,
+                    .width = width,
+                    .height = height,
+                }
+            );
+            targetOpt->get().Attachments.push_back(attachmentKey);
+            return attachmentKey;
         }
 
-        RNGO_ASSERT(false && "RenderTargetManager::CalculateAttachmentSize: Invalid sizeType.");
-        return std::make_pair(0, 0);
+        RNGO_ASSERT(
+            false && "RenderTargetManager::CreateFrameBufferAttachment - Unhandled attachment format."
+        );
+        return {};
     }
 
-    Core::Renderer::TextureID RenderTargetManager::CreateTextureAttachment(
-        const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const
+    void RenderTargetManager::DestroyFrameBufferAttachment(
+        Containers::GenerationalKey<RenderTarget> targetKey,
+        Containers::GenerationalKey<FrameBufferAttachment> frameBufferKey
+    )
     {
-        const auto [width, height] = CalculateAttachmentSize(attachmentSpec.Size, viewportWidth,
-                                                             viewportHeight);
+        const auto attachmentOpt = GetFrameBufferAttachment(frameBufferKey);
+        const auto targetOpt = GetRenderTarget(targetKey);
+        if (!attachmentOpt || !targetOpt)
+        {
+            RNGO_ASSERT(false && "RenderTargetManager::DestroyFrameBufferAttachment - Invalid Keys.");
+            return;
+        }
 
-        // TODO: Assumes caller has validated that Format is TextureFormat. Slightly ugly
-        return m_renderer.CreateTexture2D(
-            Core::Renderer::Texture2DProperties{
-                .format = std::get<Core::Renderer::TextureFormat>(attachmentSpec.Format),
-                .minifyingFilter = attachmentSpec.minifyingFilter,
-                .magnifyingFilter = attachmentSpec.magnifyingFilter,
-                // TODO: Would this ever need to be defined?
-                .wrappingMode = Core::Renderer::TextureWrapping::CLAMP_TO_EDGE,
-                .width = static_cast<unsigned int>(width),
-                .height = static_cast<unsigned int>(height),
-            },
-            {}
-        );
+        auto& attachment = attachmentOpt->get();
+        auto& target = targetOpt->get();
+
+        // Destroy GPU Resource
+        if (std::holds_alternative<Core::Renderer::Texture2DProperties>(attachment.Format))
+        {
+            m_renderer.DestroyTexture(attachment.ID);
+        }
+        else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(attachment.Format))
+        {
+            m_renderer.DestroyRenderBuffer(attachment.ID);
+        }
+
+        // Remove from Manager
+        m_frameBufferAttachments.Remove(frameBufferKey);
+
+        // Remove from Target
+        auto& attachments = target.Attachments;
+        erase_if(attachments, [&](const auto& key)
+        {
+            return key == frameBufferKey;
+        });
     }
 
-    Core::Renderer::RenderBufferID RenderTargetManager::CreateRenderBufferAttachment(
-        const FrameBufferAttachmentSpecification& attachmentSpec, int viewportWidth, int viewportHeight) const
+    void RenderTargetManager::ResizeAttachment(const Containers::GenerationalKey<RenderTarget> targetKey,
+                                               const Containers::GenerationalKey<FrameBufferAttachment>
+                                               attachmentKey,
+                                               const int width, const int height)
     {
-        const auto [width, height] = CalculateAttachmentSize(attachmentSpec.Size, viewportWidth,
-                                                             viewportHeight);
-        // TODO: Assumes caller has validated that Format is RenderBufferFormat. Slightly ugly.
-        return m_renderer.CreateRenderBuffer(
-            std::get<Core::Renderer::RenderBufferFormat>(attachmentSpec.Format),
-            width,
-            height
-        );
+        const auto attachmentOpt = GetFrameBufferAttachment(attachmentKey);
+        const auto targetOpt = GetRenderTarget(targetKey);
+
+        if (!(attachmentOpt && targetOpt))
+        {
+            RNGO_ASSERT(false && "RenderTargetManager::ResizeTarget - Invalid Keys.");
+            return;
+        }
+
+        auto& attachment = attachmentOpt->get();
+        const auto& target = targetOpt->get();
+        const auto& format = attachment.Format;
+
+        m_renderer.BindFrameBuffer(target.ID);
+        if (std::holds_alternative<Core::Renderer::Texture2DProperties>(format))
+        {
+            // TODO: Slight code duplication from Create function. Break into helpers
+            m_renderer.DestroyTexture(attachment.ID);
+
+            auto textureProperties = std::get<Core::Renderer::Texture2DProperties>(format);
+
+            attachment.ID = m_renderer.CreateTexture2D(textureProperties, width, height, {});
+            m_renderer.AttachTextureToFrameBuffer(attachment.ID, attachment.AttachmentPoint);
+        }
+        else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(format))
+        {
+            m_renderer.DestroyRenderBuffer(attachment.ID);
+            const auto& renderFormat = std::get<Core::Renderer::RenderBufferFormat>(format);
+            attachment.ID = m_renderer.CreateRenderBuffer(renderFormat, width, height);
+            m_renderer.AttachRenderBufferToFrameBuffer(attachment.ID, attachment.AttachmentPoint);
+        }
+
+        attachment.width = width;
+        attachment.height = height;
+    }
+
+    std::optional<std::reference_wrapper<RenderTarget>> RenderTargetManager::GetRenderTarget(
+        const Containers::GenerationalKey<RenderTarget> targetKey
+    )
+    {
+        return m_renderTargets.GetUnmarkedValidated(targetKey);
+    }
+
+    std::optional<std::reference_wrapper<const RenderTarget>> RenderTargetManager::GetRenderTarget(
+        const Containers::GenerationalKey<RenderTarget> targetKey
+    ) const
+    {
+        return m_renderTargets.GetUnmarkedValidated(targetKey);
+    }
+
+    std::optional<std::reference_wrapper<FrameBufferAttachment>>
+    RenderTargetManager::GetFrameBufferAttachment(
+        const Containers::GenerationalKey<FrameBufferAttachment> targetKey
+    )
+    {
+        return m_frameBufferAttachments.GetUnmarkedValidated(targetKey);
+    }
+
+    std::optional<std::reference_wrapper<const FrameBufferAttachment>>
+    RenderTargetManager::GetFrameBufferAttachment(
+        const Containers::GenerationalKey<FrameBufferAttachment> targetKey
+    ) const
+    {
+        return m_frameBufferAttachments.GetUnmarkedValidated(targetKey);
     }
 }

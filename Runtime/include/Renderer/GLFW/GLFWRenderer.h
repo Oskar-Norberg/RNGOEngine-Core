@@ -63,7 +63,8 @@ namespace RNGOEngine::Core::Renderer
         void SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot) override;
 
     public:
-        TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data) override;
+        TextureID CreateTexture2D(Texture2DProperties properties, int width, int height,
+            std::span<const std::byte> data) override;
         void DestroyTexture(TextureID texture) override;
         void BindTexture(TextureID texture, unsigned slot) override;
 

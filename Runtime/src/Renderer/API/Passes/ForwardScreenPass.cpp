@@ -56,8 +56,6 @@ namespace RNGOEngine::Core::Renderer
         // No attachments, just renders to Final Output.
         Resources::RenderTargetSpecification specification{
             .Name = "Forward Pass",
-            .CreateFrameBuffer = true,
-            .InputNames = {"Forward Pass"},
             .Attachments = {},
         };
 
@@ -68,10 +66,10 @@ namespace RNGOEngine::Core::Renderer
     {
         m_renderer.DisableFeature(DepthTesting);
         
-        const auto forwardColor = context.renderPassResources.GetTextureAttachment("ForwardOutput");
-        const auto& screenTarget = context.renderPassResources.GetRenderTarget("Final Output");
+        const auto forwardColor = context.renderPassResources.GetTextureID("ForwardOutput");
+        const auto& screenFrameBufferID = context.renderPassResources.GetFrameBufferID("Final Output");
 
-        m_renderer.BindFrameBuffer(screenTarget.FrameBuffer.value());
+        m_renderer.BindFrameBuffer(screenFrameBufferID);
         const auto shader = AssetHandling::AssetManager::GetInstance().GetShaderManager().GetShaderProgram(
             m_screenShaderProgram);
 
