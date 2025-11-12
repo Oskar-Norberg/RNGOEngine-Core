@@ -17,9 +17,14 @@ namespace RNGOEngine::AssetHandling
             AssetSerializer::Serialize(metadata, emitter);
 
             // TODO: Potentially questionable downcast.
-            // const auto& textureMetadata = static_cast<const TextureMetadata&>(metadata);
+            const auto& textureMetadata = static_cast<const TextureMetadata&>(metadata);
 
-            // Texture has no specific fields yet.
+            emitter << YAML::BeginMap;
+            emitter << YAML::Key << "Format" << YAML::Value << static_cast<int>(textureMetadata.Format);
+            emitter << YAML::Key << "Minifying Filter" << YAML::Value << static_cast<int>(textureMetadata.MinifyingFilter);
+            emitter << YAML::Key << "Magnifying Filter" << YAML::Value << static_cast<int>(textureMetadata.MagnifyingFilter);
+            emitter << YAML::Key << "Wrapping Mode" << YAML::Value << static_cast<int>(textureMetadata.WrappingMode);
+            emitter << YAML::EndMap;
         }
 
         std::unique_ptr<AssetMetadata>
@@ -28,11 +33,15 @@ namespace RNGOEngine::AssetHandling
             const auto uuidVal = node["UUID"].as<uint64_t>();
             const auto type = static_cast<AssetType>(node["Type"].as<int>());
 
-            Utilities::UUID uuid = Utilities::UUID(uuidVal);
+            auto uuid = Utilities::UUID(uuidVal);
             auto metadata = std::make_unique<TextureMetadata>();
             metadata->UUID = uuid;
             metadata->Type = type;
             metadata->Path = assetPath;
+            metadata->Format = static_cast<Core::Renderer::TextureFormat>(node["Format"].as<int>());
+            metadata->MinifyingFilter = static_cast<Core::Renderer::TextureFiltering>(node["Minifying Filter"].as<int>());
+            metadata->MagnifyingFilter = static_cast<Core::Renderer::TextureFiltering>(node["Magnifying Filter"].as<int>());
+            metadata->WrappingMode = static_cast<Core::Renderer::TextureWrapping>(node["Wrapping Mode"].as<int>());
 
             return std::move(metadata);
         }

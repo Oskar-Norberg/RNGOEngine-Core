@@ -7,8 +7,12 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: This is strictly a 2D texture for now.
     struct TextureMetadata : AssetMetadata
     {
-        // TODO: Dimensions, format, mipmaps, wrapping mode, filtering mode.
+        Core::Renderer::TextureFormat Format;
+        Core::Renderer::TextureFiltering MinifyingFilter;
+        Core::Renderer::TextureFiltering MagnifyingFilter;
+        Core::Renderer::TextureWrapping WrappingMode;
     };
 }

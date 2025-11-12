@@ -6,6 +6,8 @@
 
 #include <Application/Application.h>
 
+#include "UI/UIManager.h"
+
 namespace RNGOEngine::Editor
 {
     class Editor : public Application
@@ -17,6 +19,9 @@ namespace RNGOEngine::Editor
         void OnUpdate(float deltaTime) override;
         void OnRender() override;
 
+    private:
+        UIManager m_UIManager;
+        
     private:
         void UpdateEngineSystems(float deltaTime);
         void UpdateGameSystems(float deltaTime);

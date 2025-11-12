@@ -14,12 +14,14 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    TextureManagerError TextureManager::UploadTexture(
-        const AssetHandle& assetHandle, const Textures::TextureHandle textureHandle
-    )
+    TextureManagerError TextureManager::UploadTexture(const AssetHandle& assetHandle,
+                                                      const Core::Renderer::Texture2DProperties& properties,
+                                                      const int width, const int height,
+                                                      const std::span<const std::byte> textureData)
     {
         // Upload Resources
-        const auto textureKey = m_resourceManager.CreateTexture(textureHandle);
+        const auto textureKey = m_resourceManager.GetTextureResourceManager().CreateTexture(
+            properties, width, height, textureData);
 
         // Store Runtime Data
         m_textures.insert({assetHandle, {textureKey}});
@@ -27,12 +29,15 @@ namespace RNGOEngine::AssetHandling
         // TODO:
         return TextureManagerError::None;
     }
+
     void TextureManager::UnloadTexture(const AssetHandle& assetHandle)
     {
         if (m_textures.contains(assetHandle))
         {
             const auto& runtimeTextureData = m_textures.at(assetHandle);
-            m_resourceManager.MarkTextureForDestruction(runtimeTextureData.TextureKey);
+            const auto& textureKey = runtimeTextureData.TextureKey;
+
+            m_resourceManager.GetTextureResourceManager().MarkTextureForDeletion(textureKey);
             m_textures.erase(assetHandle);
         }
     }
@@ -52,7 +57,8 @@ namespace RNGOEngine::AssetHandling
         }
 
         const auto& runtimeTextureData = m_textures.at(uuid);
-        const auto textureOpt = m_resourceManager.GetTexture(runtimeTextureData.TextureKey);
+        const auto& textureResourceManager = m_resourceManager.GetTextureResourceManager();
+        const auto textureOpt = textureResourceManager.GetTexture(runtimeTextureData.TextureKey);
         if (!textureOpt)
         {
             RNGO_ASSERT(false && "TextureManager::GetTexture Texture has been invalidated.");

@@ -1,7 +1,23 @@
 ﻿set(RENDER_API_PROJECT_NAME RNGOEngine_RenderAPI)
 add_library(${RENDER_API_PROJECT_NAME} STATIC
+        include/Renderer/DrawQueue.h
+        
         include/Renderer/API/RenderAPI.h
         src/Renderer/API/RenderAPI.cpp
+
+        include/Renderer/API/RenderPass/RenderContext.h
+        include/Renderer/API/RenderPass/RenderPass.h
+
+        include/Renderer/API/RenderPass/RenderPassResources.h 
+        src/Renderer/API/RenderPass/RenderPassResources.cpp
+
+        include/Renderer/API/Passes/ForwardPass.h
+        src/Renderer/API/Passes/ForwardPass.cpp
+
+        include/Renderer/API/Passes/ForwardScreenPass.h
+        src/Renderer/API/Passes/ForwardScreenPass.cpp
+        
+
 
         include/Systems/Core/RenderSystem.h
         src/Systems/Core/RenderSystem.cpp

@@ -4,38 +4,16 @@
 
 #pragma once
 
+#include "RenderPass/RenderContext.h"
+#include "RenderPass/RenderPass.h"
 #include "Renderer/DrawQueue.h"
-
-namespace RNGOEngine::AssetHandling
-{
-    class ShaderManager;
-}
+#include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine
 {
     namespace Events
     {
         class EventQueue;
-    }
-
-    namespace Resources
-    {
-        class ResourceManager;
-        class ResourceTracker;
-    }
-
-    namespace Core
-    {
-        namespace Window
-        {
-            class IWindow;
-        }
-    }
-
-    namespace AssetHandling
-    {
-        class TextureManager;
-        class MaterialManager;
     }
 }
 
@@ -45,45 +23,62 @@ namespace RNGOEngine::Core::Renderer
     class RenderAPI
     {
     public:
-        explicit RenderAPI(IRenderer& renderer,
-                           Resources::ResourceTracker& resourceTracker,
-                           const Resources::ResourceManager& resourceManager,
-                           const AssetHandling::ModelManager& modelManager,
-                           const AssetHandling::ShaderManager& shaderManager,
-                           const AssetHandling::MaterialManager& materialManager,
-                           const AssetHandling::TextureManager& textureManager,
-                           int width,
-                           int height);
+        explicit RenderAPI(IRenderer& renderer, int width, int height);
 
         void SubmitDrawQueue(DrawQueue&& drawQueue);
-        void Render(Window::IWindow& window, size_t frameCount) const;
+        // TODO: I kind of dislike this not being const.
+        // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
+        void RenderToScreen(int width, int height);
+        void RenderToTarget(
+            int width, int height, Containers::GenerationalKey<Resources::RenderTarget> targetKey
+        );
 
     public:
-        /// 
+        template<typename T, typename... Args>
+        T& RegisterPass(Args&&... args)
+        {
+            m_passes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
+
+            // If target defines any attachments.
+            const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
+            if (!passSpecification.Attachments.empty())
+            {
+                CreateRenderTarget(passSpecification, m_width, m_height);
+            }
+
+            return static_cast<T&>(*m_passes.back());
+        }
+
+    public:
+        ///
         /// @param eventQueue Engine event queue to send / listen to events from.
         /// @return True if there are more events to process, false otherwise.
         ///
         bool ListenSendEvents(Events::EventQueue& eventQueue);
 
+    public:
+        Containers::GenerationalKey<Resources::RenderTarget> CreateRenderTarget(
+            const Resources::RenderTargetSpecification& specification, int width, int height);
+
     private:
         IRenderer& m_renderer;
-        DrawQueue m_drawQueue;
 
-        const Resources::ResourceManager& m_resourceManager;
-        Resources::ResourceTracker& m_resourceTracker;
-        const AssetHandling::ModelManager& m_modelManager;
-        const AssetHandling::ShaderManager& m_shaderManager;
-        const AssetHandling::MaterialManager& m_materialManager;
-        const AssetHandling::TextureManager& m_textureManager;
+    private:
+        RenderContext m_context;
+        std::vector<std::unique_ptr<RenderPass>> m_passes;
+
+        // TODO: Target Management needs to be split out into a separate class. I just don't know what to call it or where to put it yet.
+        std::unordered_map<Resources::RenderTargetSpecification, Containers::GenerationalKey<
+                               Resources::RenderTarget>> m_managedTargets;
 
     private:
         int m_width, m_height;
 
     private:
-        void ClearAmbientColor(Window::IWindow& window) const;
-        void RenderOpaque(Window::IWindow& window) const;
+        void Render(
+            int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target
+        );
 
-    private:
-        void MarkOpaqueUsed(size_t frameCount) const;
+        void EnsureTargetSizes(int width, int height);
     };
 }

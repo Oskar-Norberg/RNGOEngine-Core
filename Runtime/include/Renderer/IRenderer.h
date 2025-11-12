@@ -7,6 +7,7 @@
 #include <span>
 #include <string_view>
 
+#include "RenderFeatures.h"
 #include "RenderID.h"
 
 namespace RNGOEngine::Core::Renderer
@@ -14,10 +15,15 @@ namespace RNGOEngine::Core::Renderer
     ///
     /// <summary>Low-Level abstraction for a renderer interface.</summary>
     ///
+    // TODO: This is more so an RHI than a renderer. Rename?
     class IRenderer
     {
     public:
         virtual ~IRenderer() = default;
+
+    public:
+        virtual void EnableFeature(RenderFeature feature) = 0;
+        virtual void DisableFeature(RenderFeature feature) = 0;
 
         // TODO: Explicit function to enable depth testing etc.
         // Viewport properties
@@ -61,18 +67,18 @@ namespace RNGOEngine::Core::Renderer
         virtual void BufferVBOData(std::span<const std::byte> data, bool isDynamic) = 0;
         virtual void BufferEBOData(std::span<const std::byte> data, bool isDynamic) = 0;
 
-        // Creation of shaders
+        // Creation of Shaders
     public:
         // TODO: Perhaps this should return an std::expected for errors.
         virtual ShaderID CreateShader(std::string_view source, ShaderType type) = 0;
         virtual ShaderProgramID CreateShaderProgram(ShaderID vertexShader, ShaderID fragmentShader) = 0;
 
-        // Destruction of shaders
+        // Destruction of Shaders
     public:
         virtual void DestroyShader(ShaderID shader) = 0;
         virtual void DestroyShaderProgram(ShaderProgramID program) = 0;
 
-        // Binding of shaders
+        // Binding of Shaders
     public:
         virtual void BindShaderProgram(ShaderProgramID program) = 0;
 
@@ -89,16 +95,54 @@ namespace RNGOEngine::Core::Renderer
         virtual void SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) = 0;
         virtual void SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value) = 0;
         virtual void SetMat4(ShaderProgramID shader, std::string_view name, std::span<const float, 16> value) = 0;
-        virtual void SetTexture(ShaderProgramID shader, std::string_view name, TextureID texture, unsigned int slot) = 0;
+        virtual void SetTexture(ShaderProgramID shader, std::string_view name, unsigned int slot) = 0;
 
-        // Create texture
+        // Create Texture
     public:
-        // TODO: Assumes 2D texture.
-        // TODO: Pass in format, filtering, wrapping etc.
-        virtual TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels, std::span<const std::byte> data) = 0;
+        // TODO: Unify more texture types into one function? Or have separate functions for different types?
+        virtual TextureID CreateTexture2D(Texture2DProperties properties, int width, int height, std::span<const std::byte> data) = 0;
 
-        // Destroy texture
+        // Destroy Texture
     public:
         virtual void DestroyTexture(TextureID texture) = 0;
+
+        // Bind Texture
+    public:
+        virtual void BindTexture(TextureID texture, unsigned int slot) = 0;
+
+        // Create FrameBuffer
+    public:
+        virtual FrameBufferID CreateFrameBuffer() = 0;
+
+        // Destroy FrameBuffer
+    public:
+        virtual void DestroyFrameBuffer(FrameBufferID framebuffer) = 0;
+
+        // Bind FrameBuffer
+    public:
+        virtual void BindFrameBuffer(FrameBufferID frameBuffer) = 0;
+
+    public:
+        virtual FrameBufferStatus GetFrameBufferStatus() = 0;
+
+        // Attach Texture to FrameBuffer
+    public:
+        virtual void AttachTextureToFrameBuffer(TextureID texture, FrameBufferAttachmentPoint attachmentPoint) = 0;
+
+        // Create RenderBuffer
+    public:
+        virtual RenderBufferID CreateRenderBuffer(RenderBufferFormat format, unsigned int width, unsigned int height) = 0;
+
+        // Destroy RenderBuffer
+    public:
+        virtual void DestroyRenderBuffer(RenderBufferID renderBuffer) = 0;
+
+        // Bind RenderBuffer
+    public:
+        virtual void BindRenderBuffer(RenderBufferID renderBuffer) = 0;
+
+        // Attach RenderBuffer to FrameBuffer
+    public:
+        virtual void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer, FrameBufferAttachmentPoint attachmentPoint) = 0;
     };
 }

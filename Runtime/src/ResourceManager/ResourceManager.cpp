@@ -9,9 +9,11 @@
 namespace RNGOEngine::Resources
 {
     ResourceManager::ResourceManager(RNGOEngine::Core::Renderer::IRenderer& renderer)
-        : m_meshResourceManager(renderer),
+        : Singleton(this),
+          m_meshResourceManager(renderer),
           m_shaderResourceManager(renderer),
-          m_textureResourceManager(renderer)
+          m_textureResourceManager(renderer),
+          m_renderTargetManager(renderer)
     {
     }
 
@@ -76,24 +78,6 @@ namespace RNGOEngine::Resources
         Containers::GenerationalKey<Core::Renderer::ShaderProgramID> program)
     {
         m_shaderResourceManager.MarkShaderProgramForDestruction(program);
-    }
-
-    Containers::GenerationalKey<Core::Renderer::TextureID> ResourceManager::CreateTexture(
-        const AssetHandling::Textures::TextureHandle textureHandle)
-    {
-        return m_textureResourceManager.CreateTexture(textureHandle);
-    }
-
-    void ResourceManager::MarkTextureForDestruction(
-        const Containers::GenerationalKey<Core::Renderer::TextureID>& key)
-    {
-        m_textureResourceManager.MarkTextureForDeletion(key);
-    }
-
-    std::optional<Core::Renderer::TextureID> ResourceManager::GetTexture(
-        const Containers::GenerationalKey<Core::Renderer::TextureID>& key) const
-    {
-        return m_textureResourceManager.GetTexture(key);
     }
 
     void ResourceManager::MarkForDestruction(const TrackedCollection& resources)

@@ -8,7 +8,6 @@
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Renderer/RenderID.h"
-#include "Renderer/Handles/TextureHandle.h"
 #include "Utilities/AssetCache/AssetCache.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
@@ -40,7 +39,9 @@ namespace RNGOEngine::AssetHandling
 
     public:
         TextureManagerError UploadTexture(const AssetHandle& assetHandle,
-                                          Textures::TextureHandle textureHandle);
+                                          const Core::Renderer::Texture2DProperties& properties,
+                                          int width, int height,
+                                          std::span<const std::byte> textureData);
         void UnloadTexture(const AssetHandle& assetHandle);
 
     public:

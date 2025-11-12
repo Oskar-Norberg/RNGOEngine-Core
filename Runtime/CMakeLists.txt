@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 23)
 set(CORE_PROJECT_NAME RNGOEngine_Core)
 project(${CORE_PROJECT_NAME})
@@ -17,8 +17,6 @@ include(cmake/UnityBuild.cmake)
 include(cmake/CPM.cmake)
 include(cmake/Dependencies.cmake)
 
-# TODO: Apparently the TextureHandle.h is not included anywhere. It is header only, so its fine. But it should be included somewhere.
-# ^ For some unknown reason I put it in the core renderer. resource manager depends on it... it should be in AssetManager and its data should be passed as parameters.
 # Engine Units
 include(cmake/EngineUnits/Data.cmake)
 
@@ -54,7 +52,6 @@ add_library(${CORE_PROJECT_NAME} STATIC
 )
 target_precompile_headers(${CORE_PROJECT_NAME} PRIVATE include/PCH/PCH.h)
 target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
-
 
 target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${DATA_PROJECT_NAME}

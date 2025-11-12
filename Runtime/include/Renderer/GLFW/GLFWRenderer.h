@@ -15,6 +15,9 @@ namespace RNGOEngine::Core::Renderer
         GLFWRenderer();
 
     public:
+        void EnableFeature(RenderFeature feature) override;
+        void DisableFeature(RenderFeature feature) override;
+
         void SetViewPortSize(int width, int height) override;
         void SetClearColor(float r, float g, float b, float a) override;
         void ClearColor() override;
@@ -55,12 +58,46 @@ namespace RNGOEngine::Core::Renderer
         void SetVec4(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) override;
         void SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value) override;
         void SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value) override;
-        void SetMat4(ShaderProgramID shader, std::string_view name, std::span<const float, 16> value) override;
-        void SetTexture(ShaderProgramID shader, std::string_view name, TextureID texture,
-                        unsigned slot) override;
+        void SetMat4(ShaderProgramID shader, std::string_view name,
+                     std::span<const float, 16> value) override;
+        void SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot) override;
 
-        TextureID CreateTexture(unsigned int width, unsigned int height, unsigned int nrChannels,
-                                std::span<const std::byte> data) override;
+    public:
+        TextureID CreateTexture2D(Texture2DProperties properties, int width, int height,
+            std::span<const std::byte> data) override;
         void DestroyTexture(TextureID texture) override;
+        void BindTexture(TextureID texture, unsigned slot) override;
+
+    public:
+        FrameBufferID CreateFrameBuffer() override;
+        void DestroyFrameBuffer(FrameBufferID framebuffer) override;
+        void BindFrameBuffer(FrameBufferID frameBuffer) override;
+        void AttachTextureToFrameBuffer(TextureID texture,
+                                        FrameBufferAttachmentPoint attachmentPoint) override;
+
+    public:
+        RenderBufferID
+        CreateRenderBuffer(RenderBufferFormat format, unsigned width, unsigned height) override;
+        void DestroyRenderBuffer(RenderBufferID renderBuffer) override;
+        void BindRenderBuffer(RenderBufferID renderBuffer) override;
+        FrameBufferStatus GetFrameBufferStatus() override;
+        void AttachRenderBufferToFrameBuffer(RenderBufferID renderBuffer,
+                                             FrameBufferAttachmentPoint attachmentPoint) override;
+
+    private:
+        void EnableFeatures(RenderFeature feature);
+        void DisableFeatures(RenderFeature feature);
+
+    private:
+        static unsigned int GetGLTextureFiltering(TextureFiltering filtering);
+        static bool GetGLUsingMipMaps(TextureFiltering minifying, TextureFiltering magnifying);
+        static unsigned int GetGLTextureWrapping(TextureWrapping wrapping);
+        
+        static unsigned int GetGLAttachmentPoint(FrameBufferAttachmentPoint attachmentPoint);
+        static unsigned int GetGLRenderBufferFormat(RenderBufferFormat renderBufferFormat);
+
+        static unsigned int GetGLTextureFormat(TextureFormat format);
+
+        static FrameBufferStatus GetFrameBufferStatusFromGL(unsigned int status);
     };
 }

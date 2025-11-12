@@ -12,7 +12,7 @@ namespace RNGOEngine::AssetHandling
 {
     void TextureAssetImporter::Load(const AssetMetadata& metadata)
     {
-        auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
+        const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
 
         // Load Texture to RAM
         const auto textureHandle = TextureLoader::LoadTexture(typedMetadata.Path);
@@ -23,9 +23,31 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload to GPU
-        const auto errorMessage =
-            AssetManager::GetInstance().GetTextureManager().UploadTexture(
-                typedMetadata.UUID, textureHandle.value());
+        const auto textureDataSpan = std::as_bytes(std::span(
+            textureHandle.value().data,
+            textureHandle.value().width * textureHandle.value().height * textureHandle.value().nrChannels
+        ));
+
+        // TODO: For now, just get format from nrChannels. Should this be a part of the metadata?
+
+        const Core::Renderer::TextureFormat format = textureHandle->nrChannels == 3
+                                                         ? Core::Renderer::TextureFormat::RGB
+                                                         : Core::Renderer::TextureFormat::RGBA;
+
+        const Core::Renderer::Texture2DProperties properties
+        {
+            .Format = format,
+            .MinifyingFilter = typedMetadata.MinifyingFilter,
+            .MagnifyingFilter = typedMetadata.MagnifyingFilter,
+            .WrappingMode = typedMetadata.WrappingMode,
+        };
+        const auto errorMessage = AssetManager::GetInstance().GetTextureManager().UploadTexture(
+            typedMetadata.UUID, properties,
+            textureHandle.value().width,
+            textureHandle.value().height,
+            std::as_bytes(textureDataSpan)
+        );
+
         if (errorMessage != TextureManagerError::None)
         {
             // TODO: Error handling
@@ -41,9 +63,12 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
     }
 
-    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata() const
+    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path) const
     {
-        return std::make_unique<TextureMetadata>();
+        auto metadata = std::make_unique<TextureMetadata>();
+        metadata->Type = AssetType::Texture;
+        return std::move(metadata);
     }
 
     std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const

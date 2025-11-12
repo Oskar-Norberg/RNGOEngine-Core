@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <span>
+
 #include "ShaderManager.h"
 #include "TextureManager.h"
 #include "Renderer/Uniforms.h"
