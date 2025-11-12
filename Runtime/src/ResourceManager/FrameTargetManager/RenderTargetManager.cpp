@@ -104,8 +104,9 @@ namespace RNGOEngine::Resources
     }
 
     void RenderTargetManager::ResizeAttachment(Containers::GenerationalKey<RenderTarget> targetKey,
-                                           Containers::GenerationalKey<FrameBufferAttachment> attachmentKey,
-                                           int width, int height)
+                                               Containers::GenerationalKey<FrameBufferAttachment>
+                                               attachmentKey,
+                                               int width, int height)
     {
         const auto attachmentOpt = GetFrameBufferAttachment(attachmentKey);
         const auto targetOpt = GetRenderTarget(targetKey);
@@ -138,7 +139,11 @@ namespace RNGOEngine::Resources
             m_renderer.DestroyRenderBuffer(attachment.ID);
             const auto& renderFormat = std::get<Core::Renderer::RenderBufferFormat>(format);
             attachment.ID = m_renderer.CreateRenderBuffer(renderFormat, width, height);
+            m_renderer.AttachRenderBufferToFrameBuffer(attachment.ID, attachment.AttachmentPoint);
         }
+
+        attachment.width = width;
+        attachment.height = height;
     }
 
     std::optional<std::reference_wrapper<RenderTarget>> RenderTargetManager::GetRenderTarget(

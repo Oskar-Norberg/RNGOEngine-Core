@@ -31,9 +31,8 @@ namespace RNGOEngine::Core::Renderer
                              .MinifyingFilter = TextureFiltering::LINEAR,
                              .MagnifyingFilter = TextureFiltering::LINEAR,
                              .WrappingMode = TextureWrapping::CLAMP_TO_EDGE,
-                             // Stupid ass hardcoded value
-                             .Width = 1280,
-                             .Height = 720
+                             .Width = 1,
+                             .Height = 1
                          },
                      .AttachmentPoint = FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
                      .Size =
