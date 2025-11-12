@@ -19,14 +19,10 @@ namespace RNGOEngine::Editor
                                 .MinifyingFilter = Core::Renderer::TextureFiltering::LINEAR,
                                 .MagnifyingFilter = Core::Renderer::TextureFiltering::LINEAR,
                                 .WrappingMode = Core::Renderer::TextureWrapping::CLAMP_TO_EDGE,
-                                // TODO: Temporary garbage values anyway.
-                                .Width = 10,
-                                .Height = 10
                             },
                         .AttachmentPoint = Core::Renderer::FrameBufferAttachmentPoint::COLOR_ATTACHMENT0,
                         .Size =
                             Resources::AttachmentSize{
-                                // Set to absolute size and manage it internally.
                                 .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
                                 .width = 100,
                                 .height = 100,

@@ -48,11 +48,8 @@ namespace RNGOEngine::Resources
         if (std::holds_alternative<Core::Renderer::Texture2DProperties>(format))
         {
             auto textureProperties = std::get<Core::Renderer::Texture2DProperties>(format);
-            // TODO: Texture2DProperties should REALLY not contain the width and height.
-            textureProperties.Width = width;
-            textureProperties.Height = height;
 
-            const auto textureID = m_renderer.CreateTexture2D(textureProperties, {});
+            const auto textureID = m_renderer.CreateTexture2D(textureProperties, width, height, {});
 
             m_renderer.AttachTextureToFrameBuffer(textureID, attachmentPoint);
 
@@ -128,10 +125,8 @@ namespace RNGOEngine::Resources
             m_renderer.DestroyTexture(attachment.ID);
 
             auto textureProperties = std::get<Core::Renderer::Texture2DProperties>(format);
-            textureProperties.Width = width;
-            textureProperties.Height = height;
 
-            attachment.ID = m_renderer.CreateTexture2D(textureProperties, {});
+            attachment.ID = m_renderer.CreateTexture2D(textureProperties, width, height, {});
             m_renderer.AttachTextureToFrameBuffer(attachment.ID, attachment.AttachmentPoint);
         }
         else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(format))

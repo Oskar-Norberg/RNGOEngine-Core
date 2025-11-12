@@ -100,7 +100,7 @@ namespace RNGOEngine::Core::Renderer
         // Create Texture
     public:
         // TODO: Unify more texture types into one function? Or have separate functions for different types?
-        virtual TextureID CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data) = 0;
+        virtual TextureID CreateTexture2D(Texture2DProperties properties, int width, int height, std::span<const std::byte> data) = 0;
 
         // Destroy Texture
     public:

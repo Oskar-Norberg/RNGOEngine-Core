@@ -240,7 +240,8 @@ namespace RNGOEngine::Core::Renderer
         glUniform1i(glGetUniformLocation(shader, name.data()), slot);
     }
 
-    TextureID GLFWRenderer::CreateTexture2D(Texture2DProperties properties, std::span<const std::byte> data)
+    TextureID GLFWRenderer::CreateTexture2D(const Texture2DProperties properties, const int width, const int height,
+        const std::span<const std::byte> data)
     {
         unsigned int textureHandle;
         glGenTextures(1, &textureHandle);
@@ -256,8 +257,6 @@ namespace RNGOEngine::Core::Renderer
                         GetGLTextureFiltering(properties.MagnifyingFilter));
 
         const auto* textureData = data.data();
-        const auto width = properties.Width;
-        const auto height = properties.Height;
 
         switch (properties.Format)
         {

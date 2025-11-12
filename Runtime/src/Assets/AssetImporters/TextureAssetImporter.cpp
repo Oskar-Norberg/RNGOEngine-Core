@@ -40,11 +40,12 @@ namespace RNGOEngine::AssetHandling
             .MinifyingFilter = typedMetadata.MinifyingFilter,
             .MagnifyingFilter = typedMetadata.MagnifyingFilter,
             .WrappingMode = typedMetadata.WrappingMode,
-            .Width = textureHandle.value().width,
-            .Height = textureHandle.value().height,
         };
         const auto errorMessage = AssetManager::GetInstance().GetTextureManager().UploadTexture(
-            typedMetadata.UUID, properties, std::as_bytes(textureDataSpan)
+            typedMetadata.UUID, properties,
+            textureHandle.value().width,
+            textureHandle.value().height,
+            std::as_bytes(textureDataSpan)
         );
 
         if (errorMessage != TextureManagerError::None)

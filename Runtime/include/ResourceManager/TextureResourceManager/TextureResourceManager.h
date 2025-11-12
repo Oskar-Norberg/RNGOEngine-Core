@@ -23,7 +23,7 @@ namespace RNGOEngine::Resources
 
         // Creation / Destruction
     public:
-        Containers::GenerationalKey<Core::Renderer::TextureID> CreateTexture(const Core::Renderer::Texture2DProperties& properties, std::span<const std::byte> textureData);
+        Containers::GenerationalKey<Core::Renderer::TextureID> CreateTexture(const Core::Renderer::Texture2DProperties& properties, int width, int height, std::span<const std::byte> textureData);
         void MarkTextureForDeletion(Containers::GenerationalKey<Core::Renderer::TextureID> key);
 
         // Accessors

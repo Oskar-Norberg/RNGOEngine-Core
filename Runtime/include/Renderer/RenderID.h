@@ -67,8 +67,6 @@ namespace RNGOEngine::Core::Renderer
         TextureFiltering MinifyingFilter;
         TextureFiltering MagnifyingFilter;
         TextureWrapping WrappingMode;
-        unsigned int Width;
-        unsigned int Height;
     };
 
     // FrameBuffers

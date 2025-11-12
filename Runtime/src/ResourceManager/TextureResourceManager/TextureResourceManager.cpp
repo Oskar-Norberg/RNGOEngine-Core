@@ -14,9 +14,10 @@ namespace RNGOEngine::Resources
     }
 
     Containers::GenerationalKey<Core::Renderer::TextureID> TextureResourceManager::CreateTexture(
-        const Core::Renderer::Texture2DProperties& properties, const std::span<const std::byte> textureData)
+        const Core::Renderer::Texture2DProperties& properties, const int width, const int height,
+        const std::span<const std::byte> textureData)
     {
-        const auto textureID = m_renderer.CreateTexture2D(properties, textureData);
+        const auto textureID = m_renderer.CreateTexture2D(properties, width, height, textureData);
         return m_textures.Insert(textureID);
     }
 
