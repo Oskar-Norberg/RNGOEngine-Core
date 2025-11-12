@@ -10,6 +10,9 @@ add_library(${UI_PROJECT_NAME} STATIC
 
         include/UI/Panels/HierarchyPanel.h
         src/UI/Panels/HierarchyPanel.cpp
+        
+        include/UI/Panels/StatsPanel.h
+        src/UI/Panels/StatsPanel.cpp
 )
 target_include_directories(${UI_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake RNGOEngine_Core)
