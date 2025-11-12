@@ -39,9 +39,8 @@ namespace RNGOEngine::Core::Renderer
                      .Size =
                          Resources::AttachmentSize{
                              .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
-                             // TODO: Incorrect, just for testing
-                             .width = 1280,
-                             .height = 720,
+                             .width = 100,
+                             .height = 100,
                          },
                  },
                  Resources::FrameBufferAttachmentSpecification{
@@ -51,8 +50,8 @@ namespace RNGOEngine::Core::Renderer
                      .Size =
                          Resources::AttachmentSize{
                              .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
-                             .width = 1280,
-                             .height = 720,
+                             .width = 100,
+                             .height = 100,
                          },
                  }},
         };

@@ -52,6 +52,11 @@ namespace RNGOEngine::Resources
             Containers::GenerationalKey<FrameBufferAttachment> frameBufferKey
         );
 
+        // TODO: Should this pass the RenderTarget? Probably not necessary if we just save parent in the Attachment.
+        void ResizeAttachment(Containers::GenerationalKey<RenderTarget> targetKey,
+            Containers::GenerationalKey<FrameBufferAttachment> attachmentKey,
+            int width, int height);
+
         // Getters
     public:
         std::optional<std::reference_wrapper<RenderTarget>> GetRenderTarget(

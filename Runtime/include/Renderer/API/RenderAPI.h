@@ -66,6 +66,8 @@ namespace RNGOEngine::Core::Renderer
     private:
         RenderContext m_context;
         std::vector<std::unique_ptr<RenderPass>> m_passes;
+
+        // TODO: Target Management needs to be split out into a separate class. I just don't know what to call it or where to put it yet.
         std::unordered_map<Resources::RenderTargetSpecification, Containers::GenerationalKey<
                                Resources::RenderTarget>> m_managedTargets;
 
@@ -76,5 +78,7 @@ namespace RNGOEngine::Core::Renderer
         void Render(
             int width, int height, std::optional<std::reference_wrapper<Resources::RenderTarget>> target
         );
+
+        void EnsureTargetSizes(int width, int height);
     };
 }

@@ -36,42 +36,30 @@ namespace RNGOEngine::Editor
         };
 
     ViewPortPanel::ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI)
-        : m_rendererAPI(rendererAPI)
+        : m_rendererAPI(rendererAPI), m_viewportRenderTargetKey()
     {
-        // auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
-        //
-        // m_viewportRenderTargetKey = targetManager.CreateFrameTarget(
-        //     ViewportPanelSpecialization,
-        //     // Garbage default values. Will be resized in Render().
-        //     500, 500
-        // );
+        m_viewportRenderTargetKey = rendererAPI.CreateRenderTarget(ViewportPanelSpecialization, 1280, 720);
     }
 
     void ViewPortPanel::Render()
     {
         IDockablePanel::Render();
 
-        // const ImVec2 availableSize = ImGui::GetContentRegionAvail();
-        //
-        // m_rendererAPI.RenderToTarget(availableSize.x, availableSize.y, m_viewportRenderTargetKey);
-        // auto& resourceManager = Resources::ResourceManager::GetInstance();
-        // auto& targetManager = resourceManager.GetRenderTargetManager();
-        //
-        // const auto& target = targetManager.GetFrameTarget(m_viewportRenderTargetKey);
-        // const auto targetKey = targetManager.GetFrameTargetKeyByName("Viewport");
-        // targetManager.ResizeTarget(
-        //     targetKey.value(), ViewportPanelSpecialization, static_cast<int>(availableSize.x),
-        //     static_cast<int>(availableSize.y)
-        // );
-        //
-        // if (!target)
-        // {
-        //     ImGui::Text("Invalid Viewport");
-        //     return;
-        // }
-        //
-        // const auto texID =
-        //     static_cast<ImTextureID>(static_cast<intptr_t>(target->get().Attachments.at(0).ID));
-        // ImGui::Image(texID, availableSize);
+        const ImVec2 availableSize = ImGui::GetContentRegionAvail();
+        
+        m_rendererAPI.RenderToTarget(availableSize.x, availableSize.y, m_viewportRenderTargetKey);
+
+        const auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
+        const auto renderTarget = targetManager.GetRenderTarget(m_viewportRenderTargetKey);
+
+        if (!renderTarget)
+        {
+            ImGui::Text("Invalid Render Target!");
+            return;
+        }
+
+        // Ugly hardcoded index 0. Assumes first attachment is color.
+        const auto texID = static_cast<ImTextureID>(static_cast<intptr_t>(renderTarget->get().Attachments.at(0).ID));
+        ImGui::Image(texID, availableSize);
     }
 }

@@ -103,6 +103,44 @@ namespace RNGOEngine::Resources
         // TODO:
     }
 
+    void RenderTargetManager::ResizeAttachment(Containers::GenerationalKey<RenderTarget> targetKey,
+                                           Containers::GenerationalKey<FrameBufferAttachment> attachmentKey,
+                                           int width, int height)
+    {
+        const auto attachmentOpt = GetFrameBufferAttachment(attachmentKey);
+        const auto targetOpt = GetRenderTarget(targetKey);
+
+        if (!(attachmentOpt && targetOpt))
+        {
+            RNGO_ASSERT(false && "RenderTargetManager::ResizeTarget - Invalid Keys.");
+            return;
+        }
+
+        auto& attachment = attachmentOpt->get();
+        const auto& target = targetOpt->get();
+        const auto& format = attachment.Format;
+
+        m_renderer.BindFrameBuffer(target.ID);
+        if (std::holds_alternative<Core::Renderer::Texture2DProperties>(format))
+        {
+            // TODO: Slight code duplication from Create function. Break into helpers
+            m_renderer.DestroyTexture(attachment.ID);
+
+            auto textureProperties = std::get<Core::Renderer::Texture2DProperties>(format);
+            textureProperties.Width = width;
+            textureProperties.Height = height;
+
+            attachment.ID = m_renderer.CreateTexture2D(textureProperties, {});
+            m_renderer.AttachTextureToFrameBuffer(attachment.ID, attachment.AttachmentPoint);
+        }
+        else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(format))
+        {
+            m_renderer.DestroyRenderBuffer(attachment.ID);
+            const auto& renderFormat = std::get<Core::Renderer::RenderBufferFormat>(format);
+            attachment.ID = m_renderer.CreateRenderBuffer(renderFormat, width, height);
+        }
+    }
+
     std::optional<std::reference_wrapper<RenderTarget>> RenderTargetManager::GetRenderTarget(
         const Containers::GenerationalKey<RenderTarget> targetKey
     )

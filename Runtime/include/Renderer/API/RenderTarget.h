@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "Renderer/RenderID.h"
+#include "Utilities/RNGOAsserts.h"
 #include "Utilities/Hash/PairHash.h"
 
 namespace RNGOEngine::Resources
@@ -73,6 +74,31 @@ namespace RNGOEngine::Resources
     };
 }
 
+namespace RNGOEngine::Resources
+{
+    // TODO: Extremely ugly function.
+    inline std::pair<int, int> GetDesiredAttachmentSize(const AttachmentSize& attachmentSize, const int viewportWidth,
+                                                        const int viewportHeight)
+    {
+        switch (attachmentSize.SizeType)
+        {
+            case AttachmentSizeType::Absolute:
+                return std::make_pair(attachmentSize.width, attachmentSize.height);
+            case AttachmentSizeType::PercentOfScreen:
+                return std::make_pair(
+                    static_cast<int>(
+                        static_cast<float>(viewportWidth) *
+                        (static_cast<float>(attachmentSize.width) / 100.0f)),
+                    static_cast<int>(
+                        static_cast<float>(viewportHeight) * (
+                            static_cast<float>(attachmentSize.height) / 100.0f))
+                );
+            default:
+                RNGO_ASSERT(false && "GetDesiredAttachmentSize - Unsupported AttachmentSizeType");
+        }
+    }
+}
+
 // Hash Function for RenderTargetSpecification
 namespace std
 {
@@ -86,12 +112,16 @@ namespace std
             size_t attachmentsHash = 0;
             for (const auto& attachment : spec.Attachments)
             {
-                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(attachmentsHash, std::hash<std::string>{}(attachment.Name));
-                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(attachmentsHash, std::hash<int>{}(static_cast<int>(attachment.AttachmentPoint)));
-                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(attachmentsHash, std::hash<std::size_t>{}(attachment.Size.width));
-                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(attachmentsHash, std::hash<std::size_t>{}(attachment.Size.height));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<std::string>{}(attachment.Name));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<int>{}(static_cast<int>(attachment.AttachmentPoint)));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.width));
+                attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
+                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.height));
             }
-            
+
             return RNGOEngine::Utilities::Hash::CombineHashes(nameHash, attachmentsHash);
         }
     };
