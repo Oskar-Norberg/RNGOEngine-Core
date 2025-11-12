@@ -25,7 +25,26 @@ namespace RNGOEngine::Resources
 
     void RenderTargetManager::DestroyRenderTarget(Containers::GenerationalKey<RenderTarget> targetKey)
     {
-        // TODO: Cleanup attachments
+        const auto targetOpt = GetRenderTarget(targetKey);
+        if (!targetOpt)
+        {
+            RNGO_ASSERT(false && "RenderTargetManager::DestroyRenderTarget - Invalid RenderTarget key.");
+            return;
+        }
+
+        auto& target = targetOpt->get();
+
+        // Destroy Attachments
+        for (const auto& attachmentKey : target.Attachments)
+        {
+            DestroyFrameBufferAttachment(targetKey, attachmentKey);
+        }
+
+        // Destroy FrameBuffer
+        m_renderer.DestroyFrameBuffer(target.ID);
+
+        // Remove from Manager
+        m_renderTargets.Remove(targetKey);
     }
 
     Containers::GenerationalKey<FrameBufferAttachment> RenderTargetManager::CreateFrameBufferAttachment(
@@ -97,13 +116,42 @@ namespace RNGOEngine::Resources
         Containers::GenerationalKey<FrameBufferAttachment> frameBufferKey
     )
     {
-        // TODO:
+        const auto attachmentOpt = GetFrameBufferAttachment(frameBufferKey);
+        const auto targetOpt = GetRenderTarget(targetKey);
+        if (!attachmentOpt || !targetOpt)
+        {
+            RNGO_ASSERT(false && "RenderTargetManager::DestroyFrameBufferAttachment - Invalid Keys.");
+            return;
+        }
+
+        auto& attachment = attachmentOpt->get();
+        auto& target = targetOpt->get();
+
+        // Destroy GPU Resource
+        if (std::holds_alternative<Core::Renderer::Texture2DProperties>(attachment.Format))
+        {
+            m_renderer.DestroyTexture(attachment.ID);
+        }
+        else if (std::holds_alternative<Core::Renderer::RenderBufferFormat>(attachment.Format))
+        {
+            m_renderer.DestroyRenderBuffer(attachment.ID);
+        }
+
+        // Remove from Manager
+        m_frameBufferAttachments.Remove(frameBufferKey);
+
+        // Remove from Target
+        auto& attachments = target.Attachments;
+        erase_if(attachments, [&](const auto& key)
+        {
+            return key == frameBufferKey;
+        });
     }
 
-    void RenderTargetManager::ResizeAttachment(Containers::GenerationalKey<RenderTarget> targetKey,
-                                               Containers::GenerationalKey<FrameBufferAttachment>
+    void RenderTargetManager::ResizeAttachment(const Containers::GenerationalKey<RenderTarget> targetKey,
+                                               const Containers::GenerationalKey<FrameBufferAttachment>
                                                attachmentKey,
-                                               int width, int height)
+                                               const int width, const int height)
     {
         const auto attachmentOpt = GetFrameBufferAttachment(attachmentKey);
         const auto targetOpt = GetRenderTarget(targetKey);
