@@ -13,7 +13,7 @@ namespace RNGOEngine::Editor
     {
     public:
         explicit ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI);
-        
+
     public:
         void Render() override;
 
