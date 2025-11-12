@@ -56,8 +56,6 @@ namespace RNGOEngine::Core::Renderer
         // No attachments, just renders to Final Output.
         Resources::RenderTargetSpecification specification{
             .Name = "Forward Pass",
-            .CreateFrameBuffer = true,
-            .InputNames = {"Forward Pass"},
             .Attachments = {},
         };
 

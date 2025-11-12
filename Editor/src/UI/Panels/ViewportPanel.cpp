@@ -9,8 +9,6 @@ namespace RNGOEngine::Editor
     static auto ViewportPanelSpecialization =
         Resources::RenderTargetSpecification{
             .Name = "Viewport",
-            .CreateFrameBuffer = true,
-            .InputNames = {},
             .Attachments =
                 {
                     Resources::FrameBufferAttachmentSpecification{

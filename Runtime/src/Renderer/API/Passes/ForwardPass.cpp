@@ -22,8 +22,6 @@ namespace RNGOEngine::Core::Renderer
     {
         Resources::RenderTargetSpecification specification{
             .Name = "Forward Pass",
-            .CreateFrameBuffer = true,
-            .InputNames = {},
             .Attachments =
                 {Resources::FrameBufferAttachmentSpecification{
                      .Name = "ForwardOutput",

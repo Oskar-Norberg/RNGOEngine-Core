@@ -39,36 +39,11 @@ namespace RNGOEngine::Core::Renderer
         {
             m_passes.push_back(std::make_unique<T>(std::forward<Args>(args)...));
 
+            // If target defines any attachments.
             const auto passSpecification = m_passes.back()->GetRenderTargetSpecification();
-
-            // TODO: Should you not be able to create an empty RenderTarget?
             if (!passSpecification.Attachments.empty())
             {
-                auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
-                const auto key = targetManager.CreateRenderTarget();
-                m_context.renderPassResources.RegisterRenderTarget(passSpecification.Name, key);
-
-                for (const auto& attachment : passSpecification.Attachments)
-                {
-                    const auto attachmentKey = targetManager.CreateFrameBufferAttachment(
-                        key, attachment.Format, attachment.AttachmentPoint, attachment.Size.width,
-                        attachment.Size.height
-                    );
-
-                    // Add to resource mapper
-                    if (std::holds_alternative<Texture2DProperties>(attachment.Format))
-                    {
-                        m_context.renderPassResources.RegisterTextureAttachment(
-                            attachment.Name, attachmentKey
-                        );
-                    }
-                    else if (std::holds_alternative<RenderBufferFormat>(attachment.Format))
-                    {
-                        m_context.renderPassResources.RegisterRenderBufferAttachment(
-                            attachment.Name, attachmentKey
-                        );
-                    }
-                }
+                CreateRenderTarget(passSpecification, m_width, m_height);
             }
 
             return static_cast<T&>(*m_passes.back());
@@ -81,12 +56,18 @@ namespace RNGOEngine::Core::Renderer
         ///
         bool ListenSendEvents(Events::EventQueue& eventQueue);
 
+    public:
+        Containers::GenerationalKey<Resources::RenderTarget> CreateRenderTarget(
+            const Resources::RenderTargetSpecification& specification, int width, int height);
+
     private:
         IRenderer& m_renderer;
 
     private:
         RenderContext m_context;
         std::vector<std::unique_ptr<RenderPass>> m_passes;
+        std::unordered_map<Resources::RenderTargetSpecification, Containers::GenerationalKey<
+                               Resources::RenderTarget>> m_managedTargets;
 
     private:
         int m_width, m_height;

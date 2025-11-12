@@ -74,6 +74,42 @@ namespace RNGOEngine::Core::Renderer
         return false;
     }
 
+    // NOTE: This does not check for existing targets with the same specification.
+    // NOTE: This does not check for empty attachment lists.
+    Containers::GenerationalKey<Resources::RenderTarget> RenderAPI::CreateRenderTarget(
+        const Resources::RenderTargetSpecification& specification, const int width, const int height)
+    {
+        auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
+        const auto key = targetManager.CreateRenderTarget();
+        m_context.renderPassResources.RegisterRenderTarget(specification.Name, key);
+        m_managedTargets.insert({specification, key});
+
+        for (const auto& attachment : specification.Attachments)
+        {
+            // TODO: signedness missmatch
+            const auto attachmentKey = targetManager.CreateFrameBufferAttachment(
+                key, attachment.Format, attachment.AttachmentPoint,
+                attachment.Size.width,attachment.Size.height
+            );
+
+            // Add to resource mapper
+            if (std::holds_alternative<Texture2DProperties>(attachment.Format))
+            {
+                m_context.renderPassResources.RegisterTextureAttachment(
+                    attachment.Name, attachmentKey
+                );
+            }
+            else if (std::holds_alternative<RenderBufferFormat>(attachment.Format))
+            {
+                m_context.renderPassResources.RegisterRenderBufferAttachment(
+                    attachment.Name, attachmentKey
+                );
+            }
+        }
+
+        return key;
+    }
+
     void RenderAPI::Render(const int width, const int height,
                            std::optional<std::reference_wrapper<Resources::RenderTarget>> target)
     {
