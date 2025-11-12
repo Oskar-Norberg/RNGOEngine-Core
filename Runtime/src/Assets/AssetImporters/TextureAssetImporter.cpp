@@ -66,7 +66,9 @@ namespace RNGOEngine::AssetHandling
     std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
         const std::filesystem::path& path) const
     {
-        return std::make_unique<TextureMetadata>();
+        auto metadata = std::make_unique<TextureMetadata>();
+        metadata->Type = AssetType::Texture;
+        return std::move(metadata);
     }
 
     std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const

@@ -49,7 +49,9 @@ namespace RNGOEngine::AssetHandling
 
     std::unique_ptr<AssetMetadata> ModelAssetImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
     {
-        return std::make_unique<ModelMetadata>();
+        auto modelData = std::make_unique<ModelMetadata>();
+        modelData->Type = AssetType::Model;
+        return std::move(modelData);
     }
 
     std::span<const std::string_view> ModelAssetImporter::GetSupportedExtensions() const

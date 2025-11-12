@@ -41,6 +41,8 @@ namespace RNGOEngine::AssetHandling
     {
         auto shaderMetadata = std::make_unique<ShaderMetadata>();
         
+        shaderMetadata->Type = AssetType::Shader;
+        
         if (path.extension() == ".vert")
         {
             shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
