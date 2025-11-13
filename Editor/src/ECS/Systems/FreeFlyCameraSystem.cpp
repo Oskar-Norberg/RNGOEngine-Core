@@ -16,13 +16,26 @@ namespace RNGOEngine::Editor
     void FreeFlyCameraSystem::Update(Core::World& world, Systems::SystemContext& context)
     {
         IGameSystem::Update(world, context);
+        auto& inputManager = *context.inputManager;
 
-        if (!context.inputManager->IsMouseButtonDown(Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT))
+        // Not sure this is the best place for this, but works for now.
+        if (inputManager.WasMouseButtonPressedThisFrame(Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT))
+        {
+            inputManager.SetMouseMode(Data::Mouse::MouseMode::Locked);
+        }
+        else if (inputManager.WasMouseButtonReleasedThisFrame(
+                     Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT
+                 ))
+        {
+            inputManager.SetMouseMode(Data::Mouse::MouseMode::Normal);
+        }
+        
+        if (!inputManager.IsMouseButtonDown(Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT))
         {
             return;
         }
 
-        const auto cameraSpeed = context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_LEFT_SHIFT)
+        const auto cameraSpeed = inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_LEFT_SHIFT)
                                      ? CAMERA_SPEED * CAMERA_BOOST_MULTIPLIER
                                      : CAMERA_SPEED;
 
@@ -37,19 +50,19 @@ namespace RNGOEngine::Editor
             {
                 glm::vec3 moveDirection(0.0f);
 
-                if (context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_W))
+                if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_W))
                 {
                     moveDirection += forward;
                 }
-                if (context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_A))
+                if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_A))
                 {
                     moveDirection -= right;
                 }
-                if (context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_S))
+                if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_S))
                 {
                     moveDirection -= forward;
                 }
-                if (context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_D))
+                if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_D))
                 {
                     moveDirection += right;
                 }
@@ -64,11 +77,11 @@ namespace RNGOEngine::Editor
 
             // Vertical Movement
             {
-                if (context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_Q))
+                if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_Q))
                 {
                     transform.position += upward * cameraSpeed * context.deltaTime;
                 }
-                if (context.inputManager->IsKeyDown(Data::KeyCodes::RNGO_KEY_E))
+                if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_E))
                 {
                     transform.position -= upward * cameraSpeed * context.deltaTime;
                 }
@@ -76,7 +89,7 @@ namespace RNGOEngine::Editor
 
             // Mouse Look
             {
-                const auto mouseDelta = context.inputManager->GetMouseDelta();
+                const auto mouseDelta = inputManager.GetMouseDelta();
                 if (mouseDelta.x != 0.0 || mouseDelta.y != 0.0)
                 {
                     float yaw = glm::radians(static_cast<float>(-mouseDelta.x) * CAMERA_SENSITIVITY);
