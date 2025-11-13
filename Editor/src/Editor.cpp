@@ -36,7 +36,7 @@ namespace RNGOEngine::Editor
         m_UIManager.RegisterPanel<StatsPanel>();
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
         m_UIManager.RegisterPanel<HierarchyPanel>(m_sceneManager);
-        m_UIManager.RegisterPanel<DetailsPanel>();
+        m_UIManager.RegisterPanel<DetailsPanel>(m_sceneManager);
     }
 
     void Editor::OnUpdate(const float deltaTime)

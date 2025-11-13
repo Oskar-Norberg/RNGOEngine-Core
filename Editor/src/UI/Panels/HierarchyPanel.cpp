@@ -6,6 +6,7 @@
 
 #include "Components/Components.h"
 #include "Scene/SceneManager/SceneManager.h"
+#include "UI/Managers/UISelectionManager.h"
 #include "glm/gtc/type_ptr.inl"
 
 namespace RNGOEngine::Editor
@@ -41,7 +42,10 @@ namespace RNGOEngine::Editor
                 name = "Unnamed Entity";
             }
 
-            ImGui::Selectable(name.data());
+            if (ImGui::Selectable(name.data()))
+            {
+                context.selectionManager->SetSelectedEntity(entity);
+            }
 
             ImGui::PopID();
         }

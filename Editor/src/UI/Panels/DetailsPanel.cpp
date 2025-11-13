@@ -8,6 +8,11 @@
 
 namespace RNGOEngine::Editor
 {
+    DetailsPanel::DetailsPanel(Core::SceneManager& sceneManager)
+        : m_sceneManager(sceneManager)
+    {
+    }
+
     void DetailsPanel::Render(UIContext& context)
     {
         IDockablePanel::Render(context);
@@ -21,6 +26,5 @@ namespace RNGOEngine::Editor
         }
 
         ImGui::Text("Entity selected :)");
-
     }
 }
