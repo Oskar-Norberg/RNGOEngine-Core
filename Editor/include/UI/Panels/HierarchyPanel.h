@@ -17,7 +17,7 @@ namespace RNGOEngine::Editor
         explicit HierarchyPanel(Core::SceneManager& sceneManager);
 
     public:
-        void Render() override;
+        void Render(UIContext& context) override;
 
         std::string_view GetPanelName() const override
         {

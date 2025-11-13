@@ -5,8 +5,9 @@
 #pragma once
 
 #include <imgui.h>
-
 #include <string_view>
+
+#include "UIContext.h"
 
 namespace RNGOEngine::Editor
 {
@@ -16,45 +17,45 @@ namespace RNGOEngine::Editor
         virtual ~IDockablePanel() = default;
 
     public:
-        virtual void Update(float deltaTime)
+        virtual void Update(UIContext& context, float deltaTime)
         {
         }
 
-        virtual void Render()
-        {
-        }
-
-    public:
-        virtual void OnOpen()
-        {
-        }
-
-        virtual void OnClose()
+        virtual void Render(UIContext& context)
         {
         }
 
     public:
-        void SetTargetHovered(bool status)
+        virtual void OnOpen(UIContext& context)
+        {
+        }
+
+        virtual void OnClose(UIContext& context)
+        {
+        }
+
+    public:
+        void SetTargetHovered(UIContext& context, const bool status)
         {
             if (m_isHovered != status)
             {
                 m_isHovered = status;
                 if (m_isHovered)
                 {
-                    OnFocusGained();
+                    OnFocusGained(context);
                 }
                 else
                 {
-                    OnFocusLost();
+                    OnFocusLost(context);
                 }
             }
         }
 
-        virtual void OnFocusGained()
+        virtual void OnFocusGained(UIContext& context)
         {
         }
 
-        virtual void OnFocusLost()
+        virtual void OnFocusLost(UIContext& context)
         {
         }
 

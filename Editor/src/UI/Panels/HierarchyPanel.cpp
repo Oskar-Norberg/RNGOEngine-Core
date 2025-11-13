@@ -14,10 +14,9 @@ namespace RNGOEngine::Editor
         : m_sceneManager(sceneManager)
     {
     }
-
-    void HierarchyPanel::Render()
+    void HierarchyPanel::Render(UIContext& context)
     {
-        IDockablePanel::Render();
+        IDockablePanel::Render(context);
 
         auto* world = m_sceneManager.GetCurrentWorld();
         if (!world)

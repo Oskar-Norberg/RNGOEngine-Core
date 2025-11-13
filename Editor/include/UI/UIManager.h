@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "IDockablePanel.h"
+#include "Managers/UISelectionManager.h"
+#include "UIContext.h"
 
 namespace RNGOEngine
 {
@@ -43,6 +45,12 @@ namespace RNGOEngine::Editor
 
     private:
         std::vector<std::unique_ptr<IDockablePanel>> m_panels;
+
+    private:
+        UISelectionManager m_selectionManager;
+
+    private:
+        UIContext m_uiContext;
 
     private:
         // Reference means this cannot be moved/unbound, but that's probably fine.
