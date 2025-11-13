@@ -60,7 +60,7 @@ namespace RNGOEngine::Temporary
             }
 
             // World Camera
-            auto camera = world.CreateEntity();
+            auto camera = world.CreateEntity({"Camera"});
             camera.AddComponent<Components::Camera>();
 
             // Ambient Light
@@ -74,7 +74,7 @@ namespace RNGOEngine::Temporary
 
             // Directional Light
             {
-                auto directionalLight = world.CreateEntity();
+                auto directionalLight = world.CreateEntity({"Directional Light"});
 
                 directionalLight.AddComponent<Components::DirectionalLight>();
                 directionalLight.AddComponent<Components::Color>();
@@ -87,7 +87,7 @@ namespace RNGOEngine::Temporary
                     .position = {-2.0f, -1.7f, -8.0f}, .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
                 };
                 
-                auto pointLight = world.CreateEntity(transform);
+                auto pointLight = world.CreateEntity({"Point Light"}, transform);
 
                 const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
                 const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
@@ -111,7 +111,7 @@ namespace RNGOEngine::Temporary
                     .position = {2.0f, -1.7f, -8.0f}, .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
                 };
 
-                auto pointLight = world.CreateEntity(transform);
+                auto pointLight = world.CreateEntity({"Point Light"}, transform);
 
                 const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
                 const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
@@ -130,7 +130,7 @@ namespace RNGOEngine::Temporary
             {
                 Components::Transform transform{.scale = {0.1f, 0.1f, 0.1f}};
 
-                auto spotlight = world.CreateEntity(transform);
+                auto spotlight = world.CreateEntity({"Spotlight"}, transform);
 
                 spotlight.AddComponent<Components::Spotlight>();
                 spotlight.AddComponent<Components::Intensity>(1.0f);
@@ -139,7 +139,7 @@ namespace RNGOEngine::Temporary
 
             // Background Color
             {
-                auto background = world.CreateEntity();
+                auto background = world.CreateEntity({"Background Color"});
                 background.AddComponent<Components::BackgroundColor>();
                 background.AddComponent<Components::Color>(glm::vec3(0.3f, 0.3f, 0.3f));
             }

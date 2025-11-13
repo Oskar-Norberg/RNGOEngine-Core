@@ -87,7 +87,7 @@ namespace RNGOEngine::Components
     };
 
     // TODO: Implement a custom FixedString templated-type?
-    constexpr auto MAX_NR_CHARACTERS = 16 + 1;
+    constexpr auto MAX_NR_CHARACTERS = 24 + 1;
     constexpr auto UNNAMED_ENTITY = "Unnamed Entity";
     struct Name
     {
