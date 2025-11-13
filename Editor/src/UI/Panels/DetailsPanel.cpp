@@ -9,11 +9,6 @@
 
 namespace RNGOEngine::Editor
 {
-    DetailsPanel::DetailsPanel(Core::SceneManager& sceneManager)
-        : m_sceneManager(sceneManager)
-    {
-    }
-
     void DetailsPanel::Render(UIContext& context)
     {
         IDockablePanel::Render(context);
@@ -27,7 +22,7 @@ namespace RNGOEngine::Editor
         }
 
         // TODO:Temporarily display components directly in here. Later this will need a separate panel / proper serialization.
-        auto& registry = m_sceneManager.GetCurrentWorld()->GetRegistry();
+        auto& registry = context.sceneManager->GetCurrentWorld()->GetRegistry();
         if (registry.any_of<Components::MeshRenderer>(selectedEntity))
         {
             ImGui::Text("MeshRenderer");

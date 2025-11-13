@@ -12,6 +12,7 @@ namespace RNGOEngine::Editor
     class ViewPortPanel : public IDockablePanel
     {
     public:
+        // TODO: Add to UIContext?
         explicit ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI);
 
     public:

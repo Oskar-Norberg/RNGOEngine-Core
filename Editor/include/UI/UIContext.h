@@ -4,9 +4,22 @@
 
 #pragma once
 
-namespace RNGOEngine::Editor
+namespace RNGOEngine
 {
-    class UISelectionManager;
+    namespace Core
+    {
+        namespace Renderer
+        {
+            class RenderAPI;
+        }
+        class SceneManager;
+    }
+
+    namespace Editor
+    {
+        class UISelectionManager;
+
+    }
 }
 
 namespace RNGOEngine::Editor
@@ -14,5 +27,7 @@ namespace RNGOEngine::Editor
     struct UIContext
     {
         UISelectionManager* selectionManager = nullptr;
+        Core::SceneManager* sceneManager = nullptr;
+        Core::Renderer::RenderAPI* rendererAPI = nullptr;
     };
 }

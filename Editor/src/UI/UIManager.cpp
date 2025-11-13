@@ -12,7 +12,7 @@
 
 namespace RNGOEngine::Editor
 {
-    UIManager::UIManager(Core::Window::IWindow& window)
+    UIManager::UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager)
         : m_window(window)
     {
         // Setup Dear ImGui context
@@ -30,6 +30,7 @@ namespace RNGOEngine::Editor
 
         // Set up UIContext
         m_uiContext.selectionManager = &m_selectionManager;
+        m_uiContext.sceneManager = &sceneManager;
     }
 
     void UIManager::Update(const float deltaTime)

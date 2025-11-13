@@ -24,11 +24,11 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Editor
 {
-    // TODO: Trigger panel events (OnOpen, OnClose, OnFocusGained, OnFocusLost, OnResize)
     class UIManager
     {
     public:
-        explicit UIManager(Core::Window::IWindow& window);
+        // TODO: Passing SceneManager like this feels wrong.
+        explicit UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager);
 
         void Update(float deltaTime);
 

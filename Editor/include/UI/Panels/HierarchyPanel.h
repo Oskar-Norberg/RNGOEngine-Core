@@ -13,18 +13,11 @@ namespace RNGOEngine::Editor
     class HierarchyPanel : public IDockablePanel
     {
     public:
-        // TODO: Idk if this panel should access the SceneManager directly.
-        explicit HierarchyPanel(Core::SceneManager& sceneManager);
-
-    public:
         void Render(UIContext& context) override;
 
         std::string_view GetPanelName() const override
         {
             return "Hierarchy";
         }
-
-    private:
-        Core::SceneManager& m_sceneManager;
     };
 }

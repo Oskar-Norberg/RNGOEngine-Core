@@ -11,15 +11,11 @@
 
 namespace RNGOEngine::Editor
 {
-    HierarchyPanel::HierarchyPanel(Core::SceneManager& sceneManager)
-        : m_sceneManager(sceneManager)
-    {
-    }
     void HierarchyPanel::Render(UIContext& context)
     {
         IDockablePanel::Render(context);
 
-        auto* world = m_sceneManager.GetCurrentWorld();
+        auto* world = context.sceneManager->GetCurrentWorld();
         if (!world)
         {
             ImGui::Text("No world loaded.");

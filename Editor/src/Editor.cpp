@@ -16,7 +16,7 @@
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config), m_UIManager(*m_window)
+        : Application(config), m_UIManager(*m_window, m_sceneManager)
     {
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
@@ -35,8 +35,8 @@ namespace RNGOEngine::Editor
         // Set up UI Panels
         m_UIManager.RegisterPanel<StatsPanel>();
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
-        m_UIManager.RegisterPanel<HierarchyPanel>(m_sceneManager);
-        m_UIManager.RegisterPanel<DetailsPanel>(m_sceneManager);
+        m_UIManager.RegisterPanel<HierarchyPanel>();
+        m_UIManager.RegisterPanel<DetailsPanel>();
     }
 
     void Editor::OnUpdate(const float deltaTime)
