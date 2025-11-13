@@ -85,4 +85,12 @@ namespace RNGOEngine::Components
         float cutOff = glm::cos(glm::radians(10.0f));
         float outerCutOff = glm::cos(glm::radians(12.5f));
     };
+
+    // TODO: Implement a custom FixedString templated-type?
+    constexpr auto MAX_NR_CHARACTERS = 16 + 1;
+    constexpr auto UNNAMED_ENTITY = "Unnamed Entity";
+    struct Name
+    {
+        std::array<char, MAX_NR_CHARACTERS> NameArr;
+    };
 }

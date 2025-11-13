@@ -51,7 +51,7 @@ namespace RNGOEngine::Editor
                         auto& transform = registry.get<Components::Transform>(entity);
                         ImGui::DragFloat3("Position", glm::value_ptr(transform.position), 0.01f);
                         glm::vec3 eulerRot = glm::degrees(glm::eulerAngles(transform.rotation));
-                        if (ImGui::DragFloat3("Rotation", glm::value_ptr(eulerRot), 0.01f))
+                        if (ImGui::DragFloat3("Rotation", glm::value_ptr(eulerRot), 0.1f))
                         {
                             transform.rotation = glm::quat(glm::radians(eulerRot));
                         }
@@ -129,6 +129,16 @@ namespace RNGOEngine::Editor
                         auto& spotlight = registry.get<Components::Spotlight>(entity);
                         ImGui::DragFloat("CutOff", &spotlight.cutOff, 0.01f);
                         ImGui::DragFloat("OuterCutOff", &spotlight.outerCutOff, 0.01f);
+                        ImGui::TreePop();
+                    }
+                }
+
+                if (registry.any_of<Components::Name>(entity))
+                {
+                    if (ImGui::TreeNode("Name"))
+                    {
+                        auto& name = registry.get<Components::Name>(entity);
+                        ImGui::InputText("Name", name.NameArr.data(), Components::MAX_NR_CHARACTERS);
                         ImGui::TreePop();
                     }
                 }
