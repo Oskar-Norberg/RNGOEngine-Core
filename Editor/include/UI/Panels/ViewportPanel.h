@@ -13,7 +13,7 @@ namespace RNGOEngine::Editor
     {
     public:
         explicit ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI);
-        
+
     public:
         void Render() override;
 
@@ -21,6 +21,9 @@ namespace RNGOEngine::Editor
         {
             return "Viewport";
         }
+
+        void OnFocusGained() override;
+        void OnFocusLost() override;
 
     private:
         Core::Renderer::RenderAPI& m_rendererAPI;

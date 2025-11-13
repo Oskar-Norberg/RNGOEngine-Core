@@ -5,6 +5,7 @@
 #pragma once
 
 #include <imgui.h>
+
 #include <string_view>
 
 namespace RNGOEngine::Editor
@@ -33,6 +34,22 @@ namespace RNGOEngine::Editor
         }
 
     public:
+        void SetTargetHovered(bool status)
+        {
+            if (m_isHovered != status)
+            {
+                m_isHovered = status;
+                if (m_isHovered)
+                {
+                    OnFocusGained();
+                }
+                else
+                {
+                    OnFocusLost();
+                }
+            }
+        }
+
         virtual void OnFocusGained()
         {
         }
@@ -42,16 +59,9 @@ namespace RNGOEngine::Editor
         }
 
     public:
-        virtual void OnResize(const int width, const int height)
-        {
-            m_width = width;
-            m_height = height;
-        }
-
-    public:
         virtual std::string_view GetPanelName() const = 0;
 
-    protected:
-        int m_width = 0, m_height = 0;
+    private:
+        bool m_isHovered = false;
     };
 }

@@ -25,6 +25,8 @@ add_executable(${EDITOR_PROJECT_NAME} main.cpp
         include/Editor.h
         src/Editor.cpp
         include/TestScene.h
+        include/ECS/Systems/FreeFlyCameraSystem.h
+        src/ECS/Systems/FreeFlyCameraSystem.cpp
 )
 
 target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
