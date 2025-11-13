@@ -4,16 +4,14 @@
 
 #include "Editor.h"
 
+#include "ECS/Systems/FreeFlyCameraSystem.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
-
 #include "TestScene.h"
-
+#include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/StatsPanel.h"
 #include "UI/Panels/ViewportPanel.h"
-
-#include "ECS/Systems/FreeFlyCameraSystem.h"
 
 namespace RNGOEngine::Editor
 {
@@ -24,10 +22,12 @@ namespace RNGOEngine::Editor
 
         // Should this really be the editor's responsibility?
         // TODO: Add a RenderPipelineConfiguration to the EngineConfig?
-        m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(*m_renderer, m_window->GetWidth(),
-                                                                 m_window->GetHeight());
-        m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(*m_renderer, m_window->GetWidth(),
-                                                                       m_window->GetHeight());
+        m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
+            *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+        );
+        m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
+            *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+        );
 
         // Set up Editor Systems
         m_gameSystems.RegisterSystem<FreeFlyCameraSystem>();
@@ -36,6 +36,7 @@ namespace RNGOEngine::Editor
         m_UIManager.RegisterPanel<StatsPanel>();
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
         m_UIManager.RegisterPanel<HierarchyPanel>(m_sceneManager);
+        m_UIManager.RegisterPanel<DetailsPanel>();
     }
 
     void Editor::OnUpdate(const float deltaTime)
