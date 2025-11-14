@@ -26,6 +26,11 @@ namespace RNGOEngine::Editor
 
         auto& registry = world->GetRegistry();
 
+        if (ImGui::Button("Create Empty"))
+        {
+            world->CreateEntity();
+        }
+
         const auto entities = registry.view<entt::entity>();
         for (auto entity : entities)
         {
