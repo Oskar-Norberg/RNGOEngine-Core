@@ -6,9 +6,9 @@
 
 namespace RNGOEngine::Editor
 {
-    void StatsPanel::Update(const float deltaTime)
+    void StatsPanel::Update(UIContext& context, float deltaTime)
     {
-        IDockablePanel::Update(deltaTime);
+        IDockablePanel::Update(context, deltaTime);
 
         m_lastDeltaTime = deltaTime;
 
@@ -23,9 +23,9 @@ namespace RNGOEngine::Editor
         }
     }
 
-    void StatsPanel::Render()
+    void StatsPanel::Render(UIContext& context)
     {
-        IDockablePanel::Render();
+        IDockablePanel::Render(context);
 
         ImGui::Text("FPS: %.2f", m_fps);
         ImGui::Text("Frame Time: %.2f ms", m_lastDeltaTime * 1000.0f);

@@ -12,18 +12,16 @@ namespace RNGOEngine::Editor
     class ViewPortPanel : public IDockablePanel
     {
     public:
+        // TODO: Add to UIContext?
         explicit ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI);
 
     public:
-        void Render() override;
+        void Render(UIContext& context) override;
 
         std::string_view GetPanelName() const override
         {
             return "Viewport";
         }
-
-        void OnFocusGained() override;
-        void OnFocusLost() override;
 
     private:
         Core::Renderer::RenderAPI& m_rendererAPI;

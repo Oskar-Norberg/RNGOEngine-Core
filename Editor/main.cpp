@@ -14,7 +14,6 @@ int main()
         {EDITOR_SHADERS_DIR, Texture},
         {EDITOR_MODELS_DIR, Model}
     };
-
     constexpr RNGOEngine::EngineConfig config{
         RNGOEngine::RenderType::GLFW_OpenGL,
         1280,

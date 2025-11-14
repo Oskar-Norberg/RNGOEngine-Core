@@ -11,8 +11,8 @@ namespace RNGOEngine::Editor
     class StatsPanel : public IDockablePanel
     {
     public:
-        void Update(float deltaTime) override;
-        void Render() override;
+        void Update(UIContext& context, float deltaTime) override;
+        void Render(UIContext& context) override;
 
         std::string_view GetPanelName() const override
         {

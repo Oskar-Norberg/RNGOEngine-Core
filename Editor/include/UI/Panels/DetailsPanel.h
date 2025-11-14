@@ -1,23 +1,21 @@
 ﻿//
-// Created by Oskar.Norberg on 2025-11-10.
+// Created by Oskar.Norberg on 2025-11-13.
 //
 
 #pragma once
-
-#include <Scene/SceneManager/SceneManager.h>
-
+#include "Scene/SceneManager/SceneManager.h"
 #include "UI/IDockablePanel.h"
 
 namespace RNGOEngine::Editor
 {
-    class HierarchyPanel : public IDockablePanel
+    class DetailsPanel : public IDockablePanel
     {
     public:
         void Render(UIContext& context) override;
 
         std::string_view GetPanelName() const override
         {
-            return "Hierarchy";
+            return "Details";
         }
     };
 }

@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "IDockablePanel.h"
+#include "Managers/UISelectionManager.h"
+#include "UIContext.h"
 
 namespace RNGOEngine
 {
@@ -22,11 +24,11 @@ namespace RNGOEngine
 
 namespace RNGOEngine::Editor
 {
-    // TODO: Trigger panel events (OnOpen, OnClose, OnFocusGained, OnFocusLost, OnResize)
     class UIManager
     {
     public:
-        explicit UIManager(Core::Window::IWindow& window);
+        // TODO: Passing SceneManager like this feels wrong.
+        explicit UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager);
 
         void Update(float deltaTime);
 
@@ -43,6 +45,12 @@ namespace RNGOEngine::Editor
 
     private:
         std::vector<std::unique_ptr<IDockablePanel>> m_panels;
+
+    private:
+        UISelectionManager m_selectionManager;
+
+    private:
+        UIContext m_uiContext;
 
     private:
         // Reference means this cannot be moved/unbound, but that's probably fine.
