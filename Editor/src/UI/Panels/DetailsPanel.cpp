@@ -137,5 +137,68 @@ namespace RNGOEngine::Editor
 
             ImGui::Separator();
         }
+
+        if (ImGui::Button("Add Component"))
+        {
+            ImGui::OpenPopup("AddComponentPopup");
+        }
+
+        if (ImGui::BeginPopup("AddComponentPopup"))
+        {
+            // TODO: Another terrible hardcoded list. This should probably integrate with entt::meta.
+            if (ImGui::Button("MeshRenderer"))
+            {
+                registry.emplace<Components::MeshRenderer>(selectedEntity);
+            }
+
+            if (ImGui::Button("Camera"))
+            {
+                registry.emplace<Components::Camera>(selectedEntity);
+            }
+
+            if (ImGui::Button("Color"))
+            {
+                registry.emplace<Components::Color>(selectedEntity);
+            }
+
+            if (ImGui::Button("Intensity"))
+            {
+                registry.emplace<Components::Intensity>(selectedEntity);
+            }
+
+            if (ImGui::Button("BackgroundColor"))
+            {
+                registry.emplace<Components::BackgroundColor>(selectedEntity);
+            }
+
+            if (ImGui::Button("LightFalloff"))
+            {
+                registry.emplace<Components::LightFalloff>(selectedEntity);
+            }
+
+            if (ImGui::Button("AmbientLight"))
+            {
+                registry.emplace<Components::AmbientLight>(selectedEntity);
+            }
+
+            if (ImGui::Button("DirectionalLight"))
+            {
+                registry.emplace<Components::DirectionalLight>(selectedEntity);
+            }
+
+            if (ImGui::Button("PointLight"))
+            {
+                registry.emplace<Components::PointLight>(selectedEntity);
+            }
+
+            if (ImGui::Button("Spotlight"))
+            {
+                registry.emplace<Components::Spotlight>(selectedEntity);
+            }
+            
+            ImGui::EndPopup();
+        }
+
+        
     }
 }
