@@ -4,6 +4,8 @@
 
 #include "UI/Panels/HierarchyPanel.h"
 
+#include <iostream>
+
 #include "Components/Components.h"
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/Managers/UISelectionManager.h"
@@ -41,6 +43,32 @@ namespace RNGOEngine::Editor
             if (ImGui::Selectable(name.data()))
             {
                 context.selectionManager->SetSelectedEntity(entity);
+            }
+
+            if (ImGui::IsItemHovered() &&
+                ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            {
+                ImGui::OpenPopup("EntityOptionsPopup");
+            }
+
+            if (ImGui::BeginPopup("EntityOptionsPopup"))
+            {
+                if (ImGui::Button("Destroy"))
+                {
+                    registry.destroy(entity);
+                }
+                
+                if (ImGui::Button("Duplicate"))
+                {
+                    const auto newEntity = registry.create();
+                    for(auto [id, storage]: registry.storage()) {
+                        if(storage.contains(entity)) {
+                            storage.push(newEntity, storage.value(entity));
+                        }
+                    }
+                }
+
+                ImGui::EndPopup();
             }
 
             ImGui::PopID();
