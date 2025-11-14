@@ -23,20 +23,15 @@ namespace RNGOEngine::Editor
 
         // TODO:Temporarily display components directly in here. Later this will need a separate panel / proper serialization.
         auto& registry = context.sceneManager->GetCurrentWorld()->GetRegistry();
-        if (registry.any_of<Components::MeshRenderer>(selectedEntity))
+
+        if (registry.any_of<Components::Name>(selectedEntity))
         {
-            ImGui::Text("MeshRenderer");
-            const auto& meshRenderer = registry.get<Components::MeshRenderer>(selectedEntity);
-            ImGui::Text("ModelHandle %u", meshRenderer.modelHandle.GetValue());
-            ImGui::Text("MaterialHandle %u", meshRenderer.materialKey.GetValue());
-
-            ImGui::Separator();
+            auto& name = registry.get<Components::Name>(selectedEntity);
+            ImGui::InputText("Name", name.NameArr.data(), Components::MAX_NR_CHARACTERS);
         }
-
+        
         if (registry.any_of<Components::Transform>(selectedEntity))
         {
-            ImGui::Text("Transform");
-
             auto& transform = registry.get<Components::Transform>(selectedEntity);
 
             ImGui::Text("Transform");
@@ -48,6 +43,16 @@ namespace RNGOEngine::Editor
                 transform.rotation = glm::quat(glm::radians(eulerRot));
             }
             ImGui::DragFloat3("Scale", glm::value_ptr(transform.scale), 0.01f, 0.0f);
+
+            ImGui::Separator();
+        }
+        
+        if (registry.any_of<Components::MeshRenderer>(selectedEntity))
+        {
+            ImGui::Text("MeshRenderer");
+            const auto& meshRenderer = registry.get<Components::MeshRenderer>(selectedEntity);
+            ImGui::Text("ModelHandle %u", meshRenderer.modelHandle.GetValue());
+            ImGui::Text("MaterialHandle %u", meshRenderer.materialKey.GetValue());
 
             ImGui::Separator();
         }
