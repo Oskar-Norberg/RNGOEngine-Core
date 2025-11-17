@@ -47,16 +47,24 @@ namespace RNGOEngine::Editor
 
         const auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
         const auto renderTarget = targetManager.GetRenderTarget(m_viewportRenderTargetKey);
+        if (!renderTarget )
+        {
+            ImGui::Text("Invalid Render Target!");
+            return;
+        }
+        
+        const auto textureID = targetManager.GetFrameBufferAttachment(renderTarget->get().Attachments.at(0));
 
-        if (!renderTarget)
+        if (!textureID)
         {
             ImGui::Text("Invalid Render Target!");
             return;
         }
 
+ 
+
         // Ugly hardcoded index 0. Assumes first attachment is color.
-        const auto texID =
-            static_cast<ImTextureID>(static_cast<intptr_t>(renderTarget->get().Attachments.at(0).ID));
-        ImGui::Image(texID, availableSize);
+        const auto imguiTexID = static_cast<ImTextureID>(textureID->get().ID);
+        ImGui::Image(imguiTexID, availableSize);
     }
 }

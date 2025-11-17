@@ -16,5 +16,6 @@ namespace RNGOEngine::AssetHandling
 
     private:
         static void SetUpModel();
+        static void SetUpTexture();
     };
 }

@@ -13,6 +13,7 @@ namespace RNGOEngine::AssetHandling
     void BuiltinAssets::InitializeBuiltinAssets()
     {
         SetUpModel();
+        SetUpTexture();
     }
 
     AssetHandle BuiltinAssets::GetErrorHandle(AssetType type)
@@ -23,6 +24,7 @@ namespace RNGOEngine::AssetHandling
             case AssetType::Model:
                 return assetManager.GetModelManager().GetErrorModel();
             case AssetType::Texture:
+                return assetManager.GetTextureManager().GetInvalidTexture();
             case AssetType::Shader:
             case AssetType::Material:
                 RNGO_ASSERT(false && "Unsupported type!");
@@ -39,5 +41,12 @@ namespace RNGOEngine::AssetHandling
         auto& loader = AssetLoader::GetInstance();
 
         modelManager.SetErrorModel(loader.Load(AssetType::Model, Data::FallbackAssets::InvalidModel));
+    }
+    void BuiltinAssets::SetUpTexture()
+    {
+        auto& textureManager = AssetManager::GetInstance().GetTextureManager();
+        auto& loader = AssetLoader::GetInstance();
+
+        textureManager.SetInvalidTexture(loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture));
     }
 }

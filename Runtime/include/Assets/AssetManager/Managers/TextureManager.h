@@ -45,6 +45,7 @@ namespace RNGOEngine::AssetHandling
         void UnloadTexture(const AssetHandle& assetHandle);
 
     public:
+        void SetInvalidTexture(const AssetHandle& handle);
         AssetHandle GetInvalidTexture() const;
 
     public:
@@ -52,6 +53,7 @@ namespace RNGOEngine::AssetHandling
 
     private:
         std::unordered_map<AssetHandle, RuntimeTextureData> m_textures;
+        AssetHandle m_invalidTexture;
 
     private:
         Resources::ResourceManager& m_resourceManager;
