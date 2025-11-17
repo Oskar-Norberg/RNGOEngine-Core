@@ -6,6 +6,8 @@
 
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
+#include "Renderer/API/Passes/ForwardPass.h"
+#include "Renderer/API/Passes/ForwardScreenPass.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
 #include "Systems/Core/RenderSystem.h"
@@ -23,8 +25,8 @@ namespace RNGOEngine
         {
             case RenderType::GLFW_OpenGL:
             {
-                m_window = std::make_unique<Core::Window::GLFWWindow>(
-                    config.width, config.height, config.name);
+                m_window =
+                    std::make_unique<Core::Window::GLFWWindow>(config.width, config.height, config.name);
                 m_renderer = std::make_unique<Core::Renderer::GLFWRenderer>();
                 doFlipTexturesVertically = true;
                 break;
@@ -58,9 +60,27 @@ namespace RNGOEngine
             m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
         );
 
-        m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(
-            *m_renderer, config.width, config.height
-        );
+        m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.width, config.height);
+
+        switch (config.pipeline)
+        {
+            case Pipeline::Forward:
+            {
+                m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
+                    *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+                );
+                m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
+                    *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+                );
+            }
+            break;
+            case Pipeline::ForwardPlus:
+                RNGO_ASSERT(false && "Forward Plus pipeline not implemented.");
+                break;
+            case Pipeline::Deferred:
+                RNGO_ASSERT(false && "Deferred pipeline not implemented.");
+                break;
+        }
 
         AddEngineSystems();
         SetupSystemContexts();
@@ -82,9 +102,8 @@ namespace RNGOEngine
             RNGO_ZONE_SCOPE;
             RNGO_ZONE_NAME_C("Engine::Run - Main Loop");
 
-            const float deltaTime = std::chrono::duration<float>(
-                std::chrono::high_resolution_clock::now() - lastFrame
-            ).count();
+            const float deltaTime =
+                std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
             m_sceneManager.SwitchToPendingScene();

@@ -16,6 +16,7 @@ int main()
     };
     constexpr RNGOEngine::EngineConfig config{
         RNGOEngine::RenderType::GLFW_OpenGL,
+        RNGOEngine::Pipeline::Forward,
         1280,
         720,
         "The Renderer",

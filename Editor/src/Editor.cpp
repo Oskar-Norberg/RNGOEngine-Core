@@ -5,8 +5,6 @@
 #include "Editor.h"
 
 #include "ECS/Systems/FreeFlyCameraSystem.h"
-#include "Renderer/API/Passes/ForwardPass.h"
-#include "Renderer/API/Passes/ForwardScreenPass.h"
 #include "TestScene.h"
 #include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
@@ -19,15 +17,6 @@ namespace RNGOEngine::Editor
         : Application(config), m_UIManager(*m_window, m_sceneManager)
     {
         m_sceneManager.LoadScene<Temporary::TestScene>();
-
-        // Should this really be the editor's responsibility?
-        // TODO: Add a RenderPipelineConfiguration to the EngineConfig?
-        m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
-            *m_renderer, m_window->GetWidth(), m_window->GetHeight()
-        );
-        m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
-            *m_renderer, m_window->GetWidth(), m_window->GetHeight()
-        );
 
         // Set up Editor Systems
         m_gameSystems.RegisterSystem<FreeFlyCameraSystem>();
