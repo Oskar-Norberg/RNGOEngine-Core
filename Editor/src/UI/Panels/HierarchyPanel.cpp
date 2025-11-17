@@ -50,8 +50,7 @@ namespace RNGOEngine::Editor
                 context.selectionManager->SetSelectedEntity(entity);
             }
 
-            if (ImGui::IsItemHovered() &&
-                ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
             {
                 ImGui::OpenPopup("EntityOptionsPopup");
             }
@@ -62,14 +61,25 @@ namespace RNGOEngine::Editor
                 {
                     registry.destroy(entity);
                 }
-                
+
                 if (ImGui::Button("Duplicate"))
                 {
                     const auto newEntity = registry.create();
-                    for(auto [id, storage]: registry.storage()) {
-                        if(storage.contains(entity)) {
+                    for (auto [id, storage] : registry.storage())
+                    {
+                        if (storage.contains(entity))
+                        {
                             storage.push(newEntity, storage.value(entity));
                         }
+                    }
+
+                    if (registry.any_of<Components::Name>(newEntity))
+                    {
+                        auto& nameComp = registry.get<Components::Name>(newEntity);
+                        std::string newName = std::string(nameComp.NameArr.data()) + " (Copy)";
+                        std::snprintf(
+                            nameComp.NameArr.data(), Components::MAX_NR_CHARACTERS, "%s", newName.c_str()
+                        );
                     }
                 }
 
