@@ -10,16 +10,34 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    inline void SetUpModel()
+    void BuiltinAssets::InitializeBuiltinAssets()
+    {
+        SetUpModel();
+    }
+
+    AssetHandle BuiltinAssets::GetErrorHandle(AssetType type)
+    {
+        const auto& assetManager = AssetManager::GetInstance();
+        switch (type)
+        {
+            case AssetType::Model:
+                return assetManager.GetModelManager().GetErrorModel();
+            case AssetType::Texture:
+            case AssetType::Shader:
+            case AssetType::Material:
+                RNGO_ASSERT(false && "Unsupported type!");
+            case AssetType::Count:
+            case AssetType::None:
+            default:
+                RNGO_ASSERT(false && "Unknown AssetType!");
+        }
+    }
+
+    void BuiltinAssets::SetUpModel()
     {
         auto& modelManager = AssetManager::GetInstance().GetModelManager();
         auto& loader = AssetLoader::GetInstance();
 
         modelManager.SetErrorModel(loader.Load(AssetType::Model, Data::FallbackAssets::InvalidModel));
-    }
-
-    void InitializeBuiltinAssets()
-    {
-        SetUpModel();
     }
 }

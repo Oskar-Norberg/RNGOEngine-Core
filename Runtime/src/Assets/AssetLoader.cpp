@@ -4,13 +4,14 @@
 
 #include "Assets/AssetLoader.h"
 
-#include <ranges>
-
 #include <yaml-cpp/yaml.h>
 
+#include <ranges>
+
 #include "Assets/AssetDatabase/AssetDatabase.h"
-#include "Utilities/RNGOAsserts.h"
+#include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -33,10 +34,8 @@ namespace RNGOEngine::AssetHandling
         const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
         if (!fullPath)
         {
-            RNGO_ASSERT(false && "AssetLoader::Load - Asset not found!");
-            // TODO: What to return here?
-            // TODO: UB
-            return {};
+            // TODO: Log failure
+            return BuiltinAssets::GetErrorHandle(type);
         }
 
         if (AssetDatabase::GetInstance().IsRegistered(fullPath.value()))

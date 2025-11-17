@@ -36,13 +36,19 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle ModelManager::GetInvalidModel() const
     {
-        // TODO: Return an actual error model.
-        return Utilities::UUID(0);
+        return m_errorModel;
     }
 
     const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
     {
-        return m_models.at(handle);
+        const auto it = m_models.find(handle);
+        if (it != m_models.end())
+        {
+            return it->second;
+        }
+
+        RNGO_ASSERT(m_models.contains(handle) && "ModelManager::GetRuntimeModelData - Fallback Error model not loaded!");
+        return m_models.at(m_errorModel);
     }
 
     RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelHandle modelHandle)

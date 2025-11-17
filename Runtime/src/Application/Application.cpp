@@ -87,7 +87,8 @@ namespace RNGOEngine
             m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
         );
 
-        AssetHandling::InitializeBuiltinAssets();
+        // Builtin Assets
+        AssetHandling::BuiltinAssets::InitializeBuiltinAssets();
 
         AddEngineSystems();
         SetupSystemContexts();

@@ -3,9 +3,18 @@
 //
 
 #pragma once
+#include "Assets/Asset.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Send parameters instead of relying on singletons?
-    void InitializeBuiltinAssets();
+    class BuiltinAssets
+    {
+    public:
+        // TODO: Send parameters instead of relying on singletons?
+        static void InitializeBuiltinAssets();
+        static AssetHandle GetErrorHandle(AssetType type);
+
+    private:
+        static void SetUpModel();
+    };
 }
