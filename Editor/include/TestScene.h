@@ -22,16 +22,16 @@ namespace RNGOEngine::Temporary
 
             {
                 // Cirno Setup
-                const auto cirnoMesh = assetLoader.Load(Model, "cirno/scene.gltf");
+                const auto cirnoMesh = assetLoader.Load(Model, "cirno/cirno.obj");
                 const auto cirnoTexture = assetLoader.Load(Texture, "cirno_albedo.jpeg");
 
                 auto cirnoMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
                 cirnoMaterial.SetTexture(cirnoTexture, 0);
 
                 const Components::Transform transform{
-                    .position = glm::vec3(1.0f, 1.0f, -10.0f),
-                    .rotation = glm::angleAxis(glm::radians(45.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
-                    .scale = glm::vec3(.1f)
+                    .position = glm::vec3(1.0f, -2.0f, -10.0f),
+                    .rotation = {},
+                    .scale = glm::vec3(1.0f)
                 };
 
                 auto cirnoEntity = world.CreateEntity({"Cirno"}, transform);
@@ -42,15 +42,15 @@ namespace RNGOEngine::Temporary
 
             // Reimu setup
             {
-                const auto reimuMesh = assetLoader.Load(Model, "reimu/scene.gltf");
+                const auto reimuMesh = assetLoader.Load(Model, "reimu/reimu.obj");
                 const auto reimuTexture = assetLoader.Load(Texture, "reimu_albedo.png");
                 auto reimuMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
                 reimuMaterial.SetTexture(reimuTexture, 0);
 
                 Components::Transform transform{
-                    .position = glm::vec3(-1.0f, 1.0f, -10.0f),
-                    .rotation = glm::angleAxis(glm::radians(-40.0f), glm::vec3(0.0f, 1.0f, 0.0f)),
-                    .scale = glm::vec3(.1f)
+                    .position = glm::vec3(-1.0f, -2.0f, -10.0f),
+                    .rotation = {},
+                    .scale = glm::vec3(1.0f)
                 };
 
                 auto reimuEntity = world.CreateEntity({"Reimu"}, transform);
@@ -84,7 +84,8 @@ namespace RNGOEngine::Temporary
             // Point Light 1
             {
                 Components::Transform transform{
-                    .position = {-2.0f, -1.7f, -8.0f}, .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
+                    .position = {-2.0f, 0.5f, -8.0f},
+                    .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
                 };
                 
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);
@@ -108,7 +109,7 @@ namespace RNGOEngine::Temporary
             // Point Light 2
             {
                 Components::Transform transform{
-                    .position = {2.0f, -1.7f, -8.0f}, .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
+                    .position = {2.0f, 0.5f, -8.0f}, .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
                 };
 
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);

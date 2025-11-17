@@ -61,10 +61,8 @@ namespace RNGOEngine::Editor
             return;
         }
 
- 
-
         // Ugly hardcoded index 0. Assumes first attachment is color.
         const auto imguiTexID = static_cast<ImTextureID>(textureID->get().ID);
-        ImGui::Image(imguiTexID, availableSize);
+        ImGui::Image(imguiTexID, availableSize, ImVec2(0, 1), ImVec2(1, 0));
     }
 }

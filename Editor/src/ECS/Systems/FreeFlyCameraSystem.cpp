@@ -78,11 +78,11 @@ namespace RNGOEngine::Editor
             {
                 if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_Q))
                 {
-                    transform.position += upward * cameraSpeed * context.deltaTime;
+                    transform.position -= upward * cameraSpeed * context.deltaTime;
                 }
                 if (inputManager.IsKeyDown(Data::KeyCodes::RNGO_KEY_E))
                 {
-                    transform.position -= upward * cameraSpeed * context.deltaTime;
+                    transform.position += upward * cameraSpeed * context.deltaTime;
                 }
             }
 
@@ -92,7 +92,7 @@ namespace RNGOEngine::Editor
                 if (mouseDelta.x != 0.0 || mouseDelta.y != 0.0)
                 {
                     float yaw = glm::radians(static_cast<float>(-mouseDelta.x) * CAMERA_SENSITIVITY);
-                    float pitch = glm::radians(static_cast<float>(mouseDelta.y) * CAMERA_SENSITIVITY);
+                    float pitch = glm::radians(static_cast<float>(-mouseDelta.y) * CAMERA_SENSITIVITY);
 
                     glm::quat quatYaw = glm::angleAxis(yaw * context.deltaTime, glm::vec3(0.0f, 1.0f, 0.0f));
                     glm::quat quatPitch = glm::angleAxis(pitch * context.deltaTime, glm::normalize(right));
