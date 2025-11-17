@@ -15,12 +15,16 @@ namespace RNGOEngine::AssetHandling
         using enum AssetType;
 
         AddAssetPath(None, ENGINE_ASSETS_DIR);
+        AddAssetPath(None, ENGINE_FALLBACKS_DIR);
+
 
         AddAssetPath(Shader, ENGINE_SHADERS_DIR);
         AddAssetPath(Shader, ENGINE_SHADER_INCLUDE_DIR);
 
         AddAssetPath(Model, ENGINE_MODELS_DIR);
         AddAssetPath(Texture, ENGINE_TEXTURES_DIR);
+
+        
     }
 
     std::optional<std::filesystem::path> AssetFetcher::GetPath(const AssetType type,

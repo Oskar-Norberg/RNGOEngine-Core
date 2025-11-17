@@ -40,28 +40,27 @@ namespace RNGOEngine
             }
         }
 
-        // Resource and Runtime Asset Managers
-        m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
-        m_assetManager = std::make_unique<AssetHandling::AssetManager>(
-            m_assetFetcher, m_assetDatabase, *m_resourceManager, doFlipTexturesVertically
-        );
+        // Add Asset Paths
         for (const auto& [path, type] : config.assetPaths)
         {
             m_assetFetcher.AddAssetPath(type, path);
         }
+
+        // Resource Manager
+        m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
 
         // Asset Loader and Importers
         m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_assetDatabase, m_assetFetcher);
         AssetHandling::BootstrapContext context = {*m_assetLoader, doFlipTexturesVertically};
         AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
 
-        // TODO: TEMPORARY
-        m_assetManager->SetShaderImporter(
-            m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
+        // Asset Managers
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(
+            m_assetFetcher, m_assetDatabase, *m_resourceManager, doFlipTexturesVertically
         );
 
+        // Set up RenderAPI
         m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.width, config.height);
-
         switch (config.pipeline)
         {
             case Pipeline::Forward:
@@ -81,6 +80,11 @@ namespace RNGOEngine
                 RNGO_ASSERT(false && "Deferred pipeline not implemented.");
                 break;
         }
+
+        // TODO: TEMPORARY
+        m_assetManager->SetShaderImporter(
+            m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
+        );
 
         AddEngineSystems();
         SetupSystemContexts();
