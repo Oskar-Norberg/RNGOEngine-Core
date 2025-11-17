@@ -9,5 +9,5 @@
 // Paths to all fallback assets.
 namespace RNGOEngine::Data::FallbackAssets
 {
-    const std::filesystem::path InvalidModel = "Fallbacks/InvalidModel.obj";
+    const std::filesystem::path InvalidModel = "fallbacks/InvalidModel.obj";
 }

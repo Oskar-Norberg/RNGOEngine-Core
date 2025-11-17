@@ -76,6 +76,10 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
 
         include/Assets/AssetManager/Managers/ShaderManager.h
         src/Assets/AssetManager/Managers/ShaderManager.cpp
+        
+        # Builtin / Fallback Assets
+        include/Assets/Builtin/BuiltinAssetBootstrapper.h
+        src/Assets/Builtin/BuiltinAssetBootstrapper.cpp
 )
 target_include_directories(${ASSET_MANAGER_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC yaml-cpp ${RENDERING_PROJECT_NAME} ${RESOURCE_MANAGEMENT_PROJECT_NAME} assimp stb_image)

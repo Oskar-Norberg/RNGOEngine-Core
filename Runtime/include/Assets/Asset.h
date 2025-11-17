@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <utility>
 #include <filesystem>
 #include "Utilities/UUID/UUID.h"
 
@@ -24,7 +25,9 @@ namespace RNGOEngine::AssetHandling
         Texture,
         Shader,
         Material,
+        Count
     };
+    constexpr std::size_t AssetTypeCount = std::to_underlying(AssetType::Count);
 
     enum class AssetState
     {

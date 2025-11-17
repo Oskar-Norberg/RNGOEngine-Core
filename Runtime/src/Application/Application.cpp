@@ -6,6 +6,7 @@
 
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
+#include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
 #include "Renderer/GLFW/GLFWRenderer.h"
@@ -85,6 +86,8 @@ namespace RNGOEngine
         m_assetManager->SetShaderImporter(
             m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
         );
+
+        AssetHandling::InitializeBuiltinAssets();
 
         AddEngineSystems();
         SetupSystemContexts();
