@@ -4,14 +4,17 @@
 
 #pragma once
 
-#include "Systems/ISystem.h"
+#include "ECS/IEditorSystem.h"
 
 namespace RNGOEngine::Editor
 {
-    class FreeFlyCameraSystem : public Systems::IGameSystem
+    class FreeFlyCameraSystem : public IEditorSystem
     {
     public:
-        void Update(Core::World& world, Systems::SystemContext& context) override;
+        ~FreeFlyCameraSystem() override
+        {
+        }
+        void Update(Core::World& world, EditorSystemContext& context) override;
 
     private:
         static constexpr auto CAMERA_SENSITIVITY = 100.0f;

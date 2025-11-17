@@ -13,9 +13,10 @@
 namespace RNGOEngine::Editor
 {
 
-    void FreeFlyCameraSystem::Update(Core::World& world, Systems::SystemContext& context)
+    void FreeFlyCameraSystem::Update(Core::World& world, EditorSystemContext& context)
     {
-        IGameSystem::Update(world, context);
+        IEditorSystem::Update(world, context);
+
         auto& inputManager = *context.inputManager;
 
         // Not sure this is the best place for this, but works for now.
@@ -23,13 +24,11 @@ namespace RNGOEngine::Editor
         {
             inputManager.SetMouseMode(Data::Mouse::MouseMode::Locked);
         }
-        else if (inputManager.WasMouseButtonReleasedThisFrame(
-                     Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT
-                 ))
+        else if (inputManager.WasMouseButtonReleasedThisFrame(Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT))
         {
             inputManager.SetMouseMode(Data::Mouse::MouseMode::Normal);
         }
-        
+
         if (!inputManager.IsMouseButtonDown(Data::MouseCodes::RNGO_MOUSE_BUTTON_RIGHT))
         {
             return;

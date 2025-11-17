@@ -19,18 +19,21 @@ namespace RNGOEngine::Editor
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
         // Set up Editor Systems
-        m_gameSystems.RegisterSystem<FreeFlyCameraSystem>();
+        m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
 
         // Set up UI Panels
         m_UIManager.RegisterPanel<StatsPanel>();
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
         m_UIManager.RegisterPanel<HierarchyPanel>();
         m_UIManager.RegisterPanel<DetailsPanel>();
+
+        SetUpEditorContext();
     }
 
     void Editor::OnUpdate(const float deltaTime)
     {
         Application::OnUpdate(deltaTime);
+        UpdateEditorSystems(deltaTime);
 
         m_UIManager.Update(deltaTime);
 
@@ -55,9 +58,26 @@ namespace RNGOEngine::Editor
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineSystemContext);
     }
 
+    void Editor::UpdateEditorSystems(float deltaTime)
+    {
+        m_editorSystemContext.deltaTime = deltaTime;
+        m_editorSystems.Update(*m_sceneManager.GetCurrentWorld(), m_editorSystemContext);
+    }
+
     void Editor::UpdateGameSystems(float deltaTime)
     {
         m_gameSystemContext.deltaTime = deltaTime;
         m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameSystemContext);
+    }
+    void Editor::SetUpEditorContext()
+    {
+        m_editorSystemContext.engineResourceMapper = &m_engineResourceMapper;
+        m_editorSystemContext.gameResourceMapper = &m_gameResourceMapper;
+        m_editorSystemContext.sceneManager = &m_sceneManager;
+        m_editorSystemContext.inputManager = &m_inputManager;
+        m_editorSystemContext.jobSystem = &m_jobSystem;
+        m_editorSystemContext.eventQueue = &m_eventQueue;
+        m_editorSystemContext.assetManager = m_assetManager.get();
+        m_editorSystemContext.renderer = m_rendererAPI.get();
     }
 }

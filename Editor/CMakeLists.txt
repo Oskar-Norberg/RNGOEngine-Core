@@ -20,13 +20,12 @@ include(cmake/Dependencies.cmake)
 
 # Engine Units
 include(cmake/EngineUnits/UI.cmake)
+include(cmake/EngineUnits/Systems.cmake)
 
 add_executable(${EDITOR_PROJECT_NAME} main.cpp
         include/Editor.h
         src/Editor.cpp
         include/TestScene.h
-        include/ECS/Systems/FreeFlyCameraSystem.h
-        src/ECS/Systems/FreeFlyCameraSystem.cpp
 )
 
 target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
@@ -34,6 +33,7 @@ target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)
 # Link Engine Units
 target_link_libraries(${EDITOR_PROJECT_NAME} PUBLIC
         ${UI_PROJECT_NAME}
+        ${EDITOR_SYSTEMS_PROJECT}
 )
 
 # Libraries and C++ Version

@@ -6,6 +6,7 @@
 
 #include <Application/Application.h>
 
+#include "ECS/EditorSystemContext.h"
 #include "UI/UIManager.h"
 
 namespace RNGOEngine::Editor
@@ -21,9 +22,18 @@ namespace RNGOEngine::Editor
 
     private:
         UIManager m_UIManager;
+
+    private:
+        EditorSystemContext m_editorSystemContext;
+        Systems::SystemScheduler<EditorSystemContext> m_editorSystems;
+        
         
     private:
         void UpdateEngineSystems(float deltaTime);
+        void UpdateEditorSystems(float deltaTime);
         void UpdateGameSystems(float deltaTime);
+
+    private:
+        void SetUpEditorContext();
     };
 }
