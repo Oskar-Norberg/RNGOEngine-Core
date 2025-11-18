@@ -10,7 +10,8 @@
 namespace RNGOEngine::Data::Rendering
 {
     using Index = unsigned int;
-    
+
+    // TODO: PascalCase public members
     struct Vertex
     {
         glm::vec3 position;

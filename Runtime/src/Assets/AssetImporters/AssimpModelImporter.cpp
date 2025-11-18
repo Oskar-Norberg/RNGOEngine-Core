@@ -56,7 +56,6 @@ namespace RNGOEngine::AssetHandling
     std::span<const std::string_view> AssimpModelImporter::GetSupportedExtensions() const
     {
         static constexpr std::string_view supportedTypes[] = {
-            ".obj",
             ".fbx",
             ".gltf"
         };
