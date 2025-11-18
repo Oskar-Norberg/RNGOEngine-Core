@@ -14,6 +14,8 @@ namespace RNGOEngine::AssetHandling::TextureLoader
     std::expected<TextureData, TextureLoadingError> LoadTexture(
         const std::filesystem::path& path)
     {
+        stbi_set_flip_vertically_on_load(true);
+        
         int width, height, nrChannels;
         unsigned char* data = stbi_load(path.string().data(), &width, &height, &nrChannels, 0);
         
