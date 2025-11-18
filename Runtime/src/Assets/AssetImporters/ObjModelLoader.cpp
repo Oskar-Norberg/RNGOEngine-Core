@@ -146,7 +146,10 @@ namespace RNGOEngine::AssetHandling
                 if (face.uvIndices)
                 {
                     const auto uvIndex = face.uvIndices.value()[i] - 1;
-                    vertex.texCoord = uvs[uvIndex];
+                    // Note: Flip UVs vertically for OpenGL
+                    glm::vec2 uv = uvs[uvIndex];
+                    uv.y *= -1.0f;
+                    vertex.texCoord = uv;
                 }
 
                 if (face.normalIndices)
