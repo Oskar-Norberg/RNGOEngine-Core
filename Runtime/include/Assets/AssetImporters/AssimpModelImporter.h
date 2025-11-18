@@ -8,11 +8,11 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class ModelAssetImporter : public AssetImporter
+    class AssimpModelImporter : public AssetImporter
     {
     public:
         // TODO: This ugly construct wouldn't have to be here if they were just singletons...
-        explicit ModelAssetImporter(bool doFlipUVs);
+        explicit AssimpModelImporter(bool doFlipUVs);
 
         void Load(const AssetMetadata& metadata) override;
         void Unload(const AssetHandle& handle) override;

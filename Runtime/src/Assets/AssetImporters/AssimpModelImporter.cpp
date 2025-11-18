@@ -2,21 +2,20 @@
 // Created by ringo on 2025-11-02.
 //
 
-#include "Assets/AssetImporters/ModelAssetImporter.h"
-
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetImporters/AssimpModelImporter.h"
 #include "Assets/AssetLoaders/ModelLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    ModelAssetImporter::ModelAssetImporter(const bool doFlipUVs)
+    AssimpModelImporter::AssimpModelImporter(const bool doFlipUVs)
         : m_doFlipUVs(doFlipUVs)
     {
     }
 
-    void ModelAssetImporter::Load(const AssetMetadata& metadata)
+    void AssimpModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
@@ -42,19 +41,19 @@ namespace RNGOEngine::AssetHandling
         ModelLoading::UnloadModel(modelHandle.value());
     }
 
-    void ModelAssetImporter::Unload(const AssetHandle& handle)
+    void AssimpModelImporter::Unload(const AssetHandle& handle)
     {
         AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
     }
 
-    std::unique_ptr<AssetMetadata> ModelAssetImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
+    std::unique_ptr<AssetMetadata> AssimpModelImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
     {
         auto modelData = std::make_unique<ModelMetadata>();
         modelData->Type = AssetType::Model;
         return std::move(modelData);
     }
 
-    std::span<const std::string_view> ModelAssetImporter::GetSupportedExtensions() const
+    std::span<const std::string_view> AssimpModelImporter::GetSupportedExtensions() const
     {
         static constexpr std::string_view supportedTypes[] = {
             ".obj",
