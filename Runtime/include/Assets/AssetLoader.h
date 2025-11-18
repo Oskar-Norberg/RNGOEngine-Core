@@ -27,7 +27,7 @@ namespace RNGOEngine::AssetHandling
         template<Concepts::DerivedFrom<AssetImporter> TAssetImporter, typename... Args>
         void RegisterImporter(const AssetType type, Args&&... args)
         {
-            m_loaders[type] = std::make_unique<TAssetImporter>(std::forward<Args>(args)...);
+            m_loaders[type].push_back(std::make_unique<TAssetImporter>(std::forward<Args>(args)...));
         }
 
         template<Concepts::DerivedFrom<AssetSerializer> TAssetSerializer, typename... Args>
@@ -50,7 +50,8 @@ namespace RNGOEngine::AssetHandling
             const auto it = m_loaders.find(type);
             if (it != m_loaders.end())
             {
-                return dynamic_cast<TAssetImporter*>(it->second.get());
+                // TODO: Temporary terrible solution
+                return dynamic_cast<TAssetImporter*>(it->second.front().get());
             }
 
             return nullptr;
@@ -66,7 +67,7 @@ namespace RNGOEngine::AssetHandling
 
         // TODO: Save these together as a pair
         // TODO: Support multiple loaders per type. E.g different file formats for the same asset type.
-        std::unordered_map<AssetType, std::unique_ptr<AssetImporter>> m_loaders;
+        std::unordered_map<AssetType, std::vector<std::unique_ptr<AssetImporter>>> m_loaders;
         std::unordered_map<AssetType, std::unique_ptr<AssetSerializer>> m_serializers;
     };
 }

@@ -17,20 +17,41 @@ namespace RNGOEngine::AssetHandling
 {
     // TODO: Annoying clang warning about initialization order. But it looks fine??
     AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
-        : Singleton(this),
-          m_assetDatabase(assetDatabase),
-          m_assetFetcher(assetFetcher)
+        : Singleton(this), m_assetDatabase(assetDatabase), m_assetFetcher(assetFetcher)
     {
     }
 
     AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
     {
-        const auto& serializer = m_serializers.at(type);
-        const auto& importer = m_loaders.at(type);
-
         RNGO_ASSERT(
-            serializer && importer && "AssetLoader::Load - No serializer/importer registered for type.");
+            m_serializers.contains(type) && m_loaders.contains(type) &&
+            "AssetLoader::Load - No serializer/importer registered for type."
+        );
 
+        // Find valid importer for type and extension
+        const auto& serializer = m_serializers.at(type);
+        const auto& importers = m_loaders.at(type);
+
+        const std::string extension = searchPath.extension().string();
+
+        AssetImporter* validImporter = nullptr;
+        for (const auto& importer : importers)
+        {
+            const auto supportedFormats = importer->GetSupportedExtensions();
+            if (std::ranges::find(supportedFormats, extension) != supportedFormats.end())
+            {
+                validImporter = importer.get();
+                break;
+            }
+        }
+
+        if (!validImporter)
+        {
+            RNGO_ASSERT(false && "AssetLoader::Load - No valid importer for file extension.");
+            return BuiltinAssets::GetErrorHandle(type);
+        }
+
+        // Get full path for asset
         const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
         if (!fullPath)
         {
@@ -38,6 +59,7 @@ namespace RNGOEngine::AssetHandling
             return BuiltinAssets::GetErrorHandle(type);
         }
 
+        // Check if asset has already been loaded
         if (AssetDatabase::GetInstance().IsRegistered(fullPath.value()))
         {
             const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
@@ -61,7 +83,7 @@ namespace RNGOEngine::AssetHandling
             }
             else
             {
-                std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata(fullPath.value());
+                std::unique_ptr<AssetMetadata> metadata = validImporter->CreateDefaultMetadata(fullPath.value());
                 metadata->Path = fullPath.value();
                 AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
             }
@@ -74,7 +96,8 @@ namespace RNGOEngine::AssetHandling
 
         metadata.Path = fullPath.value();
         const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
-        importer->Load(metadata);
+
+        validImporter->Load(metadata);
         metadata.State = AssetState::Valid;
 
         // Save metadata to file?
@@ -83,8 +106,9 @@ namespace RNGOEngine::AssetHandling
         return handle;
     }
 
-    void AssetLoader::SaveMetadataToFile(const AssetHandle& handle, AssetSerializer& serializer,
-                                         const std::filesystem::path& metaFilePath) const
+    void AssetLoader::SaveMetadataToFile(
+        const AssetHandle& handle, AssetSerializer& serializer, const std::filesystem::path& metaFilePath
+    ) const
     {
         const auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(handle);
         YAML::Emitter emitter;
