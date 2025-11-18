@@ -8,7 +8,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class ObjModelLoader : public AssetImporter
+    class OBJModelImporter : public AssetImporter
     {
     public:
         void Load(const AssetMetadata& metadata) override;

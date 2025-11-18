@@ -5,7 +5,7 @@
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 
 #include "Assets/AssetImporters/AssimpModelImporter.h"
-#include "Assets/AssetImporters/ObjModelLoader.h"
+#include "Assets/AssetImporters/OBJModelImporter.h"
 #include "Assets/AssetImporters/ShaderAssetImporter.h"
 #include "Assets/AssetImporters/TextureAssetImporter.h"
 #include "Assets/AssetSerializers/ModelAssetSerializer.h"
@@ -20,7 +20,7 @@ namespace RNGOEngine::AssetHandling
         // Loaders
         {
             assetLoader->RegisterImporter<AssimpModelImporter>(AssetType::Model, context.doFlipUVs);
-            assetLoader->RegisterImporter<ObjModelLoader>(AssetType::Model);
+            assetLoader->RegisterImporter<OBJModelImporter>(AssetType::Model);
 
             assetLoader->RegisterImporter<TextureAssetImporter>(AssetType::Texture);
             assetLoader->RegisterImporter<ShaderAssetImporter>(AssetType::Shader);

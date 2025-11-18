@@ -2,11 +2,10 @@
 // Created by Oskar.Norberg on 2025-11-18.
 //
 
-#include "Assets/AssetImporters/ObjModelLoader.h"
-
 #include <fstream>
 #include <iostream>
 
+#include "Assets/AssetImporters/OBJModelImporter.h"
 #include "Assets/AssetLoaders/ModelLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/AssetTypes/ModelAsset.h"
@@ -15,7 +14,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void ObjModelLoader::Load(const AssetMetadata& metadata)
+    void OBJModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
@@ -176,11 +175,11 @@ namespace RNGOEngine::AssetHandling
         return;
     }
 
-    void ObjModelLoader::Unload(const AssetHandle& handle)
+    void OBJModelImporter::Unload(const AssetHandle& handle)
     {
     }
 
-    std::unique_ptr<AssetMetadata> ObjModelLoader::CreateDefaultMetadata(
+    std::unique_ptr<AssetMetadata> OBJModelImporter::CreateDefaultMetadata(
         const std::filesystem::path& path
     ) const
     {
@@ -189,7 +188,7 @@ namespace RNGOEngine::AssetHandling
         return std::move(modelData);
     }
 
-    std::span<const std::string_view> ObjModelLoader::GetSupportedExtensions() const
+    std::span<const std::string_view> OBJModelImporter::GetSupportedExtensions() const
     {
         static constexpr std::string_view supportedTypes[] = {
             ".obj",

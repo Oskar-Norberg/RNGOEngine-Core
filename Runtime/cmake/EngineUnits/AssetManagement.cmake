@@ -26,8 +26,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetImporters/AssimpModelImporter.h
         src/Assets/AssetImporters/AssimpModelImporter.cpp
 
-        include/Assets/AssetImporters/ObjModelLoader.h
-        src/Assets/AssetImporters/ObjModelLoader.cpp
+        include/Assets/AssetImporters/OBJModelImporter.h
+        src/Assets/AssetImporters/OBJModelImporter.cpp
 
         include/Assets/AssetImporters/TextureAssetImporter.h
         src/Assets/AssetImporters/TextureAssetImporter.cpp
