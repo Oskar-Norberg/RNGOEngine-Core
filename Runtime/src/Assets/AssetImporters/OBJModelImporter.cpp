@@ -2,15 +2,15 @@
 // Created by Oskar.Norberg on 2025-11-18.
 //
 
+#include "Assets/AssetImporters/OBJModelImporter.h"
+
 #include <fstream>
 #include <iostream>
 
-#include "Assets/AssetImporters/OBJModelImporter.h"
 #include "Assets/AssetLoaders/ModelLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/AssetTypes/ModelAsset.h"
 #include "Utilities/RNGOAsserts.h"
-#include "assimp/Vertex.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -18,30 +18,57 @@ namespace RNGOEngine::AssetHandling
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
-        std::ifstream fileStream(typedMetadata.Path);
-        if (!fileStream.is_open())
+        const auto modelResources = ParseOBJFile(typedMetadata.Path);
+
+        auto modelData = ConvertToMeshData(modelResources);
+
+        const ModelLoading::ModelHandle modelHandle{&modelData};
+        const auto errorMessage =
+            AssetManager::GetInstance().GetModelManager().UploadModel(typedMetadata.UUID, modelHandle);
+
+        if (errorMessage != ModelCreationError::None)
         {
-            RNGO_ASSERT(false && "ObjModelLoader::Load - Failed to open .obj file.");
-            // TODO: Load should probably be able to fail.
+            RNGO_ASSERT(false && "ObjModelLoader::Load - Failed to Load Model");
             return;
         }
 
-        // TODO: Consider making these static and reusing them?
-        // Data
-        std::vector<glm::vec3> vertices;
-        std::vector<glm::vec2> uvs;
-        std::vector<glm::vec3> normals;
+        return;
+    }
 
-        // Indices
-        struct Face
-        {
-            std::array<Data::Rendering::Index, 3> vertexIndices;
-            std::optional<std::array<Data::Rendering::Index, 3>> uvIndices;
-            std::optional<std::array<Data::Rendering::Index, 3>> normalIndices;
+    void OBJModelImporter::Unload(const AssetHandle& handle)
+    {
+    }
+
+    std::unique_ptr<AssetMetadata> OBJModelImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
+    {
+        auto modelData = std::make_unique<ModelMetadata>();
+        modelData->Type = AssetType::Model;
+        return std::move(modelData);
+    }
+
+    std::span<const std::string_view> OBJModelImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {
+            ".obj",
         };
-        std::vector<Face> faces;
 
-        // TODO: reserve a guesstimated size
+        return supportedTypes;
+    }
+    OBJModelImporter::ModelResources OBJModelImporter::ParseOBJFile(const std::filesystem::path& path)
+    {
+        std::ifstream fileStream(path);
+        if (!fileStream.is_open())
+        {
+            RNGO_ASSERT(false && "OBJModelImporter::ParseOBJFile - Failed to open .obj file.");
+            // TODO: Load should probably be able to fail.
+            return {};
+        }
+
+        // TODO: reserve a guesstimated size in the internal vectors
+        ModelResources modelResources;
+
         std::string currentLine;
         while (std::getline(fileStream, currentLine))
         {
@@ -52,80 +79,32 @@ namespace RNGOEngine::AssetHandling
 
             if (prefix == "v")
             {
-                glm::vec3 vertex;
-                iss >> vertex.x >> vertex.y >> vertex.z;
-                vertices.push_back(vertex);
+                AppendVertices(modelResources, iss);
             }
             if (prefix == "vn")
             {
-                glm::vec3 normal;
-                iss >> normal.x >> normal.y >> normal.z;
-                normals.push_back(normal);
+                AppendNormals(modelResources, iss);
             }
             if (prefix == "vt")
             {
-                glm::vec2 texture;
-                iss >> texture.x >> texture.y;
-                uvs.push_back(texture);
+                AppendTextures(modelResources, iss);
             }
             if (prefix == "f")
             {
-                std::string faceSpec;
-                Face face;
-
-                size_t currentIteration = 0;
-                while (iss >> faceSpec)
-                {
-                    size_t firstSlash = faceSpec.find('/');
-                    size_t secondSlash = faceSpec.find('/', firstSlash + 1);
-
-                    // V
-                    const std::string vertexIndexStr = faceSpec.substr(0, firstSlash);
-                    const int vertexIndex = std::stoi(vertexIndexStr);
-                    face.vertexIndices[currentIteration] = vertexIndex;
-
-                    // VT
-                    if (firstSlash != std::string::npos && secondSlash != std::string::npos)
-                    {
-                        const std::string texCoordIndexStr =
-                            faceSpec.substr(firstSlash + 1, secondSlash - firstSlash - 1);
-                        if (!texCoordIndexStr.empty())
-                        {
-                            const int texCoordIndex = std::stoi(texCoordIndexStr);
-                            if (!face.uvIndices)
-                            {
-                                face.uvIndices = std::array<Data::Rendering::Index, 3>();
-                            }
-                            face.uvIndices.value()[currentIteration] = texCoordIndex;
-                        }
-                    }
-
-                    // VN
-                    if (secondSlash != std::string::npos)
-                    {
-                        const std::string normalIndexStr = faceSpec.substr(secondSlash + 1);
-                        const int normalIndex = std::stoi(normalIndexStr);
-                        if (!face.normalIndices)
-                        {
-                            face.normalIndices = std::array<Data::Rendering::Index, 3>();
-                        }
-                        face.normalIndices.value()[currentIteration] = normalIndex;
-                    }
-
-                    currentIteration++;
-                }
-
-                if (currentIteration != 3)
-                {
-                    RNGO_ASSERT(false && "ObjModelLoader::Load - Only triangular faces are supported.");
-                    return;
-                }
-
-                // Add indices
-                faces.push_back(face);
+                AppendFaces(modelResources, iss);
             }
         }
         fileStream.close();
+
+        return modelResources;
+    }
+
+    ModelLoading::ModelData OBJModelImporter::ConvertToMeshData(const ModelResources& modelResources)
+    {
+        const auto& vertices = modelResources.vertices;
+        const auto& uvs = modelResources.uvs;
+        const auto& normals = modelResources.normals;
+        const auto& faces = modelResources.faces;
 
         // For now, only support single mesh obj files.
         ModelLoading::ModelData modelData;
@@ -162,38 +141,89 @@ namespace RNGOEngine::AssetHandling
             }
         }
 
-        ModelLoading::ModelHandle modelHandle{&modelData};
-        const auto errorMessage =
-            AssetManager::GetInstance().GetModelManager().UploadModel(typedMetadata.UUID, modelHandle);
+        return modelData;
+    }
 
-        if (errorMessage != ModelCreationError::None)
+    void OBJModelImporter::AppendVertices(
+        ModelResources& modelResources, std::istringstream& currentLineStream
+    )
+    {
+        glm::vec3 vertex;
+        currentLineStream >> vertex.x >> vertex.y >> vertex.z;
+        modelResources.vertices.push_back(vertex);
+    }
+
+    void OBJModelImporter::AppendTextures(
+        ModelResources& modelResources, std::istringstream& currentLineStream
+    )
+    {
+        glm::vec2 texture;
+        currentLineStream >> texture.x >> texture.y;
+        modelResources.uvs.push_back(texture);
+    }
+
+    void OBJModelImporter::AppendNormals(
+        ModelResources& modelResources, std::istringstream& currentLineStream
+    )
+    {
+        glm::vec3 normal;
+        currentLineStream >> normal.x >> normal.y >> normal.z;
+        modelResources.normals.push_back(normal);
+    }
+    void OBJModelImporter::AppendFaces(ModelResources& modelResources, std::istringstream& currentLineStream)
+    {
+        std::string faceSpec;
+        Face face;
+
+        size_t currentIteration = 0;
+        while (currentLineStream >> faceSpec)
         {
-            RNGO_ASSERT(false && "ObjModelLoader::Load - Failed to Load Model");
+            size_t firstSlash = faceSpec.find('/');
+            size_t secondSlash = faceSpec.find('/', firstSlash + 1);
+
+            // V
+            const std::string vertexIndexStr = faceSpec.substr(0, firstSlash);
+            const int vertexIndex = std::stoi(vertexIndexStr);
+            face.vertexIndices[currentIteration] = vertexIndex;
+
+            // VT
+            if (firstSlash != std::string::npos && secondSlash != std::string::npos)
+            {
+                const std::string texCoordIndexStr =
+                    faceSpec.substr(firstSlash + 1, secondSlash - firstSlash - 1);
+                if (!texCoordIndexStr.empty())
+                {
+                    const int texCoordIndex = std::stoi(texCoordIndexStr);
+                    if (!face.uvIndices)
+                    {
+                        face.uvIndices = std::array<Data::Rendering::Index, 3>();
+                    }
+                    face.uvIndices.value()[currentIteration] = texCoordIndex;
+                }
+            }
+
+            // VN
+            if (secondSlash != std::string::npos)
+            {
+                const std::string normalIndexStr = faceSpec.substr(secondSlash + 1);
+                const int normalIndex = std::stoi(normalIndexStr);
+                if (!face.normalIndices)
+                {
+                    face.normalIndices = std::array<Data::Rendering::Index, 3>();
+                }
+                face.normalIndices.value()[currentIteration] = normalIndex;
+            }
+
+            currentIteration++;
+        }
+
+        if (currentIteration != 3)
+        {
+            RNGO_ASSERT(false && "ObjModelLoader::Load - Only triangular faces are supported.");
             return;
         }
 
-        return;
-    }
-
-    void OBJModelImporter::Unload(const AssetHandle& handle)
-    {
-    }
-
-    std::unique_ptr<AssetMetadata> OBJModelImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto modelData = std::make_unique<ModelMetadata>();
-        modelData->Type = AssetType::Model;
-        return std::move(modelData);
-    }
-
-    std::span<const std::string_view> OBJModelImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {
-            ".obj",
-        };
-
-        return supportedTypes;
+        // Add indices
+        modelResources.faces.push_back(face);
     }
 }
