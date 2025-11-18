@@ -16,15 +16,16 @@ namespace RNGOEngine::AssetHandling
 {
     void OBJModelImporter::Load(const AssetMetadata& metadata)
     {
-        const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
+        // Load Model into RAM
+        const auto modelResources = ParseOBJFile(metadata.Path);
 
-        const auto modelResources = ParseOBJFile(typedMetadata.Path);
-
+        // Convert to IRenderer appropriate format
         auto modelData = ConvertToMeshData(modelResources);
 
+        // Upload to GPU
         const ModelLoading::ModelHandle modelHandle{&modelData};
         const auto errorMessage =
-            AssetManager::GetInstance().GetModelManager().UploadModel(typedMetadata.UUID, modelHandle);
+            AssetManager::GetInstance().GetModelManager().UploadModel(metadata.UUID, modelHandle);
 
         if (errorMessage != ModelCreationError::None)
         {
@@ -32,11 +33,12 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        return;
+        // Model is unloaded through RAII deconstructor
     }
 
     void OBJModelImporter::Unload(const AssetHandle& handle)
     {
+        AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
     }
 
     std::unique_ptr<AssetMetadata> OBJModelImporter::CreateDefaultMetadata(
@@ -178,8 +180,8 @@ namespace RNGOEngine::AssetHandling
         size_t currentIteration = 0;
         while (currentLineStream >> faceSpec)
         {
-            size_t firstSlash = faceSpec.find('/');
-            size_t secondSlash = faceSpec.find('/', firstSlash + 1);
+            const size_t firstSlash = faceSpec.find('/');
+            const size_t secondSlash = faceSpec.find('/', firstSlash + 1);
 
             // V
             const std::string vertexIndexStr = faceSpec.substr(0, firstSlash);
@@ -196,7 +198,7 @@ namespace RNGOEngine::AssetHandling
                     const int texCoordIndex = std::stoi(texCoordIndexStr);
                     if (!face.uvIndices)
                     {
-                        face.uvIndices = std::array<Data::Rendering::Index, 3>();
+                        face.uvIndices.emplace();
                     }
                     face.uvIndices.value()[currentIteration] = texCoordIndex;
                 }
@@ -209,7 +211,7 @@ namespace RNGOEngine::AssetHandling
                 const int normalIndex = std::stoi(normalIndexStr);
                 if (!face.normalIndices)
                 {
-                    face.normalIndices = std::array<Data::Rendering::Index, 3>();
+                    face.normalIndices.emplace();
                 }
                 face.normalIndices.value()[currentIteration] = normalIndex;
             }
