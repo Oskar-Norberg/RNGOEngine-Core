@@ -77,6 +77,7 @@ namespace RNGOEngine::Resources
 namespace RNGOEngine::Resources
 {
     // TODO: Extremely ugly function.
+    // Returns width, height. But this should probablt be a struct.
     inline std::pair<int, int> GetDesiredAttachmentSize(const AttachmentSize& attachmentSize, const int viewportWidth,
                                                         const int viewportHeight)
     {

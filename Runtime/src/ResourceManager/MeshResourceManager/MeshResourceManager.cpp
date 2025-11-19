@@ -27,22 +27,22 @@ namespace RNGOEngine::Resources
         // VBO Data
         {
             m_renderer.SetAttributePointer(0, 3, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, position));
+                                           offsetof(Data::Rendering::Vertex, Position));
             m_renderer.SetAttributePointer(1, 3, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, normal));
+                                           offsetof(Data::Rendering::Vertex, Normal));
             m_renderer.SetAttributePointer(2, 2, sizeof(Data::Rendering::Vertex),
-                                           offsetof(Data::Rendering::Vertex, texCoord));
+                                           offsetof(Data::Rendering::Vertex, TexCoord));
 
-            m_renderer.BufferVBOData(std::as_bytes(std::span(meshData.vertices)), false);
+            m_renderer.BufferVBOData(std::as_bytes(std::span(meshData.Vertices)), false);
         }
 
         // EBO Data
         {
             m_renderer.BindToEBO(EBO);
-            m_renderer.BufferEBOData(std::as_bytes(std::span(meshData.indices)), false);
+            m_renderer.BufferEBOData(std::as_bytes(std::span(meshData.Indices)), false);
         }
 
-        const auto handle = m_meshes.Insert(MeshResource{VAO, VBO, EBO, meshData.indices.size()});
+        const auto handle = m_meshes.Insert(MeshResource{VAO, VBO, EBO, meshData.Indices.size()});
         return handle;
     }
 

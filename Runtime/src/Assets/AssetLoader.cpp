@@ -17,20 +17,27 @@ namespace RNGOEngine::AssetHandling
 {
     // TODO: Annoying clang warning about initialization order. But it looks fine??
     AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
-        : Singleton(this),
-          m_assetDatabase(assetDatabase),
-          m_assetFetcher(assetFetcher)
+        : Singleton(this), m_assetDatabase(assetDatabase), m_assetFetcher(assetFetcher)
     {
     }
 
     AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
     {
+        // TODO: This should probably check the iterator against end instead of using contains. But this looks nicer.
+        if (!m_serializers.contains(type) || !m_importers.contains(type))
+        {
+            // TODO: Log error instead of asserting.
+            RNGO_ASSERT(false && "AssetLoader::Load - No serializer/importer registered for type.");
+            return BuiltinAssets::GetErrorHandle(type);
+        }
+
+        // Find valid importer for type and extension
         const auto& serializer = m_serializers.at(type);
-        const auto& importer = m_loaders.at(type);
+        const auto& importer = m_importers.at(type);
 
-        RNGO_ASSERT(
-            serializer && importer && "AssetLoader::Load - No serializer/importer registered for type.");
+        const std::string extension = searchPath.extension().string();
 
+        // Get full path for asset
         const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
         if (!fullPath)
         {
@@ -38,6 +45,7 @@ namespace RNGOEngine::AssetHandling
             return BuiltinAssets::GetErrorHandle(type);
         }
 
+        // Check if asset has already been loaded
         if (AssetDatabase::GetInstance().IsRegistered(fullPath.value()))
         {
             const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
@@ -74,6 +82,7 @@ namespace RNGOEngine::AssetHandling
 
         metadata.Path = fullPath.value();
         const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
+
         importer->Load(metadata);
         metadata.State = AssetState::Valid;
 
@@ -83,8 +92,9 @@ namespace RNGOEngine::AssetHandling
         return handle;
     }
 
-    void AssetLoader::SaveMetadataToFile(const AssetHandle& handle, AssetSerializer& serializer,
-                                         const std::filesystem::path& metaFilePath) const
+    void AssetLoader::SaveMetadataToFile(
+        const AssetHandle& handle, AssetSerializer& serializer, const std::filesystem::path& metaFilePath
+    ) const
     {
         const auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(handle);
         YAML::Emitter emitter;

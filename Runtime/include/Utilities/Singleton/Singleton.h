@@ -32,6 +32,11 @@ namespace RNGOEngine::Utilities
     protected:
         void SetInstance(T* instance)
         {
+            if (m_instance != nullptr && instance != nullptr)
+            {
+                RNGO_ASSERT(false && "Singleton<T>::SetInstance() called when instance already exists.");
+                return;
+            }
             m_instance = instance;
         }
 
