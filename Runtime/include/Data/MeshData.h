@@ -11,17 +11,16 @@ namespace RNGOEngine::Data::Rendering
 {
     using Index = unsigned int;
 
-    // TODO: PascalCase public members
     struct Vertex
     {
-        glm::vec3 position;
-        glm::vec3 normal;
-        glm::vec2 texCoord;
+        glm::vec3 Position;
+        glm::vec3 Normal;
+        glm::vec2 TexCoord;
     };
 
     struct MeshData
     {
-        std::vector<Vertex> vertices;
-        std::vector<Index> indices;
+        std::vector<Vertex> Vertices;
+        std::vector<Index> Indices;
     };
 }

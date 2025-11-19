@@ -77,8 +77,8 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         // For now, only support single mesh obj files.
         ModelData modelData;
         auto& meshData = modelData.meshes.emplace_back();
-        meshData.vertices.resize(vertices.size());
-        meshData.indices.reserve(faces.size() * 3);
+        meshData.Vertices.resize(vertices.size());
+        meshData.Indices.reserve(faces.size() * 3);
 
         // Convert to MeshData
         for (const auto& face : faces)
@@ -87,7 +87,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
             {
                 Data::Rendering::Vertex vertex{};
                 const auto vertIndex = face.VertexIndices[i] - 1;
-                vertex.position = vertices[vertIndex];
+                vertex.Position = vertices[vertIndex];
 
                 if (face.UVIndices)
                 {
@@ -98,17 +98,17 @@ namespace RNGOEngine::AssetHandling::ModelLoading
                     {
                         uv.y *= -1.0f;
                     }
-                    vertex.texCoord = uv;
+                    vertex.TexCoord = uv;
                 }
 
                 if (face.NormalIndices)
                 {
                     const auto normalIndex = face.NormalIndices.value()[i] - 1;
-                    vertex.normal = normals[normalIndex];
+                    vertex.Normal = normals[normalIndex];
                 }
 
-                meshData.vertices.at(vertIndex) = vertex;
-                meshData.indices.push_back(static_cast<Data::Rendering::Index>(vertIndex));
+                meshData.Vertices.at(vertIndex) = vertex;
+                meshData.Indices.push_back(static_cast<Data::Rendering::Index>(vertIndex));
             }
         }
 

@@ -74,20 +74,20 @@ namespace RNGOEngine::AssetHandling::ModelLoading
             Data::Rendering::Vertex vertex;
 
             // Positions
-            vertex.position = {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
+            vertex.Position = {mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z};
 
             // Normals
             if (mesh->HasNormals())
             {
-                vertex.normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
+                vertex.Normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
             }
 
             const bool hasTextureCoords = mesh->HasTextureCoords(0);
-            vertex.texCoord = hasTextureCoords
+            vertex.TexCoord = hasTextureCoords
                                   ? glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y)
                                   : glm::vec2(0.0f, 0.0f);
 
-            meshData.vertices.emplace_back(vertex);
+            meshData.Vertices.emplace_back(vertex);
         }
 
         for (size_t i = 0; i < mesh->mNumFaces; ++i)
@@ -96,7 +96,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
 
             for (size_t j = 0; j < face->mNumIndices; ++j)
             {
-                meshData.indices.emplace_back(face->mIndices[j]);
+                meshData.Indices.emplace_back(face->mIndices[j]);
             }
         }
 
