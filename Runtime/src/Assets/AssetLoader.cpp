@@ -23,33 +23,19 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
     {
-        RNGO_ASSERT(
-            m_serializers.contains(type) && m_loaders.contains(type) &&
-            "AssetLoader::Load - No serializer/importer registered for type."
-        );
+        // TODO: This should probably check the iterator against end instead of using contains. But this looks nicer.
+        if (!m_serializers.contains(type) || !m_importers.contains(type))
+        {
+            // TODO: Log error instead of asserting.
+            RNGO_ASSERT(false && "AssetLoader::Load - No serializer/importer registered for type.");
+            return BuiltinAssets::GetErrorHandle(type);
+        }
 
         // Find valid importer for type and extension
         const auto& serializer = m_serializers.at(type);
-        const auto& importers = m_loaders.at(type);
+        const auto& importer = m_importers.at(type);
 
         const std::string extension = searchPath.extension().string();
-
-        AssetImporter* validImporter = nullptr;
-        for (const auto& importer : importers)
-        {
-            const auto supportedFormats = importer->GetSupportedExtensions();
-            if (std::ranges::find(supportedFormats, extension) != supportedFormats.end())
-            {
-                validImporter = importer.get();
-                break;
-            }
-        }
-
-        if (!validImporter)
-        {
-            RNGO_ASSERT(false && "AssetLoader::Load - No valid importer for file extension.");
-            return BuiltinAssets::GetErrorHandle(type);
-        }
 
         // Get full path for asset
         const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
@@ -83,7 +69,7 @@ namespace RNGOEngine::AssetHandling
             }
             else
             {
-                std::unique_ptr<AssetMetadata> metadata = validImporter->CreateDefaultMetadata(fullPath.value());
+                std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata(fullPath.value());
                 metadata->Path = fullPath.value();
                 AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
             }
@@ -97,7 +83,7 @@ namespace RNGOEngine::AssetHandling
         metadata.Path = fullPath.value();
         const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        validImporter->Load(metadata);
+        importer->Load(metadata);
         metadata.State = AssetState::Valid;
 
         // Save metadata to file?

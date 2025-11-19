@@ -2,63 +2,34 @@
 // Created by Oskar.Norberg on 2025-11-18.
 //
 
-#include "Assets/AssetImporters/OBJModelImporter.h"
+#include "Assets/AssetLoaders/ModelLoaders/OBJModelLoader.h"
 
 #include <fstream>
 #include <iostream>
 
-#include "Assets/AssetLoaders/ModelLoader.h"
+#include "Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
-#include "Assets/AssetTypes/ModelAsset.h"
 #include "Utilities/RNGOAsserts.h"
 
-namespace RNGOEngine::AssetHandling
+namespace RNGOEngine::AssetHandling::ModelLoading
 {
-    void OBJModelImporter::Load(const AssetMetadata& metadata)
+    std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> OBJModelLoader::LoadModel(
+        const std::filesystem::path& modelPath, bool doFlipUVs
+    )
     {
+        // TODO: Conditionally flip UVs
+        
         // Load Model into RAM
-        const auto modelResources = ParseOBJFile(metadata.Path);
+        const auto modelResources = ParseOBJFile(modelPath);
 
-        // Convert to IRenderer appropriate format
+        // Convert to Engine Native format
         auto modelData = ConvertToMeshData(modelResources);
 
-        // Upload to GPU
-        const ModelLoading::ModelHandle modelHandle{&modelData};
-        const auto errorMessage =
-            AssetManager::GetInstance().GetModelManager().UploadModel(metadata.UUID, modelHandle);
-
-        if (errorMessage != ModelCreationError::None)
-        {
-            RNGO_ASSERT(false && "ObjModelLoader::Load - Failed to Load Model");
-            return;
-        }
-
         // Model is unloaded through RAII deconstructor
+        return modelData;
     }
 
-    void OBJModelImporter::Unload(const AssetHandle& handle)
-    {
-        AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
-    }
-
-    std::unique_ptr<AssetMetadata> OBJModelImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto modelData = std::make_unique<ModelMetadata>();
-        modelData->Type = AssetType::Model;
-        return std::move(modelData);
-    }
-
-    std::span<const std::string_view> OBJModelImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {
-            ".obj",
-        };
-
-        return supportedTypes;
-    }
-    OBJModelImporter::ModelResources OBJModelImporter::ParseOBJFile(const std::filesystem::path& path)
+    OBJModelResources OBJModelLoader::ParseOBJFile(const std::filesystem::path& path)
     {
         std::ifstream fileStream(path);
         if (!fileStream.is_open())
@@ -69,7 +40,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         // TODO: reserve a guesstimated size in the internal vectors
-        ModelResources modelResources;
+        OBJModelResources modelResources;
 
         std::string currentLine;
         while (std::getline(fileStream, currentLine))
@@ -98,10 +69,11 @@ namespace RNGOEngine::AssetHandling
         }
         fileStream.close();
 
-        return modelResources;
+        // TODO:
+        // return modelResources;
     }
 
-    ModelLoading::ModelData OBJModelImporter::ConvertToMeshData(const ModelResources& modelResources)
+    ModelLoading::ModelData OBJModelLoader::ConvertToMeshData(const OBJModelResources& modelResources)
     {
         const auto& vertices = modelResources.vertices;
         const auto& uvs = modelResources.uvs;
@@ -146,8 +118,8 @@ namespace RNGOEngine::AssetHandling
         return modelData;
     }
 
-    void OBJModelImporter::AppendVertices(
-        ModelResources& modelResources, std::istringstream& currentLineStream
+    void OBJModelLoader::AppendVertices(
+        OBJModelResources& modelResources, std::istringstream& currentLineStream
     )
     {
         glm::vec3 vertex;
@@ -155,8 +127,8 @@ namespace RNGOEngine::AssetHandling
         modelResources.vertices.push_back(vertex);
     }
 
-    void OBJModelImporter::AppendTextures(
-        ModelResources& modelResources, std::istringstream& currentLineStream
+    void OBJModelLoader::AppendTextures(
+        OBJModelResources& modelResources, std::istringstream& currentLineStream
     )
     {
         glm::vec2 texture;
@@ -164,15 +136,16 @@ namespace RNGOEngine::AssetHandling
         modelResources.uvs.push_back(texture);
     }
 
-    void OBJModelImporter::AppendNormals(
-        ModelResources& modelResources, std::istringstream& currentLineStream
+    void OBJModelLoader::AppendNormals(
+        OBJModelResources& modelResources, std::istringstream& currentLineStream
     )
     {
         glm::vec3 normal;
         currentLineStream >> normal.x >> normal.y >> normal.z;
         modelResources.normals.push_back(normal);
     }
-    void OBJModelImporter::AppendFaces(ModelResources& modelResources, std::istringstream& currentLineStream)
+
+    void OBJModelLoader::AppendFaces(OBJModelResources& modelResources, std::istringstream& currentLineStream)
     {
         std::string faceSpec;
         Face face;

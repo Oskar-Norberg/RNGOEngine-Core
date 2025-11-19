@@ -6,8 +6,8 @@
 
 #include <vector>
 
+#include "../../AssetLoaders/ModelLoaders/AssimpModelLoader.h"
 #include "Assets/AssetDatabase/AssetDatabase.h"
-#include "Assets/AssetLoaders/ModelLoader.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
@@ -43,7 +43,7 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelManager(Resources::ResourceManager& resourceManager);
 
-        ModelCreationError UploadModel(const AssetHandle& assetHandle, ModelLoading::ModelHandle modelHandle);
+        ModelCreationError UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
         void UnloadModel(const AssetHandle& assetHandle);
 
     public:
@@ -73,7 +73,7 @@ namespace RNGOEngine::AssetHandling
         AssetHandle m_errorModel;
 
     private:
-        RuntimeModelData UploadModelResources(ModelLoading::ModelHandle modelHandle);
+        RuntimeModelData UploadModelResources(const ModelLoading::ModelData& modelData);
         void UnloadModelResources(const RuntimeModelData& modelData);
     };
 }

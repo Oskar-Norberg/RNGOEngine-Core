@@ -23,11 +23,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         # Asset Importers
         include/Assets/AssetImporters/AssetImporter.h
         
-        include/Assets/AssetImporters/AssimpModelImporter.h
-        src/Assets/AssetImporters/AssimpModelImporter.cpp
-
-        include/Assets/AssetImporters/OBJModelImporter.h
-        src/Assets/AssetImporters/OBJModelImporter.cpp
+        include/Assets/AssetImporters/ModelImporter.h
+        src/Assets/AssetImporters/ModelImporter.cpp
 
         include/Assets/AssetImporters/TextureAssetImporter.h
         src/Assets/AssetImporters/TextureAssetImporter.cpp
@@ -64,8 +61,14 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetLoaders/ShaderLoader.h
         src/Assets/AssetLoaders/ShaderLoader.cpp
         
-        include/Assets/AssetLoaders/ModelLoader.h
-        src/Assets/AssetLoaders/ModelLoader.cpp
+        # Model Loading
+        include/Assets/AssetLoaders/ModelLoaders/ModelLoaderData.h
+
+        include/Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.h
+        src/Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.cpp
+
+        include/Assets/AssetLoaders/ModelLoaders/OBJModelLoader.h
+        src/Assets/AssetLoaders/ModelLoaders/OBJModelLoader.cpp
         
         include/Assets/AssetManager/Managers/ModelManager.h
         src/Assets/AssetManager/Managers/ModelManager.cpp

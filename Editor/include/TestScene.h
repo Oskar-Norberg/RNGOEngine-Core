@@ -42,7 +42,7 @@ namespace RNGOEngine::Temporary
 
             // Reimu setup
             {
-                const auto reimuMesh = assetLoader.Load(Model, "reimu/reimu.obj");
+                const auto reimuMesh = assetLoader.Load(Model, "reimu/reim2u.obj");
                 const auto reimuTexture = assetLoader.Load(Texture, "reimu_albedo.png");
                 auto reimuMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
                 reimuMaterial.SetTexture(reimuTexture, 0);

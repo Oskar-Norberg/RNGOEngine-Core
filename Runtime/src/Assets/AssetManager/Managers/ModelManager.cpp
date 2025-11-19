@@ -13,9 +13,8 @@ namespace RNGOEngine::AssetHandling
         : m_resourceManager(resourceManager)
     {
     }
-
     ModelCreationError ModelManager::UploadModel(
-        const AssetHandle& assetHandle, const ModelLoading::ModelHandle modelHandle
+        const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
         auto runtimeData = UploadModelResources(modelHandle);
@@ -47,22 +46,26 @@ namespace RNGOEngine::AssetHandling
             return it->second;
         }
 
-        RNGO_ASSERT(m_models.contains(handle) && "ModelManager::GetRuntimeModelData - Fallback Error model not loaded!");
+        RNGO_ASSERT(
+            m_models.contains(handle) &&
+            "ModelManager::GetRuntimeModelData - Fallback Error model not loaded!"
+        );
         return m_models.at(m_errorModel);
     }
 
-    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelHandle modelHandle)
+    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
     {
-        RuntimeModelData modelData;
-        modelData.meshKeys.reserve(modelHandle.data->meshes.size());
+        RuntimeModelData runtimeData;
+        runtimeData.meshKeys.reserve(modelData.meshes.size());
 
-        for (const auto& meshData : modelHandle.data->meshes)
+        for (const auto& meshData : modelData.meshes)
         {
-            modelData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
+            runtimeData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
         }
 
-        return modelData;
+        return runtimeData;
     }
+
     void ModelManager::UnloadModelResources(const RuntimeModelData& modelData)
     {
         for (const auto& meshKey : modelData.meshKeys)

@@ -21,13 +21,13 @@ namespace RNGOEngine::AssetHandling
 
         AssetHandle Load(AssetType type, const std::filesystem::path& searchPath) const;
 
-        // Loader Registration
+        // Registration
     public:
         // TODO: I don't like these being separate functions, but I cannot be bothered with having a multiple variadic argument function.
         template<Concepts::DerivedFrom<AssetImporter> TAssetImporter, typename... Args>
         void RegisterImporter(const AssetType type, Args&&... args)
         {
-            m_loaders[type].push_back(std::make_unique<TAssetImporter>(std::forward<Args>(args)...));
+            m_importers.insert({type, std::make_unique<TAssetImporter>(std::forward<Args>(args)...)});
         }
 
         template<Concepts::DerivedFrom<AssetSerializer> TAssetSerializer, typename... Args>
@@ -39,7 +39,7 @@ namespace RNGOEngine::AssetHandling
         template<typename T>
         void UnregisterImporter(const AssetType type)
         {
-            m_loaders.erase(type);
+            m_importers.erase(type);
         }
 
         // TODO: TEMPORARY
@@ -47,11 +47,11 @@ namespace RNGOEngine::AssetHandling
         template<Concepts::DerivedFrom<AssetImporter> TAssetImporter>
         TAssetImporter* GetImporter(const AssetType type) const
         {
-            const auto it = m_loaders.find(type);
-            if (it != m_loaders.end())
+            const auto it = m_importers.find(type);
+            if (it != m_importers.end())
             {
                 // TODO: Temporary terrible solution
-                return dynamic_cast<TAssetImporter*>(it->second.front().get());
+                return dynamic_cast<TAssetImporter*>(it->second.get());
             }
 
             return nullptr;
@@ -66,8 +66,7 @@ namespace RNGOEngine::AssetHandling
         AssetFetcher& m_assetFetcher;
 
         // TODO: Save these together as a pair
-        // TODO: Support multiple loaders per type. E.g different file formats for the same asset type.
-        std::unordered_map<AssetType, std::vector<std::unique_ptr<AssetImporter>>> m_loaders;
+        std::unordered_map<AssetType, std::unique_ptr<AssetImporter>> m_importers;
         std::unordered_map<AssetType, std::unique_ptr<AssetSerializer>> m_serializers;
     };
 }
