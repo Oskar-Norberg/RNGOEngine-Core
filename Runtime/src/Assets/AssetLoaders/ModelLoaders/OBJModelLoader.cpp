@@ -44,7 +44,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         while (std::getline(fileStream, currentLine))
         {
             std::istringstream iss(currentLine);
-            // TODO: Would be nice to avoid heap allocated string here.
+            // TODO: Would be nice to avoid heap allocated string here. Else just clear and reuse it.
             std::string prefix;
             iss >> prefix;
 
@@ -72,13 +72,10 @@ namespace RNGOEngine::AssetHandling::ModelLoading
 
     ModelData OBJModelLoader::ConvertToMeshData(const OBJModelResources& modelResources, bool doFlipUVs)
     {
-        const auto& vertices = modelResources.vertices;
-        const auto& uvs = modelResources.uvs;
-        const auto& normals = modelResources.normals;
-        const auto& faces = modelResources.faces;
+        auto& [vertices, uvs, normals, faces] = modelResources;
 
         // For now, only support single mesh obj files.
-        ModelLoading::ModelData modelData;
+        ModelData modelData;
         auto& meshData = modelData.meshes.emplace_back();
         meshData.vertices.resize(vertices.size());
         meshData.indices.reserve(faces.size() * 3);
@@ -89,12 +86,12 @@ namespace RNGOEngine::AssetHandling::ModelLoading
             for (size_t i = 0; i < 3; ++i)
             {
                 Data::Rendering::Vertex vertex{};
-                const auto vertIndex = face.vertexIndices[i] - 1;
+                const auto vertIndex = face.VertexIndices[i] - 1;
                 vertex.position = vertices[vertIndex];
 
-                if (face.uvIndices)
+                if (face.UVIndices)
                 {
-                    const auto uvIndex = face.uvIndices.value()[i] - 1;
+                    const auto uvIndex = face.UVIndices.value()[i] - 1;
                     // Note: Flip UVs vertically for OpenGL
                     glm::vec2 uv = uvs[uvIndex];
                     if (doFlipUVs)
@@ -104,9 +101,9 @@ namespace RNGOEngine::AssetHandling::ModelLoading
                     vertex.texCoord = uv;
                 }
 
-                if (face.normalIndices)
+                if (face.NormalIndices)
                 {
-                    const auto normalIndex = face.normalIndices.value()[i] - 1;
+                    const auto normalIndex = face.NormalIndices.value()[i] - 1;
                     vertex.normal = normals[normalIndex];
                 }
 
@@ -124,7 +121,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
     {
         glm::vec3 vertex;
         currentLineStream >> vertex.x >> vertex.y >> vertex.z;
-        modelResources.vertices.push_back(vertex);
+        modelResources.Vertices.push_back(vertex);
     }
 
     void OBJModelLoader::AppendTextures(
@@ -133,7 +130,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
     {
         glm::vec2 texture;
         currentLineStream >> texture.x >> texture.y;
-        modelResources.uvs.push_back(texture);
+        modelResources.UVs.push_back(texture);
     }
 
     void OBJModelLoader::AppendNormals(
@@ -142,7 +139,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
     {
         glm::vec3 normal;
         currentLineStream >> normal.x >> normal.y >> normal.z;
-        modelResources.normals.push_back(normal);
+        modelResources.Normals.push_back(normal);
     }
 
     void OBJModelLoader::AppendFaces(OBJModelResources& modelResources, std::istringstream& currentLineStream)
@@ -159,7 +156,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
             // V
             const std::string vertexIndexStr = faceSpec.substr(0, firstSlash);
             const int vertexIndex = std::stoi(vertexIndexStr);
-            face.vertexIndices[currentIteration] = vertexIndex;
+            face.VertexIndices[currentIteration] = vertexIndex;
 
             // VT
             if (firstSlash != std::string::npos && secondSlash != std::string::npos)
@@ -169,11 +166,11 @@ namespace RNGOEngine::AssetHandling::ModelLoading
                 if (!texCoordIndexStr.empty())
                 {
                     const int texCoordIndex = std::stoi(texCoordIndexStr);
-                    if (!face.uvIndices)
+                    if (!face.UVIndices)
                     {
-                        face.uvIndices.emplace();
+                        face.UVIndices.emplace();
                     }
-                    face.uvIndices.value()[currentIteration] = texCoordIndex;
+                    face.UVIndices.value()[currentIteration] = texCoordIndex;
                 }
             }
 
@@ -182,11 +179,11 @@ namespace RNGOEngine::AssetHandling::ModelLoading
             {
                 const std::string normalIndexStr = faceSpec.substr(secondSlash + 1);
                 const int normalIndex = std::stoi(normalIndexStr);
-                if (!face.normalIndices)
+                if (!face.NormalIndices)
                 {
-                    face.normalIndices.emplace();
+                    face.NormalIndices.emplace();
                 }
-                face.normalIndices.value()[currentIteration] = normalIndex;
+                face.NormalIndices.value()[currentIteration] = normalIndex;
             }
 
             currentIteration++;
@@ -199,6 +196,6 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         }
 
         // Add indices
-        modelResources.faces.push_back(face);
+        modelResources.Faces.push_back(face);
     }
 }

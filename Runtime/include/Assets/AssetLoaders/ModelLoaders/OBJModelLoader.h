@@ -12,18 +12,18 @@ namespace RNGOEngine::AssetHandling::ModelLoading
 {
     struct Face
     {
-        std::array<Data::Rendering::Index, 3> vertexIndices;
-        std::optional<std::array<Data::Rendering::Index, 3>> uvIndices;
-        std::optional<std::array<Data::Rendering::Index, 3>> normalIndices;
+        std::array<Data::Rendering::Index, 3> VertexIndices;
+        std::optional<std::array<Data::Rendering::Index, 3>> UVIndices;
+        std::optional<std::array<Data::Rendering::Index, 3>> NormalIndices;
     };
 
     struct OBJModelResources
     {
-        std::vector<glm::vec3> vertices;
-        std::vector<glm::vec2> uvs;
-        std::vector<glm::vec3> normals;
+        std::vector<glm::vec3> Vertices;
+        std::vector<glm::vec2> UVs;
+        std::vector<glm::vec3> Normals;
 
-        std::vector<Face> faces;
+        std::vector<Face> Faces;
     };
 
     class OBJModelLoader

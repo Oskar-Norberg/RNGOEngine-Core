@@ -23,7 +23,7 @@ namespace RNGOEngine::AssetHandling
         const auto extension = typedMetadata.Path.extension().string();
 
         std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> modelHandle;
-        
+
         // OBJ Loader
         if (extension == ".obj")
         {
@@ -33,6 +33,11 @@ namespace RNGOEngine::AssetHandling
         else if (extension == ".fbx" || extension == ".gltf")
         {
             modelHandle = ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+        }
+        else
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Unsupported model format");
+            return;
         }
 
         if (!modelHandle)
