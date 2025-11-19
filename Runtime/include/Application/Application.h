@@ -34,13 +34,13 @@ namespace RNGOEngine
 
     struct EngineConfig
     {
-        RenderType renderType = RenderType::Headless;
-        Pipeline pipeline = Pipeline::Forward;
-        size_t width = 800;
-        size_t height = 600;
-        std::string_view name = "RNGOEngine Application";
+        RenderType RenderType = RenderType::Headless;
+        Pipeline Pipeline = Pipeline::Forward;
+        size_t Width = 800;
+        size_t Height = 600;
+        std::string_view Name = "RNGOEngine Application";
 
-        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> assetPaths;
+        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> AssetPaths;
     };
 
     class Application

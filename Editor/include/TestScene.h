@@ -29,9 +29,9 @@ namespace RNGOEngine::Temporary
                 cirnoMaterial.SetTexture(cirnoTexture, 0);
 
                 const Components::Transform transform{
-                    .position = glm::vec3(1.0f, -2.0f, -10.0f),
-                    .rotation = {},
-                    .scale = glm::vec3(1.0f)
+                    .Position = glm::vec3(1.0f, -2.0f, -10.0f),
+                    .Rotation = {},
+                    .Scale = glm::vec3(1.0f)
                 };
 
                 auto cirnoEntity = world.CreateEntity({"Cirno"}, transform);
@@ -48,9 +48,9 @@ namespace RNGOEngine::Temporary
                 reimuMaterial.SetTexture(reimuTexture, 0);
 
                 Components::Transform transform{
-                    .position = glm::vec3(-1.0f, -2.0f, -10.0f),
-                    .rotation = {},
-                    .scale = glm::vec3(1.0f)
+                    .Position = glm::vec3(-1.0f, -2.0f, -10.0f),
+                    .Rotation = {},
+                    .Scale = glm::vec3(1.0f)
                 };
 
                 auto reimuEntity = world.CreateEntity({"Reimu"}, transform);
@@ -84,8 +84,8 @@ namespace RNGOEngine::Temporary
             // Point Light 1
             {
                 Components::Transform transform{
-                    .position = {-2.0f, 0.5f, -8.0f},
-                    .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
+                    .Position = {-2.0f, 0.5f, -8.0f},
+                    .Rotation = glm::quat{}, .Scale = {0.1f, 0.1f, 0.1f}
                 };
                 
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);
@@ -109,7 +109,7 @@ namespace RNGOEngine::Temporary
             // Point Light 2
             {
                 Components::Transform transform{
-                    .position = {2.0f, 0.5f, -8.0f}, .rotation = glm::quat{}, .scale = {0.1f, 0.1f, 0.1f}
+                    .Position = {2.0f, 0.5f, -8.0f}, .Rotation = glm::quat{}, .Scale = {0.1f, 0.1f, 0.1f}
                 };
 
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);
@@ -129,7 +129,7 @@ namespace RNGOEngine::Temporary
 
             // Spotlight
             {
-                Components::Transform transform{.scale = {0.1f, 0.1f, 0.1f}};
+                Components::Transform transform{.Scale = {0.1f, 0.1f, 0.1f}};
 
                 auto spotlight = world.CreateEntity({"Spotlight"}, transform);
 

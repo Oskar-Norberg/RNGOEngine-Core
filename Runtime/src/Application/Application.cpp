@@ -22,12 +22,12 @@ namespace RNGOEngine
         bool doFlipTexturesVertically = false;
 
         // Set Up Renderer
-        switch (config.renderType)
+        switch (config.RenderType)
         {
             case RenderType::GLFW_OpenGL:
             {
                 m_window =
-                    std::make_unique<Core::Window::GLFWWindow>(config.width, config.height, config.name);
+                    std::make_unique<Core::Window::GLFWWindow>(config.Width, config.Height, config.Name);
                 m_renderer = std::make_unique<Core::Renderer::GLFWRenderer>();
                 doFlipTexturesVertically = true;
                 break;
@@ -42,7 +42,7 @@ namespace RNGOEngine
         }
 
         // Add Asset Paths
-        for (const auto& [path, type] : config.assetPaths)
+        for (const auto& [path, type] : config.AssetPaths)
         {
             m_assetFetcher.AddAssetPath(type, path);
         }
@@ -61,8 +61,8 @@ namespace RNGOEngine
         );
 
         // Set up RenderAPI
-        m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.width, config.height);
-        switch (config.pipeline)
+        m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.Width, config.Height);
+        switch (config.Pipeline)
         {
             case Pipeline::Forward:
             {
@@ -180,23 +180,23 @@ namespace RNGOEngine
     {
         // Engine System Context
         auto& engineContext = m_engineSystemContext;
-        engineContext.engineResourceMapper = &m_engineResourceMapper;
-        engineContext.gameResourceMapper = &m_gameResourceMapper;
-        engineContext.sceneManager = &m_sceneManager;
-        engineContext.inputManager = &m_inputManager;
-        engineContext.jobSystem = &m_jobSystem;
-        engineContext.eventQueue = &m_eventQueue;
-        engineContext.assetManager = m_assetManager.get();
-        engineContext.renderer = m_rendererAPI.get();
+        engineContext.EngineResourceMapper = &m_engineResourceMapper;
+        engineContext.GameResourceMapper = &m_gameResourceMapper;
+        engineContext.SceneManager = &m_sceneManager;
+        engineContext.InputManager = &m_inputManager;
+        engineContext.JobSystem = &m_jobSystem;
+        engineContext.EventQueue = &m_eventQueue;
+        engineContext.AssetManager = m_assetManager.get();
+        engineContext.Renderer = m_rendererAPI.get();
 
         // Game System Context
         auto& gameContext = m_gameSystemContext;
-        gameContext.resourceMapper = &m_gameResourceMapper;
-        gameContext.sceneManager = &m_sceneManager;
-        gameContext.inputManager = &m_inputManager;
-        gameContext.jobSystem = &m_jobSystem;
-        gameContext.eventQueue = &m_eventQueue;
-        engineContext.assetManager = m_assetManager.get();
+        gameContext.ResourceMapper = &m_gameResourceMapper;
+        gameContext.SceneManager = &m_sceneManager;
+        gameContext.InputManager = &m_inputManager;
+        gameContext.JobSystem = &m_jobSystem;
+        gameContext.EventQueue = &m_eventQueue;
+        engineContext.AssetManager = m_assetManager.get();
     }
 
     void Application::AddEngineSystems()

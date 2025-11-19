@@ -15,10 +15,10 @@ namespace RNGOEngine::AssetHandling
 {
     void AssetImporterBootstrapper::Bootstrap(BootstrapContext& context)
     {
-        const auto& assetLoader = &context.loader;
+        const auto& assetLoader = &context.Loader;
         // Loaders
         {
-            assetLoader->RegisterImporter<ModelImporter>(AssetType::Model, context.doFlipUVs);
+            assetLoader->RegisterImporter<ModelImporter>(AssetType::Model, context.DoFlipUVs);
             assetLoader->RegisterImporter<TextureAssetImporter>(AssetType::Texture);
             assetLoader->RegisterImporter<ShaderAssetImporter>(AssetType::Shader);
         }

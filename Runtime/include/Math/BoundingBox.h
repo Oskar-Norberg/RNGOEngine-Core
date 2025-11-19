@@ -10,24 +10,24 @@ namespace RNGOEngine::Math
 {
     struct BoundingBox
     {
-        Point start, end;
+        Point Start, End;
 
         bool Contains(Point point) const
         {
-            return (point.x >= start.x && point.x <= end.x) &&
-                   (point.y >= start.y && point.y <= end.y);
+            return (point.x >= Start.x && point.x <= End.x) &&
+                   (point.y >= Start.y && point.y <= End.y);
         }
 
         bool Contains(const BoundingBox& other) const
         {
-            return Contains(other.start) && Contains(other.end);
+            return Contains(other.Start) && Contains(other.End);
         }
 
         bool Intersects(const BoundingBox& other) const
         {
             return !(
-                other.end.x < start.x || other.start.x > end.x || other.end.y < start.y ||
-                other.start.y > end.y
+                other.End.x < Start.x || other.Start.x > End.x || other.End.y < Start.y ||
+                other.Start.y > End.y
             );
         }
     };

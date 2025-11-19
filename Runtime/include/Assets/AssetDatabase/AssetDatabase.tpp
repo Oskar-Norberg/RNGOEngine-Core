@@ -12,7 +12,7 @@ const TMetadata& AssetDatabase::GetAssetMetadataAs(const AssetHandle& handle) co
     // REALLY UNSAFE DOWNCAST.
     const auto& metadata = GetAssetMetadata(handle);
     RNGO_ASSERT(
-        metadata.Type == AssetTypeForMetadata<TMetadata>::value &&
+        metadata.Type == AssetTypeForMetadata<TMetadata>::Value &&
         "AssetDatabase::GetAssetMetadataAs<TMetadata> - AssetType does not match requested Metadata type."
     );
 

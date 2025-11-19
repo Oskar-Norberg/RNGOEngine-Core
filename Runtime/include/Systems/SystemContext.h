@@ -41,31 +41,31 @@ namespace RNGOEngine::Systems
     struct EngineSystemContext
     {
         // Should be a time-span, but for now we use a float.
-        float deltaTime = 0.0f;
+        float DeltaTime = 0.0f;
 
         // TODO: This should probably not be owned by the SystemContext.
         // TODO: Ugly pointer bonanza over here
-        Resources::ResourceMapper* engineResourceMapper = nullptr;
-        Resources::ResourceMapper* gameResourceMapper = nullptr;
-        RNGOEngine::Core::SceneManager* sceneManager = nullptr;
-        RNGOEngine::Core::InputManager* inputManager = nullptr;
-        Utilities::JobSystem* jobSystem = nullptr;
-        Events::EventQueue* eventQueue = nullptr;
-        AssetHandling::AssetManager* assetManager = nullptr;
-        RNGOEngine::Core::Renderer::RenderAPI* renderer = nullptr;
+        Resources::ResourceMapper* EngineResourceMapper = nullptr;
+        Resources::ResourceMapper* GameResourceMapper = nullptr;
+        RNGOEngine::Core::SceneManager* SceneManager = nullptr;
+        RNGOEngine::Core::InputManager* InputManager = nullptr;
+        Utilities::JobSystem* JobSystem = nullptr;
+        Events::EventQueue* EventQueue = nullptr;
+        AssetHandling::AssetManager* AssetManager = nullptr;
+        RNGOEngine::Core::Renderer::RenderAPI* Renderer = nullptr;
     };
 
     struct SystemContext
     {
         // Should be a time-span, but for now we use a float.
-        float deltaTime = 0.0f;
+        float DeltaTime = 0.0f;
 
         // TODO: Ugly pointer bonanza over here
-        Resources::ResourceMapper* resourceMapper = nullptr;
-        RNGOEngine::Core::SceneManager* sceneManager = nullptr;
-        RNGOEngine::Core::InputManager* inputManager = nullptr;
-        Utilities::JobSystem* jobSystem = nullptr;
-        Events::EventQueue* eventQueue = nullptr;
-        AssetHandling::AssetManager* assetManager = nullptr;
+        Resources::ResourceMapper* ResourceMapper = nullptr;
+        RNGOEngine::Core::SceneManager* SceneManager = nullptr;
+        RNGOEngine::Core::InputManager* InputManager = nullptr;
+        Utilities::JobSystem* JobSystem = nullptr;
+        Events::EventQueue* EventQueue = nullptr;
+        AssetHandling::AssetManager* AssetManager = nullptr;
     };
 }

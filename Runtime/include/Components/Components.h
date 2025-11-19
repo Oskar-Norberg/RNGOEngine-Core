@@ -16,23 +16,23 @@ namespace RNGOEngine::Components
 {
     struct MeshRenderer
     {
-        AssetHandling::AssetHandle modelHandle;
-        AssetHandling::AssetHandle materialKey;
+        AssetHandling::AssetHandle ModelHandle;
+        AssetHandling::AssetHandle MaterialKey;
     };
 
     struct Transform
     {
-        glm::vec3 position = {0.0f, 0.0f, 0.0f};
-        glm::quat rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-        glm::vec3 scale = {1.0f, 1.0f, 1.0f};
+        glm::vec3 Position = {0.0f, 0.0f, 0.0f};
+        glm::quat Rotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+        glm::vec3 Scale = {1.0f, 1.0f, 1.0f};
 
         // TODO: Profile this versus just storing the matrix directly.
         glm::mat4 GetMatrix() const
         {
             auto m = glm::mat4(1.0f);
-            m = glm::translate(m, position);
-            m *= glm::toMat4(rotation);
-            m = glm::scale(m, scale);
+            m = glm::translate(m, Position);
+            m *= glm::toMat4(Rotation);
+            m = glm::scale(m, Scale);
 
             return m;
         }
@@ -40,19 +40,19 @@ namespace RNGOEngine::Components
 
     struct Camera
     {
-        float fov = 45.0f;
-        float nearPlane = 0.1f;
-        float farPlane = 100.0f;
+        float FOV = 45.0f;
+        float NearPlane = 0.1f;
+        float FarPlane = 100.0f;
     };
 
     struct Color
     {
-        glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 ColorValue = glm::vec3(1.0f, 1.0f, 1.0f);
     };
 
     struct Intensity
     {
-        float intensity = 1.0f;
+        float IntensityValue = 1.0f;
     };
 
     struct BackgroundColor
@@ -63,9 +63,9 @@ namespace RNGOEngine::Components
     {
         // Standard range is 100
         // https://wiki.ogre3d.org/tiki-index.php?page=-Point+Light+Attenuation
-        float constant = 1.0f;
-        float linear = 0.045f;
-        float quadratic = 0.0075f;
+        float Constant = 1.0f;
+        float Linear = 0.045f;
+        float Quadratic = 0.0075f;
     };
 
     struct AmbientLight
@@ -82,8 +82,8 @@ namespace RNGOEngine::Components
 
     struct Spotlight
     {
-        float cutOff = glm::cos(glm::radians(10.0f));
-        float outerCutOff = glm::cos(glm::radians(12.5f));
+        float CutOff = glm::cos(glm::radians(10.0f));
+        float OuterCutOff = glm::cos(glm::radians(12.5f));
     };
 
     // TODO: Implement a custom FixedString templated-type?

@@ -29,7 +29,7 @@ namespace RNGOEngine::Systems::Core
         GatherBackgroundColors(world, context, drawQueue);
 
         // Submit draw queue to renderer.
-        context.renderer->SubmitDrawQueue(std::move(drawQueue));
+        context.Renderer->SubmitDrawQueue(std::move(drawQueue));
     }
 
     void RenderSystem::GatherOpaques(RNGOEngine::Core::World& world, EngineSystemContext& context,
@@ -43,7 +43,7 @@ namespace RNGOEngine::Systems::Core
                                        ? world.GetRegistry().get<Components::Transform>(entity)
                                        : Components::Transform();
 
-            drawQueue.opaqueObjects.emplace_back(transform, meshRender.modelHandle, meshRender.materialKey);
+            drawQueue.OpaqueObjects.emplace_back(transform, meshRender.ModelHandle, meshRender.MaterialKey);
         }
     }
 
@@ -58,11 +58,11 @@ namespace RNGOEngine::Systems::Core
                                        : Components::Transform();
 
             // Copy camera properties
-            drawQueue.camera = {
-                .transform = transform,
-                .fov = camera.fov,
-                .nearPlane = camera.nearPlane,
-                .farPlane = camera.farPlane
+            drawQueue.Camera = {
+                .Transform = transform,
+                .FOV = camera.FOV,
+                .NearPlane = camera.NearPlane,
+                .FarPlane = camera.FarPlane
             };
         }
     }
@@ -83,9 +83,9 @@ namespace RNGOEngine::Systems::Core
         for (const auto entity : backgroundColorView)
         {
             const auto& color = world.GetRegistry().all_of<Components::Color>(entity)
-                                    ? world.GetRegistry().get<Components::Color>(entity).color
+                                    ? world.GetRegistry().get<Components::Color>(entity).ColorValue
                                     : glm::vec3(0.0f, 0.0f, 0.0f);
-            drawQueue.backgroundColor = {color};
+            drawQueue.BackgroundColor = {color};
         }
     }
 
@@ -97,16 +97,16 @@ namespace RNGOEngine::Systems::Core
         {
             // TODO: I'm doing this pattern so much. Make a utils helper for it. Like a GetComponentOrDefault.
             const auto intensity = world.GetRegistry().all_of<Components::Intensity>(entity)
-                                       ? world.GetRegistry().get<Components::Intensity>(entity).intensity
+                                       ? world.GetRegistry().get<Components::Intensity>(entity).IntensityValue
                                        : 1.0f;
 
             const auto color = world.GetRegistry().all_of<Components::Color>(entity)
-                                   ? world.GetRegistry().get<Components::Color>(entity).color
+                                   ? world.GetRegistry().get<Components::Color>(entity).ColorValue
                                    : glm::vec3(1.0f, 1.0f, 1.0f);
 
-            drawQueue.ambientLight = {
-                .color = color,
-                .intensity = intensity
+            drawQueue.AmbientLight = {
+                .Color = color,
+                .Intensity = intensity
             };
         }
     }
@@ -122,18 +122,18 @@ namespace RNGOEngine::Systems::Core
                                        : Components::Transform();
 
             const auto color = world.GetRegistry().all_of<Components::Color>(entity)
-                                   ? world.GetRegistry().get<Components::Color>(entity).color
+                                   ? world.GetRegistry().get<Components::Color>(entity).ColorValue
                                    : glm::vec3(1.0f, 1.0f, 1.0f);
 
             const auto intensity = world.GetRegistry().all_of<Components::Intensity>(entity)
-                                       ? world.GetRegistry().get<Components::Intensity>(entity).intensity
+                                       ? world.GetRegistry().get<Components::Intensity>(entity).IntensityValue
                                        : 1.0f;
 
-            drawQueue.directionalLight =
+            drawQueue.DirectionalLight =
             {
-                .color = color,
-                .intensity = intensity,
-                .direction = transform.rotation * glm::vec3(0.0f, 0.0f, -1.0f)
+                .Color = color,
+                .Intensity = intensity,
+                .Direction = transform.Rotation * glm::vec3(0.0f, 0.0f, -1.0f)
             };
         }
     }
@@ -147,7 +147,7 @@ namespace RNGOEngine::Systems::Core
         {
             const glm::vec3 position = world.GetRegistry().all_of<Components::Transform>(entity)
                                            ? world.GetRegistry().get<Components::Transform>(entity).
-                                                   position
+                                                   Position
                                            : glm::vec3(0.0f, 0.0f, 0.0f);
 
             const auto lightFalloff = world.GetRegistry().all_of<Components::LightFalloff>(entity)
@@ -155,29 +155,29 @@ namespace RNGOEngine::Systems::Core
                                           : Components::LightFalloff();
 
             const auto color = world.GetRegistry().all_of<Components::Color>(entity)
-                                   ? world.GetRegistry().get<Components::Color>(entity).color
+                                   ? world.GetRegistry().get<Components::Color>(entity).ColorValue
                                    : glm::vec3(1.0f, 1.0f, 1.0f);
 
             const auto intensity = world.GetRegistry().all_of<Components::Intensity>(entity)
-                                       ? world.GetRegistry().get<Components::Intensity>(entity).intensity
+                                       ? world.GetRegistry().get<Components::Intensity>(entity).IntensityValue
                                        : 1.0f;
 
             RNGO_ASSERT(currentPointLightIndex < RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS &&
                 "Exceeded maximum number of point lights in scene!"
             );
 
-            drawQueue.pointLights[currentPointLightIndex++ %
+            drawQueue.PointLights[currentPointLightIndex++ %
                                   RNGOEngine::Core::Renderer::NR_OF_POINTLIGHTS]
                 = {
-                    .color = color,
-                    .intensity = intensity,
-                    .position = position,
-                    .constant = lightFalloff.constant,
-                    .linear = lightFalloff.linear,
-                    .quadratic = lightFalloff.quadratic
+                    .Color = color,
+                    .Intensity = intensity,
+                    .Position = position,
+                    .Constant = lightFalloff.Constant,
+                    .Linear = lightFalloff.Linear,
+                    .Quadratic = lightFalloff.Quadratic
                 };
         }
-        drawQueue.pointLightIndex = currentPointLightIndex;
+        drawQueue.PointLightIndex = currentPointLightIndex;
     }
 
     void RenderSystem::GatherSpotLights(RNGOEngine::Core::World& world, EngineSystemContext& context,
@@ -196,30 +196,30 @@ namespace RNGOEngine::Systems::Core
                                     : Components::LightFalloff();
 
             const auto color = world.GetRegistry().all_of<Components::Color>(entity)
-                                   ? world.GetRegistry().get<Components::Color>(entity).color
+                                   ? world.GetRegistry().get<Components::Color>(entity).ColorValue
                                    : glm::vec3(1.0f, 1.0f, 1.0f);
 
             const auto intensity = world.GetRegistry().all_of<Components::Intensity>(entity)
-                                       ? world.GetRegistry().get<Components::Intensity>(entity).intensity
+                                       ? world.GetRegistry().get<Components::Intensity>(entity).IntensityValue
                                        : 1.0f;
 
             RNGO_ASSERT(currentSpotlightIndex < RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS &&
                 "Exceeded maximum number of spotlights in scene!"
             );
 
-            drawQueue.spotlights[currentSpotlightIndex++ % RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS] =
+            drawQueue.Spotlights[currentSpotlightIndex++ % RNGOEngine::Core::Renderer::NR_OF_SPOTLIGHTS] =
             {
-                .color = color,
-                .intensity = intensity,
-                .position = transform.position,
-                .cutoff = spotlight.cutOff,
-                .direction = transform.rotation * glm::vec3(0.0f, 0.0f, -1.0f),
-                .outerCutoff = spotlight.outerCutOff,
-                .constant = lightFalloff.constant,
-                .linear = lightFalloff.linear,
-                .quadratic = lightFalloff.quadratic
+                .Color = color,
+                .Intensity = intensity,
+                .Position = transform.Position,
+                .Cutoff = spotlight.CutOff,
+                .Direction = transform.Rotation * glm::vec3(0.0f, 0.0f, -1.0f),
+                .OuterCutoff = spotlight.OuterCutOff,
+                .Constant = lightFalloff.Constant,
+                .Linear = lightFalloff.Linear,
+                .Quadratic = lightFalloff.Quadratic
             };
         }
-        drawQueue.spotlightIndex = currentSpotlightIndex;
+        drawQueue.SpotlightIndex = currentSpotlightIndex;
     }
 }

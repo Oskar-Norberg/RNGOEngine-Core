@@ -54,7 +54,7 @@ namespace RNGOEngine::Editor
 
     void Editor::UpdateEngineSystems(float deltaTime)
     {
-        m_engineSystemContext.deltaTime = deltaTime;
+        m_engineSystemContext.DeltaTime = deltaTime;
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineSystemContext);
     }
 
@@ -66,7 +66,7 @@ namespace RNGOEngine::Editor
 
     void Editor::UpdateGameSystems(float deltaTime)
     {
-        m_gameSystemContext.deltaTime = deltaTime;
+        m_gameSystemContext.DeltaTime = deltaTime;
         m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameSystemContext);
     }
     void Editor::SetUpEditorContext()

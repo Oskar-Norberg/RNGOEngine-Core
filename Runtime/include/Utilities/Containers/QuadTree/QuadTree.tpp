@@ -308,13 +308,13 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
     const auto& bounds = m_trees[id].bounds;
     const Math::BoundingBox& boundingBox = bounds;
     // Midpoint
-    const float midX = (boundingBox.start.x + boundingBox.end.x) / 2;
-    const float midY = (boundingBox.start.y + boundingBox.end.y) / 2;
+    const float midX = (boundingBox.Start.x + boundingBox.End.x) / 2;
+    const float midY = (boundingBox.Start.y + boundingBox.End.y) / 2;
 
-    const Math::BoundingBox nwBox = {boundingBox.start, {midX, midY}};
-    const Math::BoundingBox neBox = {{midX, boundingBox.start.y}, {boundingBox.end.x, midY}};
-    const Math::BoundingBox swBox = {{boundingBox.start.x, midY}, {midX, boundingBox.end.y}};
-    const Math::BoundingBox seBox = {{midX, midY}, boundingBox.end};
+    const Math::BoundingBox nwBox = {boundingBox.Start, {midX, midY}};
+    const Math::BoundingBox neBox = {{midX, boundingBox.Start.y}, {boundingBox.End.x, midY}};
+    const Math::BoundingBox swBox = {{boundingBox.Start.x, midY}, {midX, boundingBox.End.y}};
+    const Math::BoundingBox seBox = {{midX, midY}, boundingBox.End};
 
     const auto nwChild = CreateNode(nwBox);
     const auto neChild = CreateNode(neBox);
