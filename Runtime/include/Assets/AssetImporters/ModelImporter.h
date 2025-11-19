@@ -11,7 +11,6 @@ namespace RNGOEngine::AssetHandling
     class ModelImporter : public AssetImporter
     {
     public:
-        // TODO: This ugly construct wouldn't have to be here if they were just singletons...
         explicit ModelImporter(bool doFlipUVs);
 
         void Load(const AssetMetadata& metadata) override;

@@ -35,7 +35,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
 
     private:
         static OBJModelResources ParseOBJFile(const std::filesystem::path& path);
-        static ModelData ConvertToMeshData(const OBJModelResources& modelResources);
+        static ModelData ConvertToMeshData(const OBJModelResources& modelResources, bool doFlipUVs);
 
     private:
         static void AppendVertices(OBJModelResources& modelResources, std::istringstream& currentLineStream);

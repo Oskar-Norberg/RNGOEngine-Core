@@ -13,17 +13,15 @@
 
 namespace RNGOEngine::AssetHandling::ModelLoading
 {
-    std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> OBJModelLoader::LoadModel(
+    std::expected<ModelData, ModelLoadingError> OBJModelLoader::LoadModel(
         const std::filesystem::path& modelPath, bool doFlipUVs
     )
     {
-        // TODO: Conditionally flip UVs
-        
-        // Load Model into RAM
+        // Parse OBJ File
         const auto modelResources = ParseOBJFile(modelPath);
 
         // Convert to Engine Native format
-        auto modelData = ConvertToMeshData(modelResources);
+        auto modelData = ConvertToMeshData(modelResources, doFlipUVs);
 
         // Model is unloaded through RAII deconstructor
         return modelData;
@@ -72,7 +70,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         return modelResources;
     }
 
-    ModelLoading::ModelData OBJModelLoader::ConvertToMeshData(const OBJModelResources& modelResources)
+    ModelData OBJModelLoader::ConvertToMeshData(const OBJModelResources& modelResources, bool doFlipUVs)
     {
         const auto& vertices = modelResources.vertices;
         const auto& uvs = modelResources.uvs;
@@ -99,7 +97,10 @@ namespace RNGOEngine::AssetHandling::ModelLoading
                     const auto uvIndex = face.uvIndices.value()[i] - 1;
                     // Note: Flip UVs vertically for OpenGL
                     glm::vec2 uv = uvs[uvIndex];
-                    uv.y *= -1.0f;
+                    if (doFlipUVs)
+                    {
+                        uv.y *= -1.0f;
+                    }
                     vertex.texCoord = uv;
                 }
 

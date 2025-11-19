@@ -33,6 +33,7 @@ namespace RNGOEngine::AssetHandling
         virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(const std::filesystem::path& path) const = 0;
 
     public:
+        // TODO: This isn't really being used anywhere right now.
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
     };
 }
