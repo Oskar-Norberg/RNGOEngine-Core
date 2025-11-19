@@ -5,6 +5,7 @@
 #include "Assets/AssetImporters/ModelImporter.h"
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetLoaders/ModelLoaders/OBJModelLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -21,9 +22,18 @@ namespace RNGOEngine::AssetHandling
 
         const auto extension = typedMetadata.Path.extension().string();
 
-        // Load Model into RAM
-        const auto modelHandle =
-            ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+        std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> modelHandle;
+        
+        // OBJ Loader
+        if (extension == ".obj")
+        {
+            modelHandle = ModelLoading::OBJModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+        }
+        // Assimp Loader
+        else if (extension == ".fbx" || extension == ".gltf")
+        {
+            modelHandle = ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+        }
 
         if (!modelHandle)
         {
@@ -39,16 +49,6 @@ namespace RNGOEngine::AssetHandling
         {
             // TODO: Error handling
             RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
-        }
-
-        // OBJ Loader
-        if (extension == ".obj")
-        {
-        }
-        // Assimp Loader
-        else if (extension == ".fbx" || extension == ".gltf")
-        {
-           
         }
     }
 

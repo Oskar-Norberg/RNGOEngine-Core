@@ -69,8 +69,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         }
         fileStream.close();
 
-        // TODO:
-        // return modelResources;
+        return modelResources;
     }
 
     ModelLoading::ModelData OBJModelLoader::ConvertToMeshData(const OBJModelResources& modelResources)
