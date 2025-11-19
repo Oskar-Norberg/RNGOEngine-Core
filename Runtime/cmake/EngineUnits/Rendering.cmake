@@ -6,6 +6,7 @@ add_library(${RENDERING_PROJECT_NAME} STATIC
         include/Renderer/RenderFeatures.h
         
         include/Renderer/Handles/MaterialHandle.h
+        src/Renderer/Handles/MaterialHandle.cpp
         include/Renderer/Uniforms.h
         
         include/Renderer/Null/NullRenderer.h

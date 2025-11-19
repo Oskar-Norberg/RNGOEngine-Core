@@ -56,9 +56,7 @@ namespace RNGOEngine
         AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
 
         // Asset Managers
-        m_assetManager = std::make_unique<AssetHandling::AssetManager>(
-            m_assetFetcher, m_assetDatabase, *m_resourceManager, doFlipTexturesVertically
-        );
+        m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_resourceManager);
 
         // Set up RenderAPI
         m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.Width, config.Height);
@@ -81,11 +79,6 @@ namespace RNGOEngine
                 RNGO_ASSERT(false && "Deferred pipeline not implemented.");
                 break;
         }
-
-        // TODO: TEMPORARY
-        m_assetManager->SetShaderImporter(
-            m_assetLoader->GetImporter<AssetHandling::ShaderAssetImporter>(AssetHandling::AssetType::Shader)
-        );
 
         // Builtin Assets
         AssetHandling::BuiltinAssets::InitializeBuiltinAssets();

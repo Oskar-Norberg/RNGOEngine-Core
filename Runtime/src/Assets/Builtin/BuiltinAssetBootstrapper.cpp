@@ -42,11 +42,13 @@ namespace RNGOEngine::AssetHandling
 
         modelManager.SetErrorModel(loader.Load(AssetType::Model, Data::FallbackAssets::InvalidModel));
     }
+
     void BuiltinAssets::SetUpTexture()
     {
         auto& textureManager = AssetManager::GetInstance().GetTextureManager();
         auto& loader = AssetLoader::GetInstance();
 
-        textureManager.SetInvalidTexture(loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture));
+        textureManager.SetInvalidTexture(loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture)
+        );
     }
 }

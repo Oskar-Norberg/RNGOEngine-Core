@@ -19,13 +19,14 @@ namespace RNGOEngine::Temporary
             using enum AssetHandling::AssetType;
             auto& assetManager = AssetHandling::AssetManager::GetInstance();
             auto& assetLoader = AssetHandling::AssetLoader::GetInstance();
+            auto& materialManager = assetManager.GetMaterialManager();
 
             {
                 // Cirno Setup
                 const auto cirnoMesh = assetLoader.Load(Model, "cirno/cirno.obj");
                 const auto cirnoTexture = assetLoader.Load(Texture, "cirno_albedo.jpeg");
 
-                auto cirnoMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
+                auto cirnoMaterial = assetManager.GetMaterialManager().CreateMaterial("default.vert", "default.frag");
                 cirnoMaterial.SetTexture(cirnoTexture, 0);
 
                 const Components::Transform transform{
@@ -44,7 +45,7 @@ namespace RNGOEngine::Temporary
             {
                 const auto reimuMesh = assetLoader.Load(Model, "reimu/reim2u.obj");
                 const auto reimuTexture = assetLoader.Load(Texture, "reimu_albedo.png");
-                auto reimuMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
+                auto reimuMaterial = materialManager.CreateMaterial("default.vert", "default.frag");
                 reimuMaterial.SetTexture(reimuTexture, 0);
 
                 Components::Transform transform{
@@ -92,7 +93,7 @@ namespace RNGOEngine::Temporary
 
                 const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
                 const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
-                auto lampMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
+                auto lampMaterial = materialManager.CreateMaterial("default.vert", "default.frag");
                 lampMaterial.SetTexture(lampTexture, 0);
 
 
@@ -116,7 +117,7 @@ namespace RNGOEngine::Temporary
 
                 const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
                 const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
-                auto lampMaterial = assetManager.CreateMaterial("default.vert", "default.frag");
+                auto lampMaterial = materialManager.CreateMaterial("default.vert", "default.frag");
                 lampMaterial.SetTexture(lampTexture, 0);
 
                 pointLight.AddComponent<Components::PointLight>();
