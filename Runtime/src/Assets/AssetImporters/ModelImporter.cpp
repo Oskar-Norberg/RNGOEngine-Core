@@ -24,6 +24,8 @@ namespace RNGOEngine::AssetHandling
 
         std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> modelHandle;
 
+        // TODO: Temporarily disable OBJ loader until it's fully functional.
+#if 0
         // OBJ Loader
         if (extension == ".obj")
         {
@@ -39,7 +41,11 @@ namespace RNGOEngine::AssetHandling
             RNGO_ASSERT(false && "ModelAssetImporter::Load - Unsupported model format");
             return;
         }
-
+#endif
+#if 1
+        modelHandle = ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+#endif
+        
         if (!modelHandle)
         {
             // TODO: Return expected instead of directly returning handle?
