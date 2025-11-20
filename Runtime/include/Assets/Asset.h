@@ -23,6 +23,8 @@ namespace RNGOEngine::AssetHandling
         None,
         Model,
         Texture,
+        // TODO: Should Vertex and Fragment shaders be regarded as separate asset types? Or should they share the same AssetType?
+        // Or should they be merged into a single "Shader" file that contains both vertex and fragment shader code?
         Shader,
         Material,
         Count

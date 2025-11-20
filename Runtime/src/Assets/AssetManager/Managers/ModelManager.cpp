@@ -47,7 +47,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         RNGO_ASSERT(
-            m_models.contains(handle) &&
+            m_models.contains(m_errorModel) &&
             "ModelManager::GetRuntimeModelData - Fallback Error model not loaded!"
         );
         return m_models.at(m_errorModel);

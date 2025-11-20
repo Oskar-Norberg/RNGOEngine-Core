@@ -14,6 +14,7 @@ namespace RNGOEngine::AssetHandling
     {
         SetUpModel();
         SetUpTexture();
+        SetUpMaterial();
     }
 
     AssetHandle BuiltinAssets::GetErrorHandle(AssetType type)
@@ -26,8 +27,9 @@ namespace RNGOEngine::AssetHandling
             case AssetType::Texture:
                 return assetManager.GetTextureManager().GetInvalidTexture();
             case AssetType::Shader:
-            case AssetType::Material:
                 RNGO_ASSERT(false && "Unsupported type!");
+            case AssetType::Material:
+                return assetManager.GetMaterialManager().GetInvalidMaterial();
             case AssetType::Count:
             case AssetType::None:
             default:
@@ -50,5 +52,18 @@ namespace RNGOEngine::AssetHandling
 
         textureManager.SetInvalidTexture(loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture)
         );
+    }
+
+    void BuiltinAssets::SetUpMaterial()
+    {
+        auto& materialManager = AssetManager::GetInstance().GetMaterialManager();
+        auto& loader = AssetLoader::GetInstance();
+
+        const auto vertexShader = loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidVertexShader);
+        const auto fragmentShader =
+            loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidFragmentShader);
+
+        const auto invalidMaterialHandle = materialManager.CreateMaterial(vertexShader, fragmentShader);
+        materialManager.SetInvalidMaterial(invalidMaterialHandle.GetMaterialAssetHandle());
     }
 }

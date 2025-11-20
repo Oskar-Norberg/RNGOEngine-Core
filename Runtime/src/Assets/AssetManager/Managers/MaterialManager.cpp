@@ -55,9 +55,22 @@ namespace RNGOEngine::AssetHandling
         const auto params = GetValidatedMaterialParameters(handle);
         if (!params || !m_materials.contains(handle))
         {
-            // TODO: Return error material / Try to reload material?
-            RNGO_ASSERT(false && "MaterialManager::GetMaterial - Invalid material handle.");
-            return {};
+            const auto invalidMaterialParams = GetValidatedMaterialParameters(m_invalidMaterialHandle);
+            
+            if (!invalidMaterialParams || !m_materials.contains(m_invalidMaterialHandle))
+            {
+                RNGO_ASSERT(false && "MaterialManager::GetMaterial - Invalid fallback material handle.");
+                return {};
+            }
+
+            const auto& [materialUUID, shaderProgramKey] = m_materials.at(m_invalidMaterialHandle);
+            
+            const ResolvedMaterial mat{
+                .shaderProgram = m_shaderManager.GetShaderProgram(shaderProgramKey),
+                .uniforms = invalidMaterialParams->get().uniforms
+            };
+
+            return mat;
         }
 
         const auto& [materialUUID, shaderProgramKey] = m_materials.at(handle);
@@ -176,6 +189,16 @@ namespace RNGOEngine::AssetHandling
         }
 
         parametersOpt->get().uniforms.emplace_back(name.data(), value);
+    }
+
+    void MaterialManager::SetInvalidMaterial(const AssetHandle& handle)
+    {
+        m_invalidMaterialHandle = handle;
+    }
+
+    AssetHandle MaterialManager::GetInvalidMaterial() const
+    {
+        return m_invalidMaterialHandle;
     }
 
     std::optional<std::reference_wrapper<const MaterialParameters>>
