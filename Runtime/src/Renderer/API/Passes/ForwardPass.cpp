@@ -291,12 +291,14 @@ namespace RNGOEngine::Core::Renderer
                 );
             }
 
+            // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
+            auto& meshResourceManager = resourceManager.GetMeshResourceManager();
+
             const auto& meshDatas =
                 assetManager.GetModelManager().GetRuntimeModelData(opaqueDrawCall.ModelHandle);
             for (const auto& meshData : meshDatas.meshKeys)
             {
-                // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
-                const auto meshResourceOpt = resourceManager.GetMeshResource(meshData);
+                const auto meshResourceOpt = meshResourceManager.GetMeshResource(meshData);
                 if (!meshResourceOpt.has_value())
                 {
                     RNGO_ASSERT(false && "Invalid mesh resource in RenderAPI::RenderOpaque.");

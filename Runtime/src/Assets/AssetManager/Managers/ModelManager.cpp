@@ -55,12 +55,14 @@ namespace RNGOEngine::AssetHandling
 
     RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
     {
+        auto& meshResourceManager = m_resourceManager.GetMeshResourceManager();
+        
         RuntimeModelData runtimeData;
         runtimeData.meshKeys.reserve(modelData.meshes.size());
 
         for (const auto& meshData : modelData.meshes)
         {
-            runtimeData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
+            runtimeData.meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
         }
 
         return runtimeData;
@@ -68,9 +70,6 @@ namespace RNGOEngine::AssetHandling
 
     void ModelManager::UnloadModelResources(const RuntimeModelData& modelData)
     {
-        for (const auto& meshKey : modelData.meshKeys)
-        {
-            m_resourceManager.MarkMeshForDestruction(meshKey);
-        }
+        // TODO:
     }
 }
