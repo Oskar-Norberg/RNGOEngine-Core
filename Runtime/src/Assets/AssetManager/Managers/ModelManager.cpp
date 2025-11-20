@@ -13,9 +13,8 @@ namespace RNGOEngine::AssetHandling
         : m_resourceManager(resourceManager)
     {
     }
-
     ModelCreationError ModelManager::UploadModel(
-        const AssetHandle& assetHandle, const ModelLoading::ModelHandle modelHandle
+        const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
         auto runtimeData = UploadModelResources(modelHandle);
@@ -36,27 +35,37 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle ModelManager::GetInvalidModel() const
     {
-        // TODO: Return an actual error model.
-        return Utilities::UUID(0);
+        return m_errorModel;
     }
 
     const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
     {
-        return m_models.at(handle);
-    }
-
-    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelHandle modelHandle)
-    {
-        RuntimeModelData modelData;
-        modelData.meshKeys.reserve(modelHandle.data->meshes.size());
-
-        for (const auto& meshData : modelHandle.data->meshes)
+        const auto it = m_models.find(handle);
+        if (it != m_models.end())
         {
-            modelData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
+            return it->second;
         }
 
-        return modelData;
+        RNGO_ASSERT(
+            m_models.contains(m_errorModel) &&
+            "ModelManager::GetRuntimeModelData - Fallback Error model not loaded!"
+        );
+        return m_models.at(m_errorModel);
     }
+
+    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
+    {
+        RuntimeModelData runtimeData;
+        runtimeData.meshKeys.reserve(modelData.meshes.size());
+
+        for (const auto& meshData : modelData.meshes)
+        {
+            runtimeData.meshKeys.emplace_back(m_resourceManager.CreateMesh(meshData));
+        }
+
+        return runtimeData;
+    }
+
     void ModelManager::UnloadModelResources(const RuntimeModelData& modelData)
     {
         for (const auto& meshKey : modelData.meshKeys)

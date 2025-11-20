@@ -23,8 +23,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         # Asset Importers
         include/Assets/AssetImporters/AssetImporter.h
         
-        include/Assets/AssetImporters/ModelAssetImporter.h
-        src/Assets/AssetImporters/ModelAssetImporter.cpp
+        include/Assets/AssetImporters/ModelImporter.h
+        src/Assets/AssetImporters/ModelImporter.cpp
 
         include/Assets/AssetImporters/TextureAssetImporter.h
         src/Assets/AssetImporters/TextureAssetImporter.cpp
@@ -61,8 +61,14 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetLoaders/ShaderLoader.h
         src/Assets/AssetLoaders/ShaderLoader.cpp
         
-        include/Assets/AssetLoaders/ModelLoader.h
-        src/Assets/AssetLoaders/ModelLoader.cpp
+        # Model Loading
+        include/Assets/AssetLoaders/ModelLoaders/ModelLoaderData.h
+
+        include/Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.h
+        src/Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.cpp
+
+        include/Assets/AssetLoaders/ModelLoaders/OBJModelLoader.h
+        src/Assets/AssetLoaders/ModelLoaders/OBJModelLoader.cpp
         
         include/Assets/AssetManager/Managers/ModelManager.h
         src/Assets/AssetManager/Managers/ModelManager.cpp
@@ -76,6 +82,10 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
 
         include/Assets/AssetManager/Managers/ShaderManager.h
         src/Assets/AssetManager/Managers/ShaderManager.cpp
+        
+        # Builtin / Fallback Assets
+        include/Assets/Builtin/BuiltinAssetBootstrapper.h
+        src/Assets/Builtin/BuiltinAssetBootstrapper.cpp
 )
 target_include_directories(${ASSET_MANAGER_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC yaml-cpp ${RENDERING_PROJECT_NAME} ${RESOURCE_MANAGEMENT_PROJECT_NAME} assimp stb_image)
@@ -88,9 +98,12 @@ set(ENGINE_SHADERS_DIR "${ENGINE_ASSETS_DIR}/shaders")
 set(ENGINE_SHADER_INCLUDE_DIR "${ENGINE_SHADERS_DIR}/include")
 set(ENGINE_MODELS_DIR "${ENGINE_ASSETS_DIR}/models")
 set(ENGINE_TEXTURES_DIR "${ENGINE_ASSETS_DIR}/textures")
+set(ENGINE_FALLBACKS_DIR "${ENGINE_ASSETS_DIR}/fallbacks")
+
 
 target_compile_definitions(${ASSET_MANAGER_PROJECT_NAME} PRIVATE
         ENGINE_ASSETS_DIR="${ENGINE_ASSETS_DIR}"
+        ENGINE_FALLBACKS_DIR="${ENGINE_FALLBACKS_DIR}"
         ENGINE_SHADERS_DIR="${ENGINE_SHADERS_DIR}"
         ENGINE_SHADER_INCLUDE_DIR="${ENGINE_SHADER_INCLUDE_DIR}"
         ENGINE_MODELS_DIR="${ENGINE_MODELS_DIR}"

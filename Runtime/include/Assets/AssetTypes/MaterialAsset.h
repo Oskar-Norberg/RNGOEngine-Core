@@ -12,8 +12,8 @@ namespace RNGOEngine::AssetHandling
 {
     struct MaterialMetadata : AssetMetadata
     {
-        Utilities::UUID vertexShader;
-        Utilities::UUID fragmentShader;
-        MaterialParameters parameters;
+        Utilities::UUID VertexShader;
+        Utilities::UUID FragmentShader;
+        MaterialParameters Parameters;
     };
 }

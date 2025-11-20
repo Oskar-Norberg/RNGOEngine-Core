@@ -26,6 +26,6 @@ namespace RNGOEngine::AssetHandling
         void AddAssetPath(AssetType type, const std::filesystem::path& path);
 
     private:
-        std::unordered_map<AssetType, std::vector<std::filesystem::path>> m_assetPaths;
+        std::array<std::vector<std::filesystem::path>, AssetTypeCount> m_assetPaths;
     };
 }

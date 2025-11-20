@@ -17,24 +17,24 @@ namespace RNGOEngine::AssetHandling
     template<>
     struct AssetTypeForMetadata<ModelMetadata>
     {
-        static constexpr auto value = AssetType::Model;
+        static constexpr auto Value = AssetType::Model;
     };
 
     template<>
     struct AssetTypeForMetadata<TextureMetadata>
     {
-        static constexpr auto value = AssetType::Texture;
+        static constexpr auto Value = AssetType::Texture;
     };
 
     template<>
     struct AssetTypeForMetadata<ShaderMetadata>
     {
-        static constexpr auto value = AssetType::Shader;
+        static constexpr auto Value = AssetType::Shader;
     };
 
     template<>
     struct AssetTypeForMetadata<MaterialMetadata>
     {
-        static constexpr auto value = AssetType::Material;
+        static constexpr auto Value = AssetType::Material;
     };
 }

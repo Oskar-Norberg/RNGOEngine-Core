@@ -17,8 +17,8 @@ namespace RNGOEngine::Core::Renderer
 
     struct TextureSpecification
     {
-        TextureID texture;
-        int slot;
+        TextureID Texture;
+        int Slot;
     };
 
     union UniformData
@@ -35,8 +35,8 @@ namespace RNGOEngine::Core::Renderer
 
     struct UniformSpecification
     {
-        std::string name;
-        UniformType type;
-        UniformData data;
+        std::string Name;
+        UniformType Type;
+        UniformData Data;
     };
 }

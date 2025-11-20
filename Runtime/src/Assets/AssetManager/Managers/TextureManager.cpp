@@ -14,14 +14,15 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    TextureManagerError TextureManager::UploadTexture(const AssetHandle& assetHandle,
-                                                      const Core::Renderer::Texture2DProperties& properties,
-                                                      const int width, const int height,
-                                                      const std::span<const std::byte> textureData)
+    TextureManagerError TextureManager::UploadTexture(
+        const AssetHandle& assetHandle, const Core::Renderer::Texture2DProperties& properties,
+        const int width, const int height, const std::span<const std::byte> textureData
+    )
     {
         // Upload Resources
         const auto textureKey = m_resourceManager.GetTextureResourceManager().CreateTexture(
-            properties, width, height, textureData);
+            properties, width, height, textureData
+        );
 
         // Store Runtime Data
         m_textures.insert({assetHandle, {textureKey}});
@@ -41,28 +42,37 @@ namespace RNGOEngine::AssetHandling
             m_textures.erase(assetHandle);
         }
     }
+    void TextureManager::SetInvalidTexture(const AssetHandle& handle)
+    {
+        m_invalidTexture = handle;
+    }
 
     AssetHandle TextureManager::GetInvalidTexture() const
     {
-        return Utilities::UUID(0);
+        return m_invalidTexture;
     }
 
     Core::Renderer::TextureID TextureManager::GetTexture(const AssetHandle& uuid) const
     {
+        const auto& textureResourceManager = m_resourceManager.GetTextureResourceManager();
+
+        // TODO: Cleanup
         if (!m_textures.contains(uuid))
         {
-            RNGO_ASSERT(false && "TextureManager::GetTexture called with invalid UUID.");
-            // TODO: Return actual error texture.
-            return Core::Renderer::TextureID();
+            const auto& errorTextureData = m_textures.at(m_invalidTexture);
+            const auto errorTextureOpt = textureResourceManager.GetTexture(errorTextureData.TextureKey);
+
+            return errorTextureOpt.value();
         }
 
         const auto& runtimeTextureData = m_textures.at(uuid);
-        const auto& textureResourceManager = m_resourceManager.GetTextureResourceManager();
         const auto textureOpt = textureResourceManager.GetTexture(runtimeTextureData.TextureKey);
         if (!textureOpt)
         {
-            RNGO_ASSERT(false && "TextureManager::GetTexture Texture has been invalidated.");
-            return Core::Renderer::TextureID();
+            const auto& errorTextureData = m_textures.at(m_invalidTexture);
+            const auto errorTextureOpt = textureResourceManager.GetTexture(errorTextureData.TextureKey);
+
+            return errorTextureOpt.value();
         }
 
         return textureOpt.value();

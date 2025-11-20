@@ -4,7 +4,7 @@
 
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 
-#include "Assets/AssetImporters/ModelAssetImporter.h"
+#include "Assets/AssetImporters/ModelImporter.h"
 #include "Assets/AssetImporters/ShaderAssetImporter.h"
 #include "Assets/AssetImporters/TextureAssetImporter.h"
 #include "Assets/AssetSerializers/ModelAssetSerializer.h"
@@ -15,25 +15,19 @@ namespace RNGOEngine::AssetHandling
 {
     void AssetImporterBootstrapper::Bootstrap(BootstrapContext& context)
     {
-        const auto& assetLoader = &context.loader;
+        const auto& assetLoader = &context.Loader;
         // Loaders
         {
-            assetLoader->RegisterImporter<ModelAssetImporter>(
-                AssetType::Model, context.doFlipUVs);
-            assetLoader->RegisterImporter<TextureAssetImporter>(
-                AssetType::Texture);
-            assetLoader->RegisterImporter<ShaderAssetImporter>(
-                AssetType::Shader);
+            assetLoader->RegisterImporter<ModelImporter>(AssetType::Model, context.DoFlipUVs);
+            assetLoader->RegisterImporter<TextureAssetImporter>(AssetType::Texture);
+            assetLoader->RegisterImporter<ShaderAssetImporter>(AssetType::Shader);
         }
 
         // Serializers
         {
-            assetLoader->RegisterSerializer<ModelAssetSerializer>(
-                AssetType::Model);
-            assetLoader->RegisterSerializer<TextureAssetSerializer>(
-                AssetType::Texture);
-            assetLoader->RegisterSerializer<ShaderAssetSerializer>(
-                AssetType::Shader);
+            assetLoader->RegisterSerializer<ModelAssetSerializer>(AssetType::Model);
+            assetLoader->RegisterSerializer<TextureAssetSerializer>(AssetType::Texture);
+            assetLoader->RegisterSerializer<ShaderAssetSerializer>(AssetType::Shader);
         }
     }
 }

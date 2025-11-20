@@ -16,88 +16,87 @@ namespace RNGOEngine::Core::Renderer
     constexpr auto NR_OF_POINTLIGHTS = 16;
     constexpr auto NR_OF_SPOTLIGHTS = 16;
 
-    // TODO: Consistent case on public struct members.
     struct Drawable
     {
-        Components::Transform transform;
-        AssetHandling::AssetHandle modelHandle;
-        AssetHandling::AssetHandle material;
+        Components::Transform Transform;
+        AssetHandling::AssetHandle ModelHandle;
+        AssetHandling::AssetHandle Material;
     };
 
     struct CameraData
     {
-        Components::Transform transform;
+        Components::Transform Transform;
 
-        float fov;
-        float nearPlane;
-        float farPlane;
+        float FOV;
+        float NearPlane;
+        float FarPlane;
     };
 
     struct BackgroundColorData
     {
-        glm::vec3 color;
+        glm::vec3 Color;
     };
 
     struct AmbientLightData
     {
-        glm::vec3 color;
-        float intensity;
+        glm::vec3 Color;
+        float Intensity;
     };
 
     struct DirectionalLightData
     {
-        glm::vec3 color;
-        float intensity;
-        glm::vec3 direction;
+        glm::vec3 Color;
+        float Intensity;
+        glm::vec3 Direction;
     };
 
     struct PointLightData
     {
-        glm::vec3 color;
-        float intensity;
+        glm::vec3 Color;
+        float Intensity;
 
-        glm::vec3 position;
-        float constant;
+        glm::vec3 Position;
+        float Constant;
 
-        float linear;
-        float quadratic;
+        float Linear;
+        float Quadratic;
     };
 
     struct SpotlightData
     {
-        glm::vec3 color;
-        float intensity;
+        glm::vec3 Color;
+        float Intensity;
 
-        glm::vec3 position;
-        float cutoff;
-        glm::vec3 direction;
+        glm::vec3 Position;
+        float Cutoff;
+        glm::vec3 Direction;
 
-        float outerCutoff;
+        float OuterCutoff;
 
-        float constant;
-        float linear;
-        float quadratic;
+        float Constant;
+        float Linear;
+        float Quadratic;
     };
 
     struct DrawQueue
     {
         // Camera Properties
-        CameraData camera;
+        CameraData Camera;
 
         // Light Properties
-        AmbientLightData ambientLight;
-        DirectionalLightData directionalLight;
+        AmbientLightData AmbientLight;
+        DirectionalLightData DirectionalLight;
 
-        std::array<PointLightData, NR_OF_POINTLIGHTS> pointLights;
-        size_t pointLightIndex = 0;
+        std::array<PointLightData, NR_OF_POINTLIGHTS> PointLights;
+        size_t PointLightIndex = 0;
 
-        std::array<SpotlightData, NR_OF_POINTLIGHTS> spotlights;
-        size_t spotlightIndex = 0;
+        std::array<SpotlightData, NR_OF_POINTLIGHTS> Spotlights;
+        size_t SpotlightIndex = 0;
 
-        BackgroundColorData backgroundColor;
+        BackgroundColorData BackgroundColor;
 
         // Opaque Objects
-        std::vector<Drawable> opaqueObjects;
+        std::vector<Drawable> OpaqueObjects;
 
         // TODO: Transparents
     };

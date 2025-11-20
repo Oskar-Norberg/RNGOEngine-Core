@@ -4,8 +4,8 @@
 
 #include "Assets/AssetFetcher/AssetFetcher.h"
 
-#include "Utilities/RNGOAsserts.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -15,6 +15,7 @@ namespace RNGOEngine::AssetHandling
         using enum AssetType;
 
         AddAssetPath(None, ENGINE_ASSETS_DIR);
+        AddAssetPath(None, ENGINE_FALLBACKS_DIR);
 
         AddAssetPath(Shader, ENGINE_SHADERS_DIR);
         AddAssetPath(Shader, ENGINE_SHADER_INCLUDE_DIR);
@@ -23,8 +24,9 @@ namespace RNGOEngine::AssetHandling
         AddAssetPath(Texture, ENGINE_TEXTURES_DIR);
     }
 
-    std::optional<std::filesystem::path> AssetFetcher::GetPath(const AssetType type,
-                                                                     const std::filesystem::path& path) const
+    std::optional<std::filesystem::path> AssetFetcher::GetPath(
+        const AssetType type, const std::filesystem::path& path
+    ) const
     {
         // First try relative to current working directory.
         if (Utilities::IO::FileExists(path))
@@ -33,7 +35,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Then inside registered paths
-        for (const auto& includeDirectory : m_assetPaths.at(type))
+        for (const auto& includeDirectory : m_assetPaths.at(static_cast<size_t>(type)))
         {
             const std::filesystem::path fullAssetPath = includeDirectory / path;
 
@@ -50,19 +52,27 @@ namespace RNGOEngine::AssetHandling
     {
         using enum AssetType;
 
+        size_t assetTypeIndex = static_cast<size_t>(type);
+
         if (type == None)
         {
             // Add to all
             // TODO: Feels like a bit of a hack treating 'None' as 'All'.
-            for (auto& [assetType, paths] : m_assetPaths)
+            for (size_t i = 0; i < AssetTypeCount; ++i)
             {
-                m_assetPaths[type].push_back(path);
+                const auto assetType = static_cast<AssetType>(i);
+                if (assetType == None)
+                {
+                    continue;
+                }
+
+                m_assetPaths[i].push_back(path);
             }
         }
         else
         {
             // Add to specific type
-            m_assetPaths[type].push_back(path);
+            m_assetPaths[assetTypeIndex].push_back(path);
         }
     }
 }

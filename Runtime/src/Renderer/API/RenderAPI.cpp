@@ -82,10 +82,15 @@ namespace RNGOEngine::Core::Renderer
 
         for (const auto& attachment : specification.Attachments)
         {
+            const auto [desiredWidth, desiredHeight] =
+                    Resources::GetDesiredAttachmentSize(
+                        attachment.Size, width, height
+                    );
+            
             // TODO: signedness missmatch
             const auto attachmentKey = targetManager.CreateFrameBufferAttachment(
                 key, attachment.Format, attachment.AttachmentPoint,
-                attachment.Size.width, attachment.Size.height
+                desiredWidth, desiredHeight
             );
 
             // Add to resource mapper

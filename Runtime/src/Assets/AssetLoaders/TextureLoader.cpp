@@ -11,12 +11,11 @@
 
 namespace RNGOEngine::AssetHandling::TextureLoader
 {
-    std::expected<TextureData, TextureLoadingError> LoadTexture(
-        const std::filesystem::path& path)
+    std::expected<TextureData, TextureLoadingError> LoadTexture(const std::filesystem::path& path)
     {
         int width, height, nrChannels;
         unsigned char* data = stbi_load(path.string().data(), &width, &height, &nrChannels, 0);
-        
+
         if (!data || width <= 0 || height <= 0 || nrChannels <= 0)
         {
             RNGO_ASSERT(false && "Failed to load texture");
@@ -24,11 +23,9 @@ namespace RNGOEngine::AssetHandling::TextureLoader
         }
 
         return TextureData{
-                static_cast<unsigned int>(width),
-                static_cast<unsigned int>(height),
-                static_cast<unsigned int>(nrChannels),
-                data
-            };
+            static_cast<unsigned int>(width), static_cast<unsigned int>(height),
+            static_cast<unsigned int>(nrChannels), data
+        };
     }
 
     void FreeTexture(const TextureData& texture)

@@ -73,7 +73,7 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::ClearAmbientColor(DrawQueue& queue) const
     {
-        const auto& clearColor = queue.backgroundColor.color;
+        const auto& clearColor = queue.BackgroundColor.Color;
         const auto& clearR = clearColor.r;
         const auto& clearG = clearColor.g;
         const auto& clearB = clearColor.b;
@@ -85,15 +85,15 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::RenderOpaque(DrawQueue& queue) const
     {
-        const auto& camera = queue.camera;
+        const auto& camera = queue.Camera;
 
         const auto& assetManager = AssetHandling::AssetManager::GetInstance();
         const auto& resourceManager = Resources::ResourceManager::GetInstance();
 
-        for (const auto& opaqueDrawCall : queue.opaqueObjects)
+        for (const auto& opaqueDrawCall : queue.OpaqueObjects)
         {
             const auto& materialSpecification =
-                assetManager.GetMaterialManager().GetMaterial(opaqueDrawCall.material);
+                assetManager.GetMaterialManager().GetMaterial(opaqueDrawCall.Material);
             const auto shaderProgramID = materialSpecification.shaderProgram;
 
             m_renderer.BindShaderProgram(shaderProgramID);
@@ -107,17 +107,17 @@ namespace RNGOEngine::Core::Renderer
             // Model Transform
             m_renderer.SetMat4(
                 shaderProgramID, "Model",
-                std::span<const float, 16>(glm::value_ptr(opaqueDrawCall.transform.GetMatrix()), 16)
+                std::span<const float, 16>(glm::value_ptr(opaqueDrawCall.Transform.GetMatrix()), 16)
             );
 
             // Camera Settings
             // Yes. This is set per object right now. Yes, it is terrible.
             // TODO: UBOs PLEEAAAAAAAAAAAASEEEEEEEEEEEEEEEEE
             {
-                const auto view = glm::inverse(queue.camera.transform.GetMatrix());
+                const auto view = glm::inverse(queue.Camera.Transform.GetMatrix());
                 const auto projectionMatrix = glm::perspective(
-                    glm::radians(camera.fov), static_cast<float>(m_width) / static_cast<float>(m_height),
-                    camera.nearPlane, camera.farPlane
+                    glm::radians(camera.FOV), static_cast<float>(m_width) / static_cast<float>(m_height),
+                    camera.NearPlane, camera.FarPlane
                 );
 
                 // TODO: These should not be set per object.
@@ -134,7 +134,7 @@ namespace RNGOEngine::Core::Renderer
                 // TODO: Not only are the variable names hardcoded, but they also don't follow the same conventions.
                 m_renderer.SetVec3(
                     shaderProgramID, "viewPosition",
-                    std::span<const float, 3>(&camera.transform.position[0], 3)
+                    std::span<const float, 3>(&camera.Transform.Position[0], 3)
                 );
             }
 
@@ -144,24 +144,24 @@ namespace RNGOEngine::Core::Renderer
                 // TODO: Yet another terrible hardcoded uniform path. Also this should be in shared memory.
                 m_renderer.SetVec3(
                     shaderProgramID, "ambientLight.color",
-                    std::span<const float, 3>(&queue.ambientLight.color[0], 3)
+                    std::span<const float, 3>(&queue.AmbientLight.Color[0], 3)
                 );
-                m_renderer.SetFloat(shaderProgramID, "ambientLight.intensity", queue.ambientLight.intensity);
+                m_renderer.SetFloat(shaderProgramID, "ambientLight.intensity", queue.AmbientLight.Intensity);
 
                 m_renderer.SetVec3(
                     shaderProgramID, "directionalLight.color",
-                    std::span<const float, 3>(&queue.directionalLight.color[0], 3)
+                    std::span<const float, 3>(&queue.DirectionalLight.Color[0], 3)
                 );
                 m_renderer.SetVec3(
                     shaderProgramID, "directionalLight.direction",
-                    std::span<const float, 3>(&queue.directionalLight.direction[0], 3)
+                    std::span<const float, 3>(&queue.DirectionalLight.Direction[0], 3)
                 );
                 m_renderer.SetFloat(
-                    shaderProgramID, "directionalLight.intensity", queue.directionalLight.intensity
+                    shaderProgramID, "directionalLight.intensity", queue.DirectionalLight.Intensity
                 );
 
                 // Point Lights
-                for (size_t i = 0; i < queue.pointLightIndex; i++)
+                for (size_t i = 0; i < queue.PointLightIndex; i++)
                 {
                     // TODO: This, sucks, ass.
                     const std::string pointLightBase = std::format("pointLights[{}]", i);
@@ -169,73 +169,73 @@ namespace RNGOEngine::Core::Renderer
                     const auto color = std::format("{}.color", pointLightBase);
                     m_renderer.SetVec3(
                         shaderProgramID, color.c_str(),
-                        std::span<const float, 3>(&queue.pointLights[i].color[0], 3)
+                        std::span<const float, 3>(&queue.PointLights[i].Color[0], 3)
                     );
 
                     const auto intensity = std::format("{}.intensity", pointLightBase);
-                    m_renderer.SetFloat(shaderProgramID, intensity.c_str(), queue.pointLights[i].intensity);
+                    m_renderer.SetFloat(shaderProgramID, intensity.c_str(), queue.PointLights[i].Intensity);
 
                     const auto position = std::format("{}.position", pointLightBase);
                     m_renderer.SetVec3(
                         shaderProgramID, position.c_str(),
-                        std::span<const float, 3>(&queue.pointLights[i].position[0], 3)
+                        std::span<const float, 3>(&queue.PointLights[i].Position[0], 3)
                     );
 
                     const auto constant = std::format("{}.constant", pointLightBase);
-                    m_renderer.SetFloat(shaderProgramID, constant.c_str(), queue.pointLights[i].constant);
+                    m_renderer.SetFloat(shaderProgramID, constant.c_str(), queue.PointLights[i].Constant);
 
                     const auto linear = std::format("{}.linear", pointLightBase);
-                    m_renderer.SetFloat(shaderProgramID, linear.c_str(), queue.pointLights[i].linear);
+                    m_renderer.SetFloat(shaderProgramID, linear.c_str(), queue.PointLights[i].Linear);
 
                     const auto quadratic = std::format("{}.quadratic", pointLightBase);
-                    m_renderer.SetFloat(shaderProgramID, quadratic.c_str(), queue.pointLights[i].quadratic);
+                    m_renderer.SetFloat(shaderProgramID, quadratic.c_str(), queue.PointLights[i].Quadratic);
                 }
-                m_renderer.SetInt(shaderProgramID, "numPointLights", static_cast<int>(queue.pointLightIndex));
+                m_renderer.SetInt(shaderProgramID, "numPointLights", static_cast<int>(queue.PointLightIndex));
 
                 // Spotlights
-                for (size_t i = 0; i < queue.spotlightIndex; i++)
+                for (size_t i = 0; i < queue.SpotlightIndex; i++)
                 {
                     const std::string spotlightBase = std::format("spotlights[{}]", i);
 
                     const auto color = std::format("{}.color", spotlightBase);
                     m_renderer.SetVec3(
                         shaderProgramID, color.c_str(),
-                        std::span<const float, 3>(&queue.spotlights[i].color[0], 3)
+                        std::span<const float, 3>(&queue.Spotlights[i].Color[0], 3)
                     );
 
                     const auto intensity = std::format("{}.intensity", spotlightBase);
-                    m_renderer.SetFloat(shaderProgramID, intensity.c_str(), queue.spotlights[i].intensity);
+                    m_renderer.SetFloat(shaderProgramID, intensity.c_str(), queue.Spotlights[i].Intensity);
 
                     const auto position = std::format("{}.position", spotlightBase);
                     m_renderer.SetVec3(
                         shaderProgramID, position.c_str(),
-                        std::span<const float, 3>(&queue.spotlights[i].position[0], 3)
+                        std::span<const float, 3>(&queue.Spotlights[i].Position[0], 3)
                     );
 
                     const auto cutoff = std::format("{}.cutoff", spotlightBase);
-                    m_renderer.SetFloat(shaderProgramID, cutoff.c_str(), queue.spotlights[i].cutoff);
+                    m_renderer.SetFloat(shaderProgramID, cutoff.c_str(), queue.Spotlights[i].Cutoff);
 
                     const auto direction = std::format("{}.direction", spotlightBase);
                     m_renderer.SetVec3(
                         shaderProgramID, direction.c_str(),
-                        std::span<const float, 3>(&queue.spotlights[i].direction[0], 3)
+                        std::span<const float, 3>(&queue.Spotlights[i].Direction[0], 3)
                     );
 
                     const auto outerCutoff = std::format("{}.outerCutoff", spotlightBase);
                     m_renderer.SetFloat(
-                        shaderProgramID, outerCutoff.c_str(), queue.spotlights[i].outerCutoff
+                        shaderProgramID, outerCutoff.c_str(), queue.Spotlights[i].OuterCutoff
                     );
 
                     const auto constant = std::format("{}.constant", spotlightBase);
-                    m_renderer.SetFloat(shaderProgramID, constant.c_str(), queue.spotlights[i].constant);
+                    m_renderer.SetFloat(shaderProgramID, constant.c_str(), queue.Spotlights[i].Constant);
 
                     const auto linear = std::format("{}.linear", spotlightBase);
-                    m_renderer.SetFloat(shaderProgramID, linear.c_str(), queue.spotlights[i].linear);
+                    m_renderer.SetFloat(shaderProgramID, linear.c_str(), queue.Spotlights[i].Linear);
 
                     const auto quadratic = std::format("{}.quadratic", spotlightBase);
-                    m_renderer.SetFloat(shaderProgramID, quadratic.c_str(), queue.spotlights[i].quadratic);
+                    m_renderer.SetFloat(shaderProgramID, quadratic.c_str(), queue.Spotlights[i].Quadratic);
                 }
-                m_renderer.SetInt(shaderProgramID, "numSpotlights", static_cast<int>(queue.spotlightIndex));
+                m_renderer.SetInt(shaderProgramID, "numSpotlights", static_cast<int>(queue.SpotlightIndex));
             }
 
             for (const auto& [name, data] : materialSpecification.uniforms)
@@ -289,22 +289,22 @@ namespace RNGOEngine::Core::Renderer
                     },
                     data
                 );
+            }
 
-                const auto& meshDatas =
-                    assetManager.GetModelManager().GetRuntimeModelData(opaqueDrawCall.modelHandle);
-                for (const auto& meshData : meshDatas.meshKeys)
+            const auto& meshDatas =
+                assetManager.GetModelManager().GetRuntimeModelData(opaqueDrawCall.ModelHandle);
+            for (const auto& meshData : meshDatas.meshKeys)
+            {
+                // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
+                const auto meshResourceOpt = resourceManager.GetMeshResource(meshData);
+                if (!meshResourceOpt.has_value())
                 {
-                    // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
-                    const auto meshResourceOpt = resourceManager.GetMeshResource(meshData);
-                    if (!meshResourceOpt.has_value())
-                    {
-                        RNGO_ASSERT(false && "Invalid mesh resource in RenderAPI::RenderOpaque.");
-                        continue;
-                    }
-                    const auto& meshResource = meshResourceOpt->get();
-                    m_renderer.BindToVAO(meshResource.vao);
-                    m_renderer.DrawElement(meshResource.elementCount);
+                    RNGO_ASSERT(false && "Invalid mesh resource in RenderAPI::RenderOpaque.");
+                    continue;
                 }
+                const auto& meshResource = meshResourceOpt->get();
+                m_renderer.BindToVAO(meshResource.vao);
+                m_renderer.DrawElement(meshResource.elementCount);
             }
         }
     }

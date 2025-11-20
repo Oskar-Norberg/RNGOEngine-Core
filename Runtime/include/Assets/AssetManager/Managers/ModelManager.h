@@ -6,8 +6,8 @@
 
 #include <vector>
 
+#include "../../AssetLoaders/ModelLoaders/AssimpModelLoader.h"
 #include "Assets/AssetDatabase/AssetDatabase.h"
-#include "Assets/AssetLoaders/ModelLoader.h"
 #include "ResourceManager/ResourceManager.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
@@ -43,7 +43,7 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelManager(Resources::ResourceManager& resourceManager);
 
-        ModelCreationError UploadModel(const AssetHandle& assetHandle, ModelLoading::ModelHandle modelHandle);
+        ModelCreationError UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
         void UnloadModel(const AssetHandle& assetHandle);
 
     public:
@@ -53,14 +53,27 @@ namespace RNGOEngine::AssetHandling
         // TODO: Make this return an optional or expected?
         const RuntimeModelData& GetRuntimeModelData(const AssetHandle& handle) const;
 
+        // Engine Internals
+    public:
+        void SetErrorModel(const AssetHandle& handle)
+        {
+            m_errorModel = handle;
+        }
+
+        AssetHandle GetErrorModel() const
+        {
+            return m_errorModel;
+        }
+
     private:
         Resources::ResourceManager& m_resourceManager;
 
     private:
         std::unordered_map<AssetHandle, RuntimeModelData> m_models;
+        AssetHandle m_errorModel;
 
     private:
-        RuntimeModelData UploadModelResources(ModelLoading::ModelHandle modelHandle);
+        RuntimeModelData UploadModelResources(const ModelLoading::ModelData& modelData);
         void UnloadModelResources(const RuntimeModelData& modelData);
     };
 }

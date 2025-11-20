@@ -9,10 +9,10 @@ namespace RNGOEngine::AssetHandling
 {
     struct BootstrapContext
     {
-        AssetLoader& loader;
+        AssetLoader& Loader;
 
         // Model Importer Settings
-        bool doFlipUVs;
+        bool DoFlipUVs;
     };
     
     // TODO: I don't like this design, but it is better than having everything in the Engine source-file.

@@ -4,15 +4,10 @@
 
 #pragma once
 
-// TODO: This should not be here
-#include "Assets/AssetImporters/ShaderAssetImporter.h"
-
-#include "Assets/AssetFetcher/AssetFetcher.h"
-#include "Assets/AssetManager/Managers/ModelManager.h"
 #include "Assets/AssetManager/Managers/MaterialManager.h"
+#include "Assets/AssetManager/Managers/ModelManager.h"
 #include "Assets/AssetManager/Managers/ShaderManager.h"
 #include "Assets/AssetManager/Managers/TextureManager.h"
-#include "Renderer/Handles/MaterialHandle.h"
 
 namespace RNGOEngine
 {
@@ -28,12 +23,7 @@ namespace RNGOEngine::AssetHandling
     class AssetManager : public Utilities::Singleton<AssetManager>
     {
     public:
-        explicit AssetManager(AssetFetcher& assetFetcher, AssetDatabase& assetDatabase,
-                              Resources::ResourceManager& resourceManager, bool doFlipUVs);
-        
-    public:
-        Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexSourcePath,
-                                                      const std::filesystem::path& fragmentSourcePath);
+        explicit AssetManager(Resources::ResourceManager& resourceManager);
 
         // Non-const Getters
     public:
@@ -79,24 +69,7 @@ namespace RNGOEngine::AssetHandling
             return m_textureManager;
         }
 
-        // TODO: TEMPORARY SOLUTION
-        // The AssetManager should never be responsible for importing.
-        // But since there is currently no stable UUID system in which a material could reference shaders, these need to be loaded at runtime.
-        void SetShaderImporter(ShaderAssetImporter* importer)
-        {
-            m_shaderAssetImporter = importer;
-        }
-        ShaderAssetImporter* m_shaderAssetImporter;
-
-        // Engine Internal
-    public:
-        void BeginDestroyAllAssets();
-
     private:
-        AssetDatabase& m_assetDatabase;
-        // TODO: Manager should get from the Database in the future. Remove this when possible.
-        AssetFetcher& m_assetFileFetcher;
-
         ShaderManager m_shaderManager;
         ModelManager m_modelManager;
         TextureManager m_textureManager;
