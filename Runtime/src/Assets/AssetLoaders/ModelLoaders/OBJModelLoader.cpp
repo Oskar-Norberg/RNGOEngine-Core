@@ -5,7 +5,6 @@
 #include "Assets/AssetLoaders/ModelLoaders/OBJModelLoader.h"
 
 #include <fstream>
-#include <iostream>
 
 #include "Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.h"
 #include "Assets/AssetManager/AssetManager.h"

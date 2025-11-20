@@ -26,8 +26,7 @@ namespace RNGOEngine::Editor
     private:
         EditorSystemContext m_editorSystemContext;
         Systems::SystemScheduler<EditorSystemContext> m_editorSystems;
-        
-        
+
     private:
         void UpdateEngineSystems(float deltaTime);
         void UpdateEditorSystems(float deltaTime);
