@@ -45,56 +45,18 @@ namespace RNGOEngine::Editor
 
         if (ImGui::BeginPopup("AddComponentPopup"))
         {
-            // TODO: Another terrible hardcoded list. This should probably integrate with entt::meta.
-            if (ImGui::Button("MeshRenderer"))
-            {
-                registry.emplace<Components::MeshRenderer>(selectedEntity);
-            }
-
-            if (ImGui::Button("Camera"))
-            {
-                registry.emplace<Components::Camera>(selectedEntity);
-            }
-
-            if (ImGui::Button("Color"))
-            {
-                registry.emplace<Components::Color>(selectedEntity);
-            }
-
-            if (ImGui::Button("Intensity"))
-            {
-                registry.emplace<Components::Intensity>(selectedEntity);
-            }
-
-            if (ImGui::Button("BackgroundColor"))
-            {
-                registry.emplace<Components::BackgroundColor>(selectedEntity);
-            }
-
-            if (ImGui::Button("LightFalloff"))
-            {
-                registry.emplace<Components::LightFalloff>(selectedEntity);
-            }
-
-            if (ImGui::Button("AmbientLight"))
-            {
-                registry.emplace<Components::AmbientLight>(selectedEntity);
-            }
-
-            if (ImGui::Button("DirectionalLight"))
-            {
-                registry.emplace<Components::DirectionalLight>(selectedEntity);
-            }
-
-            if (ImGui::Button("PointLight"))
-            {
-                registry.emplace<Components::PointLight>(selectedEntity);
-            }
-
-            if (ImGui::Button("Spotlight"))
-            {
-                registry.emplace<Components::Spotlight>(selectedEntity);
-            }
+            DrawAddComponent<Components::Name>(registry, selectedEntity, "Name");
+            DrawAddComponent<Components::Transform>(registry, selectedEntity, "Transform");
+            DrawAddComponent<Components::MeshRenderer>(registry, selectedEntity, "MeshRenderer");
+            DrawAddComponent<Components::Camera>(registry, selectedEntity, "Camera");
+            DrawAddComponent<Components::Color>(registry, selectedEntity, "Color");
+            DrawAddComponent<Components::Intensity>(registry, selectedEntity, "Intensity");
+            DrawAddComponent<Components::BackgroundColor>(registry, selectedEntity, "BackgroundColor");
+            DrawAddComponent<Components::LightFalloff>(registry, selectedEntity, "LightFalloff");
+            DrawAddComponent<Components::AmbientLight>(registry, selectedEntity, "AmbientLight");
+            DrawAddComponent<Components::DirectionalLight>(registry, selectedEntity, "DirectionalLight");
+            DrawAddComponent<Components::PointLight>(registry, selectedEntity, "PointLight");
+            DrawAddComponent<Components::Spotlight>(registry, selectedEntity, "Spotlight");
             
             ImGui::EndPopup();
         }

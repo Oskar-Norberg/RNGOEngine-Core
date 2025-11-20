@@ -17,6 +17,7 @@ namespace RNGOEngine::Editor
     template<>
     inline void DrawProperties<Components::Name>(entt::registry& registry, const entt::entity entity)
     {
+        // TODO: I don't like everything needing to check if the component exists.
         if (registry.any_of<Components::Name>(entity))
         {
             auto& name = registry.get<Components::Name>(entity);
@@ -33,8 +34,6 @@ namespace RNGOEngine::Editor
             const auto& meshRenderer = registry.get<Components::MeshRenderer>(entity);
             ImGui::Text("ModelHandle %u", meshRenderer.ModelHandle.GetValue());
             ImGui::Text("MaterialHandle %u", meshRenderer.MaterialKey.GetValue());
-
-            ImGui::Separator();
         }
     }
 
@@ -54,8 +53,6 @@ namespace RNGOEngine::Editor
                 transform.Rotation = glm::quat(glm::radians(eulerRot));
             }
             ImGui::DragFloat3("Scale", glm::value_ptr(transform.Scale), 0.01f, 0.0f);
-
-            ImGui::Separator();
         }
     }
 
@@ -68,8 +65,6 @@ namespace RNGOEngine::Editor
 
             auto& camera = registry.get<Components::Camera>(entity);
             ImGui::DragFloat("FOV", &camera.FOV, 0.1f, 0.1f, 180.0f);
-
-            ImGui::Separator();
         }
     }
 
@@ -82,8 +77,6 @@ namespace RNGOEngine::Editor
 
             auto& color = registry.get<Components::Color>(entity);
             ImGui::DragFloat3("Color", glm::value_ptr(color.ColorValue), 0.01f, 0.0f, 1.0f);
-
-            ImGui::Separator();
         }
     }
 
@@ -96,8 +89,6 @@ namespace RNGOEngine::Editor
 
             auto& intensity = registry.get<Components::Intensity>(entity);
             ImGui::DragFloat("Intensity", &intensity.IntensityValue, 0.01f);
-
-            ImGui::Separator();
         }
     }
 
@@ -109,8 +100,6 @@ namespace RNGOEngine::Editor
         if (registry.any_of<Components::BackgroundColor>(entity))
         {
             ImGui::Text("BackgroundColor");
-
-            ImGui::Separator();
         }
     }
 
@@ -125,8 +114,6 @@ namespace RNGOEngine::Editor
             ImGui::DragFloat("Constant", &falloff.Constant, 0.01f);
             ImGui::DragFloat("Linear", &falloff.Linear, 0.01f);
             ImGui::DragFloat("Quadratic", &falloff.Quadratic, 0.01f);
-
-            ImGui::Separator();
         }
     }
 
@@ -136,8 +123,6 @@ namespace RNGOEngine::Editor
         if (registry.any_of<Components::AmbientLight>(entity))
         {
             ImGui::Text("AmbientLight");
-
-            ImGui::Separator();
         }
     }
 
@@ -149,8 +134,6 @@ namespace RNGOEngine::Editor
         if (registry.any_of<Components::DirectionalLight>(entity))
         {
             ImGui::Text("DirectionalLight");
-
-            ImGui::Separator();
         }
     }
 
@@ -160,8 +143,6 @@ namespace RNGOEngine::Editor
         if (registry.any_of<Components::PointLight>(entity))
         {
             ImGui::Text("PointLight");
-
-            ImGui::Separator();
         }
     }
 
@@ -175,8 +156,6 @@ namespace RNGOEngine::Editor
             auto& spotlight = registry.get<Components::Spotlight>(entity);
             ImGui::DragFloat("CutOff", &spotlight.CutOff, 0.01f);
             ImGui::DragFloat("OuterCutOff", &spotlight.OuterCutOff, 0.01f);
-
-            ImGui::Separator();
         }
     }
 }
