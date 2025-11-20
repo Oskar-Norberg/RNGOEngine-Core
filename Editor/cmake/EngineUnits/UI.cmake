@@ -20,6 +20,8 @@ add_library(${UI_PROJECT_NAME} STATIC
         include/UI/Panels/StatsPanel.h
         src/UI/Panels/StatsPanel.cpp
         
+        include/UI/PropertyDrawer/PropertyDrawers.h
+        
         include/UI/Panels/DetailsPanel.h
         src/UI/Panels/DetailsPanel.cpp
 )

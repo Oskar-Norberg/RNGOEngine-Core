@@ -24,119 +24,19 @@ namespace RNGOEngine::Editor
         // TODO:Temporarily display components directly in here. Later this will need a separate panel / proper serialization.
         auto& registry = context.sceneManager->GetCurrentWorld()->GetRegistry();
 
-        if (registry.any_of<Components::Name>(selectedEntity))
-        {
-            auto& name = registry.get<Components::Name>(selectedEntity);
-            ImGui::InputText("Name", name.NameArr.data(), Components::MAX_NR_CHARACTERS);
-        }
-        
-        if (registry.any_of<Components::Transform>(selectedEntity))
-        {
-            auto& transform = registry.get<Components::Transform>(selectedEntity);
-
-            ImGui::Text("Transform");
-            ImGui::DragFloat3("Position", glm::value_ptr(transform.Position), 0.01f);
-
-            glm::vec3 eulerRot = glm::degrees(glm::eulerAngles(transform.Rotation));
-            if (ImGui::DragFloat3("Rotation", glm::value_ptr(eulerRot), 0.01f))
-            {
-                transform.Rotation = glm::quat(glm::radians(eulerRot));
-            }
-            ImGui::DragFloat3("Scale", glm::value_ptr(transform.Scale), 0.01f, 0.0f);
-
-            ImGui::Separator();
-        }
-        
-        if (registry.any_of<Components::MeshRenderer>(selectedEntity))
-        {
-            ImGui::Text("MeshRenderer");
-            const auto& meshRenderer = registry.get<Components::MeshRenderer>(selectedEntity);
-            ImGui::Text("ModelHandle %u", meshRenderer.ModelHandle.GetValue());
-            ImGui::Text("MaterialHandle %u", meshRenderer.MaterialKey.GetValue());
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::Camera>(selectedEntity))
-        {
-            ImGui::Text("Camera");
-
-            auto& camera = registry.get<Components::Camera>(selectedEntity);
-            ImGui::DragFloat("FOV", &camera.FOV, 0.1f, 0.1f, 180.0f);
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::Color>(selectedEntity))
-        {
-            ImGui::Text("Color");
-
-            auto& color = registry.get<Components::Color>(selectedEntity);
-            ImGui::DragFloat3("Color", glm::value_ptr(color.ColorValue), 0.01f, 0.0f, 1.0f);
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::Intensity>(selectedEntity))
-        {
-            ImGui::Text("Intensity");
-
-            auto& intensity = registry.get<Components::Intensity>(selectedEntity);
-            ImGui::DragFloat("Intensity", &intensity.IntensityValue, 0.01f);
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::BackgroundColor>(selectedEntity))
-        {
-            ImGui::Text("BackgroundColor");
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::LightFalloff>(selectedEntity))
-        {
-            ImGui::Text("LightFalloff");
-
-            auto& falloff = registry.get<Components::LightFalloff>(selectedEntity);
-            ImGui::DragFloat("Constant", &falloff.Constant, 0.01f);
-            ImGui::DragFloat("Linear", &falloff.Linear, 0.01f);
-            ImGui::DragFloat("Quadratic", &falloff.Quadratic, 0.01f);
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::AmbientLight>(selectedEntity))
-        {
-            ImGui::Text("AmbientLight");
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::DirectionalLight>(selectedEntity))
-        {
-            ImGui::Text("DirectionalLight");
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::PointLight>(selectedEntity))
-        {
-            ImGui::Text("PointLight");
-
-            ImGui::Separator();
-        }
-
-        if (registry.any_of<Components::Spotlight>(selectedEntity))
-        {
-            ImGui::Text("Spotlight");
-
-            auto& spotlight = registry.get<Components::Spotlight>(selectedEntity);
-            ImGui::DragFloat("CutOff", &spotlight.CutOff, 0.01f);
-            ImGui::DragFloat("OuterCutOff", &spotlight.OuterCutOff, 0.01f);
-
-            ImGui::Separator();
-        }
+        // TODO: Not the best solution, but works for now.
+        DrawComponent<Components::Name>(registry, selectedEntity);
+        DrawComponent<Components::Transform>(registry, selectedEntity);
+        DrawComponent<Components::MeshRenderer>(registry, selectedEntity);
+        DrawComponent<Components::Camera>(registry, selectedEntity);
+        DrawComponent<Components::Color>(registry, selectedEntity);
+        DrawComponent<Components::Intensity>(registry, selectedEntity);
+        DrawComponent<Components::BackgroundColor>(registry, selectedEntity);
+        DrawComponent<Components::LightFalloff>(registry, selectedEntity);
+        DrawComponent<Components::AmbientLight>(registry, selectedEntity);
+        DrawComponent<Components::DirectionalLight>(registry, selectedEntity);
+        DrawComponent<Components::PointLight>(registry, selectedEntity);
+        DrawComponent<Components::Spotlight>(registry, selectedEntity);
 
         if (ImGui::Button("Add Component"))
         {
@@ -198,7 +98,5 @@ namespace RNGOEngine::Editor
             
             ImGui::EndPopup();
         }
-
-        
     }
 }

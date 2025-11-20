@@ -3,8 +3,10 @@
 //
 
 #pragma once
+
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/IDockablePanel.h"
+#include "UI/PropertyDrawer/PropertyDrawers.h"
 
 namespace RNGOEngine::Editor
 {
@@ -18,4 +20,10 @@ namespace RNGOEngine::Editor
             return "Details";
         }
     };
+
+    template<typename T>
+    void DrawComponent(entt::registry& registry, const entt::entity entity)
+    {
+        DrawProperties<T>(registry, entity);
+    }
 }
