@@ -21,19 +21,21 @@ namespace RNGOEngine::Editor
         void OnRender() override;
 
     private:
+        UIContext m_uiContext;
         UIManager m_UIManager;
 
     private:
         EditorSystemContext m_editorSystemContext;
+        UISelectionManager m_selectionManager;
         Systems::SystemScheduler<EditorSystemContext> m_editorSystems;
-        
-        
+
     private:
         void UpdateEngineSystems(float deltaTime);
         void UpdateEditorSystems(float deltaTime);
         void UpdateGameSystems(float deltaTime);
 
     private:
+        void SetUpUIContext();
         void SetUpEditorContext();
     };
 }

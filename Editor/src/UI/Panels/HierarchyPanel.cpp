@@ -4,8 +4,6 @@
 
 #include "UI/Panels/HierarchyPanel.h"
 
-#include <iostream>
-
 #include "Components/Components.h"
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/Managers/UISelectionManager.h"

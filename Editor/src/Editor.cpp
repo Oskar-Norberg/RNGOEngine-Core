@@ -27,6 +27,7 @@ namespace RNGOEngine::Editor
         m_UIManager.RegisterPanel<HierarchyPanel>();
         m_UIManager.RegisterPanel<DetailsPanel>();
 
+        SetUpUIContext();
         SetUpEditorContext();
     }
 
@@ -35,7 +36,7 @@ namespace RNGOEngine::Editor
         Application::OnUpdate(deltaTime);
         UpdateEditorSystems(deltaTime);
 
-        m_UIManager.Update(deltaTime);
+        m_UIManager.Update(m_uiContext, deltaTime);
 
         UpdateEngineSystems(deltaTime);
         UpdateGameSystems(deltaTime);
@@ -46,7 +47,7 @@ namespace RNGOEngine::Editor
         Application::OnRender();
 
         m_UIManager.BeginFrame();
-        m_UIManager.Render();
+        m_UIManager.Render(m_uiContext);
         m_UIManager.EndFrame();
 
         m_window->SwapBuffers();
@@ -69,6 +70,15 @@ namespace RNGOEngine::Editor
         m_gameSystemContext.DeltaTime = deltaTime;
         m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameSystemContext);
     }
+
+    void Editor::SetUpUIContext()
+    {
+        // Set up UIContext
+        m_uiContext.selectionManager = &m_selectionManager;
+        m_uiContext.sceneManager = &m_sceneManager;
+        m_uiContext.rendererAPI = m_rendererAPI.get();
+    }
+
     void Editor::SetUpEditorContext()
     {
         m_editorSystemContext.engineResourceMapper = &m_engineResourceMapper;

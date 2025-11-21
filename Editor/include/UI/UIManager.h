@@ -30,10 +30,10 @@ namespace RNGOEngine::Editor
         // TODO: Passing SceneManager like this feels wrong.
         explicit UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager);
 
-        void Update(float deltaTime);
+        void Update(UIContext& context, float deltaTime);
 
         void BeginFrame();
-        void Render();
+        void Render(UIContext& context);
         void EndFrame();
 
     public:
@@ -45,12 +45,6 @@ namespace RNGOEngine::Editor
 
     private:
         std::vector<std::unique_ptr<IDockablePanel>> m_panels;
-
-    private:
-        UISelectionManager m_selectionManager;
-
-    private:
-        UIContext m_uiContext;
 
     private:
         // Reference means this cannot be moved/unbound, but that's probably fine.

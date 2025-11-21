@@ -27,6 +27,7 @@ namespace RNGOEngine::Components
         glm::vec3 Scale = {1.0f, 1.0f, 1.0f};
 
         // TODO: Profile this versus just storing the matrix directly.
+        // TODO: Give more descriptive name. Is this a ModelMatrix? A ViewMatrix? Does it take parenting into account?
         glm::mat4 GetMatrix() const
         {
             auto m = glm::mat4(1.0f);

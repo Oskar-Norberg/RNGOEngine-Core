@@ -4,8 +4,6 @@
 
 #include "Utilities/ThreadPool/ThreadPool.h"
 
-#include <iostream>
-
 RNGOEngine::Utilities::ThreadPool::ThreadPool::ThreadPool(size_t initialThreadCount)
     : shouldStop(false)
 {

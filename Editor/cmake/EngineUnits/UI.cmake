@@ -26,4 +26,4 @@ add_library(${UI_PROJECT_NAME} STATIC
         src/UI/Panels/DetailsPanel.cpp
 )
 target_include_directories(${UI_PROJECT_NAME} PUBLIC include)
-target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake RNGOEngine_Core)
+target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake imguizmo-cmake RNGOEngine_Core)
