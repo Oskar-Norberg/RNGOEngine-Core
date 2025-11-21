@@ -83,12 +83,15 @@ namespace RNGOEngine::Editor
 
     void ViewPortPanel::DrawGizmo(const DrawGizmoContext& context)
     {
-        if (ImGui::IsKeyPressed(ImGuiKey_T))
-            m_gizmoData.CurrentGizmoOperation = ImGuizmo::TRANSLATE;
-        if (ImGui::IsKeyPressed(ImGuiKey_E))
-            m_gizmoData.CurrentGizmoOperation = ImGuizmo::ROTATE;
-        if (ImGui::IsKeyPressed(ImGuiKey_R))
-            m_gizmoData.CurrentGizmoOperation = ImGuizmo::SCALE;
+        if (ImGui::IsWindowHovered())
+        {
+            if (ImGui::IsKeyPressed(ImGuiKey_T))
+                m_gizmoData.CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+            if (ImGui::IsKeyPressed(ImGuiKey_E))
+                m_gizmoData.CurrentGizmoOperation = ImGuizmo::ROTATE;
+            if (ImGui::IsKeyPressed(ImGuiKey_R))
+                m_gizmoData.CurrentGizmoOperation = ImGuizmo::SCALE;
+        }
 
         auto& registry = context.Context.sceneManager->GetCurrentWorld()->GetRegistry();
 
@@ -124,10 +127,10 @@ namespace RNGOEngine::Editor
             glm::vec3 newScale;
 
             // Decompose needs these rvalues.
-            glm::vec3 dummySkew;
-            glm::vec4 dummyPerspective;
+            glm::vec3 dummyV3;
+            glm::vec4 dummyV4;
 
-            glm::decompose(targetMatrix, newScale, newRotation, newPosition, dummySkew, dummyPerspective);
+            glm::decompose(targetMatrix, newScale, newRotation, newPosition, dummyV3, dummyV4);
 
             targetTransform = Components::Transform{
                 .Position = newPosition,

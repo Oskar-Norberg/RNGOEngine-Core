@@ -28,17 +28,12 @@ namespace RNGOEngine::Editor
         ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window.GetNativeWindow()), true);
         // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
         ImGui_ImplOpenGL3_Init();
-
-        // Set up UIContext
-        m_uiContext.selectionManager = &m_selectionManager;
-        m_uiContext.sceneManager = &sceneManager;
     }
-
-    void UIManager::Update(const float deltaTime)
+    void UIManager::Update(UIContext& context, float deltaTime)
     {
         for (const auto& panel : m_panels)
         {
-            panel->Update(m_uiContext, deltaTime);
+            panel->Update(context, deltaTime);
         }
     }
 
@@ -51,8 +46,7 @@ namespace RNGOEngine::Editor
 
         ImGui::DockSpaceOverViewport();
     }
-
-    void UIManager::Render()
+    void UIManager::Render(UIContext& context)
     {
         for (const auto& panel : m_panels)
         {
@@ -60,10 +54,10 @@ namespace RNGOEngine::Editor
 
             {
                 const bool hovered = ImGui::IsWindowHovered();
-                panel->SetTargetHovered(m_uiContext, hovered);
+                panel->SetTargetHovered(context, hovered);
             }
 
-            panel->Render(m_uiContext);
+            panel->Render(context);
             ImGui::End();
         }
     }

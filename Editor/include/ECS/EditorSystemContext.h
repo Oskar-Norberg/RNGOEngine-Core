@@ -45,6 +45,8 @@ namespace RNGOEngine::Editor
         // Should be a time-span, but for now we use a float.
         float deltaTime = 0.0f;
 
+        
+
         // TODO: This should probably not be owned by the SystemContext.
         // TODO: Ugly pointer bonanza over here
         Systems::Resources::ResourceMapper* engineResourceMapper = nullptr;
