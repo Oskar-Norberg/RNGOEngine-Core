@@ -8,6 +8,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
+#include "ImGuizmo.h"
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::Editor
@@ -46,6 +47,7 @@ namespace RNGOEngine::Editor
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
+        ImGuizmo::BeginFrame();
 
         ImGui::DockSpaceOverViewport();
     }
