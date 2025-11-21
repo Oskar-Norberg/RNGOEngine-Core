@@ -9,6 +9,7 @@
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/Managers/UISelectionManager.h"
 #include "glm/gtc/type_ptr.inl"
+#include "glm/gtx/matrix_decompose.hpp"
 
 namespace RNGOEngine::Editor
 {
@@ -68,6 +69,7 @@ namespace RNGOEngine::Editor
         const auto imguiTexID = static_cast<ImTextureID>(textureID->get().ID);
         ImGui::SetNextItemAllowOverlap();
         ImGui::Image(imguiTexID, availableSize, ImVec2(0, 1), ImVec2(1, 0));
+        ImGui::SetNextItemAllowOverlap();
 
         ImVec2 startPos = ImGui::GetItemRectMin();
         ImVec2 size = ImGui::GetItemRectSize();
@@ -106,6 +108,7 @@ namespace RNGOEngine::Editor
         auto* projectionMatrixPtr = glm::value_ptr(projectionMatrix);
 
         ImGuizmo::SetOrthographic(false);
+        ImGuizmo::SetDrawlist();
 
         ImGuizmo::SetRect(context.StartPos.x, context.StartPos.y, context.Size.x, context.Size.y);
 
@@ -116,23 +119,21 @@ namespace RNGOEngine::Editor
 
         if (ImGuizmo::IsUsing())
         {
-            const glm::vec3 newPos = {
-                targetMatrixPtr[3],
-                targetMatrixPtr[7],
-                targetMatrixPtr[11],
+            glm::vec3 newPosition;
+            glm::quat newRotation;
+            glm::vec3 newScale;
+
+            // Decompose needs these rvalues.
+            glm::vec3 dummySkew;
+            glm::vec4 dummyPerspective;
+
+            glm::decompose(targetMatrix, newScale, newRotation, newPosition, dummySkew, dummyPerspective);
+
+            targetTransform = Components::Transform{
+                .Position = newPosition,
+                .Rotation = newRotation,
+                .Scale = newScale,
             };
-
-            targetTransform.Position = newPos;
-
-            const glm::quat newRot = glm::quat_cast(targetMatrix);
-            targetTransform.Rotation = newRot;
-
-            const glm::vec3 newScale = {
-                glm::length(glm::vec3(targetMatrixPtr[0], targetMatrixPtr[1], targetMatrixPtr[2])),
-                glm::length(glm::vec3(targetMatrixPtr[4], targetMatrixPtr[5], targetMatrixPtr[6])),
-                glm::length(glm::vec3(targetMatrixPtr[8], targetMatrixPtr[9], targetMatrixPtr[10])),
-            };
-            targetTransform.Scale = newScale;
         }
     }
 
