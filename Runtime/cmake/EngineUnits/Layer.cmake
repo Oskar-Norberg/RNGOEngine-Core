@@ -1,9 +1,9 @@
 set(LAYER_PROJECT_NAME RNGOEngine_Layer)
 add_library(${LAYER_PROJECT_NAME} STATIC
         include/Layer/Layer.h
-        src/Layer/Layer.cpp
         
         include/Layer/LayerStack.h
+        include/Layer/LayerStack.tpp
         src/Layer/LayerStack.cpp
 )
 target_include_directories(${LAYER_PROJECT_NAME} PUBLIC include)
