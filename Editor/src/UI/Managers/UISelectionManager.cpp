@@ -2,8 +2,6 @@
 // Created by Oskar.Norberg on 2025-11-13.
 //
 
-#pragma once
-
 #include "UI/Managers/UISelectionManager.h"
 
 namespace RNGOEngine::Editor

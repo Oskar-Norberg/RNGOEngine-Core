@@ -37,6 +37,8 @@ include(cmake/EngineUnits/Rendering.cmake)
 include(cmake/EngineUnits/ResourceManagement.cmake)
 include(cmake/EngineUnits/AssetManagement.cmake)
 
+include(cmake/EngineUnits/Layer.cmake)
+
 include(cmake/EngineUnits/Components.cmake)
 include(cmake/EngineUnits/Scene.cmake)
 include(cmake/EngineUnits/Systems.cmake)
@@ -73,10 +75,12 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         
         ${RESOURCE_MANAGEMENT_PROJECT_NAME}
         ${ASSET_MANAGER_PROJECT_NAME}
+        
+        ${LAYER_PROJECT_NAME}
 
+        ${COMPONENT_PROJECT_NAME}
         ${SCENE_PROJECT_NAME}
         ${SYSTEM_PROJECT_NAME}
-        ${COMPONENT_PROJECT_NAME}
         
         ${RENDER_API_PROJECT_NAME}
 )
