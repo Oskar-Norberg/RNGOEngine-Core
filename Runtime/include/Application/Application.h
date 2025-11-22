@@ -6,11 +6,12 @@
 
 #include <memory>
 
-#include "Assets/AssetLoader.h"
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetLoader.h"
 #include "InputManager/InputManager.h"
-#include "Renderer/IRenderer.h"
+#include "Layer/LayerStack.h"
 #include "Renderer/API/RenderAPI.h"
+#include "Renderer/IRenderer.h"
 #include "Scene/SceneManager/SceneManager.h"
 #include "Systems/SystemContext.h"
 #include "Systems/SystemScheduler.h"
@@ -55,6 +56,9 @@ namespace RNGOEngine
     public:
         virtual void OnUpdate(float deltaTime);
         virtual void OnRender();
+
+    protected:
+        Core::LayerStack m_layers;
 
     protected:
         bool m_isRunning = true;

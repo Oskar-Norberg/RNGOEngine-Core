@@ -45,6 +45,8 @@ include(cmake/EngineUnits/Systems.cmake)
 
 include(cmake/EngineUnits/RenderAPI.cmake)
 
+include(cmake/EngineUnits/RuntimeLayers.cmake)
+
 # Testing
 include(cmake/Testing.cmake)
 
@@ -83,6 +85,8 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${SYSTEM_PROJECT_NAME}
         
         ${RENDER_API_PROJECT_NAME}
+        
+        ${RUNTIME_LAYERS_PROJECT_NAME}
 )
 
 # Include assets in build.
