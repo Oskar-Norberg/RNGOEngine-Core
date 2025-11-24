@@ -36,7 +36,7 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::MaterialHandle CreateMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader);
 
     public:
-        ResolvedMaterial GetMaterial(const AssetHandle& handle) const;
+        std::optional<ResolvedMaterial> GetMaterial(const AssetHandle& handle) const;
 
         // Shader Uniforms
     public:

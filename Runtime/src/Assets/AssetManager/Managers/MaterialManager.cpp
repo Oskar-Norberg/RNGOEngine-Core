@@ -50,14 +50,12 @@ namespace RNGOEngine::AssetHandling
         return Core::Renderer::MaterialHandle(uuid, *this);
     }
 
-    ResolvedMaterial MaterialManager::GetMaterial(const AssetHandle& handle) const
+    std::optional<ResolvedMaterial> MaterialManager::GetMaterial(const AssetHandle& handle) const
     {
         const auto params = GetValidatedMaterialParameters(handle);
         if (!params || !m_materials.contains(handle))
         {
-            // TODO: Return opt.
-            RNGO_ASSERT(false && "MaterialManager::GetMaterial - Material not found or invalid.");
-            return ResolvedMaterial{};
+            return std::nullopt;
         }
 
         const auto& [materialUUID, shaderProgramKey] = m_materials.at(handle);

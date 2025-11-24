@@ -4,17 +4,12 @@
 
 #pragma once
 
+#include <expected>
 #include <vector>
 
-#include "../../AssetLoaders/ModelLoaders/AssimpModelLoader.h"
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetLoaders/ModelLoaders/ModelLoaderData.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
-
-namespace RNGOEngine::AssetHandling
-{
-    class AssetDatabase;
-}
 
 namespace RNGOEngine
 {

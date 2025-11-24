@@ -20,6 +20,6 @@ namespace RNGOEngine::AssetHandling
         static void SetUpMaterial();
 
     private:
-        static AssetHandle s_errorHandles[static_cast<size_t>(AssetType::Count)];
+        static AssetHandle s_errorHandles[AssetTypeCount];
     };
 }
