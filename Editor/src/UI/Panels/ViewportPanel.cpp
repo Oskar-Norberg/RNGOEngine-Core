@@ -126,7 +126,7 @@ namespace RNGOEngine::Editor
             glm::quat newRotation;
             glm::vec3 newScale;
 
-            // Decompose needs these rvalues.
+            // Decompose needs these lvalues.
             glm::vec3 dummyV3;
             glm::vec4 dummyV4;
 

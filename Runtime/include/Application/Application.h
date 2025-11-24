@@ -6,11 +6,12 @@
 
 #include <memory>
 
-#include "Assets/AssetLoader.h"
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetLoader.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "InputManager/InputManager.h"
-#include "Renderer/IRenderer.h"
 #include "Renderer/API/RenderAPI.h"
+#include "Renderer/IRenderer.h"
 #include "Scene/SceneManager/SceneManager.h"
 #include "Systems/SystemContext.h"
 #include "Systems/SystemScheduler.h"
@@ -71,6 +72,7 @@ namespace RNGOEngine
         std::unique_ptr<Resources::ResourceManager> m_resourceManager;
         Resources::ResourceTracker m_resourceTracker;
         AssetHandling::AssetDatabase m_assetDatabase;
+        AssetHandling::RuntimeAssetRegistry m_runtimeAssetRegistry;
         std::unique_ptr<AssetHandling::AssetManager> m_assetManager;
 
         // Threading
