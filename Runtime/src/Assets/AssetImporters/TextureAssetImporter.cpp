@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    Asset* TextureAssetImporter::Load(const AssetMetadata& metadata)
+    std::expected<Asset*, ImportingError> TextureAssetImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
 

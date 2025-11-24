@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    Asset* ModelImporter::Load(const AssetMetadata& metadata)
+    std::expected<Asset*, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 

@@ -12,6 +12,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: AssetHandles should store Type.
     using AssetHandle = Utilities::UUID;
 
     // NOTE: To add new AssetType, add here and create corresponding Metadata struct inheriting from AssetMetadata.

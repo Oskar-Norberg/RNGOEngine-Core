@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    Asset* ShaderAssetImporter::Load(const AssetMetadata& metadata)
+    std::expected<Asset*, ImportingError> ShaderAssetImporter::Load(const AssetMetadata& metadata)
     {
         auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
 

@@ -11,10 +11,12 @@ namespace RNGOEngine::AssetHandling
     class TextureAssetImporter : public AssetImporter
     {
     public:
-        Asset* Load(const AssetMetadata& metadata) override;
+        std::expected<Asset*, ImportingError> Load(const AssetMetadata& metadata) override;
         void Unload(const AssetHandle& handle) override;
 
-        std::unique_ptr<AssetMetadata> CreateDefaultMetadata(const std::filesystem::path& path) const override;
+        std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
+            const std::filesystem::path& path
+        ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
     };

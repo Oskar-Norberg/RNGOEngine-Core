@@ -83,9 +83,13 @@ namespace RNGOEngine::AssetHandling
         metadata.Path = fullPath.value();
         const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        Asset* asset = importer->Load(metadata);
+        const auto importResult = importer->Load(metadata);
+        if (!importResult)
+        {
+            return BuiltinAssets::GetErrorHandle(type);
+        }
         metadata.State = AssetState::Valid;
-        metadata.RuntimeAsset = asset;
+        metadata.RuntimeAsset = importResult.value();
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
