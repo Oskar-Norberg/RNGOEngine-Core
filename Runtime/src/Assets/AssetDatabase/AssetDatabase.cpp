@@ -55,6 +55,24 @@ namespace RNGOEngine::AssetHandling
         auto& metadata = metadataOpt->get();
         metadata.RuntimeAsset = asset;
     }
+    std::optional<std::reference_wrapper<Asset>> AssetDatabase::TryGetRuntimePointer(
+        const AssetHandle& handle
+    ) const
+    {
+        const auto metadataOpt = TryGetAssetMetadata(handle);
+        if (!metadataOpt.has_value())
+        {
+            return std::nullopt;
+        }
+
+        auto& metadata = metadataOpt->get();
+        if (metadata.RuntimeAsset == nullptr)
+        {
+            return std::nullopt;
+        }
+
+        return std::ref(*metadata.RuntimeAsset);
+    }
 
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {

@@ -33,6 +33,8 @@ namespace RNGOEngine::AssetHandling
     public:
         void SetRuntimePointer(Asset* asset, const AssetHandle& handle);
 
+        std::optional<std::reference_wrapper<Asset>> TryGetRuntimePointer(const AssetHandle& handle) const;
+
         // State
     public:
         bool IsRegistered(const AssetHandle& handle) const;

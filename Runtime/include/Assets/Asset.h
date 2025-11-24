@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <utility>
 
+#include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
@@ -42,20 +43,41 @@ namespace RNGOEngine::AssetHandling
     class Asset
     {
     public:
+        explicit Asset(AssetHandle&& handle)
+            : m_handle(std::move(handle))
+        {
+        }
+
         virtual ~Asset() = default;
+
+    public:
+        bool IsType(AssetType type) const;
+
+        // TODO: Unsafe as all hell.
+        template<Concepts::DerivedFrom<Asset> TAsset>
+        TAsset& GetAsType()
+        {
+            return static_cast<TAsset&>(*this);
+        }
+
+        template<Concepts::DerivedFrom<Asset> TAsset>
+        const TAsset& GetAsType() const
+        {
+            return static_cast<const TAsset&>(*this);
+        }
 
     public:
         AssetState GetState() const;
         bool IsValid() const;
 
-    protected:
+    private:
         AssetHandle m_handle;
     };
 
     struct AssetMetadata
     {
         virtual ~AssetMetadata() = default;
-        
+
         Utilities::UUID UUID;
         std::filesystem::path Path;
         AssetType Type = AssetType::None;

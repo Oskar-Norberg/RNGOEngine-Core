@@ -85,6 +85,7 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::RenderOpaque(DrawQueue& queue) const
     {
+        const auto& assetDatabase = AssetHandling::AssetDatabase::GetInstance();
         const auto& camera = queue.Camera;
 
         const auto& assetManager = AssetHandling::AssetManager::GetInstance();
@@ -294,9 +295,25 @@ namespace RNGOEngine::Core::Renderer
             // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
             auto& meshResourceManager = resourceManager.GetMeshResourceManager();
 
-            const auto& meshDatas =
-                assetManager.GetModelManager().GetRuntimeModelData(opaqueDrawCall.ModelHandle);
-            for (const auto& meshData : meshDatas.meshKeys)
+            // const auto& meshDatas =
+            //     assetManager.GetModelManager().GetRuntimeModelData(opaqueDrawCall.ModelHandle);
+
+            const auto modelAsset = assetDatabase.TryGetRuntimePointer(opaqueDrawCall.ModelHandle);
+            if (!modelAsset)
+            {
+                // TODO: Draw fallback model.
+                continue;
+            }
+            const auto& assetRef = modelAsset->get();
+            if (!assetRef.IsType(AssetHandling::AssetType::Model))
+            {
+                // TODO: Draw fallback model.
+                continue;
+            }
+
+            const auto& modelAssetRef = assetRef.GetAsType<AssetHandling::ModelAsset>();
+            
+            for (const auto& meshData : modelAssetRef.GetMeshKeys())
             {
                 const auto meshResourceOpt = meshResourceManager.GetMeshResource(meshData);
                 if (!meshResourceOpt.has_value())

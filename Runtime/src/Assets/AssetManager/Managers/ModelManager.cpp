@@ -13,18 +13,18 @@ namespace RNGOEngine::AssetHandling
         : m_resourceManager(resourceManager)
     {
     }
-    
+
     ModelCreationError ModelManager::UploadModel(
         const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
-        auto runtimeData = UploadModelResources(modelHandle);
-        m_models.insert({assetHandle, std::move(runtimeData)});
+        ModelAsset modelAsset(UploadModelResources(modelHandle), AssetHandle(assetHandle));
+        m_models.insert({assetHandle, modelAsset});
 
         // TODO:
         return ModelCreationError::None;
     }
-    
+
     void ModelManager::UnloadModel(const AssetHandle& assetHandle)
     {
         if (m_models.contains(assetHandle))
@@ -35,36 +35,50 @@ namespace RNGOEngine::AssetHandling
         }
     }
 
-    const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
-    {
-        const auto it = m_models.find(handle);
-        if (it != m_models.end())
-        {
-            return it->second;
-        }
-
-        // TODO:
-        RNGO_ASSERT(false && "ModelManager::GetRuntimeModelData - TODO: This needs to return an opt");
-        return {};
-    }
-
-    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
+    MeshCollection ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
     {
         auto& meshResourceManager = m_resourceManager.GetMeshResourceManager();
-        
-        RuntimeModelData runtimeData;
-        runtimeData.meshKeys.reserve(modelData.meshes.size());
+
+        MeshCollection meshKeys;
+        meshKeys.reserve(modelData.meshes.size());
 
         for (const auto& meshData : modelData.meshes)
         {
-            runtimeData.meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
+            meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
         }
 
-        return runtimeData;
+        return meshKeys;
     }
 
-    void ModelManager::UnloadModelResources(const RuntimeModelData& modelData)
+    void ModelManager::UnloadModelResources(const ModelAsset& modelData)
     {
-        // TODO:
     }
+
+    // const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
+    // {
+    //     const auto it = m_models.find(handle);
+    //     if (it != m_models.end())
+    //     {
+    //         return it->second;
+    //     }
+    //
+    //     // TODO:
+    //     RNGO_ASSERT(false && "ModelManager::GetRuntimeModelData - TODO: This needs to return an opt");
+    //     return {};
+    // }
+    //
+    // RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
+    // {
+    //     auto& meshResourceManager = m_resourceManager.GetMeshResourceManager();
+    //
+    //     RuntimeModelData runtimeData;
+    //     runtimeData.meshKeys.reserve(modelData.meshes.size());
+    //
+    //     for (const auto& meshData : modelData.meshes)
+    //     {
+    //         runtimeData.meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
+    //     }
+    //
+    //     return runtimeData;
+    // }
 }

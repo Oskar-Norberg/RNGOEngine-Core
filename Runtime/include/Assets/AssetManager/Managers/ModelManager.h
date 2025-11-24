@@ -27,11 +27,6 @@ namespace RNGOEngine
 // Move to a Manager namespace?
 namespace RNGOEngine::AssetHandling
 {
-    struct RuntimeModelData
-    {
-        std::vector<Containers::GenerationalKey<RNGOEngine::Resources::MeshResource>> meshKeys;
-    };
-
     enum class ModelCreationError
     {
         None,
@@ -46,18 +41,14 @@ namespace RNGOEngine::AssetHandling
         ModelCreationError UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
         void UnloadModel(const AssetHandle& assetHandle);
 
-    public:
-        // TODO: Make this return an optional or expected?
-        const RuntimeModelData& GetRuntimeModelData(const AssetHandle& handle) const;
-
     private:
         Resources::ResourceManager& m_resourceManager;
 
     private:
-        std::unordered_map<AssetHandle, RuntimeModelData> m_models;
+        std::unordered_map<AssetHandle, ModelAsset> m_models;
 
     private:
-        RuntimeModelData UploadModelResources(const ModelLoading::ModelData& modelData);
-        void UnloadModelResources(const RuntimeModelData& modelData);
+        MeshCollection UploadModelResources(const ModelLoading::ModelData& modelData);
+        void UnloadModelResources(const ModelAsset& modelData);
     };
 }
