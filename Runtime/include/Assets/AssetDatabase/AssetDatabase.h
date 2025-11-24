@@ -25,8 +25,13 @@ namespace RNGOEngine::AssetHandling
 
         // Instead of templated functions?
         // Register / Unregister
+    public:
         void RegisterAsset(AssetType type, std::unique_ptr<AssetMetadata> metadata);
         void UnregisterAsset(const AssetHandle& uuid);
+
+        // Runtime Linking
+    public:
+        void SetRuntimePointer(Asset* asset, const AssetHandle& handle);
 
         // State
     public:

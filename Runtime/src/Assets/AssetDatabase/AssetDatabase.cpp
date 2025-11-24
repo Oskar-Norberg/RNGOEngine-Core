@@ -20,7 +20,7 @@ namespace RNGOEngine::AssetHandling
 
         const auto uuid = metadata->UUID;
         const auto path = metadata->Path;
-        
+
         const auto& storage = m_metadataStorages.at(type);
         const auto index = storage->Insert(std::move(metadata));
 
@@ -41,6 +41,19 @@ namespace RNGOEngine::AssetHandling
         storage->Remove(index);
         m_handleToStorageIndex.erase(uuid);
         m_pathToHandle.erase(path);
+    }
+
+    void AssetDatabase::SetRuntimePointer(Asset* asset, const AssetHandle& handle)
+    {
+        const auto metadataOpt = TryGetAssetMetadata(handle);
+        if (!metadataOpt.has_value())
+        {
+            RNGO_ASSERT(false && "AssetDatabase::SetRuntimePointer - Called on invalid asset handle");
+            return;
+        }
+
+        auto& metadata = metadataOpt->get();
+        metadata.RuntimeAsset = asset;
     }
 
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
@@ -103,7 +116,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     std::optional<std::reference_wrapper<AssetMetadata>> AssetDatabase::TryGetAssetMetadata(
-        const AssetHandle& handle)
+        const AssetHandle& handle
+    )
     {
         const auto constThis = static_cast<const AssetDatabase*>(this);
         const auto assetMetadataOpt = constThis->TryGetAssetMetadata(handle);
@@ -116,7 +130,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     std::optional<std::reference_wrapper<const AssetMetadata>> AssetDatabase::TryGetAssetMetadata(
-        const AssetHandle& handle) const
+        const AssetHandle& handle
+    ) const
     {
         if (const auto* metadata = GetMetadataOrNullptr(handle); metadata != nullptr)
         {
