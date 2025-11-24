@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::weak_ptr<Asset>, ImportingError> TextureAssetImporter::Load(
+    std::expected<std::unique_ptr<Asset>, ImportingError> TextureAssetImporter::Load(
         const AssetMetadata& metadata
     )
     {
@@ -70,7 +70,7 @@ namespace RNGOEngine::AssetHandling
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
 
-        return textureResult.value();
+        return nullptr;
     }
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)

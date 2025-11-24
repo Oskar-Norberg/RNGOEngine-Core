@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<std::weak_ptr<Asset>, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
+    std::expected<std::unique_ptr<Asset>, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
@@ -61,7 +61,7 @@ namespace RNGOEngine::AssetHandling
             return std::unexpected(ImportingError::UnknownError);
         }
 
-        return result.value();
+        return nullptr;
     }
 
     void ModelImporter::Unload(const AssetHandle& handle)

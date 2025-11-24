@@ -89,7 +89,6 @@ namespace RNGOEngine::AssetHandling
             return BuiltinAssets::GetErrorHandle(type);
         }
         metadata.State = AssetState::Valid;
-        metadata.RuntimeAsset = importResult.value();
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");

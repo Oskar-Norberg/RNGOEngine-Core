@@ -32,12 +32,12 @@ namespace RNGOEngine::AssetHandling
     private:
         // NOTE: These have to correspond with the AssetType enum.
         std::tuple<
-            std::monostate,            // Placeholder for None
-            AssetMap<ModelAsset>,      // Models
-            AssetMap<TextureAsset>,    // Textures
-            AssetMap<ShaderAsset>,     // Shaders
-            AssetMap<std::monostate>,  // TODO: Materials....
-            std::monostate             // Placeholder for Count
+            std::monostate,          // Placeholder for None
+            AssetMap<ModelAsset>,    // Models
+            AssetMap<TextureAsset>,  // Textures
+            AssetMap<ShaderAsset>,   // Shaders
+            std::monostate,          // TODO: Materials....
+            std::monostate           // Placeholder for Count
             >
             m_assetStorage;
     };

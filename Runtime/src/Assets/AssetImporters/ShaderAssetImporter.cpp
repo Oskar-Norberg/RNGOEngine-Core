@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::weak_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
+    std::expected<std::unique_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
         const AssetMetadata& metadata
     )
     {
@@ -42,7 +42,8 @@ namespace RNGOEngine::AssetHandling
             typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
         );
 
-        return assetPtr.value();
+        // TODO:
+        return nullptr;
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
