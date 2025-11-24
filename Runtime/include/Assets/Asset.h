@@ -83,8 +83,7 @@ namespace RNGOEngine::AssetHandling
         std::filesystem::path Path;
         AssetType Type = AssetType::None;
         AssetState State = AssetState::None;
-        // TODO: I don't like having a raw pointer here. But works for now.
-        // For future improvements. This should have some sort of reference wrapper system to check validity.
-        Asset* RuntimeAsset = nullptr;
+        // TODO: I hate Assets needing to be heap-allocated just to have a weak_ptr here.
+        std::weak_ptr<Asset> RuntimeAsset;
     };
 }

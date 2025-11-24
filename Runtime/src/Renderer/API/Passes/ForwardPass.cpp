@@ -304,14 +304,14 @@ namespace RNGOEngine::Core::Renderer
                 // TODO: Draw fallback model.
                 continue;
             }
-            const auto& assetRef = modelAsset->get();
-            if (!assetRef.IsType(AssetHandling::AssetType::Model))
+            const auto assetSharedPtr = modelAsset.value().lock();
+            if (!assetSharedPtr->IsType(AssetHandling::AssetType::Model))
             {
                 // TODO: Draw fallback model.
                 continue;
             }
 
-            const auto& modelAssetRef = assetRef.GetAsType<AssetHandling::ModelAsset>();
+            const auto& modelAssetRef = assetSharedPtr->GetAsType<AssetHandling::ModelAsset>();
             
             for (const auto& meshData : modelAssetRef.GetMeshKeys())
             {

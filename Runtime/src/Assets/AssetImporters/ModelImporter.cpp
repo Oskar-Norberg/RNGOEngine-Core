@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<Asset*, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
+    std::expected<std::weak_ptr<Asset>, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
@@ -48,8 +48,8 @@ namespace RNGOEngine::AssetHandling
         
         if (!modelHandle)
         {
-            // TODO: Return expected instead of directly returning handle?
-            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
+            // TODO: More specific error types
+            return std::unexpected(ImportingError::UnknownError);
         }
 
         // Upload to GPU
@@ -58,8 +58,7 @@ namespace RNGOEngine::AssetHandling
         );
         if (!result)
         {
-            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to upload model to GPU");
-            return nullptr;
+            return std::unexpected(ImportingError::UnknownError);
         }
 
         return result.value();

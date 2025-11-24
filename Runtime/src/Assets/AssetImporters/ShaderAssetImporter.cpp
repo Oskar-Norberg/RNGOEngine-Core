@@ -10,7 +10,9 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<Asset*, ImportingError> ShaderAssetImporter::Load(const AssetMetadata& metadata)
+    std::expected<std::weak_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
+        const AssetMetadata& metadata
+    )
     {
         auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
 
@@ -18,9 +20,17 @@ namespace RNGOEngine::AssetHandling
         const auto shaderResult = m_shaderLoader.LoadShader(typedMetadata.Path);
         if (!shaderResult)
         {
-            RNGO_ASSERT(false && "ShaderAssetImporter::Load failed to load shader.");
-            // TODO: Return expected?
-            return nullptr;
+            switch (shaderResult.error())
+            {
+                case Shaders::ShaderPreProcessingError::FileNotFound:
+                    return std::unexpected(ImportingError::FileNotFound);
+                case Shaders::ShaderPreProcessingError::MalformedInclude:
+                    return std::unexpected(ImportingError::MalformedFile);
+                case Shaders::ShaderPreProcessingError::TokenNotFound:
+                    return std::unexpected(ImportingError::MalformedFile);
+                default:
+                    return std::unexpected(ImportingError::UnknownError);
+            }
         }
 
         // TODO: Really, really, really, unstable way to determine shader type. Works for now!
@@ -29,10 +39,11 @@ namespace RNGOEngine::AssetHandling
 
         // Upload Resources
         AssetManager::GetInstance().GetShaderManager().UploadShader(
-            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType);
+            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
+        );
 
         // TODO:
-        return nullptr;
+        return std::unexpected(ImportingError::UnknownError);
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
@@ -40,12 +51,14 @@ namespace RNGOEngine::AssetHandling
         AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
     }
 
-    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(const std::filesystem::path& path) const
+    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
     {
         auto shaderMetadata = std::make_unique<ShaderMetadata>();
-        
+
         shaderMetadata->Type = AssetType::Shader;
-        
+
         if (path.extension() == ".vert")
         {
             shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
@@ -56,18 +69,17 @@ namespace RNGOEngine::AssetHandling
         }
         else
         {
-            RNGO_ASSERT(false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension.");
+            RNGO_ASSERT(
+                false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension."
+            );
         }
-        
+
         return std::move(shaderMetadata);
     }
 
     std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const
     {
-        static constexpr std::string_view supportedTypes[] = {
-            ".frag",
-            ".vert"
-        };
+        static constexpr std::string_view supportedTypes[] = {".frag", ".vert"};
 
         return supportedTypes;
     }

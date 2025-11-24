@@ -38,14 +38,15 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelManager(Resources::ResourceManager& resourceManager);
 
-        std::expected<ModelAsset*, ModelCreationError> UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
+        std::expected<std::weak_ptr<ModelAsset>, ModelCreationError> UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
         void UnloadModel(const AssetHandle& assetHandle);
 
     private:
         Resources::ResourceManager& m_resourceManager;
 
     private:
-        std::unordered_map<AssetHandle, ModelAsset> m_models;
+        // TODO: I hate the fact that we have to store shared_ptrs. But we need to ensure Assets can be devalidated in the database.
+        std::unordered_map<AssetHandle, std::shared_ptr<ModelAsset>> m_models;
 
     private:
         MeshCollection UploadModelResources(const ModelLoading::ModelData& modelData);

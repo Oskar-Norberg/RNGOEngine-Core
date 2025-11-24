@@ -42,8 +42,7 @@ namespace RNGOEngine::AssetHandling
         m_handleToStorageIndex.erase(uuid);
         m_pathToHandle.erase(path);
     }
-
-    void AssetDatabase::SetRuntimePointer(Asset* asset, const AssetHandle& handle)
+    void AssetDatabase::SetRuntimePointer(std::weak_ptr<Asset> asset, const AssetHandle& handle)
     {
         const auto metadataOpt = TryGetAssetMetadata(handle);
         if (!metadataOpt.has_value())
@@ -55,9 +54,8 @@ namespace RNGOEngine::AssetHandling
         auto& metadata = metadataOpt->get();
         metadata.RuntimeAsset = asset;
     }
-    std::optional<std::reference_wrapper<Asset>> AssetDatabase::TryGetRuntimePointer(
-        const AssetHandle& handle
-    ) const
+
+    std::optional<std::weak_ptr<Asset>> AssetDatabase::TryGetRuntimePointer(const AssetHandle& handle) const
     {
         const auto metadataOpt = TryGetAssetMetadata(handle);
         if (!metadataOpt.has_value())
@@ -66,12 +64,12 @@ namespace RNGOEngine::AssetHandling
         }
 
         auto& metadata = metadataOpt->get();
-        if (metadata.RuntimeAsset == nullptr)
+        if (metadata.RuntimeAsset.expired())
         {
             return std::nullopt;
         }
 
-        return std::ref(*metadata.RuntimeAsset);
+        return std::ref(metadata.RuntimeAsset);
     }
 
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const

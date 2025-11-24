@@ -11,7 +11,7 @@ namespace RNGOEngine::AssetHandling
     class TextureAssetImporter : public AssetImporter
     {
     public:
-        std::expected<Asset*, ImportingError> Load(const AssetMetadata& metadata) override;
+        std::expected<std::weak_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) override;
         void Unload(const AssetHandle& handle) override;
 
         std::unique_ptr<AssetMetadata> CreateDefaultMetadata(

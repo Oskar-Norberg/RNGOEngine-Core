@@ -35,7 +35,7 @@ namespace RNGOEngine::AssetHandling
     public:
         virtual ~AssetImporter() = default;
 
-        virtual std::expected<Asset*, ImportingError> Load(const AssetMetadata& metadata) = 0;
+        virtual std::expected<std::weak_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
 
         virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(

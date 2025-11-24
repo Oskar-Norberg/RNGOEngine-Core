@@ -14,15 +14,18 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<ModelAsset*, ModelCreationError> ModelManager::UploadModel(
+    std::expected<std::weak_ptr<ModelAsset>, ModelCreationError> ModelManager::UploadModel(
         const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
-        ModelAsset modelAsset(UploadModelResources(modelHandle), AssetHandle(assetHandle));
-        const auto [it, inserted] = m_models.insert({assetHandle, modelAsset});
+        auto modelAsset = std::make_shared<ModelAsset>(
+            UploadModelResources(modelHandle),
+            AssetHandle(assetHandle)
+        );
+        const auto [it, inserted] = m_models.insert({assetHandle, std::move(modelAsset)});
 
         // TODO: Error handling
-        return &it->second;
+        return it->second;
     }
 
     void ModelManager::UnloadModel(const AssetHandle& assetHandle)
@@ -30,7 +33,7 @@ namespace RNGOEngine::AssetHandling
         if (m_models.contains(assetHandle))
         {
             const auto& modelData = m_models.at(assetHandle);
-            UnloadModelResources(modelData);
+            UnloadModelResources(*modelData.get());
             m_models.erase(assetHandle);
         }
     }
@@ -52,33 +55,6 @@ namespace RNGOEngine::AssetHandling
 
     void ModelManager::UnloadModelResources(const ModelAsset& modelData)
     {
+        // TODO:
     }
-
-    // const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
-    // {
-    //     const auto it = m_models.find(handle);
-    //     if (it != m_models.end())
-    //     {
-    //         return it->second;
-    //     }
-    //
-    //     // TODO:
-    //     RNGO_ASSERT(false && "ModelManager::GetRuntimeModelData - TODO: This needs to return an opt");
-    //     return {};
-    // }
-    //
-    // RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
-    // {
-    //     auto& meshResourceManager = m_resourceManager.GetMeshResourceManager();
-    //
-    //     RuntimeModelData runtimeData;
-    //     runtimeData.meshKeys.reserve(modelData.meshes.size());
-    //
-    //     for (const auto& meshData : modelData.meshes)
-    //     {
-    //         runtimeData.meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
-    //     }
-    //
-    //     return runtimeData;
-    // }
 }
