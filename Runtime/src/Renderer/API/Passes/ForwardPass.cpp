@@ -101,15 +101,14 @@ namespace RNGOEngine::Core::Renderer
         for (const auto& opaqueDrawCall : queue.OpaqueObjects)
         {
             const auto resolvedMatOpt = materialManager.GetMaterial(opaqueDrawCall.Material);
-            const AssetHandling::ResolvedMaterial resolvedMat =
-                resolvedMatOpt.has_value()
-                    ? resolvedMatOpt.value()
-                    : materialManager
-                          .GetMaterial(
-                              AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
-                          )
-                          .value();
-            
+            const AssetHandling::ResolvedMaterial resolvedMat = resolvedMatOpt.value_or(
+                materialManager
+                    .GetMaterial(
+                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
+                    )
+                    .value()
+            );
+
             const auto shaderProgramID = resolvedMat.shaderProgram;
 
             m_renderer.BindShaderProgram(shaderProgramID);
@@ -331,13 +330,17 @@ namespace RNGOEngine::Core::Renderer
             // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
             auto& meshResourceManager = Resources::ResourceManager::GetInstance().GetMeshResourceManager();
 
-            const auto modelAsset = assetDatabase.TryGetRuntimePointer(opaqueDrawCall.ModelHandle);
-            if (!modelAsset)
-            {
-                // TODO: Draw fallback model.
-                continue;
-            }
-            const auto assetSharedPtr = modelAsset.value().lock();
+            const auto modelAssetOpt = assetDatabase.TryGetRuntimePointer(opaqueDrawCall.ModelHandle);
+
+            std::weak_ptr<AssetHandling::Asset> modelAssetWeak = modelAssetOpt.value_or(
+                assetDatabase
+                    .TryGetRuntimePointer(
+                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
+                    )
+                    .value()
+            );
+
+            const auto assetSharedPtr = modelAssetWeak.lock();
             if (!assetSharedPtr->IsType(AssetHandling::AssetType::Model))
             {
                 // TODO: Draw fallback model.
