@@ -9,7 +9,6 @@
 #include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Renderer/RenderID.h"
 #include "Utilities/AssetCache/AssetCache.h"
-#include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
 {
@@ -29,7 +28,6 @@ namespace RNGOEngine::AssetHandling
 
     struct RuntimeTextureData
     {
-        Containers::GenerationalKey<Core::Renderer::TextureID> TextureKey;
     };
 
     class TextureManager
@@ -38,7 +36,7 @@ namespace RNGOEngine::AssetHandling
         explicit TextureManager(Resources::ResourceManager& resourceManager);
 
     public:
-        TextureManagerError UploadTexture(const AssetHandle& assetHandle,
+        std::expected<std::weak_ptr<TextureAsset>, TextureManagerError> UploadTexture(const AssetHandle& assetHandle,
                                           const Core::Renderer::Texture2DProperties& properties,
                                           int width, int height,
                                           std::span<const std::byte> textureData);
@@ -48,7 +46,7 @@ namespace RNGOEngine::AssetHandling
         Core::Renderer::TextureID GetTexture(const AssetHandle& uuid) const;
 
     private:
-        std::unordered_map<AssetHandle, RuntimeTextureData> m_textures;
+        std::unordered_map<AssetHandle, std::shared_ptr<TextureAsset>> m_textures;
 
     private:
         Resources::ResourceManager& m_resourceManager;

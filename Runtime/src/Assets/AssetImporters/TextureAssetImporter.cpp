@@ -51,22 +51,26 @@ namespace RNGOEngine::AssetHandling
             .MagnifyingFilter = typedMetadata.MagnifyingFilter,
             .WrappingMode = typedMetadata.WrappingMode,
         };
-        const auto errorMessage = AssetManager::GetInstance().GetTextureManager().UploadTexture(
+        const auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
             typedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
             std::as_bytes(textureDataSpan)
         );
 
-        if (errorMessage != TextureManagerError::None)
+        if (!textureResult)
         {
-            // TODO: Error handling
-            RNGO_ASSERT(false && "TextureAssetImporter::Load - Failed to Load Texture");
+            switch (textureResult.error())
+            {
+                case TextureManagerError::None:
+                    break;
+                default:
+                    return std::unexpected(ImportingError::UnknownError);
+            }
         }
 
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
 
-        // TODO:
-        return std::unexpected(ImportingError::UnknownError);
+        return textureResult.value();
     }
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)

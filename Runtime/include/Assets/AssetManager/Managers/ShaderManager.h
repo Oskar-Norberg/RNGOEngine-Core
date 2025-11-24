@@ -42,6 +42,7 @@ namespace RNGOEngine::AssetHandling
         explicit ShaderManager(Resources::ResourceManager& resourceManager);
 
     public:
+        // TODO: Why is this not returning a ShaderAsset? But a base Asset?
         std::expected<std::weak_ptr<Asset>, ShaderManagerError> UploadShader(
             const AssetHandle& assetHandle, std::string_view shaderSource, Core::Renderer::ShaderType type
         );

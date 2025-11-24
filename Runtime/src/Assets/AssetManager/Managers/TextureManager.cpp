@@ -14,21 +14,21 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    TextureManagerError TextureManager::UploadTexture(
+    std::expected<std::weak_ptr<TextureAsset>, TextureManagerError> TextureManager::UploadTexture(
         const AssetHandle& assetHandle, const Core::Renderer::Texture2DProperties& properties,
         const int width, const int height, const std::span<const std::byte> textureData
     )
     {
         // Upload Resources
-        const auto textureKey = m_resourceManager.GetTextureResourceManager().CreateTexture(
+        auto textureKey = m_resourceManager.GetTextureResourceManager().CreateTexture(
             properties, width, height, textureData
         );
 
         // Store Runtime Data
-        m_textures.insert({assetHandle, {textureKey}});
+        auto textureAsset = std::make_shared<TextureAsset>(AssetHandle(assetHandle), std::move(textureKey));
+        auto [it, inserted] = m_textures.insert({assetHandle, std::move(textureAsset)});
 
-        // TODO:
-        return TextureManagerError::None;
+        return it->second;
     }
 
     void TextureManager::UnloadTexture(const AssetHandle& assetHandle)
@@ -36,7 +36,7 @@ namespace RNGOEngine::AssetHandling
         if (m_textures.contains(assetHandle))
         {
             const auto& runtimeTextureData = m_textures.at(assetHandle);
-            const auto& textureKey = runtimeTextureData.TextureKey;
+            const auto& textureKey = runtimeTextureData->GetTextureKey();
 
             m_resourceManager.GetTextureResourceManager().MarkTextureForDeletion(textureKey);
             m_textures.erase(assetHandle);
@@ -55,7 +55,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         const auto& runtimeTextureData = m_textures.at(uuid);
-        const auto textureOpt = textureResourceManager.GetTexture(runtimeTextureData.TextureKey);
+        const auto textureOpt = textureResourceManager.GetTexture(runtimeTextureData->GetTextureKey());
         if (!textureOpt)
         {
             // TODO: return opt.
