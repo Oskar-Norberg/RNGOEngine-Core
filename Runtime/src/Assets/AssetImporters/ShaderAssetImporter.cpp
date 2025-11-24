@@ -38,12 +38,11 @@ namespace RNGOEngine::AssetHandling
         //                                               : Core::Renderer::ShaderType::Fragment;
 
         // Upload Resources
-        AssetManager::GetInstance().GetShaderManager().UploadShader(
+        auto assetPtr = AssetManager::GetInstance().GetShaderManager().UploadShader(
             typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
         );
 
-        // TODO:
-        return std::unexpected(ImportingError::UnknownError);
+        return assetPtr.value();
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)

@@ -4,7 +4,6 @@
 
 #include "Assets/AssetManager/Managers/ShaderManager.h"
 
-#include "Assets/AssetTypes/ShaderAsset.h"
 #include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
@@ -14,41 +13,26 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    ShaderManagerError ShaderManager::UploadShader(
+    std::expected<std::weak_ptr<Asset>, ShaderManagerError> ShaderManager::UploadShader(
         const AssetHandle& assetHandle, const std::string_view shaderSource,
         const Core::Renderer::ShaderType type
     )
     {
         auto& shaderResourceManager = m_resourceManager.GetShaderResourceManager();
-        
+
         // Create Shader Resource
-        const auto shaderID = shaderResourceManager.CreateShader(shaderSource, type);
-        const auto runtimeShaderData = RuntimeShaderData{.Type = type, .ShaderKey = shaderID};
+        auto shaderAsset = std::make_shared<ShaderAsset>(
+            AssetHandle(assetHandle), shaderResourceManager.CreateShader(shaderSource, type), type
+        );
         // Store Runtime shader data
-        auto runtimeShaderKey = m_shaders.Insert(runtimeShaderData);
+        auto [it, inserted] = m_handleToShader.insert({assetHandle, std::move(shaderAsset)});
 
-        m_handleToShader.insert({assetHandle, runtimeShaderKey});
-
-        // TODO:
-        return ShaderManagerError::None;
+        return it->second;
     }
 
     void ShaderManager::DestroyShader(const AssetHandle& assetHandle)
     {
         // TODO:
-        // if (m_handleToShader.contains(assetHandle))
-        // {
-        //     const auto& runtimeShaderKey = m_handleToShader.at(assetHandle);
-        //     const auto runtimeShaderDataOpt = m_shaders.GetUnmarkedValidated(runtimeShaderKey);
-        //
-        //     if (runtimeShaderDataOpt)
-        //     {
-        //         m_resourceManager.MarkShaderForDestruction(runtimeShaderDataOpt->get().ShaderKey);
-        //     }
-        //
-        //     m_shaders.Remove(runtimeShaderKey);
-        //     m_handleToShader.erase(assetHandle);
-        // }
     }
 
     // TODO: Long function, clean up.
@@ -57,7 +41,7 @@ namespace RNGOEngine::AssetHandling
     )
     {
         auto& shaderResourceManager = m_resourceManager.GetShaderResourceManager();
-        
+
         // Check cache first
         const auto pair = std::make_pair(vertexShader, fragmentShader);
         if (m_shaderProgramCache.contains(pair))
@@ -82,31 +66,20 @@ namespace RNGOEngine::AssetHandling
             return {};
         }
 
-        const auto vertexKey = m_handleToShader.at(vertexShader);
-        const auto fragmentKey = m_handleToShader.at(fragmentShader);
-
-        const auto vertexRuntimeShader = m_shaders.GetUnmarkedValidated(vertexKey);
-        const auto fragmentRuntimeShader = m_shaders.GetUnmarkedValidated(fragmentKey);
-
-        // Invalid RuntimeShaderData/Runtime Data
-        if (!vertexRuntimeShader || !fragmentRuntimeShader)
-        {
-            RNGO_ASSERT(false && "ShaderManager::CreateShaderProgram invalid runtime shader.");
-            return {};
-        }
+        const auto& vertexKey = m_handleToShader.at(vertexShader);
+        const auto& fragmentKey = m_handleToShader.at(fragmentShader);
 
         // Type mismatch
-        if (vertexRuntimeShader->get().Type != Core::Renderer::ShaderType::Vertex ||
-            fragmentRuntimeShader->get().Type != Core::Renderer::ShaderType::Fragment)
+        if (vertexKey->GetShaderType() != Core::Renderer::ShaderType::Vertex ||
+            fragmentKey->GetShaderType() != Core::Renderer::ShaderType::Fragment)
         {
             RNGO_ASSERT(false && "ShaderManager::CreateShaderProgram shader type mismatch.");
             return {};
         }
 
         // Create ShaderProgram
-        const auto shaderProgramKey = shaderResourceManager.CreateShaderProgram(
-            vertexRuntimeShader->get().ShaderKey, fragmentRuntimeShader->get().ShaderKey
-        );
+        const auto shaderProgramKey =
+            shaderResourceManager.CreateShaderProgram(vertexKey->GetShaderKey(), fragmentKey->GetShaderKey());
 
         const auto runtimeShaderProgramData = RuntimeShaderProgramData{.ProgramKey = shaderProgramKey};
 
