@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void ShaderAssetImporter::Load(const AssetMetadata& metadata)
+    Asset* ShaderAssetImporter::Load(const AssetMetadata& metadata)
     {
         auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
 
@@ -20,7 +20,7 @@ namespace RNGOEngine::AssetHandling
         {
             RNGO_ASSERT(false && "ShaderAssetImporter::Load failed to load shader.");
             // TODO: Return expected?
-            return;
+            return nullptr;
         }
 
         // TODO: Really, really, really, unstable way to determine shader type. Works for now!
@@ -30,6 +30,9 @@ namespace RNGOEngine::AssetHandling
         // Upload Resources
         AssetManager::GetInstance().GetShaderManager().UploadShader(
             typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType);
+
+        // TODO:
+        return nullptr;
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)

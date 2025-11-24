@@ -27,7 +27,7 @@ namespace RNGOEngine::AssetHandling
         virtual ~AssetImporter() = default;
 
         // Should load be able to return failure? On malformed files? Just a bool?
-        virtual void Load(const AssetMetadata& metadata) = 0;
+        virtual Asset* Load(const AssetMetadata& metadata) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
 
         virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(const std::filesystem::path& path) const = 0;

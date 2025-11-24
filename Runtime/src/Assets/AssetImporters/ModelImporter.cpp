@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    void ModelImporter::Load(const AssetMetadata& metadata)
+    Asset* ModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
@@ -53,14 +53,16 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Upload to GPU
-        const auto errorMessage = AssetManager::GetInstance().GetModelManager().UploadModel(
+        const auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
             typedMetadata.UUID, modelHandle.value()
         );
-        if (errorMessage != ModelCreationError::None)
+        if (!result)
         {
-            // TODO: Error handling
-            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to upload model to GPU");
+            return nullptr;
         }
+
+        return result.value();
     }
 
     void ModelImporter::Unload(const AssetHandle& handle)

@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void TextureAssetImporter::Load(const AssetMetadata& metadata)
+    Asset* TextureAssetImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
 
@@ -56,6 +56,9 @@ namespace RNGOEngine::AssetHandling
 
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
+
+        // TODO:
+        return nullptr;
     }
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)

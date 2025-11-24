@@ -14,15 +14,15 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    ModelCreationError ModelManager::UploadModel(
+    std::expected<ModelAsset*, ModelCreationError> ModelManager::UploadModel(
         const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
         ModelAsset modelAsset(UploadModelResources(modelHandle), AssetHandle(assetHandle));
-        m_models.insert({assetHandle, modelAsset});
+        const auto [it, inserted] = m_models.insert({assetHandle, modelAsset});
 
-        // TODO:
-        return ModelCreationError::None;
+        // TODO: Error handling
+        return &it->second;
     }
 
     void ModelManager::UnloadModel(const AssetHandle& assetHandle)
