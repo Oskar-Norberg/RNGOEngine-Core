@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <utility>
 #include <filesystem>
+#include <utility>
+
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
@@ -38,18 +39,29 @@ namespace RNGOEngine::AssetHandling
         Valid
     };
 
+    class Asset
+    {
+    public:
+        virtual ~Asset() = default;
+
+    public:
+        AssetState GetState() const;
+        bool IsValid() const;
+
+    protected:
+        AssetHandle m_handle;
+    };
+
     struct AssetMetadata
     {
         virtual ~AssetMetadata() = default;
         
         Utilities::UUID UUID;
         std::filesystem::path Path;
-        AssetState State = AssetState::None;
         AssetType Type = AssetType::None;
-        // TODO: Would be nice to have a runtime link to the data here. But that would require a base Asset class along with a Ref counted pointer system.
-        // This means either everything has to be shared_ptrs (cache coherency be damned) or implementing a ref counting system.
+        AssetState State = AssetState::None;
+        // TODO: I don't like having a raw pointer here. But works for now.
+        // For future improvements. This should have some sort of reference wrapper system to check validity.
+        Asset* RuntimeAsset = nullptr;
     };
-
-    // TODO: For now there is no Asset base class. Assets can be whatever their corresponding Runtime Manager wants them to be.
-    // This might need to change in the future.
 }
