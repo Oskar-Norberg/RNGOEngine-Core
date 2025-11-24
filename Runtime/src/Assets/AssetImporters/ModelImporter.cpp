@@ -61,7 +61,7 @@ namespace RNGOEngine::AssetHandling
             return std::unexpected(ImportingError::UnknownError);
         }
 
-        return nullptr;
+        return std::make_unique<ModelAsset>(result.value());
     }
 
     void ModelImporter::Unload(const AssetHandle& handle)

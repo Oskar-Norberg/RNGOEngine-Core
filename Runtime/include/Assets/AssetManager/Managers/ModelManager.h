@@ -33,7 +33,7 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelManager(Resources::ResourceManager& resourceManager);
 
-        std::expected<std::weak_ptr<ModelAsset>, ModelCreationError> UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
+        std::expected<ModelAsset, ModelCreationError> UploadModel(const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle);
         void UnloadModel(const AssetHandle& assetHandle);
 
     private:

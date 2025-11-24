@@ -11,6 +11,7 @@
 #include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -89,13 +90,14 @@ namespace RNGOEngine::AssetHandling
         metadata.Path = fullPath.value();
         const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        const auto importResult = importer->Load(metadata);
+        auto importResult = importer->Load(metadata);
         if (!importResult)
         {
             return BuiltinAssets::GetErrorHandle(type);
         }
 
         metadata.State = AssetState::Valid;
+        m_assetRegistry.Insert(type, handle, std::move(importResult.value()));
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");

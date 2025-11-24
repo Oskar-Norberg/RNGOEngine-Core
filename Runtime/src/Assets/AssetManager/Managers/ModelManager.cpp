@@ -14,18 +14,12 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<std::weak_ptr<ModelAsset>, ModelCreationError> ModelManager::UploadModel(
+    std::expected<ModelAsset, ModelCreationError> ModelManager::UploadModel(
         const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
-        auto modelAsset = std::make_shared<ModelAsset>(
-            UploadModelResources(modelHandle),
-            AssetHandle(assetHandle)
-        );
-        const auto [it, inserted] = m_models.insert({assetHandle, std::move(modelAsset)});
-
-        // TODO: Error handling
-        return it->second;
+        ModelAsset model(UploadModelResources(modelHandle), AssetHandle(assetHandle));
+        return model;
     }
 
     void ModelManager::UnloadModel(const AssetHandle& assetHandle)

@@ -70,7 +70,7 @@ namespace RNGOEngine::AssetHandling
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
 
-        return nullptr;
+        return std::make_unique<TextureAsset>(textureResult.value());
     }
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)
