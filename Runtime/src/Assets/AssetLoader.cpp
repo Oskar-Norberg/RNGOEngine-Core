@@ -9,15 +9,21 @@
 #include <ranges>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Annoying clang warning about initialization order. But it looks fine??
-    AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
-        : Singleton(this), m_assetDatabase(assetDatabase), m_assetFetcher(assetFetcher)
+    AssetLoader::AssetLoader(
+        RuntimeAssetRegistry& assetRegistry, AssetDatabase& assetDatabase, AssetFetcher& assetFetcher
+    )
+        : Singleton(this),
+          m_assetRegistry(assetRegistry),
+          m_assetDatabase(assetDatabase),
+          m_assetFetcher(assetFetcher)
+
     {
     }
 
@@ -88,6 +94,7 @@ namespace RNGOEngine::AssetHandling
         {
             return BuiltinAssets::GetErrorHandle(type);
         }
+
         metadata.State = AssetState::Valid;
 
         // Save metadata to file?

@@ -83,7 +83,5 @@ namespace RNGOEngine::AssetHandling
         std::filesystem::path Path;
         AssetType Type = AssetType::None;
         AssetState State = AssetState::None;
-        // TODO: I hate Assets needing to be heap-allocated just to have a weak_ptr here.
-        std::weak_ptr<Asset> RuntimeAsset;
     };
 }

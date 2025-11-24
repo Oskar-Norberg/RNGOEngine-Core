@@ -7,17 +7,26 @@
 #include <filesystem>
 
 #include "Asset.h"
-#include "AssetFetcher/AssetFetcher.h"
 #include "AssetImporters/AssetImporter.h"
 #include "AssetSerializers/AssetSerializer.h"
 #include "Concepts/Concepts.h"
+#include "Utilities/Singleton/Singleton.h"
+
+namespace RNGOEngine::AssetHandling
+{
+    class AssetFetcher;
+    class AssetDatabase;
+    class RuntimeAssetRegistry;
+}
 
 namespace RNGOEngine::AssetHandling
 {
     class AssetLoader : public Utilities::Singleton<AssetLoader>
     {
     public:
-        explicit AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher);
+        explicit AssetLoader(
+            RuntimeAssetRegistry& assetRegistry, AssetDatabase& assetDatabase, AssetFetcher& assetFetcher
+        );
 
         AssetHandle Load(AssetType type, const std::filesystem::path& searchPath) const;
 
@@ -42,26 +51,13 @@ namespace RNGOEngine::AssetHandling
             m_importers.erase(type);
         }
 
-        // TODO: TEMPORARY
-    public:
-        template<Concepts::DerivedFrom<AssetImporter> TAssetImporter>
-        TAssetImporter* GetImporter(const AssetType type) const
-        {
-            const auto it = m_importers.find(type);
-            if (it != m_importers.end())
-            {
-                // TODO: Temporary terrible solution
-                return dynamic_cast<TAssetImporter*>(it->second.get());
-            }
-
-            return nullptr;
-        }
+    private:
+        void SaveMetadataToFile(
+            const AssetHandle& handle, AssetSerializer& serializer, const std::filesystem::path& metaFilePath
+        ) const;
 
     private:
-        void SaveMetadataToFile(const AssetHandle& handle, AssetSerializer& serializer,
-                                const std::filesystem::path& metaFilePath) const;
-
-    private:
+        RuntimeAssetRegistry& m_assetRegistry;
         AssetDatabase& m_assetDatabase;
         AssetFetcher& m_assetFetcher;
 

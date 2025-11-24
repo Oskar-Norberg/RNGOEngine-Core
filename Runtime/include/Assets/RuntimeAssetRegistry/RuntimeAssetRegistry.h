@@ -27,7 +27,10 @@ namespace RNGOEngine::AssetHandling
         void Remove(AssetType type, AssetHandle handle);
 
         template<Concepts::DerivedFrom<Asset> TAsset>
-        TAsset* Get(AssetHandle handle);
+        std::optional<std::reference_wrapper<TAsset>> TryGet(AssetHandle handle);
+
+        template<Concepts::DerivedFrom<Asset> TAsset>
+        std::optional<std::reference_wrapper<const TAsset>> TryGet(AssetHandle handle) const;
 
     private:
         // NOTE: These have to correspond with the AssetType enum.

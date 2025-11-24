@@ -7,6 +7,7 @@
 #include <memory>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/AssetLoader.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "InputManager/InputManager.h"
