@@ -10,6 +10,8 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    AssetHandle BuiltinAssets::s_errorHandles[static_cast<size_t>(AssetType::Count)];
+
     void BuiltinAssets::InitializeBuiltinAssets()
     {
         SetUpModel();
@@ -19,39 +21,22 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle BuiltinAssets::GetErrorHandle(AssetType type)
     {
-        const auto& assetManager = AssetManager::GetInstance();
-        switch (type)
-        {
-            case AssetType::Model:
-                return assetManager.GetModelManager().GetErrorModel();
-            case AssetType::Texture:
-                return assetManager.GetTextureManager().GetInvalidTexture();
-            case AssetType::Shader:
-                RNGO_ASSERT(false && "Unsupported type!");
-            case AssetType::Material:
-                return assetManager.GetMaterialManager().GetInvalidMaterial();
-            case AssetType::Count:
-            case AssetType::None:
-            default:
-                RNGO_ASSERT(false && "Unknown AssetType!");
-        }
+        // TODO: Assert type is valid and has been set up.
+        return s_errorHandles[static_cast<size_t>(type)];
     }
 
     void BuiltinAssets::SetUpModel()
     {
-        auto& modelManager = AssetManager::GetInstance().GetModelManager();
         auto& loader = AssetLoader::GetInstance();
-
-        modelManager.SetErrorModel(loader.Load(AssetType::Model, Data::FallbackAssets::InvalidModel));
+        s_errorHandles[static_cast<size_t>(AssetType::Model)] =
+            loader.Load(AssetType::Model, Data::FallbackAssets::InvalidModel);
     }
 
     void BuiltinAssets::SetUpTexture()
     {
-        auto& textureManager = AssetManager::GetInstance().GetTextureManager();
         auto& loader = AssetLoader::GetInstance();
-
-        textureManager.SetInvalidTexture(loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture)
-        );
+        s_errorHandles[static_cast<size_t>(AssetType::Texture)] =
+            loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture);
     }
 
     void BuiltinAssets::SetUpMaterial()
@@ -63,7 +48,7 @@ namespace RNGOEngine::AssetHandling
         const auto fragmentShader =
             loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidFragmentShader);
 
-        const auto invalidMaterialHandle = materialManager.CreateMaterial(vertexShader, fragmentShader);
-        materialManager.SetInvalidMaterial(invalidMaterialHandle.GetMaterialAssetHandle());
+        s_errorHandles[static_cast<size_t>(AssetType::Material)] =
+            materialManager.CreateMaterial(vertexShader, fragmentShader).GetMaterialAssetHandle();
     }
 }

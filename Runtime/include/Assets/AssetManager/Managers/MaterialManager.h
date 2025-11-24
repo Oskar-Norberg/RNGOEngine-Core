@@ -49,13 +49,8 @@ namespace RNGOEngine::AssetHandling
         void SetVec4(const AssetHandle& materialHandle, std::string_view name, const glm::vec4& value);
         void SetMat4(const AssetHandle& materialHandle, std::string_view name, const glm::mat4& value);
 
-    public:
-        void SetInvalidMaterial(const AssetHandle& handle);
-        AssetHandle GetInvalidMaterial() const;
-
     private:
         std::unordered_map<AssetHandle, RuntimeMaterial> m_materials;
-        AssetHandle m_invalidMaterialHandle;
 
     private:
         ShaderManager& m_shaderManager;

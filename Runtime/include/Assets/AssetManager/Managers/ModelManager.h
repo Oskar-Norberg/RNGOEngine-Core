@@ -47,30 +47,14 @@ namespace RNGOEngine::AssetHandling
         void UnloadModel(const AssetHandle& assetHandle);
 
     public:
-        AssetHandle GetInvalidModel() const;
-
-    public:
         // TODO: Make this return an optional or expected?
         const RuntimeModelData& GetRuntimeModelData(const AssetHandle& handle) const;
-
-        // Engine Internals
-    public:
-        void SetErrorModel(const AssetHandle& handle)
-        {
-            m_errorModel = handle;
-        }
-
-        AssetHandle GetErrorModel() const
-        {
-            return m_errorModel;
-        }
 
     private:
         Resources::ResourceManager& m_resourceManager;
 
     private:
         std::unordered_map<AssetHandle, RuntimeModelData> m_models;
-        AssetHandle m_errorModel;
 
     private:
         RuntimeModelData UploadModelResources(const ModelLoading::ModelData& modelData);

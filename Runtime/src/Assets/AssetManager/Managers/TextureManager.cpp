@@ -42,15 +42,6 @@ namespace RNGOEngine::AssetHandling
             m_textures.erase(assetHandle);
         }
     }
-    void TextureManager::SetInvalidTexture(const AssetHandle& handle)
-    {
-        m_invalidTexture = handle;
-    }
-
-    AssetHandle TextureManager::GetInvalidTexture() const
-    {
-        return m_invalidTexture;
-    }
 
     Core::Renderer::TextureID TextureManager::GetTexture(const AssetHandle& uuid) const
     {
@@ -59,20 +50,16 @@ namespace RNGOEngine::AssetHandling
         // TODO: Cleanup
         if (!m_textures.contains(uuid))
         {
-            const auto& errorTextureData = m_textures.at(m_invalidTexture);
-            const auto errorTextureOpt = textureResourceManager.GetTexture(errorTextureData.TextureKey);
-
-            return errorTextureOpt.value();
+            // TODO: return opt.
+            RNGO_ASSERT(false && "TextureManager::GetTexture - TextureAsset not found.");
         }
 
         const auto& runtimeTextureData = m_textures.at(uuid);
         const auto textureOpt = textureResourceManager.GetTexture(runtimeTextureData.TextureKey);
         if (!textureOpt)
         {
-            const auto& errorTextureData = m_textures.at(m_invalidTexture);
-            const auto errorTextureOpt = textureResourceManager.GetTexture(errorTextureData.TextureKey);
-
-            return errorTextureOpt.value();
+            // TODO: return opt.
+            RNGO_ASSERT(false && "TextureManager::GetTexture - TextureAsset not found.");
         }
 
         return textureOpt.value();
