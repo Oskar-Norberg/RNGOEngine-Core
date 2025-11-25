@@ -9,15 +9,22 @@
 #include <ranges>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Annoying clang warning about initialization order. But it looks fine??
-    AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
-        : Singleton(this), m_assetDatabase(assetDatabase), m_assetFetcher(assetFetcher)
+    AssetLoader::AssetLoader(
+        RuntimeAssetRegistry& assetRegistry, AssetDatabase& assetDatabase, AssetFetcher& assetFetcher
+    )
+        : Singleton(this),
+          m_assetRegistry(assetRegistry),
+          m_assetDatabase(assetDatabase),
+          m_assetFetcher(assetFetcher)
+
     {
     }
 
@@ -83,13 +90,14 @@ namespace RNGOEngine::AssetHandling
         metadata.Path = fullPath.value();
         const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        const auto importResult = importer->Load(metadata);
+        auto importResult = importer->Load(metadata);
         if (!importResult)
         {
             return BuiltinAssets::GetErrorHandle(type);
         }
+
         metadata.State = AssetState::Valid;
-        metadata.RuntimeAsset = importResult.value();
+        m_assetRegistry.Insert(type, handle, std::move(importResult.value()));
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");

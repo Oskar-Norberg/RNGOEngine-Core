@@ -42,35 +42,6 @@ namespace RNGOEngine::AssetHandling
         m_handleToStorageIndex.erase(uuid);
         m_pathToHandle.erase(path);
     }
-    void AssetDatabase::SetRuntimePointer(std::weak_ptr<Asset> asset, const AssetHandle& handle)
-    {
-        const auto metadataOpt = TryGetAssetMetadata(handle);
-        if (!metadataOpt.has_value())
-        {
-            RNGO_ASSERT(false && "AssetDatabase::SetRuntimePointer - Called on invalid asset handle");
-            return;
-        }
-
-        auto& metadata = metadataOpt->get();
-        metadata.RuntimeAsset = asset;
-    }
-
-    std::optional<std::weak_ptr<Asset>> AssetDatabase::TryGetRuntimePointer(const AssetHandle& handle) const
-    {
-        const auto metadataOpt = TryGetAssetMetadata(handle);
-        if (!metadataOpt.has_value())
-        {
-            return std::nullopt;
-        }
-
-        auto& metadata = metadataOpt->get();
-        if (metadata.RuntimeAsset.expired())
-        {
-            return std::nullopt;
-        }
-
-        return std::ref(metadata.RuntimeAsset);
-    }
 
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {

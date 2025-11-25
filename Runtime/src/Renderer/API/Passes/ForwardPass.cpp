@@ -7,13 +7,13 @@
 #include <format>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Assets/AssetDatabase/AssetDatabase.h"
 // TODO: Remove when MaterialManager is less shit
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/AssetManager/Managers/Material/Material.h"
 #include "Assets/AssetTypes/ModelAsset.h"
 #include "Assets/AssetTypes/TextureAsset.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
@@ -92,7 +92,7 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::RenderOpaque(DrawQueue& queue) const
     {
-        const auto& assetDatabase = AssetHandling::AssetDatabase::GetInstance();
+        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         const auto& camera = queue.Camera;
 
         // TODO: I hate the material manager so much
@@ -256,7 +256,7 @@ namespace RNGOEngine::Core::Renderer
             for (const auto& [name, data] : resolvedMat.uniforms)
             {
                 std::visit(
-                    [this, &name, &assetDatabase, shaderProgramID]<typename T0>(T0&& arg)
+                    [this, &name, &runtimeRegistry, shaderProgramID]<typename T0>(T0&& arg)
                     {
                         using T = std::decay_t<T0>;
                         if constexpr (std::is_same_v<T, bool>)
@@ -291,23 +291,21 @@ namespace RNGOEngine::Core::Renderer
                         }
                         else if constexpr (std::is_same_v<T, AssetHandling::MaterialTextureSpecification>)
                         {
-                            auto textureHandle = assetDatabase.TryGetRuntimePointer(arg.textureHandle);
-                            if (!textureHandle)
-                            {
-                                textureHandle = assetDatabase.TryGetRuntimePointer(
+                            const auto textureAssetOpt =
+                                runtimeRegistry.TryGet<AssetHandling::TextureAsset>(arg.textureHandle);
+
+                            const auto textureAsset = textureAssetOpt.value_or(
+                                runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
                                     AssetHandling::BuiltinAssets::GetErrorHandle(
                                         AssetHandling::AssetType::Texture
                                     )
-                                );
-                            }
-
-                            const auto& ref = textureHandle.value().lock();
-                            // TODO: I have never seen this template syntax before.
-                            const auto& textureRef = ref->template GetAsType<AssetHandling::TextureAsset>();
+                                ).value()
+                            );
+                            const auto& textureAssetRef = textureAsset.get();
 
                             const auto textureID = Resources::ResourceManager::GetInstance()
                                                        .GetTextureResourceManager()
-                                                       .GetTexture(textureRef.GetTextureKey());
+                                                       .GetTexture(textureAssetRef.GetTextureKey());
                             if (!textureID)
                             {
                                 RNGO_ASSERT(false && "Invalid texture resource in RenderAPI::RenderOpaque.");
@@ -330,26 +328,16 @@ namespace RNGOEngine::Core::Renderer
             // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
             auto& meshResourceManager = Resources::ResourceManager::GetInstance().GetMeshResourceManager();
 
-            const auto modelAssetOpt = assetDatabase.TryGetRuntimePointer(opaqueDrawCall.ModelHandle);
-
-            std::weak_ptr<AssetHandling::Asset> modelAssetWeak = modelAssetOpt.value_or(
-                assetDatabase
-                    .TryGetRuntimePointer(
-                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
-                    )
-                    .value()
+            const auto modelAssetOpt = runtimeRegistry.TryGet<AssetHandling::ModelAsset>(
+                opaqueDrawCall.ModelHandle
+            );
+            const auto modelAsset = modelAssetOpt.value_or(
+                runtimeRegistry.TryGet<AssetHandling::ModelAsset>(
+                    AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
+                ).value()
             );
 
-            const auto assetSharedPtr = modelAssetWeak.lock();
-            if (!assetSharedPtr->IsType(AssetHandling::AssetType::Model))
-            {
-                // TODO: Draw fallback model.
-                continue;
-            }
-
-            const auto& modelAssetRef = assetSharedPtr->GetAsType<AssetHandling::ModelAsset>();
-
-            for (const auto& meshData : modelAssetRef.GetMeshKeys())
+            for (const auto& meshData : modelAsset.get().GetMeshKeys())
             {
                 const auto meshResourceOpt = meshResourceManager.GetMeshResource(meshData);
                 if (!meshResourceOpt.has_value())

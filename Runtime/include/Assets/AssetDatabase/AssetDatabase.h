@@ -29,12 +29,6 @@ namespace RNGOEngine::AssetHandling
         void RegisterAsset(AssetType type, std::unique_ptr<AssetMetadata> metadata);
         void UnregisterAsset(const AssetHandle& uuid);
 
-        // Runtime Linking
-    public:
-        void SetRuntimePointer(std::weak_ptr<Asset> asset, const AssetHandle& handle);
-
-        std::optional<std::weak_ptr<Asset>> TryGetRuntimePointer(const AssetHandle& handle) const;
-
         // State
     public:
         bool IsRegistered(const AssetHandle& handle) const;

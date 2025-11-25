@@ -13,7 +13,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<std::weak_ptr<Asset>, ShaderManagerError> ShaderManager::UploadShader(
+    std::expected<ShaderAsset, ShaderManagerError> ShaderManager::UploadShader(
         const AssetHandle& assetHandle, const std::string_view shaderSource,
         const Core::Renderer::ShaderType type
     )
@@ -27,7 +27,8 @@ namespace RNGOEngine::AssetHandling
         // Store Runtime shader data
         auto [it, inserted] = m_handleToShader.insert({assetHandle, std::move(shaderAsset)});
 
-        return it->second;
+        // TODO: This returns a copy for now. Fix later.
+        return *it->second.get();
     }
 
     void ShaderManager::DestroyShader(const AssetHandle& assetHandle)

@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::weak_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
+    std::expected<std::unique_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
         const AssetMetadata& metadata
     )
     {
@@ -38,11 +38,20 @@ namespace RNGOEngine::AssetHandling
         //                                               : Core::Renderer::ShaderType::Fragment;
 
         // Upload Resources
-        auto assetPtr = AssetManager::GetInstance().GetShaderManager().UploadShader(
+        auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
             typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
         );
 
-        return assetPtr.value();
+        if (!uploadResult)
+        {
+            switch (uploadResult.error())
+            {
+                case ShaderManagerError::None:
+                    return std::unexpected(ImportingError::UnknownError);
+            }
+        }
+
+        return std::make_unique<ShaderAsset>(uploadResult.value());
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
