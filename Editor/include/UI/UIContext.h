@@ -8,6 +8,8 @@ namespace RNGOEngine
 {
     namespace Core
     {
+        class VectorSink;
+
         namespace Renderer
         {
             class RenderAPI;
@@ -26,6 +28,7 @@ namespace RNGOEngine::Editor
 {
     struct UIContext
     {
+        Core::VectorSink* loggerSink = nullptr;
         UISelectionManager* selectionManager = nullptr;
         Core::SceneManager* sceneManager = nullptr;
         Core::Renderer::RenderAPI* rendererAPI = nullptr;

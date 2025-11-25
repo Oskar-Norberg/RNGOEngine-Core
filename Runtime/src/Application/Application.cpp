@@ -51,7 +51,9 @@ namespace RNGOEngine
         m_resourceManager = std::make_unique<Resources::ResourceManager>(*m_renderer);
 
         // Asset Loader and Importers
-        m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(m_runtimeAssetRegistry, m_assetDatabase, m_assetFetcher);
+        m_assetLoader = std::make_unique<AssetHandling::AssetLoader>(
+            m_runtimeAssetRegistry, m_assetDatabase, m_assetFetcher
+        );
         AssetHandling::BootstrapContext context = {*m_assetLoader, doFlipTexturesVertically};
         AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
 

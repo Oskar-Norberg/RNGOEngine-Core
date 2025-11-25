@@ -6,12 +6,14 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <magic_enum/magic_enum.hpp>
 #include <ranges>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
+#include "Logging/Logger.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -30,6 +32,11 @@ namespace RNGOEngine::AssetHandling
 
     AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
     {
+        RNGO_LOG(
+            Core::LogLevel::Info, "AssetLoader::Load - Loading asset of type {} from path '{}'.",
+            magic_enum::enum_name(type), searchPath.string()
+        );
+
         // TODO: This should probably check the iterator against end instead of using contains. But this looks nicer.
         if (!m_serializers.contains(type) || !m_importers.contains(type))
         {

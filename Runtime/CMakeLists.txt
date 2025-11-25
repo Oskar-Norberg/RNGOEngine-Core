@@ -25,6 +25,8 @@ include(cmake/EngineUnits/Profiling.cmake)
 include(cmake/EngineUnits/Concepts.cmake)
 include(cmake/EngineUnits/Math.cmake)
 include(cmake/EngineUnits/Utilities.cmake)
+include(cmake/EngineUnits/Logging.cmake)
+
 include(cmake/EngineUnits/Containers.cmake)
 include(cmake/EngineUnits/Events.cmake)
 include(cmake/EngineUnits/InputManager.cmake)
@@ -62,6 +64,8 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${CONCEPTS_PROJECT_NAME}
         ${MATH_PROJECT_NAME}
         ${UTILITIES_PROJECT_NAME}
+        ${LOGGING_PROJECT_NAME}
+        
         ${CONTAINERS_PROJECT_NAME}
         ${EVENTS_PROJECT_NAME}
         ${INPUT_MANAGER_PROJECT_NAME}

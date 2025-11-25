@@ -1,0 +1,41 @@
+﻿//
+// Created by Oskar.Norberg on 2025-11-25.
+//
+
+#pragma once
+
+#include "Logger.h"
+#include "spdlog/sinks/base_sink.h"
+
+namespace RNGOEngine::Core
+{
+    // This will store every single message in a vector.
+    // This is mainly used for drawing to ImGui.
+    // This will destroy memory if there are too many messages.
+    class VectorSink : public spdlog::sinks::base_sink<std::mutex>
+    {
+    public:
+        std::span<const LogEntry> GetLogs() const
+        {
+            return m_logs;
+        }
+
+    protected:
+        void sink_it_(const spdlog::details::log_msg& msg) override
+        {
+            m_logs.push_back(
+                LogEntry{
+                    .Level = SPDLogLevelToRNGOLevel(msg.level),
+                    .Message = std::string(msg.payload.data(), msg.payload.size())
+                }
+            );
+        }
+
+        void flush_() override
+        {
+        }
+
+    private:
+        std::vector<LogEntry> m_logs;
+    };
+}

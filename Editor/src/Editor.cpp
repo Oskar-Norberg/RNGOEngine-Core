@@ -5,7 +5,9 @@
 #include "Editor.h"
 
 #include "ECS/Systems/FreeFlyCameraSystem.h"
+#include "Logging/VectorSink.h"
 #include "TestScene.h"
+#include "UI/Panels/ConsolePanel.h"
 #include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/StatsPanel.h"
@@ -14,8 +16,13 @@
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config), m_UIManager(*m_window, m_sceneManager)
+        : Application(config),
+          m_UIManager(*m_window, m_sceneManager),
+          m_vectorSink(std::make_shared<Core::VectorSink>())
     {
+        // Attach Editor only VectorSink
+        m_logger.AttachSink(m_vectorSink);
+        
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
         // Set up Editor Systems
@@ -26,6 +33,7 @@ namespace RNGOEngine::Editor
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
         m_UIManager.RegisterPanel<HierarchyPanel>();
         m_UIManager.RegisterPanel<DetailsPanel>();
+        m_UIManager.RegisterPanel<ConsolePanel>();
 
         SetUpUIContext();
         SetUpEditorContext();
@@ -74,6 +82,7 @@ namespace RNGOEngine::Editor
     void Editor::SetUpUIContext()
     {
         // Set up UIContext
+        m_uiContext.loggerSink = m_vectorSink.get();
         m_uiContext.selectionManager = &m_selectionManager;
         m_uiContext.sceneManager = &m_sceneManager;
         m_uiContext.rendererAPI = m_rendererAPI.get();
