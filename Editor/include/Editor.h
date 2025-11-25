@@ -7,6 +7,7 @@
 #include <Application/Application.h>
 
 #include "ECS/EditorSystemContext.h"
+#include "Logging/VectorSink.h"
 #include "UI/UIManager.h"
 
 namespace RNGOEngine::Editor
@@ -23,6 +24,9 @@ namespace RNGOEngine::Editor
     private:
         UIContext m_uiContext;
         UIManager m_UIManager;
+
+    private:
+        std::shared_ptr<Core::VectorSink> m_vectorSink;
 
     private:
         EditorSystemContext m_editorSystemContext;
