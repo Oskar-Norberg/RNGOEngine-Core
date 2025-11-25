@@ -18,3 +18,7 @@ target_link_libraries(${UTILITIES_PROJECT_NAME} PUBLIC
         ${PROFILING_PROJECT_NAME}
         ${LOGGING_PROJECT_NAME}
 )
+target_link_libraries(${UTILITIES_PROJECT_NAME} PUBLIC
+        magic_enum
+)
+

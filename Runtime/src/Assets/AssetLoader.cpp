@@ -6,6 +6,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include <magic_enum/magic_enum.hpp>
 #include <ranges>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
@@ -33,7 +34,7 @@ namespace RNGOEngine::AssetHandling
     {
         RNGO_LOG(
             Core::LogLevel::Info, "AssetLoader::Load - Loading asset of type {} from path '{}'.",
-            static_cast<size_t>(type), searchPath.string()
+            magic_enum::enum_name(type), searchPath.string()
         );
 
         // TODO: This should probably check the iterator against end instead of using contains. But this looks nicer.
