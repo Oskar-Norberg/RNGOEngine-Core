@@ -1,14 +1,14 @@
 ﻿set(RENDER_API_PROJECT_NAME RNGOEngine_RenderAPI)
 add_library(${RENDER_API_PROJECT_NAME} STATIC
         include/Renderer/DrawQueue.h
-        
+
         include/Renderer/API/RenderAPI.h
         src/Renderer/API/RenderAPI.cpp
 
         include/Renderer/API/RenderPass/RenderContext.h
         include/Renderer/API/RenderPass/RenderPass.h
 
-        include/Renderer/API/RenderPass/RenderPassResources.h 
+        include/Renderer/API/RenderPass/RenderPassResources.h
         src/Renderer/API/RenderPass/RenderPassResources.cpp
 
         include/Renderer/API/Passes/ForwardPass.h
@@ -16,7 +16,6 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
 
         include/Renderer/API/Passes/ForwardScreenPass.h
         src/Renderer/API/Passes/ForwardScreenPass.cpp
-        
 
 
         include/Systems/Core/RenderSystem.h
@@ -34,4 +33,5 @@ target_link_libraries(${RENDER_API_PROJECT_NAME} PUBLIC
         ${PROFILING_PROJECT_NAME}
         ${UTILITIES_PROJECT_NAME}
         ${DATA_PROJECT_NAME}
+        ${LOGGING_PROJECT_NAME}
 )

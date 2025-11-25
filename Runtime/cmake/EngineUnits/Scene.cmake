@@ -20,4 +20,5 @@ target_link_libraries(${SCENE_PROJECT_NAME} PUBLIC
         ${UTILITIES_PROJECT_NAME}
         ${COMPONENT_PROJECT_NAME}
         ${MATH_PROJECT_NAME}
+        ${LOGGING_PROJECT_NAME}
 )
