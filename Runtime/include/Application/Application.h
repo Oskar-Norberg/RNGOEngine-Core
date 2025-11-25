@@ -11,6 +11,7 @@
 #include "Assets/AssetLoader.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "InputManager/InputManager.h"
+#include "Logging/Logger.h"
 #include "Renderer/API/RenderAPI.h"
 #include "Renderer/IRenderer.h"
 #include "Scene/SceneManager/SceneManager.h"
@@ -61,6 +62,8 @@ namespace RNGOEngine
     protected:
         bool m_isRunning = true;
         size_t m_frameCount = 0;
+
+        Core::Logger m_logger;
 
         std::unique_ptr<Core::Window::IWindow> m_window;
         std::unique_ptr<Core::Renderer::IRenderer> m_renderer;
