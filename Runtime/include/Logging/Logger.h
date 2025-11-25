@@ -6,6 +6,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include <magic_enum/magic_enum.hpp>
+
 #include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine::Core

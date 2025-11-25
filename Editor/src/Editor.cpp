@@ -28,13 +28,6 @@ namespace RNGOEngine::Editor
         // Set up Editor Systems
         m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
 
-        RNGO_LOG(Core::LogLevel::Info, "Sample Info Text");
-        RNGO_LOG(Core::LogLevel::Warning, "Sample Warning Text");
-        RNGO_LOG(Core::LogLevel::Error, "Sample Error Text");
-        RNGO_LOG(Core::LogLevel::Critical, "Sample Critical Text");
-        RNGO_LOG(Core::LogLevel::Debug, "Sample Debug Text");
-
-
         // Set up UI Panels
         m_UIManager.RegisterPanel<StatsPanel>();
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
