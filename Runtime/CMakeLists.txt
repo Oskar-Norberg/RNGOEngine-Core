@@ -21,6 +21,7 @@ include(cmake/Dependencies.cmake)
 include(cmake/EngineUnits/Data.cmake)
 
 include(cmake/EngineUnits/Profiling.cmake)
+include(cmake/EngineUnits/Logging.cmake)
 
 include(cmake/EngineUnits/Concepts.cmake)
 include(cmake/EngineUnits/Math.cmake)
@@ -58,6 +59,7 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${DATA_PROJECT_NAME}
         
         ${PROFILING_PROJECT_NAME}
+        ${LOGGING_PROJECT_NAME}
         
         ${CONCEPTS_PROJECT_NAME}
         ${MATH_PROJECT_NAME}
