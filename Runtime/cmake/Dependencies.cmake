@@ -11,25 +11,6 @@ CPMAddPackage(
         GIT_TAG 1.0.1
 )
 
-CPMAddPackage(
-        NAME assimp
-        GITHUB_REPOSITORY assimp/assimp
-        GIT_TAG v6.0.2
-        OPTIONS "ASSIMP_BUILD_TESTS OFF"
-        "BUILD_SHARED_LIBS OFF"
-        
-        # Dont need exporters for now.
-        "ASSIMP_NO_EXPORT ON"
-        "ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF"
-        
-        # Build only required importers.
-        "ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF"
-        "ASSIMP_BUILD_OBJ_IMPORTER ON"
-        "ASSIMP_BUILD_FBX_IMPORTER ON"
-        "ASSIMP_BUILD_GLTF_IMPORTER ON"
-        
-)
-
 if (RNGOENGINE_TRACY_ENABLE)
     CPMAddPackage("gh:wolfpld/tracy@0.12.2")
 endif ()
@@ -40,3 +21,17 @@ add_subdirectory(./vendor/stb_image)
 add_subdirectory(./vendor/yaml-cpp)
 add_subdirectory(./vendor/spdlog)
 add_subdirectory(./vendor/magic_enum)
+
+# Assimp Build Properties
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(ASSIMP_NO_EXPORT ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_ALL_EXPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+
+# Build only required importers.
+set(ASSIMP_BUILD_ALL_IMPORTERS_BY_DEFAULT OFF CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_OBJ_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_FBX_IMPORTER ON CACHE BOOL "" FORCE)
+set(ASSIMP_BUILD_GLTF_IMPORTER ON CACHE BOOL "" FORCE)
+
+add_subdirectory(./vendor/assimp)
