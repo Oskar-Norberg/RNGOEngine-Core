@@ -37,8 +37,9 @@ namespace RNGOEngine::AssetHandling
     enum class AssetState
     {
         None,
+        Ready,
         Invalid,
-        Valid
+        Loading
     };
 
     class Asset
@@ -52,6 +53,7 @@ namespace RNGOEngine::AssetHandling
         virtual ~Asset() = default;
 
     public:
+        AssetType GetType() const;
         bool IsType(AssetType type) const;
 
         // TODO: Unsafe as all hell.
@@ -69,7 +71,7 @@ namespace RNGOEngine::AssetHandling
 
     public:
         AssetState GetState() const;
-        bool IsValid() const;
+        bool IsReady() const;
 
     private:
         AssetHandle m_handle;
@@ -82,6 +84,5 @@ namespace RNGOEngine::AssetHandling
         Utilities::UUID UUID;
         std::filesystem::path Path;
         AssetType Type = AssetType::None;
-        AssetState State = AssetState::None;
     };
 }

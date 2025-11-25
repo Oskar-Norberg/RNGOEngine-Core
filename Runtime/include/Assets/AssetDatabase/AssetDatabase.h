@@ -32,11 +32,8 @@ namespace RNGOEngine::AssetHandling
         // State
     public:
         bool IsRegistered(const AssetHandle& handle) const;
-
-        AssetState GetAssetState(const AssetHandle& handle) const;
-
         bool IsRegistered(const std::filesystem::path& path) const;
-
+        
         // Unchecked
         AssetHandle GetAssetHandle(const std::filesystem::path& path) const;
 

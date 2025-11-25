@@ -46,24 +46,7 @@ namespace RNGOEngine::AssetHandling
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {
         const auto* metadata = GetMetadataOrNullptr(handle);
-
-        if (metadata)
-        {
-            return metadata->State != AssetState::None;
-        }
-
-        return false;
-    }
-
-    AssetState AssetDatabase::GetAssetState(const AssetHandle& handle) const
-    {
-        const auto* metadata = GetMetadataOrNullptr(handle);
-        if (metadata)
-        {
-            return metadata->State;
-        }
-
-        return AssetState::None;
+        return metadata != nullptr;
     }
 
     bool AssetDatabase::IsRegistered(const std::filesystem::path& path) const

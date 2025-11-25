@@ -40,7 +40,6 @@ namespace RNGOEngine::AssetHandling
         std::unique_ptr<MaterialMetadata> metadata = std::make_unique<MaterialMetadata>();
         metadata->UUID = uuid;
         metadata->Parameters = MaterialParameters{};
-        metadata->State = AssetState::Valid;
         metadata->VertexShader = vertexShader;
         metadata->FragmentShader = fragmentShader;
         metadata->Type = AssetType::Material;

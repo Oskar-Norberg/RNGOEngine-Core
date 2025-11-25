@@ -5,29 +5,35 @@
 #include "Assets/Asset.h"
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    bool Asset::IsType(AssetType type) const
+    AssetType Asset::GetType() const
     {
         const auto metadata = AssetDatabase::GetInstance().TryGetAssetMetadata(m_handle);
 
         if (!metadata)
         {
-            return false;
+            return AssetType::None;
         }
-        auto& metadataRef = metadata->get();
+        const auto& metadataRef = metadata->get();
+        return metadataRef.Type;
+    }
 
-        return metadataRef.Type == type;
+    bool Asset::IsType(const AssetType type) const
+    {
+        return GetType() == type;
     }
 
     AssetState Asset::GetState() const
     {
-        return AssetDatabase::GetInstance().GetAssetState(m_handle);
+        // TODO: Should this cache the type? It will be a minimal amount of extra memory. But assets will never change type.
+        return RuntimeAssetRegistry::GetInstance().GetState(GetType(), m_handle);
     }
 
-    bool Asset::IsValid() const
+    bool Asset::IsReady() const
     {
-        return GetState() == AssetState::Valid;
+        return GetState() == AssetState::Ready;
     }
 }

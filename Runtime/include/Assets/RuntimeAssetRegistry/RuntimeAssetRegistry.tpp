@@ -17,11 +17,14 @@ template<Concepts::DerivedFrom<Asset> TAsset>
 std::optional<std::reference_wrapper<const TAsset>> RuntimeAssetRegistry::TryGet(AssetHandle handle) const
 {
     const auto& assetMap = std::get<AssetMap<TAsset>>(m_assetStorage);
-    auto it = assetMap.find(handle);
+    const auto it = assetMap.find(handle);
 
     if (it != assetMap.end())
     {
-        return std::cref(it->second);
+        if (it->second.State == AssetState::Ready)
+        {
+            return std::cref(it->second.Asset);
+        }
     }
 
     return std::nullopt;

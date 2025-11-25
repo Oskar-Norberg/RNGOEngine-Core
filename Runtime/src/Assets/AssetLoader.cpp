@@ -52,14 +52,16 @@ namespace RNGOEngine::AssetHandling
             return BuiltinAssets::GetErrorHandle(type);
         }
 
+        auto& database = AssetDatabase::GetInstance();
+        auto& registry = RuntimeAssetRegistry::GetInstance();
         // Check if asset has already been loaded
-        if (AssetDatabase::GetInstance().IsRegistered(fullPath.value()))
+        if (database.IsRegistered(fullPath.value()))
         {
             const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
             auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(handle);
 
             RNGO_ASSERT(metadata.Type == type && "AssetLoader::Load - Asset type mismatch.");
-            if (metadata.State == AssetState::Valid)
+            if (registry.GetState(type, handle) == AssetState::Ready)
             {
                 return handle;
             }
@@ -88,7 +90,7 @@ namespace RNGOEngine::AssetHandling
         );
 
         metadata.Path = fullPath.value();
-        const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
+        auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
         auto importResult = importer->Load(metadata);
         if (!importResult)
@@ -96,8 +98,8 @@ namespace RNGOEngine::AssetHandling
             return BuiltinAssets::GetErrorHandle(type);
         }
 
-        metadata.State = AssetState::Valid;
-        m_assetRegistry.Insert(type, handle, std::move(importResult.value()));
+        auto& registryEntry = m_assetRegistry.Insert(type, handle, std::move(importResult.value()));
+        registryEntry.SetState(AssetState::Ready);
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
