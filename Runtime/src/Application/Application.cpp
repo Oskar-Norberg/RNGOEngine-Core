@@ -18,7 +18,6 @@
 namespace RNGOEngine
 {
     Application::Application(const EngineConfig& config)
-        : m_logger()
     {
         bool doFlipTexturesVertically = false;
 

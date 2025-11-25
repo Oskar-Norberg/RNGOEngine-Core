@@ -19,18 +19,26 @@ namespace RNGOEngine::Editor
             switch (logEntry.Level)
             {
                 case Core::LogLevel::Warning:
-                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 1.0f, 0.0f, 1.0f));
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.75f, 0.75f, 0.0f, 1.0f));
                     pushedColor = true;
                     break;
 
                 case Core::LogLevel::Error:
-                case Core::LogLevel::Critical:
                     ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.4f, 0.4f, 1.0f));
                     pushedColor = true;
                     break;
 
-                case Core::LogLevel::Info:
+                case Core::LogLevel::Critical:
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
+                    pushedColor = true;
+                    break;
+
                 case Core::LogLevel::Debug:
+                    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
+                    pushedColor = true;
+                    break;
+
+                case Core::LogLevel::Info:
                 default:
                     break;
             }

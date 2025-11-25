@@ -27,11 +27,12 @@ namespace RNGOEngine::Core
 
         m_logger.info("Logger initialized");
     }
+
     Logger::~Logger()
     {
         m_logger.info("Logger Exiting");
     }
-    
+
     void Logger::AttachSink(std::shared_ptr<spdlog::sinks::sink> sink)
     {
         m_logger.sinks().emplace_back(sink);
