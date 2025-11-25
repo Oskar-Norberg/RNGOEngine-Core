@@ -10,7 +10,9 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void TextureAssetImporter::Load(const AssetMetadata& metadata)
+    std::expected<std::unique_ptr<Asset>, ImportingError> TextureAssetImporter::Load(
+        const AssetMetadata& metadata
+    )
     {
         const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
 
@@ -18,15 +20,24 @@ namespace RNGOEngine::AssetHandling
         const auto textureHandle = TextureLoader::LoadTexture(typedMetadata.Path);
         if (!textureHandle)
         {
-            // TODO: Return error texture? Or expected?
-            RNGO_ASSERT(false && "TextureAssetImporter::Load - Failed to Load Texture");
+            switch (textureHandle.error())
+            {
+                case TextureLoader::TextureLoadingError::FileNotFound:
+                    return std::unexpected(ImportingError::FileNotFound);
+                case TextureLoader::TextureLoadingError::FailedToLoad:
+                    return std::unexpected(ImportingError::MalformedFile);
+                default:
+                    return std::unexpected(ImportingError::UnknownError);
+            }
         }
 
         // Upload to GPU
-        const auto textureDataSpan = std::as_bytes(std::span(
-            textureHandle.value().data,
-            textureHandle.value().width * textureHandle.value().height * textureHandle.value().nrChannels
-        ));
+        const auto textureDataSpan = std::as_bytes(
+            std::span(
+                textureHandle.value().data,
+                textureHandle.value().width * textureHandle.value().height * textureHandle.value().nrChannels
+            )
+        );
 
         // TODO: For now, just get format from nrChannels. Should this be a part of the metadata?
 
@@ -34,28 +45,32 @@ namespace RNGOEngine::AssetHandling
                                                          ? Core::Renderer::TextureFormat::RGB
                                                          : Core::Renderer::TextureFormat::RGBA;
 
-        const Core::Renderer::Texture2DProperties properties
-        {
+        const Core::Renderer::Texture2DProperties properties{
             .Format = format,
             .MinifyingFilter = typedMetadata.MinifyingFilter,
             .MagnifyingFilter = typedMetadata.MagnifyingFilter,
             .WrappingMode = typedMetadata.WrappingMode,
         };
-        const auto errorMessage = AssetManager::GetInstance().GetTextureManager().UploadTexture(
-            typedMetadata.UUID, properties,
-            textureHandle.value().width,
-            textureHandle.value().height,
+        const auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
+            typedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
             std::as_bytes(textureDataSpan)
         );
 
-        if (errorMessage != TextureManagerError::None)
+        if (!textureResult)
         {
-            // TODO: Error handling
-            RNGO_ASSERT(false && "TextureAssetImporter::Load - Failed to Load Texture");
+            switch (textureResult.error())
+            {
+                case TextureManagerError::None:
+                    break;
+                default:
+                    return std::unexpected(ImportingError::UnknownError);
+            }
         }
 
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
+
+        return std::make_unique<TextureAsset>(textureResult.value());
     }
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)
@@ -64,7 +79,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path) const
+        const std::filesystem::path& path
+    ) const
     {
         auto metadata = std::make_unique<TextureMetadata>();
         metadata->Type = AssetType::Texture;

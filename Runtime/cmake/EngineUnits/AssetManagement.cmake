@@ -2,6 +2,7 @@ set(ASSET_MANAGER_PROJECT_NAME RNGOEngine_AssetManager)
 add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         # Asset
         include/Assets/Asset.h
+        src/Assets/Asset.cpp
         include/Assets/AssetMetadataTypes.h
 
         # Asset Types
@@ -9,6 +10,8 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetTypes/ModelAsset.h
         include/Assets/AssetTypes/ShaderAsset.h
         include/Assets/AssetTypes/MaterialAsset.h
+        include/Assets/AssetManager/Managers/Material/Material.h
+        include/Assets/AssetTypeToClass.h
 
         # Serializer
         include/Assets/AssetSerializers/AssetSerializer.h
@@ -18,7 +21,6 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetSerializers/TextureAssetSerializer.h
         include/Assets/AssetSerializers/ShaderAssetSerializer.h
         include/Assets/AssetSerializers/ModelAssetSerializer.h
-
 
         # Asset Importers
         include/Assets/AssetImporters/AssetImporter.h
@@ -38,10 +40,16 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         # Asset Importer Bootstrapper
         include/Assets/Bootstrapper/AssetImporterBootstrapper.h
         src/Assets/Bootstrapper/AssetImporterBootstrapper.cpp
+        
 
+        # Runtime Asset Registry
+        include/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h
+        include/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.tpp
+        src/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.cpp
         
         include/Assets/AssetMetadataStorage.h
         
+        # Asset Database
         include/Assets/AssetDatabase/AssetDatabase.h
         include/Assets/AssetDatabase/AssetDatabase.tpp
         src/Assets/AssetDatabase/AssetDatabase.cpp
@@ -55,31 +63,33 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetFetcher/AssetFetcher.h
         src/Assets/AssetFetcher/AssetFetcher.cpp
         
+        # Asset Loaders
+        ## Texture Loading
         include/Assets/AssetLoaders/TextureLoader.h
         src/Assets/AssetLoaders/TextureLoader.cpp
-        
+        ## Shader Loading
         include/Assets/AssetLoaders/ShaderLoader.h
         src/Assets/AssetLoaders/ShaderLoader.cpp
-        
-        # Model Loading
+        ## Model Loading
         include/Assets/AssetLoaders/ModelLoaders/ModelLoaderData.h
-
+        ### Assimp
         include/Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.h
         src/Assets/AssetLoaders/ModelLoaders/AssimpModelLoader.cpp
-
+        ### OBJ
         include/Assets/AssetLoaders/ModelLoaders/OBJModelLoader.h
         src/Assets/AssetLoaders/ModelLoaders/OBJModelLoader.cpp
         
+        # Asset Managers
+        ## Model Manager
         include/Assets/AssetManager/Managers/ModelManager.h
         src/Assets/AssetManager/Managers/ModelManager.cpp
-
+        ## Texture Manager
         include/Assets/AssetManager/Managers/TextureManager.h
         src/Assets/AssetManager/Managers/TextureManager.cpp
-
-        include/Assets/AssetManager/Managers/Material/Material.h
+        ## Material Manager
         include/Assets/AssetManager/Managers/MaterialManager.h
         src/Assets/AssetManager/Managers/MaterialManager.cpp
-
+        ## Shader Manager
         include/Assets/AssetManager/Managers/ShaderManager.h
         src/Assets/AssetManager/Managers/ShaderManager.cpp
         

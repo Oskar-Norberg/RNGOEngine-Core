@@ -30,12 +30,6 @@ namespace RNGOEngine::AssetHandling
         // TODO:
     };
 
-    struct RuntimeShaderData
-    {
-        Core::Renderer::ShaderType Type;
-        Containers::GenerationalKey<Core::Renderer::ShaderID> ShaderKey;
-    };
-
     struct RuntimeShaderProgramData
     {
         Containers::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
@@ -48,32 +42,32 @@ namespace RNGOEngine::AssetHandling
         explicit ShaderManager(Resources::ResourceManager& resourceManager);
 
     public:
-        ShaderManagerError UploadShader(const AssetHandle& assetHandle,
-                                        std::string_view shaderSource, Core::Renderer::ShaderType type);
+        std::expected<ShaderAsset, ShaderManagerError> UploadShader(
+            const AssetHandle& assetHandle, std::string_view shaderSource, Core::Renderer::ShaderType type
+        );
         void DestroyShader(const AssetHandle& assetHandle);
 
     public:
         Containers::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(
-            const AssetHandle& vertexShader,
-            const AssetHandle& fragmentShader);
+            const AssetHandle& vertexShader, const AssetHandle& fragmentShader
+        );
 
     public:
         Core::Renderer::ShaderProgramID GetShaderProgram(
-            const Containers::GenerationalKey<RuntimeShaderProgramData>& key);
+            const Containers::GenerationalKey<RuntimeShaderProgramData>& key
+        );
 
     private:
         Resources::ResourceManager& m_resourceManager;
 
     private:
-        Containers::GenerationalVector<RuntimeShaderData> m_shaders;
-        Containers::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
+        std::unordered_map<AssetHandle, std::shared_ptr<ShaderAsset>> m_handleToShader;
 
     private:
-        // TODO: Why exactly is this map pointing to a genkey instead of the actual data?
-        std::unordered_map<AssetHandle, Containers::GenerationalKey<RuntimeShaderData>>
-        m_handleToShader;
-
-        std::unordered_map<std::pair<AssetHandle, AssetHandle>, Containers::GenerationalKey<
-                               RuntimeShaderProgramData>, Utilities::Hash::PairHash> m_shaderProgramCache;
+        Containers::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
+        std::unordered_map<
+            std::pair<AssetHandle, AssetHandle>, Containers::GenerationalKey<RuntimeShaderProgramData>,
+            Utilities::Hash::PairHash>
+            m_shaderProgramCache;
     };
 }

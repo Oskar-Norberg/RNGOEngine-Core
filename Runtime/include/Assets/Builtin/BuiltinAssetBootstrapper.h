@@ -18,5 +18,8 @@ namespace RNGOEngine::AssetHandling
         static void SetUpModel();
         static void SetUpTexture();
         static void SetUpMaterial();
+
+    private:
+        static AssetHandle s_errorHandles[AssetTypeCount];
     };
 }

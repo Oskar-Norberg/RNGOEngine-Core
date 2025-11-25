@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <memory>
+#include <expected>
 #include <filesystem>
 #include <span>
 
@@ -21,16 +23,25 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
+    enum class ImportingError
+    {
+        FileNotFound,
+        UnsupportedFormat,
+        MalformedFile,
+        UnknownError,
+    };
+
     class AssetImporter
     {
     public:
         virtual ~AssetImporter() = default;
 
-        // Should load be able to return failure? On malformed files? Just a bool?
-        virtual void Load(const AssetMetadata& metadata) = 0;
+        virtual std::expected<std::unique_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) = 0;
         virtual void Unload(const AssetHandle& handle) = 0;
 
-        virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(const std::filesystem::path& path) const = 0;
+        virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
+            const std::filesystem::path& path
+        ) const = 0;
 
     public:
         // TODO: This isn't really being used anywhere right now.

@@ -4,12 +4,15 @@
 
 #pragma once
 
-#include <utility>
 #include <filesystem>
+#include <utility>
+
+#include "Concepts/Concepts.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
 {
+    // TODO: AssetHandles should store Type.
     using AssetHandle = Utilities::UUID;
 
     // NOTE: To add new AssetType, add here and create corresponding Metadata struct inheriting from AssetMetadata.
@@ -34,22 +37,52 @@ namespace RNGOEngine::AssetHandling
     enum class AssetState
     {
         None,
+        Ready,
         Invalid,
-        Valid
+        Loading
+    };
+
+    class Asset
+    {
+    public:
+        explicit Asset(AssetHandle&& handle)
+            : m_handle(std::move(handle))
+        {
+        }
+
+        virtual ~Asset() = default;
+
+    public:
+        AssetType GetType() const;
+        bool IsType(AssetType type) const;
+
+        // TODO: Unsafe as all hell.
+        template<Concepts::DerivedFrom<Asset> TAsset>
+        TAsset& GetAsType()
+        {
+            return static_cast<TAsset&>(*this);
+        }
+
+        template<Concepts::DerivedFrom<Asset> TAsset>
+        const TAsset& GetAsType() const
+        {
+            return static_cast<const TAsset&>(*this);
+        }
+
+    public:
+        AssetState GetState() const;
+        bool IsReady() const;
+
+    private:
+        AssetHandle m_handle;
     };
 
     struct AssetMetadata
     {
         virtual ~AssetMetadata() = default;
-        
+
         Utilities::UUID UUID;
         std::filesystem::path Path;
-        AssetState State = AssetState::None;
         AssetType Type = AssetType::None;
-        // TODO: Would be nice to have a runtime link to the data here. But that would require a base Asset class along with a Ref counted pointer system.
-        // This means either everything has to be shared_ptrs (cache coherency be damned) or implementing a ref counting system.
     };
-
-    // TODO: For now there is no Asset base class. Assets can be whatever their corresponding Runtime Manager wants them to be.
-    // This might need to change in the future.
 }

@@ -13,62 +13,41 @@ namespace RNGOEngine::AssetHandling
         : m_resourceManager(resourceManager)
     {
     }
-    ModelCreationError ModelManager::UploadModel(
+
+    std::expected<ModelAsset, ModelCreationError> ModelManager::UploadModel(
         const AssetHandle& assetHandle, const ModelLoading::ModelData& modelHandle
     )
     {
-        auto runtimeData = UploadModelResources(modelHandle);
-        m_models.insert({assetHandle, std::move(runtimeData)});
-
-        // TODO:
-        return ModelCreationError::None;
+        ModelAsset model(UploadModelResources(modelHandle), AssetHandle(assetHandle));
+        return model;
     }
+
     void ModelManager::UnloadModel(const AssetHandle& assetHandle)
     {
         if (m_models.contains(assetHandle))
         {
             const auto& modelData = m_models.at(assetHandle);
-            UnloadModelResources(modelData);
+            UnloadModelResources(*modelData.get());
             m_models.erase(assetHandle);
         }
     }
 
-    AssetHandle ModelManager::GetInvalidModel() const
-    {
-        return m_errorModel;
-    }
-
-    const RuntimeModelData& ModelManager::GetRuntimeModelData(const AssetHandle& handle) const
-    {
-        const auto it = m_models.find(handle);
-        if (it != m_models.end())
-        {
-            return it->second;
-        }
-
-        RNGO_ASSERT(
-            m_models.contains(m_errorModel) &&
-            "ModelManager::GetRuntimeModelData - Fallback Error model not loaded!"
-        );
-        return m_models.at(m_errorModel);
-    }
-
-    RuntimeModelData ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
+    MeshCollection ModelManager::UploadModelResources(const ModelLoading::ModelData& modelData)
     {
         auto& meshResourceManager = m_resourceManager.GetMeshResourceManager();
-        
-        RuntimeModelData runtimeData;
-        runtimeData.meshKeys.reserve(modelData.meshes.size());
+
+        MeshCollection meshKeys;
+        meshKeys.reserve(modelData.meshes.size());
 
         for (const auto& meshData : modelData.meshes)
         {
-            runtimeData.meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
+            meshKeys.emplace_back(meshResourceManager.CreateMesh(meshData));
         }
 
-        return runtimeData;
+        return meshKeys;
     }
 
-    void ModelManager::UnloadModelResources(const RuntimeModelData& modelData)
+    void ModelManager::UnloadModelResources(const ModelAsset& modelData)
     {
         // TODO:
     }

@@ -13,10 +13,12 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelImporter(bool doFlipUVs);
 
-        void Load(const AssetMetadata& metadata) override;
+        std::expected<std::unique_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) override;
         void Unload(const AssetHandle& handle) override;
 
-        std::unique_ptr<AssetMetadata> CreateDefaultMetadata(const std::filesystem::path& path) const override;
+        std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
+            const std::filesystem::path& path
+        ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
 

@@ -9,15 +9,22 @@
 #include <ranges>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Annoying clang warning about initialization order. But it looks fine??
-    AssetLoader::AssetLoader(AssetDatabase& assetDatabase, AssetFetcher& assetFetcher)
-        : Singleton(this), m_assetDatabase(assetDatabase), m_assetFetcher(assetFetcher)
+    AssetLoader::AssetLoader(
+        RuntimeAssetRegistry& assetRegistry, AssetDatabase& assetDatabase, AssetFetcher& assetFetcher
+    )
+        : Singleton(this),
+          m_assetRegistry(assetRegistry),
+          m_assetDatabase(assetDatabase),
+          m_assetFetcher(assetFetcher)
+
     {
     }
 
@@ -45,14 +52,16 @@ namespace RNGOEngine::AssetHandling
             return BuiltinAssets::GetErrorHandle(type);
         }
 
+        auto& database = AssetDatabase::GetInstance();
+        auto& registry = RuntimeAssetRegistry::GetInstance();
         // Check if asset has already been loaded
-        if (AssetDatabase::GetInstance().IsRegistered(fullPath.value()))
+        if (database.IsRegistered(fullPath.value()))
         {
             const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
             auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(handle);
 
             RNGO_ASSERT(metadata.Type == type && "AssetLoader::Load - Asset type mismatch.");
-            if (metadata.State == AssetState::Valid)
+            if (registry.GetState(type, handle) == AssetState::Ready)
             {
                 return handle;
             }
@@ -81,10 +90,16 @@ namespace RNGOEngine::AssetHandling
         );
 
         metadata.Path = fullPath.value();
-        const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
+        auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        importer->Load(metadata);
-        metadata.State = AssetState::Valid;
+        auto importResult = importer->Load(metadata);
+        if (!importResult)
+        {
+            return BuiltinAssets::GetErrorHandle(type);
+        }
+
+        auto& registryEntry = m_assetRegistry.Insert(type, handle, std::move(importResult.value()));
+        registryEntry.SetState(AssetState::Ready);
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");

@@ -4,11 +4,6 @@
 
 #include "Assets/AssetManager/AssetManager.h"
 
-// TODO: TEMPORARY TEMPORARY TEMPORARY
-#include "Assets/AssetImporters/ShaderAssetImporter.h"
-#include "Renderer/IRenderer.h"
-#include "Utilities/RNGOAsserts.h"
-
 namespace RNGOEngine::AssetHandling
 {
     AssetManager::AssetManager(Resources::ResourceManager& resourceManager)

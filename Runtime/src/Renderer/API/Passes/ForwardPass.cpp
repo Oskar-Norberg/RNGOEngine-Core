@@ -7,9 +7,16 @@
 #include <format>
 #include <glm/gtc/type_ptr.hpp>
 
+// TODO: Remove when MaterialManager is less shit
 #include "Assets/AssetManager/AssetManager.h"
+#include "Assets/AssetManager/Managers/Material/Material.h"
+#include "Assets/AssetTypes/ModelAsset.h"
+#include "Assets/AssetTypes/TextureAsset.h"
+#include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
+#include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -85,16 +92,24 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::RenderOpaque(DrawQueue& queue) const
     {
+        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         const auto& camera = queue.Camera;
 
-        const auto& assetManager = AssetHandling::AssetManager::GetInstance();
-        const auto& resourceManager = Resources::ResourceManager::GetInstance();
+        // TODO: I hate the material manager so much
+        const auto& materialManager = AssetHandling::AssetManager::GetInstance().GetMaterialManager();
 
         for (const auto& opaqueDrawCall : queue.OpaqueObjects)
         {
-            const auto& materialSpecification =
-                assetManager.GetMaterialManager().GetMaterial(opaqueDrawCall.Material);
-            const auto shaderProgramID = materialSpecification.shaderProgram;
+            const auto resolvedMatOpt = materialManager.GetMaterial(opaqueDrawCall.Material);
+            const AssetHandling::ResolvedMaterial resolvedMat = resolvedMatOpt.value_or(
+                materialManager
+                    .GetMaterial(
+                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
+                    )
+                    .value()
+            );
+
+            const auto shaderProgramID = resolvedMat.shaderProgram;
 
             m_renderer.BindShaderProgram(shaderProgramID);
 
@@ -238,10 +253,10 @@ namespace RNGOEngine::Core::Renderer
                 m_renderer.SetInt(shaderProgramID, "numSpotlights", static_cast<int>(queue.SpotlightIndex));
             }
 
-            for (const auto& [name, data] : materialSpecification.uniforms)
+            for (const auto& [name, data] : resolvedMat.uniforms)
             {
                 std::visit(
-                    [this, &name, &assetManager, shaderProgramID]<typename T0>(T0&& arg)
+                    [this, &name, &runtimeRegistry, shaderProgramID]<typename T0>(T0&& arg)
                     {
                         using T = std::decay_t<T0>;
                         if constexpr (std::is_same_v<T, bool>)
@@ -276,9 +291,28 @@ namespace RNGOEngine::Core::Renderer
                         }
                         else if constexpr (std::is_same_v<T, AssetHandling::MaterialTextureSpecification>)
                         {
-                            const auto textureHandle =
-                                assetManager.GetTextureManager().GetTexture(arg.textureHandle);
-                            m_renderer.BindTexture(textureHandle, arg.slot);
+                            const auto textureAssetOpt =
+                                runtimeRegistry.TryGet<AssetHandling::TextureAsset>(arg.textureHandle);
+
+                            const auto textureAsset = textureAssetOpt.value_or(
+                                runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
+                                    AssetHandling::BuiltinAssets::GetErrorHandle(
+                                        AssetHandling::AssetType::Texture
+                                    )
+                                ).value()
+                            );
+                            const auto& textureAssetRef = textureAsset.get();
+
+                            const auto textureID = Resources::ResourceManager::GetInstance()
+                                                       .GetTextureResourceManager()
+                                                       .GetTexture(textureAssetRef.GetTextureKey());
+                            if (!textureID)
+                            {
+                                RNGO_ASSERT(false && "Invalid texture resource in RenderAPI::RenderOpaque.");
+                                return;
+                            }
+
+                            m_renderer.BindTexture(textureID.value(), arg.slot);
                             m_renderer.SetTexture(shaderProgramID, name, arg.slot);
                         }
                         else
@@ -292,11 +326,18 @@ namespace RNGOEngine::Core::Renderer
             }
 
             // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
-            auto& meshResourceManager = resourceManager.GetMeshResourceManager();
+            auto& meshResourceManager = Resources::ResourceManager::GetInstance().GetMeshResourceManager();
 
-            const auto& meshDatas =
-                assetManager.GetModelManager().GetRuntimeModelData(opaqueDrawCall.ModelHandle);
-            for (const auto& meshData : meshDatas.meshKeys)
+            const auto modelAssetOpt = runtimeRegistry.TryGet<AssetHandling::ModelAsset>(
+                opaqueDrawCall.ModelHandle
+            );
+            const auto modelAsset = modelAssetOpt.value_or(
+                runtimeRegistry.TryGet<AssetHandling::ModelAsset>(
+                    AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
+                ).value()
+            );
+
+            for (const auto& meshData : modelAsset.get().GetMeshKeys())
             {
                 const auto meshResourceOpt = meshResourceManager.GetMeshResource(meshData);
                 if (!meshResourceOpt.has_value())

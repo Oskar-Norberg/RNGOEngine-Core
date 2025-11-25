@@ -20,7 +20,7 @@ namespace RNGOEngine::AssetHandling
 
         const auto uuid = metadata->UUID;
         const auto path = metadata->Path;
-        
+
         const auto& storage = m_metadataStorages.at(type);
         const auto index = storage->Insert(std::move(metadata));
 
@@ -46,24 +46,7 @@ namespace RNGOEngine::AssetHandling
     bool AssetDatabase::IsRegistered(const AssetHandle& handle) const
     {
         const auto* metadata = GetMetadataOrNullptr(handle);
-
-        if (metadata)
-        {
-            return metadata->State != AssetState::None;
-        }
-
-        return false;
-    }
-
-    AssetState AssetDatabase::GetAssetState(const AssetHandle& handle) const
-    {
-        const auto* metadata = GetMetadataOrNullptr(handle);
-        if (metadata)
-        {
-            return metadata->State;
-        }
-
-        return AssetState::None;
+        return metadata != nullptr;
     }
 
     bool AssetDatabase::IsRegistered(const std::filesystem::path& path) const
@@ -103,7 +86,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     std::optional<std::reference_wrapper<AssetMetadata>> AssetDatabase::TryGetAssetMetadata(
-        const AssetHandle& handle)
+        const AssetHandle& handle
+    )
     {
         const auto constThis = static_cast<const AssetDatabase*>(this);
         const auto assetMetadataOpt = constThis->TryGetAssetMetadata(handle);
@@ -116,7 +100,8 @@ namespace RNGOEngine::AssetHandling
     }
 
     std::optional<std::reference_wrapper<const AssetMetadata>> AssetDatabase::TryGetAssetMetadata(
-        const AssetHandle& handle) const
+        const AssetHandle& handle
+    ) const
     {
         if (const auto* metadata = GetMetadataOrNullptr(handle); metadata != nullptr)
         {

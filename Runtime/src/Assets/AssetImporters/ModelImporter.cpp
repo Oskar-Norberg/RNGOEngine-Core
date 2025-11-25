@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    void ModelImporter::Load(const AssetMetadata& metadata)
+    std::expected<std::unique_ptr<Asset>, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
@@ -48,19 +48,20 @@ namespace RNGOEngine::AssetHandling
         
         if (!modelHandle)
         {
-            // TODO: Return expected instead of directly returning handle?
-            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
+            // TODO: More specific error types
+            return std::unexpected(ImportingError::UnknownError);
         }
 
         // Upload to GPU
-        const auto errorMessage = AssetManager::GetInstance().GetModelManager().UploadModel(
+        const auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
             typedMetadata.UUID, modelHandle.value()
         );
-        if (errorMessage != ModelCreationError::None)
+        if (!result)
         {
-            // TODO: Error handling
-            RNGO_ASSERT(false && "ModelAssetImporter::Load - Failed to Load Model");
+            return std::unexpected(ImportingError::UnknownError);
         }
+
+        return std::make_unique<ModelAsset>(result.value());
     }
 
     void ModelImporter::Unload(const AssetHandle& handle)
