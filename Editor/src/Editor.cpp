@@ -7,6 +7,7 @@
 #include "ECS/Systems/FreeFlyCameraSystem.h"
 #include "Logging/VectorSink.h"
 #include "TestScene.h"
+#include "UI/Panels/ConsolePanel.h"
 #include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/StatsPanel.h"
@@ -27,13 +28,19 @@ namespace RNGOEngine::Editor
         // Set up Editor Systems
         m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
 
-        RNGO_LOG(Core::LogLevel::Info, "Editor initialized");
+        RNGO_LOG(Core::LogLevel::Info, "Sample Info Text");
+        RNGO_LOG(Core::LogLevel::Warning, "Sample Warning Text");
+        RNGO_LOG(Core::LogLevel::Error, "Sample Error Text");
+        RNGO_LOG(Core::LogLevel::Critical, "Sample Critical Text");
+        RNGO_LOG(Core::LogLevel::Debug, "Sample Debug Text");
+
 
         // Set up UI Panels
         m_UIManager.RegisterPanel<StatsPanel>();
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
         m_UIManager.RegisterPanel<HierarchyPanel>();
         m_UIManager.RegisterPanel<DetailsPanel>();
+        m_UIManager.RegisterPanel<ConsolePanel>();
 
         SetUpUIContext();
         SetUpEditorContext();

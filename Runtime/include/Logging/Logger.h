@@ -15,7 +15,50 @@ namespace RNGOEngine::Core
         Info,
         Warning,
         Error,
-        Critical
+        Critical,
+        Debug
+    };
+
+    constexpr LogLevel SPDLogLevelToRNGOLevel(spdlog::level::level_enum level)
+    {
+        switch (level)
+        {
+            case spdlog::level::debug:
+                return LogLevel::Debug;
+            case spdlog::level::warn:
+                return LogLevel::Warning;
+            case spdlog::level::err:
+                return LogLevel::Error;
+            case spdlog::level::critical:
+                return LogLevel::Critical;
+            case spdlog::level::info:
+            default:
+                return LogLevel::Info;
+        }
+    }
+
+    constexpr spdlog::level::level_enum RNGOLevelToSPDLogLevel(LogLevel level)
+    {
+        switch (level)
+        {
+            case LogLevel::Debug:
+                return spdlog::level::debug;
+            case LogLevel::Warning:
+                return spdlog::level::warn;
+            case LogLevel::Error:
+                return spdlog::level::err;
+            case LogLevel::Critical:
+                return spdlog::level::critical;
+            case LogLevel::Info:
+            default:
+                return spdlog::level::info;
+        }
+    }
+
+    struct LogEntry
+    {
+        LogLevel Level;
+        std::string Message;
     };
 
     class Logger : public Utilities::Singleton<Logger>
