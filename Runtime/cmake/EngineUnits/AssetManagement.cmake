@@ -103,7 +103,7 @@ target_link_libraries(${ASSET_MANAGER_PROJECT_NAME} PUBLIC ${PROFILING_PROJECT_N
 
 
 # Define engine root path for assets.
-set(ENGINE_ASSETS_DIR "${CMAKE_CURRENT_BINARY_DIR}/assets")
+set(ENGINE_ASSETS_DIR "assets")
 set(ENGINE_SHADERS_DIR "${ENGINE_ASSETS_DIR}/shaders")
 set(ENGINE_SHADER_INCLUDE_DIR "${ENGINE_SHADERS_DIR}/include")
 set(ENGINE_MODELS_DIR "${ENGINE_ASSETS_DIR}/models")

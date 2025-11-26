@@ -82,10 +82,15 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${RENDER_API_PROJECT_NAME}
 )
 
+# TODO: Get help with the asset copying mess.
 # Include assets in build.
 set(COPY_PROJECT_NAME RNGOEngine_Core-Assets)
+get_filename_component(RUNTIME_BINARY_PARENT "${CMAKE_CURRENT_BINARY_DIR}" DIRECTORY)
+
 add_custom_target(${COPY_PROJECT_NAME}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_LIST_DIR}/assets
+        ${RUNTIME_BINARY_PARENT}/assets
 )
 
 add_dependencies(${CORE_PROJECT_NAME} ${COPY_PROJECT_NAME})

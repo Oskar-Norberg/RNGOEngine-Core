@@ -24,6 +24,10 @@ namespace RNGOEngine
             m_vectorSink = std::make_shared<Core::VectorSink>();
             m_logger.AttachSink(m_vectorSink.value());
         }
+
+#ifdef RNGOENGINE_TRACY_ENABLE
+        RNGO_LOG(Core::LogLevel::Info, "Profiling with Tracy enabled.");
+#endif
         
         bool doFlipTexturesVertically = false;
 
