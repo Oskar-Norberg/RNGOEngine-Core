@@ -1,5 +1,5 @@
 ﻿if (RNGOENGINE_TRACY_ENABLE)
-    CPMAddPackage("gh:wolfpld/tracy@0.12.2")
+    add_subdirectory(./vendor/tracy)
 endif ()
 CPMAddPackage("gh:skypjack/entt@3.15.0")
 
