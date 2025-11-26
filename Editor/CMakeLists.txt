@@ -1,9 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 23)
 
-# I don't like this. Can this be set from CLion/cli?
-set(RNGOENGINE_TRACY_ENABLE ON CACHE BOOL FORCE "Enable Tracy profiler")
-
 set(EDITOR_PROJECT_NAME RNGOEngine_Editor)
 project(${EDITOR_PROJECT_NAME})
 

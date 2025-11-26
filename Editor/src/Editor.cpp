@@ -22,7 +22,7 @@ namespace RNGOEngine::Editor
     {
         // Attach Editor only VectorSink
         m_logger.AttachSink(m_vectorSink);
-        
+
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
         // Set up Editor Systems
@@ -42,7 +42,7 @@ namespace RNGOEngine::Editor
     void Editor::OnUpdate(const float deltaTime)
     {
         RNGO_ZONE_SCOPED_N("Editor::OnUpdate");
-        
+
         Application::OnUpdate(deltaTime);
         UpdateEditorSystems(deltaTime);
 
@@ -55,7 +55,7 @@ namespace RNGOEngine::Editor
     void Editor::OnRender()
     {
         RNGO_ZONE_SCOPED_N("Editor::OnRender");
-        
+
         Application::OnRender();
 
         m_UIManager.BeginFrame();
