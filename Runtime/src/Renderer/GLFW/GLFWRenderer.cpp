@@ -420,6 +420,7 @@ namespace RNGOEngine::Core::Renderer
                 return GL_LINEAR_MIPMAP_LINEAR;
             default:
                 RNGO_ASSERT(false && "GLFWRenderer::GetGLTextureFiltering - Unsupported TextureFiltering");
+                // TODO: UB if assert disabled.
         }
     }
 

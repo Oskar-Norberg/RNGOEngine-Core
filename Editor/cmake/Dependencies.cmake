@@ -1,3 +1,2 @@
-﻿include(cmake/Dependencies/imgui.cmake)
-
+﻿add_subdirectory(./vendor/imgui)
 add_subdirectory(./vendor/imguizmo)
