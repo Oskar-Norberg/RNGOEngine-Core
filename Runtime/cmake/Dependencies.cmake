@@ -5,17 +5,12 @@
         OPTIONS "GLFW_BUILD_DOCS OFF" "GLFW_BUILD_TESTS OFF" "GLFW_BUILD_EXAMPLES OFF" "BUILD_SHARED_LIBS OFF"
 )
 
-CPMAddPackage(
-        NAME glm
-        GITHUB_REPOSITORY g-truc/glm
-        GIT_TAG 1.0.1
-)
-
 if (RNGOENGINE_TRACY_ENABLE)
     CPMAddPackage("gh:wolfpld/tracy@0.12.2")
 endif ()
 CPMAddPackage("gh:skypjack/entt@3.15.0")
 
+add_subdirectory(./vendor/glm)
 add_subdirectory(./vendor/glad)
 add_subdirectory(./vendor/stb_image)
 add_subdirectory(./vendor/yaml-cpp)
