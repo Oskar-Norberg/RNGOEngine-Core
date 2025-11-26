@@ -21,23 +21,10 @@ else()
   set(IS_TOPLEVEL_PROJECT FALSE)
 endif()
 
-option(MAGIC_ENUM_OPT_BUILD_EXAMPLES "Build magic_enum examples" ${IS_TOPLEVEL_PROJECT})
-option(MAGIC_ENUM_OPT_BUILD_TESTS "Build and perform magic_enum tests" ${IS_TOPLEVEL_PROJECT})
 option(MAGIC_ENUM_OPT_INSTALL "Generate and install magic_enum target" ${IS_TOPLEVEL_PROJECT})
 option(MAGIC_ENUM_OPT_INSTALL_PACKAGE_XML "Include package.xml when installing"
        ${MAGIC_ENUM_OPT_INSTALL}
 )
-option(MAGIC_ENUM_OPT_TEST_INSTALLED_VERSION "When configuring tests, try use
-a local magic_enum." NO
-)
-option(MAGIC_ENUM_OPT_TEST_INSTALLED_VERSION_PKGCONFIG "When configuring tests, try use
-a local magic_enum via pkgconfig" NO
-)
-
-if(${MAGIC_ENUM_OPT_TEST_INSTALLED_VERSION} OR ${MAGIC_ENUM_OPT_TEST_INSTALLED_VERSION_PKGCONFIG})
-  add_subdirectory(test)
-  return()
-endif()
 
 set(INCLUDES "${CMAKE_CURRENT_SOURCE_DIR}/include/magic_enum")
 set(EXPORT_NAMESPACE "${PROJECT_NAME}::")
@@ -48,15 +35,6 @@ target_include_directories(
   ${PROJECT_NAME} INTERFACE $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-
-if(MAGIC_ENUM_OPT_BUILD_EXAMPLES)
-  add_subdirectory(example)
-endif()
-
-if(MAGIC_ENUM_OPT_BUILD_TESTS)
-  enable_testing()
-  add_subdirectory(test)
-endif()
 
 if(MAGIC_ENUM_OPT_INSTALL)
   list(APPEND CMAKE_MODULE_PATH "${ADDITIONAL_MODULES_DIR}/GenPkgConfig")
