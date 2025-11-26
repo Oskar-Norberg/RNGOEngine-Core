@@ -1,12 +1,11 @@
 ﻿if (RNGOENGINE_TRACY_ENABLE)
     add_subdirectory(./vendor/tracy)
 endif ()
-CPMAddPackage("gh:skypjack/entt@3.15.0")
 
 # GLFW
 ## GLFW Build Properties
 add_subdirectory(./vendor/glfw)
-
+add_subdirectory(./vendor/entt)
 add_subdirectory(./vendor/glm)
 add_subdirectory(./vendor/glad)
 add_subdirectory(./vendor/stb_image)
