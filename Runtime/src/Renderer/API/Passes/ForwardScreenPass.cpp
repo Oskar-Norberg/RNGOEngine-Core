@@ -6,8 +6,9 @@
 
 #include "Assets/AssetLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
-#include "Renderer/IRenderer.h"
+#include "Profiling/Profiling.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
+#include "Renderer/IRenderer.h"
 
 namespace RNGOEngine::Core::Renderer
 {
@@ -64,8 +65,9 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardScreenPass::Execute(RenderContext& context)
     {
-        m_renderer.DisableFeature(DepthTesting);
+        RNGO_ZONE_SCOPED_N("ForwardPass::Execute");
         
+        m_renderer.DisableFeature(DepthTesting);
         const auto forwardColor = context.renderPassResources.GetTextureID("ForwardOutput");
         const auto& screenFrameBufferID = context.renderPassResources.GetFrameBufferID("Final Output");
 

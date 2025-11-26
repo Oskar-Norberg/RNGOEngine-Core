@@ -16,8 +16,7 @@ namespace RNGOEngine::Systems::Core
 {
     void RenderSystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
     {
-        RNGO_ZONE_SCOPE;
-        RNGO_ZONE_NAME_C("RenderSystem::Update");
+        RNGO_ZONE_SCOPED_N("RenderSystem::Update");
         
         EngineSystem::Update(world, context);
 

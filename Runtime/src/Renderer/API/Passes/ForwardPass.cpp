@@ -14,6 +14,7 @@
 #include "Assets/AssetTypes/TextureAsset.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
+#include "Profiling/Profiling.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
 #include "ResourceManager/ResourceManager.h"
@@ -65,6 +66,7 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::Execute(RenderContext& context)
     {
+        RNGO_ZONE_SCOPED_N("ForwardPass::Execute");
         m_renderer.EnableFeature(DepthTesting);
 
         const auto frameBufferID = context.renderPassResources.GetFrameBufferID("Forward Pass");

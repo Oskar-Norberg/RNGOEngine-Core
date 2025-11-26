@@ -109,6 +109,12 @@ namespace RNGOEngine
 
         // Internals
     private:
+        void SwitchPendingScene();
+
+    private:
+        void SwapBuffers();
+        
+    private:
         void PollWindowEvents();
         void PollGameEvents();
         void PollEngineEvents();

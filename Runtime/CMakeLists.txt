@@ -3,10 +3,8 @@ set(CMAKE_CXX_STANDARD 23)
 set(CORE_PROJECT_NAME RNGOEngine_Core)
 project(${CORE_PROJECT_NAME})
 
+# Options
 option(RNGOENGINE_TRACY_ENABLE "Enable Tracy profiler" OFF)
-if (RNGOENGINE_TRACY_ENABLE)
-    add_compile_definitions(RNGOENGINE_TRACY_ENABLE)
-endif ()
 option(RNGOENGINE_UNITY_BUILD "Enable Unity builds" OFF)
 
 # Build Preferences
@@ -58,14 +56,14 @@ target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
 
 target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${DATA_PROJECT_NAME}
-        
+
         ${PROFILING_PROJECT_NAME}
-        
+
         ${CONCEPTS_PROJECT_NAME}
         ${MATH_PROJECT_NAME}
         ${UTILITIES_PROJECT_NAME}
         ${LOGGING_PROJECT_NAME}
-        
+
         ${CONTAINERS_PROJECT_NAME}
         ${EVENTS_PROJECT_NAME}
         ${INPUT_MANAGER_PROJECT_NAME}
@@ -74,14 +72,14 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
 
         ${WINDOWING_PROJECT_NAME}
         ${RENDERING_PROJECT_NAME}
-        
+
         ${RESOURCE_MANAGEMENT_PROJECT_NAME}
         ${ASSET_MANAGER_PROJECT_NAME}
 
         ${SCENE_PROJECT_NAME}
         ${SYSTEM_PROJECT_NAME}
         ${COMPONENT_PROJECT_NAME}
-        
+
         ${RENDER_API_PROJECT_NAME}
 )
 

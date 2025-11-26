@@ -39,6 +39,8 @@ namespace RNGOEngine::Editor
 
     void UIManager::BeginFrame()
     {
+        RNGO_ZONE_SCOPED_N("UIManager::BeginFrame");
+
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -48,22 +50,26 @@ namespace RNGOEngine::Editor
     }
     void UIManager::Render(UIContext& context)
     {
+        RNGO_ZONE_SCOPED_N("UIManager::Render");
+
         for (const auto& panel : m_panels)
         {
+            // TODO: Technically UB because string_view is not guaranteed to be null terminated.
             ImGui::Begin(panel->GetPanelName().data());
 
-            {
-                const bool hovered = ImGui::IsWindowHovered();
-                panel->SetTargetHovered(context, hovered);
-            }
+            const bool hovered = ImGui::IsWindowHovered();
+            panel->SetTargetHovered(context, hovered);
 
             panel->Render(context);
+
             ImGui::End();
         }
     }
 
     void UIManager::EndFrame()
     {
+        RNGO_ZONE_SCOPED_N("UIManager::EndFrame");
+
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }

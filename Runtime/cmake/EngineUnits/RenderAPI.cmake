@@ -17,7 +17,6 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
         include/Renderer/API/Passes/ForwardScreenPass.h
         src/Renderer/API/Passes/ForwardScreenPass.cpp
 
-
         include/Systems/Core/RenderSystem.h
         src/Systems/Core/RenderSystem.cpp
 )

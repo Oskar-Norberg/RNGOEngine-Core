@@ -41,6 +41,8 @@ namespace RNGOEngine::Editor
 
     void Editor::OnUpdate(const float deltaTime)
     {
+        RNGO_ZONE_SCOPED_N("Editor::OnUpdate");
+        
         Application::OnUpdate(deltaTime);
         UpdateEditorSystems(deltaTime);
 
@@ -52,13 +54,13 @@ namespace RNGOEngine::Editor
 
     void Editor::OnRender()
     {
+        RNGO_ZONE_SCOPED_N("Editor::OnRender");
+        
         Application::OnRender();
 
         m_UIManager.BeginFrame();
         m_UIManager.Render(m_uiContext);
         m_UIManager.EndFrame();
-
-        m_window->SwapBuffers();
     }
 
     void Editor::UpdateEngineSystems(float deltaTime)

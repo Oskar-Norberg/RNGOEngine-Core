@@ -19,8 +19,7 @@ namespace RNGOEngine::Events
         template<typename T>
         void PushEventMultiple(std::vector<T>& event)
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("EventQueue::PushEventBulk");
+            RNGO_ZONE_SCOPED_N("EventQueue::PushEventMultiple");
 
             const auto typeIndex = std::type_index(typeid(T));
             auto& eventList = m_currentEvents[typeIndex];
@@ -35,8 +34,7 @@ namespace RNGOEngine::Events
         template<typename T>
         void PushEvent(T&& event)
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("EventQueue::PushEvent");
+            RNGO_ZONE_SCOPED_N("EventQueue::PushEvent");
 
             const auto typeIndex = std::type_index(typeid(T));
             m_currentEvents[typeIndex].emplace_back(std::move(event));
@@ -45,8 +43,7 @@ namespace RNGOEngine::Events
         template<typename T, typename... Args>
         void EmplaceEvent(Args&&... args)
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("EventQueue::EmplaceEvent");
+            RNGO_ZONE_SCOPED_N("EventQueue::EmplaceEvent");
 
             const auto typeIndex = std::type_index(typeid(T));
             m_currentEvents[typeIndex].emplace_back(T(std::forward<Args>(args)...));
@@ -57,8 +54,7 @@ namespace RNGOEngine::Events
         // Implement custom iterator that can automatically cast the events to the correct type.
         std::vector<T> GetEvents() const
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("EventQueue::GetEvents");
+            RNGO_ZONE_SCOPED_N("EventQueue::GetEvents");
 
             std::vector<T> events;
             const auto typeIndex = std::type_index(typeid(T));
@@ -78,8 +74,7 @@ namespace RNGOEngine::Events
 
         void Clear()
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("EventQueue::GetEvents");
+            RNGO_ZONE_SCOPED_N("EventQueue::Clear");
 
             m_currentEvents.clear();
         }

@@ -102,26 +102,27 @@ namespace RNGOEngine
         auto lastFrame = std::chrono::high_resolution_clock::now();
         while (m_isRunning)
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("Engine::Run - Main Loop");
+            RNGO_ZONE_SCOPED_N("Application::Run");
 
             const float deltaTime =
                 std::chrono::duration<float>(std::chrono::high_resolution_clock::now() - lastFrame).count();
             lastFrame = std::chrono::high_resolution_clock::now();
 
-            m_sceneManager.SwitchToPendingScene();
-            RNGO_ASSERT(m_sceneManager.GetCurrentScene() && "No scene loaded.");
+            SwitchPendingScene();
 
             PollWindowEvents();
 
             OnUpdate(deltaTime);
             OnRender();
+            SwapBuffers();
 
             PollGameEvents();
             PollEngineEvents();
             ClearEvents();
 
             ++m_frameCount;
+
+            RNGO_FRAME_MARK;
         }
     }
 
@@ -133,8 +134,25 @@ namespace RNGOEngine
     {
     }
 
+    void Application::SwitchPendingScene()
+    {
+        RNGO_ZONE_SCOPED_N("Application::SwitchPendingScene");
+
+        m_sceneManager.SwitchToPendingScene();
+        RNGO_ASSERT(m_sceneManager.GetCurrentScene() && "No scene loaded.");
+    }
+
+    void Application::SwapBuffers()
+    {
+        RNGO_ZONE_SCOPED_N("Application::SwapBuffers");
+
+        m_window->SwapBuffers();
+    }
+
     void Application::PollWindowEvents()
     {
+        RNGO_ZONE_SCOPED_N("Application::PollWindowEvents");
+
         m_window->PollWindowEvents(m_eventQueue);
         m_window->PollKeyboardEvents(m_eventQueue);
         m_window->PollMouseEvents(m_eventQueue);
@@ -154,12 +172,16 @@ namespace RNGOEngine
     // TODO: Very hyperspecific function. Just have a pre-update poll and post-update poll
     void Application::PollGameEvents()
     {
+        RNGO_ZONE_SCOPED_N("Application::PollGameEvents");
+
         m_inputManager.GetPendingChanges(m_eventQueue);
         m_window->PollGameEvents(m_eventQueue);
     }
 
     void Application::PollEngineEvents()
     {
+        RNGO_ZONE_SCOPED_N("Application::PollEngineEvents");
+
         if (!m_eventQueue.GetEvents<Events::ExitEvent>().empty())
         {
             m_isRunning = false;
@@ -168,6 +190,8 @@ namespace RNGOEngine
 
     void Application::ClearEvents()
     {
+        RNGO_ZONE_SCOPED_N("Application::ClearEvents");
+
         m_eventQueue.Clear();
     }
 

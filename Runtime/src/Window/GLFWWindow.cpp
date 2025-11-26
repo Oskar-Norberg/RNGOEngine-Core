@@ -2,9 +2,10 @@
 // Created by Oskar.Norberg on 2025-08-25.
 //
 
+#include "Window/GLFW/GLFWWindow.h"
+
 #include <GLFW/glfw3.h>
 
-#include "Window/GLFW/GLFWWindow.h"
 #include "EventQueue/EngineEvents/EngineEvents.h"
 #include "Utilities/RNGOAsserts.h"
 
@@ -33,54 +34,66 @@ namespace RNGOEngine::Core::Window
         glfwMakeContextCurrent(m_window);
         glfwSetWindowUserPointer(m_window, this);
 
-        glfwSetFramebufferSizeCallback(m_window, [](GLFWwindow* glfwWindow, int width, int height)
-        {
-            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+        glfwSetFramebufferSizeCallback(
+            m_window,
+            [](GLFWwindow* glfwWindow, int width, int height)
             {
-                static_cast<GLFWWindow*>(userPtr)->WindowSizeCallback(width, height);
+                if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+                {
+                    static_cast<GLFWWindow*>(userPtr)->WindowSizeCallback(width, height);
+                }
+                else
+                {
+                    RNGO_ASSERT(false && "GLFW window user pointer is null.");
+                }
             }
-            else
-            {
-                RNGO_ASSERT(false && "GLFW window user pointer is null.");
-            }
-        });
+        );
 
-        glfwSetKeyCallback(m_window, [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
-        {
-            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+        glfwSetKeyCallback(
+            m_window,
+            [](GLFWwindow* glfwWindow, int key, int scancode, int action, int mods)
             {
-                static_cast<GLFWWindow*>(userPtr)->KeyEventCallback(key, scancode, action, mods);
+                if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+                {
+                    static_cast<GLFWWindow*>(userPtr)->KeyEventCallback(key, scancode, action, mods);
+                }
+                else
+                {
+                    RNGO_ASSERT(false && "GLFW window user pointer is null.");
+                }
             }
-            else
-            {
-                RNGO_ASSERT(false && "GLFW window user pointer is null.");
-            }
-        });
+        );
 
-        glfwSetCursorPosCallback(m_window, [](GLFWwindow* glfwWindow, double x, double y)
-        {
-            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+        glfwSetCursorPosCallback(
+            m_window,
+            [](GLFWwindow* glfwWindow, double x, double y)
             {
-                static_cast<GLFWWindow*>(userPtr)->MouseMoveCallback(x, y);
+                if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+                {
+                    static_cast<GLFWWindow*>(userPtr)->MouseMoveCallback(x, y);
+                }
+                else
+                {
+                    RNGO_ASSERT(false && "GLFW window user pointer is null.");
+                }
             }
-            else
-            {
-                RNGO_ASSERT(false && "GLFW window user pointer is null.");
-            }
-        });
+        );
 
-        glfwSetMouseButtonCallback(m_window, [](GLFWwindow* glfwWindow, int button, int action, int mods)
-        {
-            if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+        glfwSetMouseButtonCallback(
+            m_window,
+            [](GLFWwindow* glfwWindow, int button, int action, int mods)
             {
-                static_cast<GLFWWindow*>(userPtr)->MouseButtonCallback(button, action, mods);
+                if (auto* userPtr = glfwGetWindowUserPointer(glfwWindow))
+                {
+                    static_cast<GLFWWindow*>(userPtr)->MouseButtonCallback(button, action, mods);
+                }
+                else
+                {
+                    RNGO_ASSERT(false && "GLFW window user pointer is null.");
+                }
             }
-            else
-            {
-                RNGO_ASSERT(false && "GLFW window user pointer is null.");
-            }
-        });
-        
+        );
+
         glfwSwapInterval(0);
     }
 
@@ -156,15 +169,15 @@ namespace RNGOEngine::Core::Window
                 case Data::Mouse::MouseMode::Normal:
                     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
                     break;
-                    
+
                 case Data::Mouse::MouseMode::Hidden:
                     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
                     break;
-                    
+
                 case Data::Mouse::MouseMode::Locked:
                     glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
                     break;
-                    
+
                 default:
                     break;
             }
@@ -184,10 +197,10 @@ namespace RNGOEngine::Core::Window
         {
             return;
         }
-        
-        m_keyEvents.emplace_back(key, action == GLFW_PRESS
-                                          ? Events::ButtonAction::Press
-                                          : Events::ButtonAction::Release);
+
+        m_keyEvents.emplace_back(
+            key, action == GLFW_PRESS ? Events::ButtonAction::Press : Events::ButtonAction::Release
+        );
     }
 
     void GLFWWindow::MouseMoveCallback(double x, double y)
@@ -208,9 +221,9 @@ namespace RNGOEngine::Core::Window
         {
             return;
         }
-        
-        m_mouseButtonEvents.emplace_back(button, action == GLFW_PRESS
-                                                     ? Events::ButtonAction::Press
-                                                     : Events::ButtonAction::Release);
+
+        m_mouseButtonEvents.emplace_back(
+            button, action == GLFW_PRESS ? Events::ButtonAction::Press : Events::ButtonAction::Release
+        );
     }
 }
