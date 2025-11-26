@@ -12,7 +12,6 @@ include(cmake/EnableCCache.cmake)
 include(cmake/UnityBuild.cmake)
 
 # Dependencies
-include(cmake/CPM.cmake)
 include(cmake/Dependencies.cmake)
 
 # Engine Units

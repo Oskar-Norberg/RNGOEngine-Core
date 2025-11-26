@@ -96,6 +96,7 @@ namespace RNGOEngine::Resources
                 );
             default:
                 RNGO_ASSERT(false && "GetDesiredAttachmentSize - Unsupported AttachmentSizeType");
+                // TODO: UB if assert disabled.
         }
     }
 }

@@ -62,6 +62,7 @@ namespace RNGOEngine::AssetHandling
                 // TODO: Going to UB land if assert is disabled.
                 break;
         }
+        // TODO: Going to UB land if assert is disabled.
     }
 
     void RuntimeAssetRegistry::Remove(AssetType type, AssetHandle handle)
