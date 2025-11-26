@@ -26,9 +26,6 @@ namespace RNGOEngine::Editor
         UIManager m_UIManager;
 
     private:
-        std::shared_ptr<Core::VectorSink> m_vectorSink;
-
-    private:
         EditorSystemContext m_editorSystemContext;
         UISelectionManager m_selectionManager;
         Systems::SystemScheduler<EditorSystemContext> m_editorSystems;

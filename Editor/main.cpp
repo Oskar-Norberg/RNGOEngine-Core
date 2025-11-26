@@ -20,7 +20,8 @@ int main()
         1280,
         720,
         "The Renderer",
-        assetPaths
+        assetPaths,
+        true
     };
 
     RNGOEngine::Editor::Editor editor(config);

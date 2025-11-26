@@ -19,6 +19,12 @@ namespace RNGOEngine
 {
     Application::Application(const EngineConfig& config)
     {
+        if (config.LogToVectorSink)
+        {
+            m_vectorSink = std::make_shared<Core::VectorSink>();
+            m_logger.AttachSink(m_vectorSink.value());
+        }
+        
         bool doFlipTexturesVertically = false;
 
         // Set Up Renderer

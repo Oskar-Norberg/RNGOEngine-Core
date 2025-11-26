@@ -12,6 +12,7 @@
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "InputManager/InputManager.h"
 #include "Logging/Logger.h"
+#include "Logging/VectorSink.h"
 #include "Renderer/API/RenderAPI.h"
 #include "Renderer/IRenderer.h"
 #include "Scene/SceneManager/SceneManager.h"
@@ -44,6 +45,7 @@ namespace RNGOEngine
         std::string_view Name = "RNGOEngine Application";
 
         std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> AssetPaths;
+        bool LogToVectorSink = false;
     };
 
     class Application
@@ -63,6 +65,7 @@ namespace RNGOEngine
         bool m_isRunning = true;
         size_t m_frameCount = 0;
 
+        std::optional<std::shared_ptr<Core::VectorSink>> m_vectorSink;
         Core::Logger m_logger;
 
         std::unique_ptr<Core::Window::IWindow> m_window;

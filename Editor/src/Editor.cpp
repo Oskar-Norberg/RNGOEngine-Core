@@ -16,13 +16,8 @@
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config),
-          m_UIManager(*m_window, m_sceneManager),
-          m_vectorSink(std::make_shared<Core::VectorSink>())
+        : Application(config), m_UIManager(*m_window, m_sceneManager)
     {
-        // Attach Editor only VectorSink
-        m_logger.AttachSink(m_vectorSink);
-
         m_sceneManager.LoadScene<Temporary::TestScene>();
 
         // Set up Editor Systems
@@ -84,7 +79,7 @@ namespace RNGOEngine::Editor
     void Editor::SetUpUIContext()
     {
         // Set up UIContext
-        m_uiContext.loggerSink = m_vectorSink.get();
+        m_uiContext.loggerSink = m_vectorSink.value().get();
         m_uiContext.selectionManager = &m_selectionManager;
         m_uiContext.sceneManager = &m_sceneManager;
         m_uiContext.rendererAPI = m_rendererAPI.get();
