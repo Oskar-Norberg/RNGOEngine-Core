@@ -13,32 +13,23 @@ namespace RNGOEngine::Utilities
     public:
         virtual ~Runnable() = default;
 
+        // API (Non-Blocking)
+    public:
+        void Start();
+        void Execute();
+        void Stop();
+
+        // API (Blocking)
+    public:
+        void Run();
+
+        // Implementation
+    protected:
         virtual void Initialize(){}
-        virtual void Shutdown(){}
         virtual void Step() = 0;
+        virtual void Shutdown(){}
 
-    public:
-        void Run()
-        {
-            m_isRunning = true;
-
-            Initialize();
-
-            while (m_isRunning)
-            {
-                Step();
-            }
-
-            Shutdown();
-        }
-
-    public:
-        void Stop()
-        {
-            m_isRunning = false;
-        }
-
-    private:
+    protected:
         std::atomic<bool> m_isRunning{false};
     };
 }

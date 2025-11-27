@@ -11,6 +11,7 @@ add_library(${JOBS_PROJECT_NAME} STATIC
         include/Utilities/JobSystem/Handle/JobHandle.tpp
         
         include/Utilities/Threading/Runnable.h
+        src/Utilities/Threading/Runnable.cpp
 )
 target_include_directories(${JOBS_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${JOBS_PROJECT_NAME} PUBLIC 

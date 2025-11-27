@@ -36,6 +36,12 @@ namespace RNGOEngine
         Deferred,
     };
 
+    enum class ThreadingPolicy 
+    {
+        SingleThreaded,
+        MultiThreaded,
+    };
+
     struct EngineConfig
     {
         RenderType RenderType = RenderType::Headless;
@@ -43,6 +49,7 @@ namespace RNGOEngine
         size_t Width = 800;
         size_t Height = 600;
         std::string_view Name = "RNGOEngine Application";
+        ThreadingPolicy threadingPolicy = ThreadingPolicy::MultiThreaded;
 
         std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> AssetPaths;
         bool LogToVectorSink = false;
