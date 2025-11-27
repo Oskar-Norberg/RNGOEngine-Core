@@ -15,13 +15,13 @@ int main()
         {EDITOR_MODELS_DIR, Model}
     };
 
-    constexpr RNGOEngine::EngineConfig config{
-        RNGOEngine::RenderType::GLFW_OpenGL,
-        RNGOEngine::Pipeline::Forward,
+    constexpr RNGOEngine::Data::EngineConfig config{
+        RNGOEngine::Data::RenderType::GLFW_OpenGL,
+        RNGOEngine::Data::Pipeline::Forward,
         1280,
         720,
         "The Renderer",
-        RNGOEngine::ThreadingPolicy::MultiThreaded,
+        RNGOEngine::Data::ThreadingPolicy::MultiThreaded,
         assetPaths,
         true
     };

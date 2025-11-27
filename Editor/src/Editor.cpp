@@ -15,7 +15,7 @@
 
 namespace RNGOEngine::Editor
 {
-    Editor::Editor(const EngineConfig& config)
+    Editor::Editor(const Data::EngineConfig& config)
         : Application(config), m_UIManager(*m_window, m_sceneManager)
     {
         m_sceneManager.LoadScene<Temporary::TestScene>();

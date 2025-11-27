@@ -17,7 +17,7 @@
 
 namespace RNGOEngine
 {
-    Application::Application(const EngineConfig& config)
+    Application::Application(const Data::EngineConfig& config)
     {
         if (config.LogToVectorSink)
         {
@@ -34,7 +34,7 @@ namespace RNGOEngine
         // Set Up Renderer
         switch (config.RenderType)
         {
-            case RenderType::GLFW_OpenGL:
+            case Data::RenderType::GLFW_OpenGL:
             {
                 m_window =
                     std::make_unique<Core::Window::GLFWWindow>(config.Width, config.Height, config.Name);
@@ -42,7 +42,7 @@ namespace RNGOEngine
                 doFlipTexturesVertically = true;
                 break;
             }
-            case RenderType::Headless:
+            case Data::RenderType::Headless:
             default:
             {
                 m_window = std::make_unique<Core::Window::NullWindow>();
@@ -74,7 +74,7 @@ namespace RNGOEngine
         m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.Width, config.Height);
         switch (config.Pipeline)
         {
-            case Pipeline::Forward:
+            case Data::Pipeline::Forward:
             {
                 m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
                     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
@@ -84,10 +84,10 @@ namespace RNGOEngine
                 );
             }
             break;
-            case Pipeline::ForwardPlus:
+            case Data::Pipeline::ForwardPlus:
                 RNGO_ASSERT(false && "Forward Plus pipeline not implemented.");
                 break;
-            case Pipeline::Deferred:
+            case Data::Pipeline::Deferred:
                 RNGO_ASSERT(false && "Deferred pipeline not implemented.");
                 break;
         }

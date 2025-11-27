@@ -15,7 +15,7 @@ namespace RNGOEngine::Editor
     class Editor : public Application
     {
     public:
-        explicit Editor(const EngineConfig& config);
+        explicit Editor(const Data::EngineConfig& config);
 
     public:
         void OnUpdate(float deltaTime) override;

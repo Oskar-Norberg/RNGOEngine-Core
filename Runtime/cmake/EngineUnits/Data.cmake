@@ -6,6 +6,8 @@ add_library(${DATA_PROJECT_NAME} INTERFACE
         include/Data/MouseModes.h
         
         include/Data/FallbackAssets.h
+        
+        include/Application/EngineConfig.h
 )
 target_include_directories(${DATA_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${DATA_PROJECT_NAME} INTERFACE glm)

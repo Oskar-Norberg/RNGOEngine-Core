@@ -10,6 +10,7 @@
 #include "Assets/AssetFetcher/AssetFetcher.h"
 #include "Assets/AssetLoader.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
+#include "EngineConfig.h"
 #include "InputManager/InputManager.h"
 #include "Logging/Logger.h"
 #include "Logging/VectorSink.h"
@@ -23,42 +24,10 @@
 
 namespace RNGOEngine
 {
-    enum class RenderType
-    {
-        Headless,
-        GLFW_OpenGL,
-    };
-
-    enum class Pipeline
-    {
-        Forward,
-        ForwardPlus,
-        Deferred,
-    };
-
-    enum class ThreadingPolicy 
-    {
-        SingleThreaded,
-        MultiThreaded,
-    };
-
-    struct EngineConfig
-    {
-        RenderType RenderType = RenderType::Headless;
-        Pipeline Pipeline = Pipeline::Forward;
-        size_t Width = 800;
-        size_t Height = 600;
-        std::string_view Name = "RNGOEngine Application";
-        ThreadingPolicy threadingPolicy = ThreadingPolicy::MultiThreaded;
-
-        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> AssetPaths;
-        bool LogToVectorSink = false;
-    };
-
     class Application
     {
     public:
-        explicit Application(const EngineConfig& config);
+        explicit Application(const Data::EngineConfig& config);
         virtual ~Application();
 
     public:
