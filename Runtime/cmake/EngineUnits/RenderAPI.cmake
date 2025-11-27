@@ -19,6 +19,9 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
 
         include/Systems/Core/RenderSystem.h
         src/Systems/Core/RenderSystem.cpp
+        
+        include/Renderer/API/RenderThread.h
+        src/Renderer/API/RenderThread.cpp
 )
 target_include_directories(${RENDER_API_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RENDER_API_PROJECT_NAME} PUBLIC
