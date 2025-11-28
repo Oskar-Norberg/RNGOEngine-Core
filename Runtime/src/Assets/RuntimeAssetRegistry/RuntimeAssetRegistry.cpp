@@ -13,58 +13,6 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    AssetRegistryEntry& RuntimeAssetRegistry::Insert(
-        const AssetType type, const AssetHandle& handle, std::unique_ptr<Asset> asset
-    )
-    {
-        // TODO: it's. so. ugly.
-        switch (type)
-        {
-            case AssetType::Model:
-            {
-                using TAsset = ClassForAssetType<AssetType::Model>::Type;
-                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
-
-                const auto it = storage.emplace(
-                    AssetHandle(handle),
-                    AssetRegistryEntryT(AssetState::Invalid, std::move(*static_cast<TAsset*>(asset.get())))
-                );
-                return it.first->second;
-            }
-            break;
-            case AssetType::Texture:
-            {
-                using TAsset = ClassForAssetType<AssetType::Texture>::Type;
-                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
-                const auto it = storage.emplace(
-                    AssetHandle(handle),
-                    AssetRegistryEntryT(AssetState::Invalid, std::move(*static_cast<TAsset*>(asset.get())))
-                );
-                return it.first->second;
-            }
-            break;
-            case AssetType::Shader:
-            {
-                using TAsset = ClassForAssetType<AssetType::Shader>::Type;
-                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
-                const auto it = storage.emplace(
-                    AssetHandle(handle),
-                    AssetRegistryEntryT(AssetState::Invalid, std::move(*static_cast<TAsset*>(asset.get())))
-                );
-                return it.first->second;
-            }
-            break;
-            case AssetType::Material:
-            case AssetType::None:
-            case AssetType::Count:
-            default:
-                RNGO_ASSERT(false && "RuntimeAssetRegistry::Insert - Unsupported AssetType.");
-                // TODO: Going to UB land if assert is disabled.
-                break;
-        }
-        // TODO: Going to UB land if assert is disabled.
-    }
-
     void RuntimeAssetRegistry::Remove(AssetType type, AssetHandle handle)
     {
         switch (type)

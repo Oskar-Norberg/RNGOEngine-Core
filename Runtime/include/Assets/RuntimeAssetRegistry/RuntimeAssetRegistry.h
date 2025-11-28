@@ -56,13 +56,23 @@ namespace RNGOEngine::AssetHandling
     public:
         RuntimeAssetRegistry();
 
-        ///
-        /// @param type Asset Type
-        /// @param handle Asset Handle
-        /// @param asset Unique pointer to the asset
-        /// @return Reference to the inserted AssetRegistryEntry. State is initially set to Invalid. Set to ready when fully loaded.
-        /// 
-        AssetRegistryEntry& Insert(AssetType type, const AssetHandle& handle, std::unique_ptr<Asset> asset);
+        template<Concepts::DerivedFrom<Asset> TAsset>
+        AssetRegistryEntry& Insert(const AssetHandle& handle, TAsset&& asset)
+        {
+            // TODO: Make Static Assert Macro
+            static_assert(
+                std::is_same_v<TAsset, ModelAsset> || std::is_same_v<TAsset, TextureAsset> ||
+                    std::is_same_v<TAsset, ShaderAsset>,
+                "RuntimeAssetRegistry::Insert - Unsupported asset type."
+            );
+            auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+
+            const auto it = storage.emplace(
+                AssetHandle(handle), AssetRegistryEntryT(AssetState::Invalid, std::move(asset))
+            );
+            return it.first->second;
+        }
+
         void Remove(AssetType type, AssetHandle handle);
 
         AssetState GetState(AssetType type, const AssetHandle& handle) const;

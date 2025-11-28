@@ -65,10 +65,7 @@ namespace RNGOEngine::AssetHandling
                 return importResult.error();
             }
 
-            // TODO: Remove this ugly unique ptr garbage
-            auto& registryEntry = registry.Insert(
-                GetAssetType(), metadata.UUID, std::make_unique<TAsset>(std::move(importResult.value()))
-            );
+            auto& registryEntry = registry.Insert<TAsset>(metadata.UUID, std::move(importResult.value()));
             registryEntry.SetState(AssetState::Ready);
 
             return ImportingError::None;
