@@ -99,14 +99,11 @@ namespace RNGOEngine::AssetHandling
         metadata.Path = fullPath.value();
         auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        auto importResult = importer->Load(metadata);
-        if (!importResult)
+        const auto importResult = importer->Load(registry, metadata);
+        if (importResult != ImportingError::None)
         {
             return BuiltinAssets::GetErrorHandle(type);
         }
-
-        auto& registryEntry = m_assetRegistry.Insert(type, handle, std::move(importResult.value()));
-        registryEntry.SetState(AssetState::Ready);
 
         // Save metadata to file?
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");

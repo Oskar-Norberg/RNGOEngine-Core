@@ -16,11 +16,33 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<std::unique_ptr<Asset>, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
+    void ModelImporter::Unload(const AssetHandle& handle)
+    {
+        AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
+    }
+
+    std::unique_ptr<AssetMetadata> ModelImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
+    {
+        auto modelData = std::make_unique<ModelMetadata>();
+        modelData->Type = AssetType::Model;
+        return std::move(modelData);
+    }
+
+    std::span<const std::string_view> ModelImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {".obj", ".fbx", ".gltf"};
+
+        return supportedTypes;
+    }
+
+    std::expected<ModelAsset, ImportingError> ModelImporter::ImportAsset(const AssetMetadata& metadata)
     {
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
-        const auto extension = typedMetadata.Path.extension().string();
+        auto extension = typedMetadata.Path.extension().string();
+        std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
 
         std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> modelHandle;
 
@@ -45,7 +67,7 @@ namespace RNGOEngine::AssetHandling
 #if 1
         modelHandle = ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
 #endif
-        
+
         if (!modelHandle)
         {
             // TODO: More specific error types
@@ -61,27 +83,11 @@ namespace RNGOEngine::AssetHandling
             return std::unexpected(ImportingError::UnknownError);
         }
 
-        return std::make_unique<ModelAsset>(result.value());
+        return result.value();
     }
 
-    void ModelImporter::Unload(const AssetHandle& handle)
+    AssetType ModelImporter::GetAssetType() const
     {
-        AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
-    }
-
-    std::unique_ptr<AssetMetadata> ModelImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto modelData = std::make_unique<ModelMetadata>();
-        modelData->Type = AssetType::Model;
-        return std::move(modelData);
-    }
-
-    std::span<const std::string_view> ModelImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {".obj", ".fbx", ".gltf"};
-
-        return supportedTypes;
+        return AssetType::Model;
     }
 }

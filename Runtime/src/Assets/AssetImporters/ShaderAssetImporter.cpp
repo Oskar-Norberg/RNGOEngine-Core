@@ -10,9 +10,45 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::unique_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
-        const AssetMetadata& metadata
-    )
+    void ShaderAssetImporter::Unload(const AssetHandle& handle)
+    {
+        AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
+    }
+
+    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
+    {
+        auto shaderMetadata = std::make_unique<ShaderMetadata>();
+
+        shaderMetadata->Type = AssetType::Shader;
+
+        if (path.extension() == ".vert")
+        {
+            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
+        }
+        else if (path.extension() == ".frag")
+        {
+            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Fragment;
+        }
+        else
+        {
+            RNGO_ASSERT(
+                false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension."
+            );
+        }
+
+        return std::move(shaderMetadata);
+    }
+
+    std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {".frag", ".vert"};
+
+        return supportedTypes;
+    }
+
+    std::expected<ShaderAsset, ImportingError> ShaderAssetImporter::ImportAsset(const AssetMetadata& metadata)
     {
         auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
 
@@ -51,44 +87,11 @@ namespace RNGOEngine::AssetHandling
             }
         }
 
-        return std::make_unique<ShaderAsset>(uploadResult.value());
+        return uploadResult.value();
     }
 
-    void ShaderAssetImporter::Unload(const AssetHandle& handle)
+    AssetType ShaderAssetImporter::GetAssetType() const
     {
-        AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
-    }
-
-    std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto shaderMetadata = std::make_unique<ShaderMetadata>();
-
-        shaderMetadata->Type = AssetType::Shader;
-
-        if (path.extension() == ".vert")
-        {
-            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
-        }
-        else if (path.extension() == ".frag")
-        {
-            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Fragment;
-        }
-        else
-        {
-            RNGO_ASSERT(
-                false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension."
-            );
-        }
-
-        return std::move(shaderMetadata);
-    }
-
-    std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {".frag", ".vert"};
-
-        return supportedTypes;
+        return AssetType::Shader;
     }
 }

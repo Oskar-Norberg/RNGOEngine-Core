@@ -8,12 +8,12 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class ModelImporter : public AssetImporter
+    class ModelImporter : public TAssetImporter<ModelAsset>
     {
     public:
         explicit ModelImporter(bool doFlipUVs);
 
-        std::expected<std::unique_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) override;
+    public:
         void Unload(const AssetHandle& handle) override;
 
         std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
@@ -21,6 +21,10 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
+
+    protected:
+        std::expected<ModelAsset, ImportingError> ImportAsset(const AssetMetadata& metadata) override;
+        AssetType GetAssetType() const override;
 
     private:
         bool m_doFlipUVs;

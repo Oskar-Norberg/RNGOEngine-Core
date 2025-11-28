@@ -10,7 +10,32 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::unique_ptr<Asset>, ImportingError> TextureAssetImporter::Load(
+    void TextureAssetImporter::Unload(const AssetHandle& handle)
+    {
+        AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
+    }
+
+    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
+    {
+        auto metadata = std::make_unique<TextureMetadata>();
+        metadata->Type = AssetType::Texture;
+        return std::move(metadata);
+    }
+
+    std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {
+            ".png",
+            ".jpg",
+            ".jpeg",
+        };
+
+        return supportedTypes;
+    }
+
+    std::expected<TextureAsset, ImportingError> TextureAssetImporter::ImportAsset(
         const AssetMetadata& metadata
     )
     {
@@ -70,31 +95,11 @@ namespace RNGOEngine::AssetHandling
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
 
-        return std::make_unique<TextureAsset>(textureResult.value());
+        return textureResult.value();
     }
 
-    void TextureAssetImporter::Unload(const AssetHandle& handle)
+    AssetType TextureAssetImporter::GetAssetType() const
     {
-        AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
-    }
-
-    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto metadata = std::make_unique<TextureMetadata>();
-        metadata->Type = AssetType::Texture;
-        return std::move(metadata);
-    }
-
-    std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {
-            ".png",
-            ".jpg",
-            ".jpeg",
-        };
-
-        return supportedTypes;
+        return AssetType::Texture;
     }
 }

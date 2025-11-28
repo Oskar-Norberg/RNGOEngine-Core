@@ -5,13 +5,13 @@
 #pragma once
 
 #include "AssetImporter.h"
+#include "Assets/AssetTypes/TextureAsset.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    class TextureAssetImporter : public AssetImporter
+    class TextureAssetImporter : public TAssetImporter<TextureAsset>
     {
     public:
-        std::expected<std::unique_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) override;
         void Unload(const AssetHandle& handle) override;
 
         std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
@@ -19,5 +19,9 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
+
+    protected:
+        std::expected<TextureAsset, ImportingError> ImportAsset(const AssetMetadata& metadata) override;
+        AssetType GetAssetType() const override;
     };
 }
