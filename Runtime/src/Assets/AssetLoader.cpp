@@ -55,7 +55,10 @@ namespace RNGOEngine::AssetHandling
         const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
         if (!fullPath)
         {
-            // TODO: Log failure
+            RNGO_LOG(
+                Core::LogLevel::Error, "AssetLoader::Load - Failed to find asset of type {} at path '{}'.",
+                magic_enum::enum_name(type), searchPath.string()
+            );
             return BuiltinAssets::GetErrorHandle(type);
         }
 
@@ -102,6 +105,10 @@ namespace RNGOEngine::AssetHandling
         const auto importResult = importer->LoadFromDisk(registry, metadata);
         if (importResult != ImportingError::None)
         {
+            RNGO_LOG(
+                Core::LogLevel::Error, "Importing asset of type {} from path '{}' failed with error: {}.",
+                magic_enum::enum_name(type), fullPath.value().string(), magic_enum::enum_name(importResult)
+            );
             return BuiltinAssets::GetErrorHandle(type);
         }
 
@@ -109,6 +116,17 @@ namespace RNGOEngine::AssetHandling
         // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
 
         return handle;
+    }
+
+    void AssetLoader::LoadPendingAssets(Data::ThreadType threadType) const
+    {
+        for (const auto& [type, importer] : m_importers)
+        {
+            if (importer->GetFinalizationThreadTypes() & threadType)
+            {
+                importer->FinalizeLoad(threadType, m_assetRegistry);
+            }
+        }
     }
 
     void AssetLoader::SaveMetadataToFile(

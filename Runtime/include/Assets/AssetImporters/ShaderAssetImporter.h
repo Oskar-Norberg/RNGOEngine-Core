@@ -5,8 +5,8 @@
 #pragma once
 
 #include "AssetImporter.h"
-#include "Assets/AssetTypes/ShaderAsset.h"
 #include "Assets/AssetLoaders/ShaderLoader.h"
+#include "Utilities/Containers/TSQueue/TSQueue.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -22,8 +22,14 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
+        Data::ThreadType GetFinalizationThreadTypes() const override
+        {
+            return Data::ThreadType::Render;
+        }
 
     private:
+        // TODO:
+        // Containers::TSQueue<std::pair<ShaderMetadata, std::string>> m_shaderDataQueue;
         ShaderLoader m_shaderLoader;
     };
 }

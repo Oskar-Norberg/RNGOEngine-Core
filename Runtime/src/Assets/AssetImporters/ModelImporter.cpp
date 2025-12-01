@@ -15,12 +15,9 @@ namespace RNGOEngine::AssetHandling
         : m_doFlipUVs(doFlipUVs)
     {
     }
-    
+
     ImportingError ModelImporter::LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata)
     {
-        // Assuming single-threaded.
-        // TODO: Just do everything in LoadFromDisk for now.
-
         const auto* typedMetadata = dynamic_cast<const ModelMetadata*>(&metadata);
         if (!typedMetadata)
         {
@@ -29,7 +26,6 @@ namespace RNGOEngine::AssetHandling
         // TODO: This is shit, but it works.
         auto sharedCopy = std::make_shared<ModelMetadata>(*typedMetadata);
         auto& safeTypedMetadata = *sharedCopy;
-        
 
         auto extension = safeTypedMetadata.Path.extension().string();
         std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
@@ -64,25 +60,33 @@ namespace RNGOEngine::AssetHandling
             return ImportingError::UnknownError;
         }
 
-        // Upload to GPU
-        auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
-            safeTypedMetadata.UUID, modelHandle.value()
-        );
-        auto& asset = result.value();
-        if (!result)
-        {
-            return ImportingError::UnknownError;
-        }
+        m_modelDataQueue.Enqueue(std::make_pair(safeTypedMetadata, std::move(modelHandle.value())));
 
-        auto& entry = registry.Insert<ModelAsset>(metadata.UUID, std::move(asset));
-        entry.SetState(AssetState::Ready);
-        
         return ImportingError::None;
     }
-    
+
     ImportingError ModelImporter::FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry)
     {
-        // TODO:
+        constexpr auto NUMBER_OF_MODELS_TO_PROCESS_PER_CALL = 8;
+        // TODO: Is having a inline boolean in the for-loop cursed?
+        for (int i = 0; i < NUMBER_OF_MODELS_TO_PROCESS_PER_CALL && !m_modelDataQueue.IsEmpty(); ++i)
+        {
+            auto [modelMetadata, modelHandle] = m_modelDataQueue.Dequeue();
+
+            // Upload to GPU
+            auto result =
+                AssetManager::GetInstance().GetModelManager().UploadModel(modelMetadata.UUID, modelHandle);
+            auto& asset = result.value();
+
+            if (!result)
+            {
+                return ImportingError::UnknownError;
+            }
+
+            auto& entry = registry.Insert<ModelAsset>(modelMetadata.UUID, std::move(asset));
+            entry.SetState(AssetState::Ready);
+        }
+
         return ImportingError::None;
     }
 

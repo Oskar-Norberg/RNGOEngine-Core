@@ -30,6 +30,8 @@ namespace RNGOEngine::AssetHandling
 
         AssetHandle Load(AssetType type, const std::filesystem::path& searchPath) const;
 
+        void LoadPendingAssets(Data::ThreadType threadType) const;
+
         // Registration
     public:
         // TODO: I don't like these being separate functions, but I cannot be bothered with having a multiple variadic argument function.

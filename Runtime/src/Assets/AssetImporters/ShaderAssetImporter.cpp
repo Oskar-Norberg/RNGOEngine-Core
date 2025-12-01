@@ -38,26 +38,24 @@ namespace RNGOEngine::AssetHandling
                     return ImportingError::UnknownError;
             }
         }
-
-        // TODO: Really, really, really, unstable way to determine shader type. Works for now!
-        // const auto type = typedMetadata.Path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
-        //                                               : Core::Renderer::ShaderType::Fragment;
+        const auto& shaderString = shaderResult.value();
 
         // Upload Resources
         auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
-            safeTypedMetadata.UUID, shaderResult.value(), safeTypedMetadata.ShaderType
+            safeTypedMetadata.UUID, shaderString, safeTypedMetadata.ShaderType
         );
 
         if (!uploadResult)
         {
             switch (uploadResult.error())
             {
+                // TODO: Because we're processing multiple shaders, how should we best return errors?
                 case ShaderManagerError::None:
                     return ImportingError::UnknownError;
             }
         }
 
-        auto& entry = registry.Insert<ShaderAsset>(metadata.UUID, std::move(uploadResult.value()));
+        auto& entry = registry.Insert<ShaderAsset>(safeTypedMetadata.UUID, std::move(uploadResult.value()));
         entry.SetState(AssetState::Ready);
 
         return ImportingError::None;
@@ -67,7 +65,32 @@ namespace RNGOEngine::AssetHandling
         Data::ThreadType threadType, RuntimeAssetRegistry& registry
     )
     {
+        // TODO: For now, shaders are finalized in the load from disk.
         return ImportingError::None;
+
+        // constexpr auto NUMBER_OF_SHADERS_TO_PROCESS_PER_CALL = 8;
+        // for (int i = 0; i < NUMBER_OF_SHADERS_TO_PROCESS_PER_CALL && !m_shaderDataQueue.IsEmpty(); ++i)
+        // {
+        //     auto [shaderMetadata, shaderString] = m_shaderDataQueue.Dequeue();
+        //
+        //     // Upload Resources
+        //     auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
+        //         shaderMetadata.UUID, shaderString, shaderMetadata.ShaderType
+        //     );
+        //
+        //     if (!uploadResult)
+        //     {
+        //         switch (uploadResult.error())
+        //         {
+        //             // TODO: Because we're processing multiple shaders, how should we best return errors?
+        //             case ShaderManagerError::None:
+        //                 return ImportingError::UnknownError;
+        //         }
+        //     }
+        //
+        //     auto& entry = registry.Insert<ShaderAsset>(shaderMetadata.UUID, std::move(uploadResult.value()));
+        //     entry.SetState(AssetState::Ready);
+        // }
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)

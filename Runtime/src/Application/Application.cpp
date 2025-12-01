@@ -142,6 +142,7 @@ namespace RNGOEngine
 
     void Application::OnRender()
     {
+        m_assetLoader->LoadPendingAssets(Data::ThreadType::Render);
     }
 
     void Application::SwitchPendingScene()

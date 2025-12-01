@@ -52,33 +52,11 @@ namespace RNGOEngine::AssetHandling
                                                          ? Core::Renderer::TextureFormat::RGB
                                                          : Core::Renderer::TextureFormat::RGBA;
 
-        const Core::Renderer::Texture2DProperties properties{
-            .Format = format,
-            .MinifyingFilter = safeTypedMetadata.MinifyingFilter,
-            .MagnifyingFilter = safeTypedMetadata.MagnifyingFilter,
-            .WrappingMode = safeTypedMetadata.WrappingMode,
-        };
-        auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
-            safeTypedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
-            std::as_bytes(textureDataSpan)
-        );
+        // TODO: Weird copy to save the format. Fix later.
+        TextureMetadata textureMetadata = safeTypedMetadata;
+        textureMetadata.Format = format;
 
-        if (!textureResult)
-        {
-            switch (textureResult.error())
-            {
-                case TextureManagerError::None:
-                    break;
-                default:
-                    return ImportingError::UnknownError;
-            }
-        }
-
-        // Unload Model from RAM
-        TextureLoader::FreeTexture(textureHandle.value());
-
-        auto& entry = registry.Insert<TextureAsset>(metadata.UUID, std::move(textureResult.value()));
-        entry.SetState(AssetState::Ready);
+        m_textureQueue.Enqueue(std::make_pair(textureMetadata, std::move(textureHandle.value())));
 
         return ImportingError::None;
     }
@@ -87,6 +65,45 @@ namespace RNGOEngine::AssetHandling
         Data::ThreadType threadType, RuntimeAssetRegistry& registry
     )
     {
+        constexpr auto NUMBER_OF_TEXTURES_TO_PROCESS_PER_CALL = 8;
+        for (int i = 0; i < NUMBER_OF_TEXTURES_TO_PROCESS_PER_CALL && !m_textureQueue.IsEmpty(); ++i)
+        {
+            auto [textureMetadata, textureData] = m_textureQueue.Dequeue();
+
+            Core::Renderer::Texture2DProperties properties{
+                .Format = textureMetadata.Format,
+                .MinifyingFilter = textureMetadata.MinifyingFilter,
+                .MagnifyingFilter = textureMetadata.MagnifyingFilter,
+                .WrappingMode = textureMetadata.WrappingMode,
+            };
+
+            const auto textureDataSpan = std::as_bytes(
+                std::span(textureData.data, textureData.width * textureData.height * textureData.nrChannels)
+            );
+
+            auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
+                textureMetadata.UUID, properties, textureData.width, textureData.height,
+                std::as_bytes(textureDataSpan)
+            );
+
+            if (!textureResult)
+            {
+                switch (textureResult.error())
+                {
+                    case TextureManagerError::None:
+                        break;
+                    default:
+                        return ImportingError::UnknownError;
+                }
+            }
+
+            // Unload Model from RAM
+            TextureLoader::FreeTexture(textureData);
+
+            auto& entry = registry.Insert<TextureAsset>(textureMetadata.UUID, std::move(textureResult.value()));
+            entry.SetState(AssetState::Ready);
+        }
+
         return ImportingError::None;
     }
 

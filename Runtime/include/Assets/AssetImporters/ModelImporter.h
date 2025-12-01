@@ -5,6 +5,8 @@
 #pragma once
 
 #include "AssetImporter.h"
+#include "Assets/AssetLoaders/ModelLoaders/ModelLoaderData.h"
+#include "Utilities/Containers/TSQueue/TSQueue.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -24,6 +26,13 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
+        Data::ThreadType GetFinalizationThreadTypes() const override
+        {
+            return Data::ThreadType::Render;
+        }
+
+    private:
+        Containers::TSQueue<std::pair<ModelMetadata, ModelLoading::ModelData>> m_modelDataQueue;
 
     private:
         bool m_doFlipUVs;
