@@ -4,9 +4,18 @@
 
 #include "Assets/AssetLoaders/ShaderLoader.h"
 
+#include "Data/Shaders/ShaderSpecification.h"
+
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::string, Shaders::ShaderPreProcessingError> ShaderLoader::LoadShader(const std::filesystem::path& path) const
+    ShaderLoader::ShaderLoader()
+        : shaderPreprocessor(Data::Shader::RNGO_SHADER_DEFINITIONS)
+    {
+    }
+
+    std::expected<Shaders::ShaderParseResult, Shaders::ShaderPreProcessingError> ShaderLoader::LoadShader(
+        const std::filesystem::path& path
+    ) const
     {
         return shaderPreprocessor.Parse(path);
     }

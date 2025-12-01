@@ -21,18 +21,18 @@ namespace RNGOEngine::Temporary
             auto& assetLoader = AssetHandling::AssetLoader::GetInstance();
             auto& materialManager = assetManager.GetMaterialManager();
 
+            const auto shaderHandle = assetLoader.Load(Shader, "default.glsl");
+
             {
                 // Cirno Setup
                 const auto cirnoMesh = assetLoader.Load(Model, "cirno/cirno.obj");
                 const auto cirnoTexture = assetLoader.Load(Texture, "cirno_albedo.jpeg");
 
-                auto cirnoMaterial = assetManager.GetMaterialManager().CreateMaterial("default.vert", "default.frag");
+                auto cirnoMaterial = assetManager.GetMaterialManager().CreateMaterial(shaderHandle);
                 cirnoMaterial.SetTexture(cirnoTexture, 0);
 
                 const Components::Transform transform{
-                    .Position = glm::vec3(1.0f, -2.0f, -10.0f),
-                    .Rotation = {},
-                    .Scale = glm::vec3(1.0f)
+                    .Position = glm::vec3(1.0f, -2.0f, -10.0f), .Rotation = {}, .Scale = glm::vec3(1.0f)
                 };
 
                 auto cirnoEntity = world.CreateEntity({"Cirno"}, transform);
@@ -45,13 +45,11 @@ namespace RNGOEngine::Temporary
             {
                 const auto reimuMesh = assetLoader.Load(Model, "reimu/reim2u.obj");
                 const auto reimuTexture = assetLoader.Load(Texture, "reimu_albedo.png");
-                auto reimuMaterial = materialManager.CreateMaterial("default.vert", "default.frag");
+                auto reimuMaterial = materialManager.CreateMaterial(shaderHandle);
                 reimuMaterial.SetTexture(reimuTexture, 0);
 
                 Components::Transform transform{
-                    .Position = glm::vec3(-1.0f, -2.0f, -10.0f),
-                    .Rotation = {},
-                    .Scale = glm::vec3(1.0f)
+                    .Position = glm::vec3(-1.0f, -2.0f, -10.0f), .Rotation = {}, .Scale = glm::vec3(1.0f)
                 };
 
                 auto reimuEntity = world.CreateEntity({"Reimu"}, transform);
@@ -85,18 +83,15 @@ namespace RNGOEngine::Temporary
             // Point Light 1
             {
                 Components::Transform transform{
-                    .Position = {-2.0f, 0.5f, -8.0f},
-                    .Rotation = glm::quat{}, .Scale = {0.1f, 0.1f, 0.1f}
+                    .Position = {-2.0f, 0.5f, -8.0f}, .Rotation = glm::quat{}, .Scale = {0.1f, 0.1f, 0.1f}
                 };
-                
+
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);
 
                 const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
                 const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
-                auto lampMaterial = materialManager.CreateMaterial("default.vert", "default.frag");
+                auto lampMaterial = materialManager.CreateMaterial(shaderHandle);
                 lampMaterial.SetTexture(lampTexture, 0);
-
-
 
                 pointLight.AddComponent<Components::PointLight>();
                 pointLight.AddComponent<Components::LightFalloff>(0.5f, 0.2f, 0.007f);
@@ -117,7 +112,7 @@ namespace RNGOEngine::Temporary
 
                 const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
                 const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
-                auto lampMaterial = materialManager.CreateMaterial("default.vert", "default.frag");
+                auto lampMaterial = materialManager.CreateMaterial(shaderHandle);
                 lampMaterial.SetTexture(lampTexture, 0);
 
                 pointLight.AddComponent<Components::PointLight>();

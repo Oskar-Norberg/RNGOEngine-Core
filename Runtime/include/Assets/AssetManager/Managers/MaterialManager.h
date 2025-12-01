@@ -16,7 +16,7 @@ namespace RNGOEngine::AssetHandling
     struct RuntimeMaterial
     {
         Utilities::UUID materialUUID;
-        Containers::GenerationalKey<RuntimeShaderProgramData> shaderProgramKey;
+        ShaderProgramKey shaderProgramKey;
     };
 
     struct ResolvedMaterial
@@ -32,8 +32,7 @@ namespace RNGOEngine::AssetHandling
 
     public:
         // TODO: In the future, Materials should be created just like shaders from some sort of serialized file that stores UUIDs to shaders and a list of params.
-        Core::Renderer::MaterialHandle CreateMaterial(const std::filesystem::path& vertexShader, const std::filesystem::path& fragmentShader);
-        Core::Renderer::MaterialHandle CreateMaterial(const AssetHandle& vertexShader, const AssetHandle& fragmentShader);
+        Core::Renderer::MaterialHandle CreateMaterial(const AssetHandle& shader);
 
     public:
         std::optional<ResolvedMaterial> GetMaterial(const AssetHandle& handle) const;

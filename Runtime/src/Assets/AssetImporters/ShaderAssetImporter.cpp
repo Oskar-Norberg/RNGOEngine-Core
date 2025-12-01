@@ -38,12 +38,12 @@ namespace RNGOEngine::AssetHandling
                     return ImportingError::UnknownError;
             }
         }
-        const auto& shaderString = shaderResult.value();
+        const auto& shaderParseResult = shaderResult.value();
 
         // Upload Resources
-        auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
-            safeTypedMetadata.UUID, shaderString, safeTypedMetadata.ShaderType
-        );
+        auto& shaderManager = AssetManager::GetInstance().GetShaderManager();
+        auto uploadResult =
+            shaderManager.UploadShader(shaderParseResult.VertexShader, shaderParseResult.FragmentShader);
 
         if (!uploadResult)
         {
@@ -55,7 +55,11 @@ namespace RNGOEngine::AssetHandling
             }
         }
 
-        auto& entry = registry.Insert<ShaderAsset>(safeTypedMetadata.UUID, std::move(uploadResult.value()));
+        auto& shaderKey = uploadResult.value();
+        auto& entry = registry.Insert<ShaderAsset>(
+            safeTypedMetadata.UUID,
+            ShaderAsset(AssetHandle(safeTypedMetadata.UUID), shaderKey)
+        );
         entry.SetState(AssetState::Ready);
 
         return ImportingError::None;
@@ -95,7 +99,8 @@ namespace RNGOEngine::AssetHandling
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
     {
-        AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
+        // TODO: Get from the RuntimeRegistry and destroy the shader.
+        // AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
     }
 
     std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(
@@ -105,21 +110,6 @@ namespace RNGOEngine::AssetHandling
         auto shaderMetadata = std::make_unique<ShaderMetadata>();
 
         shaderMetadata->Type = AssetType::Shader;
-
-        if (path.extension() == ".vert")
-        {
-            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
-        }
-        else if (path.extension() == ".frag")
-        {
-            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Fragment;
-        }
-        else
-        {
-            RNGO_ASSERT(
-                false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension."
-            );
-        }
 
         return std::move(shaderMetadata);
     }

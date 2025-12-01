@@ -7,6 +7,7 @@
 #include "Assets/AssetLoader.h"
 #include "Assets/AssetTypes/MaterialAsset.h"
 #include "Renderer/Handles/MaterialHandle.h"
+#include "ResourceManager/ResourceManager.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -15,40 +16,39 @@ namespace RNGOEngine::AssetHandling
 
     {
     }
-
-    Core::Renderer::MaterialHandle MaterialManager::CreateMaterial(
-        const std::filesystem::path& vertexShader, const std::filesystem::path& fragmentShader
-    )
+    
+    Core::Renderer::MaterialHandle MaterialManager::CreateMaterial(const AssetHandle& shader)
     {
-        const auto vertexShaderHandle = AssetLoader::GetInstance().Load(AssetType::Shader, vertexShader);
-        const auto fragmentShaderHandle = AssetLoader::GetInstance().Load(AssetType::Shader, fragmentShader);
-        return CreateMaterial(vertexShaderHandle, fragmentShaderHandle);
-    }
+        RuntimeAssetRegistry& registry = RuntimeAssetRegistry::GetInstance();
 
-    Core::Renderer::MaterialHandle MaterialManager::CreateMaterial(
-        const AssetHandle& vertexShader, const AssetHandle& fragmentShader
-    )
-    {
-        // TODO: Path is currently not used.
-        const auto programID = m_shaderManager.CreateShaderProgram(vertexShader, fragmentShader);
+        const auto shaderAssetOpt = registry.TryGet<ShaderAsset>(shader);
+        if (!shaderAssetOpt)
+        {
+            RNGO_ASSERT(false && "MaterialManager::CreateMaterial - Shader asset not found in registry.");
+            // TODO: i hate the material system i hate the material system i hate the material system
+        }
+
+        auto& shaderAsset = shaderAssetOpt->get();
+        auto shaderKey = shaderAsset.GetShaderKey();
+
         const auto uuid = Utilities::UUID();
 
-        const auto runtimeMaterialData = RuntimeMaterial{.materialUUID = uuid, .shaderProgramKey = programID};
+        const auto runtimeMaterialData = RuntimeMaterial{.materialUUID = uuid, .shaderProgramKey = shaderKey};
 
         m_materials.insert({uuid, runtimeMaterialData});
 
         std::unique_ptr<MaterialMetadata> metadata = std::make_unique<MaterialMetadata>();
         metadata->UUID = uuid;
         metadata->Parameters = MaterialParameters{};
-        metadata->VertexShader = vertexShader;
-        metadata->FragmentShader = fragmentShader;
+        metadata->VertexShader = Utilities::UUID(0);
+        metadata->FragmentShader = Utilities::UUID(0);
         metadata->Type = AssetType::Material;
 
         AssetDatabase::GetInstance().RegisterAsset(AssetType::Material, std::move(metadata));
 
         return Core::Renderer::MaterialHandle(uuid, *this);
     }
-
+    
     std::optional<ResolvedMaterial> MaterialManager::GetMaterial(const AssetHandle& handle) const
     {
         const auto params = GetValidatedMaterialParameters(handle);
@@ -59,8 +59,9 @@ namespace RNGOEngine::AssetHandling
 
         const auto& [materialUUID, shaderProgramKey] = m_materials.at(handle);
 
+        auto& shaderResourceManager = Resources::ResourceManager::GetInstance().GetShaderResourceManager();
         const ResolvedMaterial mat{
-            .shaderProgram = m_shaderManager.GetShaderProgram(shaderProgramKey),
+            .shaderProgram = shaderResourceManager.GetShaderProgram(shaderProgramKey).value(),
             .uniforms = params->get().uniforms
         };
 

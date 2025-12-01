@@ -23,6 +23,6 @@ namespace RNGOEngine::Core::Renderer
         VBO m_quadVBO;
         EBO m_quadEBO;
         
-        Containers::GenerationalKey<AssetHandling::RuntimeShaderProgramData> m_screenShaderProgram;
+        AssetHandling::AssetHandle m_screenShader;
     };
 }

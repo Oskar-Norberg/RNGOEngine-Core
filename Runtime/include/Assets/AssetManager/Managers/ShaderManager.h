@@ -6,10 +6,8 @@
 
 #include <expected>
 
-#include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Assets/AssetLoaders/ShaderLoader.h"
 #include "Renderer/RenderID.h"
-#include "Utilities/AssetCache/AssetCache.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine
@@ -22,52 +20,35 @@ namespace RNGOEngine
 
 namespace RNGOEngine::AssetHandling
 {
-    using ShaderManagerID = unsigned int;
-
+    using ShaderProgramKey = Containers::GenerationalKey<Core::Renderer::ShaderProgramID>;
     enum class ShaderManagerError
     {
         None,
         // TODO:
     };
 
-    struct RuntimeShaderProgramData
-    {
-        Containers::GenerationalKey<Core::Renderer::ShaderProgramID> ProgramKey;
-    };
-
-    // TODO: Separate Shader and ShaderProgram into separate managers.
     class ShaderManager
     {
     public:
         explicit ShaderManager(Resources::ResourceManager& resourceManager);
 
     public:
-        std::expected<ShaderAsset, ShaderManagerError> UploadShader(
-            const AssetHandle& assetHandle, std::string_view shaderSource, Core::Renderer::ShaderType type
+        std::expected<ShaderProgramKey, ShaderManagerError> UploadShader(
+            std::string_view vertexShader, std::string_view fragmentShader
         );
-        void DestroyShader(const AssetHandle& assetHandle);
+        void DestroyShader(ShaderProgramKey shaderAsset);
 
-    public:
-        Containers::GenerationalKey<RuntimeShaderProgramData> CreateShaderProgram(
-            const AssetHandle& vertexShader, const AssetHandle& fragmentShader
+    private:
+        Containers::GenerationalKey<Core::Renderer::ShaderID> CreateShader(
+            std::string_view shaderSource, Core::Renderer::ShaderType type
         );
 
-    public:
-        Core::Renderer::ShaderProgramID GetShaderProgram(
-            const Containers::GenerationalKey<RuntimeShaderProgramData>& key
+        Containers::GenerationalKey<Core::Renderer::ShaderProgramID> CreateShaderProgram(
+            Containers::GenerationalKey<Core::Renderer::ShaderID> vertexShaderKey,
+            Containers::GenerationalKey<Core::Renderer::ShaderID> fragmentShaderKey
         );
 
     private:
         Resources::ResourceManager& m_resourceManager;
-
-    private:
-        std::unordered_map<AssetHandle, std::shared_ptr<ShaderAsset>> m_handleToShader;
-
-    private:
-        Containers::GenerationalVector<RuntimeShaderProgramData> m_shaderPrograms;
-        std::unordered_map<
-            std::pair<AssetHandle, AssetHandle>, Containers::GenerationalKey<RuntimeShaderProgramData>,
-            Utilities::Hash::PairHash>
-            m_shaderProgramCache;
     };
 }
