@@ -16,7 +16,12 @@
 
 namespace RNGOEngine::Shaders
 {
-
+    struct ShaderParseResult
+    {
+        std::string VertexShader;
+        std::string FragmentShader;
+    };
+    
     enum class ShaderPreProcessingError
     {
         None,
@@ -29,10 +34,13 @@ namespace RNGOEngine::Shaders
     {
     public:
         ShaderPreProcessor(std::span<const Data::Shader::ShaderDefinition> definitions = {});
-        std::expected<std::string, ShaderPreProcessingError> Parse(const std::filesystem::path& source) const;
+        std::expected<ShaderParseResult, ShaderPreProcessingError> Parse(const std::filesystem::path& source) const;
 
         void AddDefinition(const Data::Shader::ShaderDefinition& definition);
         void RemoveDefinition(std::string_view name);
+
+    private:
+        ShaderParseResult SplitVertAndFrag(std::string_view source) const;
 
     private:
         ShaderPreProcessingError ParseTokens(std::string& source) const;

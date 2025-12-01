@@ -4,6 +4,9 @@
 
 #include "Shader/ShaderPreprocessor.h"
 
+#include <string.h>
+
+#include <cstring>
 #include <unordered_set>
 
 #include "Data/Shaders/ShaderSpecification.h"
@@ -24,11 +27,15 @@ namespace RNGOEngine::Shaders
             AddDefinition(definition);
         }
     }
-    
-    std::expected<std::string, ShaderPreProcessingError> ShaderPreProcessor::Parse(
-        const std::filesystem::path& source) const
+
+    std::expected<ShaderParseResult, ShaderPreProcessingError> ShaderPreProcessor::Parse(
+        const std::filesystem::path& source
+    ) const
     {
-        const auto foundPath = AssetHandling::AssetFetcher::GetInstance().GetPath(AssetHandling::AssetType::Shader, source);
+        // TODO: Should this be getting the path from asset fetcher?
+        // This should be passed an actualized path and the includes should be resolved through the Fetcher.
+        const auto foundPath =
+            AssetHandling::AssetFetcher::GetInstance().GetPath(AssetHandling::AssetType::Shader, source);
 
         if (!foundPath.has_value())
         {
@@ -36,21 +43,31 @@ namespace RNGOEngine::Shaders
             return std::unexpected(ShaderPreProcessingError::FileNotFound);
         }
 
-        std::string processedSource = Utilities::IO::ReadFile(foundPath.value());
+        std::string combinedShader = Utilities::IO::ReadFile(foundPath.value());
+        auto splitResult = SplitVertAndFrag(combinedShader);
 
-        const auto includeError = ParseIncludes(processedSource);
-        if (includeError != ShaderPreProcessingError::None)
+        auto processLambda =
+            [this](std::string& shaderSource) -> std::expected<std::string, ShaderPreProcessingError>
         {
-            return std::unexpected(includeError);
-        }
+            const auto includeError = ParseIncludes(shaderSource);
+            if (includeError != ShaderPreProcessingError::None)
+            {
+                return std::unexpected(includeError);
+            }
 
-        const auto tokenError = ParseTokens(processedSource);
-        if (tokenError != ShaderPreProcessingError::None)
-        {
-            return std::unexpected(tokenError);
-        }
+            const auto tokenError = ParseTokens(shaderSource);
+            if (tokenError != ShaderPreProcessingError::None)
+            {
+                return std::unexpected(tokenError);
+            }
 
-        return processedSource;
+            return shaderSource;
+        };
+
+        processLambda(splitResult.VertexShader);
+        processLambda(splitResult.FragmentShader);
+
+        return splitResult;
     }
 
     void ShaderPreProcessor::AddDefinition(const Data::Shader::ShaderDefinition& definition)
@@ -68,6 +85,21 @@ namespace RNGOEngine::Shaders
         {
             m_definitions.erase(it);
         }
+    }
+
+    ShaderParseResult ShaderPreProcessor::SplitVertAndFrag(std::string_view source) const
+    {
+        const auto vertStart =
+            source.find(Data::Shader::VERTEX_SHADER_START) + std::strlen(Data::Shader::VERTEX_SHADER_START);
+        const auto fragStart = source.find(Data::Shader::FRAGMENT_SHADER_START);
+
+        std::string sourceStr(source);
+
+        ShaderParseResult result;
+        result.VertexShader = sourceStr.substr(vertStart, fragStart - std::strlen(Data::Shader::FRAGMENT_SHADER_START) - 1);
+        result.FragmentShader = sourceStr.substr(fragStart + std::strlen(Data::Shader::FRAGMENT_SHADER_START));
+
+        return result;
     }
 
     ShaderPreProcessingError ShaderPreProcessor::ParseTokens(std::string& source) const
@@ -112,10 +144,8 @@ namespace RNGOEngine::Shaders
                 return ShaderPreProcessingError::MalformedInclude;
             }
 
-            std::string_view includePath = std::string_view(
-                source.data() + includeBeginIt + 1,
-                includeEndIt - includeBeginIt - 1
-            );
+            std::string_view includePath =
+                std::string_view(source.data() + includeBeginIt + 1, includeEndIt - includeBeginIt - 1);
 
             if (includedFiles.contains(std::string(includePath)))
             {
@@ -127,7 +157,8 @@ namespace RNGOEngine::Shaders
                 includedFiles.insert(std::string(includePath));
 
                 const auto includeFilePath = AssetHandling::AssetFetcher::GetInstance().GetPath(
-                    AssetHandling::AssetType::Shader, includePath);
+                    AssetHandling::AssetType::Shader, includePath
+                );
 
                 if (!includeFilePath.has_value())
                 {
@@ -150,7 +181,8 @@ namespace RNGOEngine::Shaders
     }
 
     ShaderPreProcessingError ShaderPreProcessor::ParseForDefinitions(
-        const std::string& token, std::string& source) const
+        const std::string& token, std::string& source
+    ) const
     {
         const auto tokenIt = m_definitions.find(token);
 

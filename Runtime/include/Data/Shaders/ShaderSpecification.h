@@ -11,6 +11,9 @@ namespace RNGOEngine::Data::Shader
     constexpr auto INCLUDE_START = '<';
     constexpr auto INCLUDE_END = '>';
 
+    constexpr auto VERTEX_SHADER_START = "#vertex_shader";
+    constexpr auto FRAGMENT_SHADER_START = "#fragment_shader";
+
     // Attribute Pointers
     constexpr ShaderDefinition POSITION_ATTRIBUTE_POINTER = {"POSITION_ATTRIBUTE_POINTER", 0};
     constexpr ShaderDefinition NORMAL_ATTRIBUTE_POINTER = {"NORMAL_ATTRIBUTE_POINTER", 1};
