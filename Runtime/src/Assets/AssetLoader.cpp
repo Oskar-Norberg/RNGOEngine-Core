@@ -99,7 +99,7 @@ namespace RNGOEngine::AssetHandling
         metadata.Path = fullPath.value();
         auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
 
-        const auto importResult = importer->Load(registry, metadata);
+        const auto importResult = importer->LoadFromDisk(registry, metadata);
         if (importResult != ImportingError::None)
         {
             return BuiltinAssets::GetErrorHandle(type);

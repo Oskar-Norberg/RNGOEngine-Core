@@ -10,33 +10,8 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void TextureAssetImporter::Unload(const AssetHandle& handle)
-    {
-        AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
-    }
-
-    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto metadata = std::make_unique<TextureMetadata>();
-        metadata->Type = AssetType::Texture;
-        return std::move(metadata);
-    }
-
-    std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {
-            ".png",
-            ".jpg",
-            ".jpeg",
-        };
-
-        return supportedTypes;
-    }
-
-    std::expected<TextureAsset, ImportingError> TextureAssetImporter::ImportAsset(
-        const AssetMetadata& metadata
+    ImportingError TextureAssetImporter::LoadFromDisk(
+        RuntimeAssetRegistry& registry, const AssetMetadata& metadata
     )
     {
         const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
@@ -48,11 +23,11 @@ namespace RNGOEngine::AssetHandling
             switch (textureHandle.error())
             {
                 case TextureLoader::TextureLoadingError::FileNotFound:
-                    return std::unexpected(ImportingError::FileNotFound);
+                    return ImportingError::FileNotFound;
                 case TextureLoader::TextureLoadingError::FailedToLoad:
-                    return std::unexpected(ImportingError::MalformedFile);
+                    return ImportingError::MalformedFile;
                 default:
-                    return std::unexpected(ImportingError::UnknownError);
+                    return ImportingError::UnknownError;
             }
         }
 
@@ -76,7 +51,7 @@ namespace RNGOEngine::AssetHandling
             .MagnifyingFilter = typedMetadata.MagnifyingFilter,
             .WrappingMode = typedMetadata.WrappingMode,
         };
-        const auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
+        auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
             typedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
             std::as_bytes(textureDataSpan)
         );
@@ -88,14 +63,49 @@ namespace RNGOEngine::AssetHandling
                 case TextureManagerError::None:
                     break;
                 default:
-                    return std::unexpected(ImportingError::UnknownError);
+                    return ImportingError::UnknownError;
             }
         }
 
         // Unload Model from RAM
         TextureLoader::FreeTexture(textureHandle.value());
 
-        return textureResult.value();
+        auto& entry = registry.Insert<TextureAsset>(metadata.UUID, std::move(textureResult.value()));
+        entry.SetState(AssetState::Ready);
+
+        return ImportingError::None;
+    }
+
+    ImportingError TextureAssetImporter::FinalizeLoad(
+        Data::ThreadType threadType, RuntimeAssetRegistry& registry
+    )
+    {
+        return ImportingError::None;
+    }
+
+    void TextureAssetImporter::Unload(const AssetHandle& handle)
+    {
+        AssetManager::GetInstance().GetTextureManager().UnloadTexture(handle);
+    }
+
+    std::unique_ptr<AssetMetadata> TextureAssetImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
+    {
+        auto metadata = std::make_unique<TextureMetadata>();
+        metadata->Type = AssetType::Texture;
+        return std::move(metadata);
+    }
+
+    std::span<const std::string_view> TextureAssetImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {
+            ".png",
+            ".jpg",
+            ".jpeg",
+        };
+
+        return supportedTypes;
     }
 
     AssetType TextureAssetImporter::GetAssetType() const

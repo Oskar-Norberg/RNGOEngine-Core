@@ -13,6 +13,8 @@ namespace RNGOEngine::AssetHandling
     class ShaderAssetImporter : public TAssetImporter<ShaderAsset>
     {
     public:
+        ImportingError LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) override;
+        ImportingError FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry) override;
         void Unload(const AssetHandle& handle) override;
 
         std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
@@ -22,7 +24,6 @@ namespace RNGOEngine::AssetHandling
         std::span<const std::string_view> GetSupportedExtensions() const override;
 
     protected:
-        std::expected<ShaderAsset, ImportingError> ImportAsset(const AssetMetadata& metadata) override;
         AssetType GetAssetType() const override;
 
     private:

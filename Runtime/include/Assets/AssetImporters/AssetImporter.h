@@ -11,6 +11,7 @@
 
 #include "Assets/Asset.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
+#include "Data/ThreadType.h"
 
 namespace RNGOEngine
 {
@@ -38,13 +39,16 @@ namespace RNGOEngine::AssetHandling
     public:
         virtual ~AssetImporter() = default;
 
-        virtual ImportingError Load(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) = 0;
+        virtual ImportingError LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) = 0;
+        virtual ImportingError FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry) = 0;
+
         virtual void Unload(const AssetHandle& handle) = 0;
 
         virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
             const std::filesystem::path& path
         ) const = 0;
 
+        // TODO: Function to get Finalization ThreadType? +Multiple finalization steps?
     public:
         // TODO: This isn't really being used anywhere right now.
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
@@ -57,20 +61,6 @@ namespace RNGOEngine::AssetHandling
     class TAssetImporter<TAsset> : public AssetImporter
     {
     public:
-        ImportingError Load(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) override
-        {
-            auto importResult = ImportAsset(metadata);
-            if (!importResult)
-            {
-                return importResult.error();
-            }
-
-            auto& registryEntry = registry.Insert<TAsset>(metadata.UUID, std::move(importResult.value()));
-            registryEntry.SetState(AssetState::Ready);
-
-            return ImportingError::None;
-        }
-
         void Unload(const AssetHandle& handle) override = 0;
 
         std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
@@ -81,7 +71,6 @@ namespace RNGOEngine::AssetHandling
 
         // Implementation
     protected:
-        virtual std::expected<TAsset, ImportingError> ImportAsset(const AssetMetadata& metadata) = 0;
         // TODO: Bad solution, but works for now.
         virtual AssetType GetAssetType() const = 0;
     };

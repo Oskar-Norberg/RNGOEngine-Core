@@ -4,8 +4,9 @@ add_library(${DATA_PROJECT_NAME} INTERFACE
         include/Data/MouseCodes.h
         include/Data/MeshData.h
         include/Data/MouseModes.h
-        
+
         include/Data/FallbackAssets.h
+        include/Data/ThreadType.h
 )
 target_include_directories(${DATA_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${DATA_PROJECT_NAME} INTERFACE glm)

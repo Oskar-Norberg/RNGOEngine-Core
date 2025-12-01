@@ -10,6 +10,59 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    ImportingError ShaderAssetImporter::LoadFromDisk(
+        RuntimeAssetRegistry& registry, const AssetMetadata& metadata
+    )
+    {
+        auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
+
+        // Preprocess Shader
+        const auto shaderResult = m_shaderLoader.LoadShader(typedMetadata.Path);
+        if (!shaderResult)
+        {
+            switch (shaderResult.error())
+            {
+                case Shaders::ShaderPreProcessingError::FileNotFound:
+                    return ImportingError::FileNotFound;
+                case Shaders::ShaderPreProcessingError::MalformedInclude:
+                case Shaders::ShaderPreProcessingError::TokenNotFound:
+                    return ImportingError::MalformedFile;
+                default:
+                    return ImportingError::UnknownError;
+            }
+        }
+
+        // TODO: Really, really, really, unstable way to determine shader type. Works for now!
+        // const auto type = typedMetadata.Path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
+        //                                               : Core::Renderer::ShaderType::Fragment;
+
+        // Upload Resources
+        auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
+            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
+        );
+
+        if (!uploadResult)
+        {
+            switch (uploadResult.error())
+            {
+                case ShaderManagerError::None:
+                    return ImportingError::UnknownError;
+            }
+        }
+
+        auto& entry = registry.Insert<ShaderAsset>(metadata.UUID, std::move(uploadResult.value()));
+        entry.SetState(AssetState::Ready);
+
+        return ImportingError::None;
+    }
+
+    ImportingError ShaderAssetImporter::FinalizeLoad(
+        Data::ThreadType threadType, RuntimeAssetRegistry& registry
+    )
+    {
+        return ImportingError::None;
+    }
+
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
     {
         AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
@@ -46,48 +99,6 @@ namespace RNGOEngine::AssetHandling
         static constexpr std::string_view supportedTypes[] = {".frag", ".vert"};
 
         return supportedTypes;
-    }
-
-    std::expected<ShaderAsset, ImportingError> ShaderAssetImporter::ImportAsset(const AssetMetadata& metadata)
-    {
-        auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
-
-        // Preprocess Shader
-        const auto shaderResult = m_shaderLoader.LoadShader(typedMetadata.Path);
-        if (!shaderResult)
-        {
-            switch (shaderResult.error())
-            {
-                case Shaders::ShaderPreProcessingError::FileNotFound:
-                    return std::unexpected(ImportingError::FileNotFound);
-                case Shaders::ShaderPreProcessingError::MalformedInclude:
-                    return std::unexpected(ImportingError::MalformedFile);
-                case Shaders::ShaderPreProcessingError::TokenNotFound:
-                    return std::unexpected(ImportingError::MalformedFile);
-                default:
-                    return std::unexpected(ImportingError::UnknownError);
-            }
-        }
-
-        // TODO: Really, really, really, unstable way to determine shader type. Works for now!
-        // const auto type = typedMetadata.Path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
-        //                                               : Core::Renderer::ShaderType::Fragment;
-
-        // Upload Resources
-        auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
-            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
-        );
-
-        if (!uploadResult)
-        {
-            switch (uploadResult.error())
-            {
-                case ShaderManagerError::None:
-                    return std::unexpected(ImportingError::UnknownError);
-            }
-        }
-
-        return uploadResult.value();
     }
 
     AssetType ShaderAssetImporter::GetAssetType() const

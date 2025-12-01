@@ -15,30 +15,14 @@ namespace RNGOEngine::AssetHandling
         : m_doFlipUVs(doFlipUVs)
     {
     }
-
-    void ModelImporter::Unload(const AssetHandle& handle)
+    
+    ImportingError ModelImporter::LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata)
     {
-        AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
-    }
+        // TODO: Just do everything in LoadFromDisk for now.
+        // Assuming single-threaded.
 
-    std::unique_ptr<AssetMetadata> ModelImporter::CreateDefaultMetadata(
-        const std::filesystem::path& path
-    ) const
-    {
-        auto modelData = std::make_unique<ModelMetadata>();
-        modelData->Type = AssetType::Model;
-        return std::move(modelData);
-    }
-
-    std::span<const std::string_view> ModelImporter::GetSupportedExtensions() const
-    {
-        static constexpr std::string_view supportedTypes[] = {".obj", ".fbx", ".gltf"};
-
-        return supportedTypes;
-    }
-
-    std::expected<ModelAsset, ImportingError> ModelImporter::ImportAsset(const AssetMetadata& metadata)
-    {
+        // TODO: Ugly terrible downcast.
+        // TODO: Also Metadata will go out of scope, should not be passed by reference.
         const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
 
         auto extension = typedMetadata.Path.extension().string();
@@ -71,21 +55,52 @@ namespace RNGOEngine::AssetHandling
         if (!modelHandle)
         {
             // TODO: More specific error types
-            return std::unexpected(ImportingError::UnknownError);
+            return ImportingError::UnknownError;
         }
 
         // Upload to GPU
-        const auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
+        auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
             typedMetadata.UUID, modelHandle.value()
         );
+        auto& asset = result.value();
         if (!result)
         {
-            return std::unexpected(ImportingError::UnknownError);
+            return ImportingError::UnknownError;
         }
 
-        return result.value();
+        auto& entry = registry.Insert<ModelAsset>(metadata.UUID, std::move(asset));
+        entry.SetState(AssetState::Ready);
+        
+        return ImportingError::None;
+    }
+    
+    ImportingError ModelImporter::FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry)
+    {
+        // TODO:
+        return ImportingError::None;
     }
 
+    void ModelImporter::Unload(const AssetHandle& handle)
+    {
+        AssetManager::GetInstance().GetModelManager().UnloadModel(handle);
+    }
+
+    std::unique_ptr<AssetMetadata> ModelImporter::CreateDefaultMetadata(
+        const std::filesystem::path& path
+    ) const
+    {
+        auto modelData = std::make_unique<ModelMetadata>();
+        modelData->Type = AssetType::Model;
+        return std::move(modelData);
+    }
+
+    std::span<const std::string_view> ModelImporter::GetSupportedExtensions() const
+    {
+        static constexpr std::string_view supportedTypes[] = {".obj", ".fbx", ".gltf"};
+
+        return supportedTypes;
+    }
+    
     AssetType ModelImporter::GetAssetType() const
     {
         return AssetType::Model;
