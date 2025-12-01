@@ -13,6 +13,8 @@ add_library(${CONTAINERS_PROJECT_NAME} INTERFACE
         
         include/Utilities/Containers/GenerationalVector/MarkedIterator.tpp
         include/Utilities/Containers/GenerationalVector/UnmarkedIterator.tpp
+        
+        include/Utilities/Containers/TSQueue/TSQueue.h
 )
 target_include_directories(${CONTAINERS_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${CONTAINERS_PROJECT_NAME} INTERFACE ${MATH_PROJECT_NAME} 

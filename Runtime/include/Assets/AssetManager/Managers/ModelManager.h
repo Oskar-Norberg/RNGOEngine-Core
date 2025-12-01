@@ -41,6 +41,7 @@ namespace RNGOEngine::AssetHandling
 
     private:
         // TODO: I hate the fact that we have to store shared_ptrs. But we need to ensure Assets can be devalidated in the database.
+        // TODO: This isn't being used????????? Why is this still here????
         std::unordered_map<AssetHandle, std::shared_ptr<ModelAsset>> m_models;
 
     private:
