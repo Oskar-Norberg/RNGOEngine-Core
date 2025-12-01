@@ -8,6 +8,8 @@
 namespace RNGOEngine::Data::Shader
 {
     constexpr auto INCLUDE_DIRECTIVE = "#include";
+    constexpr auto INCLUDE_START = '<';
+    constexpr auto INCLUDE_END = '>';
 
     // Attribute Pointers
     constexpr ShaderDefinition POSITION_ATTRIBUTE_POINTER = {"POSITION_ATTRIBUTE_POINTER", 0};

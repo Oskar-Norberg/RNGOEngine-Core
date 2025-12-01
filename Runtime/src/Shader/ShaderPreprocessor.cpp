@@ -102,10 +102,9 @@ namespace RNGOEngine::Shaders
                 break;
             }
 
-            // Only supports diamond bracket includes for now.
             const auto endLineIt = source.find('\n', it);
-            const auto includeBeginIt = source.find('<', it);
-            const auto includeEndIt = source.find('>', includeBeginIt);
+            const auto includeBeginIt = source.find(Data::Shader::INCLUDE_START, it);
+            const auto includeEndIt = source.find(Data::Shader::INCLUDE_END, includeBeginIt);
 
             if (includeBeginIt > endLineIt || includeEndIt > endLineIt)
             {
