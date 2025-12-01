@@ -1,8 +1,8 @@
 ﻿#version 330 core
 
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec3 aNormal;
-layout (location = 2) in vec2 aTexCoord;
+layout (location = POSITION_ATTRIBUTE_POINTER) in vec3 aPos;
+layout (location = NORMAL_ATTRIBUTE_POINTER) in vec3 aNormal;
+layout (location = TEXCOORD_ATTRIBUTE_POINTER) in vec2 aTexCoord;
 
 // These should not be uniforms.
 uniform mat4 View;

@@ -43,8 +43,8 @@ namespace RNGOEngine::Core::Renderer
         m_renderer.BindToVAO(m_quadVAO);
         m_renderer.BindToVBO(m_quadVBO);
         m_renderer.BufferVBOData(std::as_bytes(std::span<float>(quadVertices)), false);
-        m_renderer.SetAttributePointer(0, 2, 4 * sizeof(float), 0);
-        m_renderer.SetAttributePointer(1, 2, 4 * sizeof(float), 2 * sizeof(float));
+        m_renderer.SetAttributePointer(Data::Shader::POSITION_ATTRIBUTE_POINTER.Value, 2, 4 * sizeof(float), 0);
+        m_renderer.SetAttributePointer(Data::Shader::TEXCOORD_ATTRIBUTE_POINTER.Value, 2, 4 * sizeof(float), 2 * sizeof(float));
 
         m_renderer.BindToEBO(m_quadEBO);
         m_renderer.BufferEBOData(std::as_bytes(std::span<unsigned int>(quadEBO)), false);
