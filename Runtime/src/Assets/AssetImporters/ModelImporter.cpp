@@ -18,14 +18,20 @@ namespace RNGOEngine::AssetHandling
     
     ImportingError ModelImporter::LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata)
     {
-        // TODO: Just do everything in LoadFromDisk for now.
         // Assuming single-threaded.
+        // TODO: Just do everything in LoadFromDisk for now.
 
-        // TODO: Ugly terrible downcast.
-        // TODO: Also Metadata will go out of scope, should not be passed by reference.
-        const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
+        const auto* typedMetadata = dynamic_cast<const ModelMetadata*>(&metadata);
+        if (!typedMetadata)
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Metadata type mismatch.");
+        }
+        // TODO: This is shit, but it works.
+        auto sharedCopy = std::make_shared<ModelMetadata>(*typedMetadata);
+        auto& safeTypedMetadata = *sharedCopy;
+        
 
-        auto extension = typedMetadata.Path.extension().string();
+        auto extension = safeTypedMetadata.Path.extension().string();
         std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
 
         std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> modelHandle;
@@ -49,7 +55,7 @@ namespace RNGOEngine::AssetHandling
         }
 #endif
 #if 1
-        modelHandle = ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+        modelHandle = ModelLoading::AssimpModelLoader::LoadModel(safeTypedMetadata.Path, m_doFlipUVs);
 #endif
 
         if (!modelHandle)
@@ -60,7 +66,7 @@ namespace RNGOEngine::AssetHandling
 
         // Upload to GPU
         auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
-            typedMetadata.UUID, modelHandle.value()
+            safeTypedMetadata.UUID, modelHandle.value()
         );
         auto& asset = result.value();
         if (!result)

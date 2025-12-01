@@ -14,10 +14,17 @@ namespace RNGOEngine::AssetHandling
         RuntimeAssetRegistry& registry, const AssetMetadata& metadata
     )
     {
-        const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
+        const auto* typedMetadata = dynamic_cast<const TextureMetadata*>(&metadata);
+        if (!typedMetadata)
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Metadata type mismatch.");
+        }
+        // TODO: This is shit, but it works.
+        auto sharedCopy = std::make_shared<TextureMetadata>(*typedMetadata);
+        auto& safeTypedMetadata = *sharedCopy;
 
         // Load Texture to RAM
-        const auto textureHandle = TextureLoader::LoadTexture(typedMetadata.Path);
+        const auto textureHandle = TextureLoader::LoadTexture(safeTypedMetadata.Path);
         if (!textureHandle)
         {
             switch (textureHandle.error())
@@ -47,12 +54,12 @@ namespace RNGOEngine::AssetHandling
 
         const Core::Renderer::Texture2DProperties properties{
             .Format = format,
-            .MinifyingFilter = typedMetadata.MinifyingFilter,
-            .MagnifyingFilter = typedMetadata.MagnifyingFilter,
-            .WrappingMode = typedMetadata.WrappingMode,
+            .MinifyingFilter = safeTypedMetadata.MinifyingFilter,
+            .MagnifyingFilter = safeTypedMetadata.MagnifyingFilter,
+            .WrappingMode = safeTypedMetadata.WrappingMode,
         };
         auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
-            typedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
+            safeTypedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
             std::as_bytes(textureDataSpan)
         );
 

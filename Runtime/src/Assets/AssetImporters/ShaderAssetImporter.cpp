@@ -14,10 +14,17 @@ namespace RNGOEngine::AssetHandling
         RuntimeAssetRegistry& registry, const AssetMetadata& metadata
     )
     {
-        auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
+        const auto* typedMetadata = dynamic_cast<const ShaderMetadata*>(&metadata);
+        if (!typedMetadata)
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Metadata type mismatch.");
+        }
+        // TODO: This is shit, but it works.
+        auto sharedCopy = std::make_shared<ShaderMetadata>(*typedMetadata);
+        auto& safeTypedMetadata = *sharedCopy;
 
         // Preprocess Shader
-        const auto shaderResult = m_shaderLoader.LoadShader(typedMetadata.Path);
+        const auto shaderResult = m_shaderLoader.LoadShader(safeTypedMetadata.Path);
         if (!shaderResult)
         {
             switch (shaderResult.error())
@@ -38,7 +45,7 @@ namespace RNGOEngine::AssetHandling
 
         // Upload Resources
         auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
-            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
+            safeTypedMetadata.UUID, shaderResult.value(), safeTypedMetadata.ShaderType
         );
 
         if (!uploadResult)
