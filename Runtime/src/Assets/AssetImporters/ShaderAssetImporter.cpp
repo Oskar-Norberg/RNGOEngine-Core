@@ -100,9 +100,4 @@ namespace RNGOEngine::AssetHandling
 
         return supportedTypes;
     }
-
-    AssetType ShaderAssetImporter::GetAssetType() const
-    {
-        return AssetType::Shader;
-    }
 }

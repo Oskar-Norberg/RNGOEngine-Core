@@ -9,7 +9,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class TextureAssetImporter : public TAssetImporter<TextureAsset>
+    class TextureAssetImporter : public AssetImporter
     {
     public:
         ImportingError LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) override;
@@ -21,8 +21,5 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
-
-    protected:
-        AssetType GetAssetType() const override;
     };
 }

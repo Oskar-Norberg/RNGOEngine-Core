@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class ShaderAssetImporter : public TAssetImporter<ShaderAsset>
+    class ShaderAssetImporter : public AssetImporter
     {
     public:
         ImportingError LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) override;
@@ -22,9 +22,6 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
-
-    protected:
-        AssetType GetAssetType() const override;
 
     private:
         ShaderLoader m_shaderLoader;

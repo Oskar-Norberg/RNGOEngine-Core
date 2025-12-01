@@ -53,25 +53,4 @@ namespace RNGOEngine::AssetHandling
         // TODO: This isn't really being used anywhere right now.
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
     };
-
-    template<typename TAsset>
-    class TAssetImporter;
-
-    template<Concepts::DerivedFrom<Asset> TAsset>
-    class TAssetImporter<TAsset> : public AssetImporter
-    {
-    public:
-        void Unload(const AssetHandle& handle) override = 0;
-
-        std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
-            const std::filesystem::path& path
-        ) const override = 0;
-
-        std::span<const std::string_view> GetSupportedExtensions() const override = 0;
-
-        // Implementation
-    protected:
-        // TODO: Bad solution, but works for now.
-        virtual AssetType GetAssetType() const = 0;
-    };
 }

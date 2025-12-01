@@ -8,7 +8,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    class ModelImporter : public TAssetImporter<ModelAsset>
+    class ModelImporter : public AssetImporter
     {
     public:
         explicit ModelImporter(bool doFlipUVs);
@@ -24,8 +24,6 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
-
-        AssetType GetAssetType() const override;
 
     private:
         bool m_doFlipUVs;

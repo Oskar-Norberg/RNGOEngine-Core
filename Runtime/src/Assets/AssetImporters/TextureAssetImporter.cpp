@@ -107,9 +107,4 @@ namespace RNGOEngine::AssetHandling
 
         return supportedTypes;
     }
-
-    AssetType TextureAssetImporter::GetAssetType() const
-    {
-        return AssetType::Texture;
-    }
 }

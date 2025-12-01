@@ -100,9 +100,4 @@ namespace RNGOEngine::AssetHandling
 
         return supportedTypes;
     }
-    
-    AssetType ModelImporter::GetAssetType() const
-    {
-        return AssetType::Model;
-    }
 }
