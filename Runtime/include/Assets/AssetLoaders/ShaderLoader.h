@@ -11,6 +11,7 @@ namespace RNGOEngine::AssetHandling
     class ShaderLoader
     {
     public:
+        ShaderLoader();
         std::expected<std::string, Shaders::ShaderPreProcessingError> LoadShader(const std::filesystem::path& path) const;
 
     private:

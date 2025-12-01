@@ -6,9 +6,10 @@
 
 #include <unordered_set>
 
+#include "Data/Shaders/ShaderSpecification.h"
 #include "Renderer/DrawQueue.h"
-#include "Utilities/RNGOAsserts.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
+#include "Utilities/RNGOAsserts.h"
 
 #ifndef ENGINE_SHADERS_DIR
 #error "ENGINE_SHADERS_DIR is not defined."
@@ -16,12 +17,14 @@
 
 namespace RNGOEngine::Shaders
 {
-    ShaderPreProcessor::ShaderPreProcessor()
+    ShaderPreProcessor::ShaderPreProcessor(std::span<const Data::Shader::ShaderDefinition> definitions)
     {
-        AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
-        AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
+        for (const auto& definition : definitions)
+        {
+            AddDefinition(definition);
+        }
     }
-
+    
     std::expected<std::string, ShaderPreProcessingError> ShaderPreProcessor::Parse(
         const std::filesystem::path& source) const
     {
@@ -50,10 +53,10 @@ namespace RNGOEngine::Shaders
         return processedSource;
     }
 
-    void ShaderPreProcessor::AddDefinition(const std::string_view name, const std::string_view value)
+    void ShaderPreProcessor::AddDefinition(const Data::Shader::ShaderDefinition& definition)
     {
-        m_definitions[std::string(name)] = std::string(value);
-        m_tokens[std::string(name)] = [this](const std::string& token, std::string& source)
+        m_definitions[std::string(definition.Name)] = std::to_string(definition.Value);
+        m_tokens[std::string(definition.Name)] = [this](const std::string& token, std::string& source)
         {
             return ParseForDefinitions(token, source);
         };
@@ -92,7 +95,7 @@ namespace RNGOEngine::Shaders
 
         while (true)
         {
-            const auto it = source.find(INCLUDE_DIRECTIVE);
+            const auto it = source.find(Data::Shader::INCLUDE_DIRECTIVE);
 
             if (it == std::string::npos)
             {

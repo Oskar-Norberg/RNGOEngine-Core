@@ -7,15 +7,12 @@
 #include <array>
 #include <vector>
 
-#include "RenderID.h"
-#include "Uniforms.h"
 #include "Components/Components.h"
+#include "Data/Shaders/ShaderSpecification.h"
+#include "Uniforms.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-    constexpr auto NR_OF_POINTLIGHTS = 16;
-    constexpr auto NR_OF_SPOTLIGHTS = 16;
-
     struct Drawable
     {
         Components::Transform Transform;
@@ -87,10 +84,10 @@ namespace RNGOEngine::Core::Renderer
         AmbientLightData AmbientLight;
         DirectionalLightData DirectionalLight;
 
-        std::array<PointLightData, NR_OF_POINTLIGHTS> PointLights;
+        std::array<PointLightData, Data::Shader::NR_OF_POINTLIGHTS.Value> PointLights;
         size_t PointLightIndex = 0;
 
-        std::array<SpotlightData, NR_OF_POINTLIGHTS> Spotlights;
+        std::array<SpotlightData, Data::Shader::NR_OF_SPOTLIGHTS.Value> Spotlights;
         size_t SpotlightIndex = 0;
 
         BackgroundColorData BackgroundColor;
