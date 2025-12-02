@@ -94,25 +94,11 @@ namespace RNGOEngine::Core::Renderer
 
     void ForwardPass::RenderOpaque(DrawQueue& queue) const
     {
-        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         const auto& camera = queue.Camera;
-
-        // TODO: I hate the material manager so much
-        const auto& materialManager = AssetHandling::AssetManager::GetInstance().GetMaterialManager();
 
         for (const auto& opaqueDrawCall : queue.OpaqueObjects)
         {
-            const auto resolvedMatOpt = materialManager.GetMaterial(opaqueDrawCall.Material);
-            const AssetHandling::ResolvedMaterial resolvedMat = resolvedMatOpt.value_or(
-                materialManager
-                    .GetMaterial(
-                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
-                    )
-                    .value()
-            );
-
-            const auto shaderProgramID = resolvedMat.shaderProgram;
-
+            const auto shaderProgramID = opaqueDrawCall.Material.ShaderProgram;
             m_renderer.BindShaderProgram(shaderProgramID);
 
             // TODO: Not sure if this is a great idea.
@@ -255,10 +241,10 @@ namespace RNGOEngine::Core::Renderer
                 m_renderer.SetInt(shaderProgramID, "numSpotlights", static_cast<int>(queue.SpotlightIndex));
             }
 
-            for (const auto& [name, data] : resolvedMat.uniforms)
+            for (const auto& [name, data] : opaqueDrawCall.Material.Parameters)
             {
                 std::visit(
-                    [this, &name, &runtimeRegistry, shaderProgramID]<typename T0>(T0&& arg)
+                    [this, &name, shaderProgramID]<typename T0>(T0&& arg)
                     {
                         using T = std::decay_t<T0>;
                         if constexpr (std::is_same_v<T, bool>)
@@ -291,31 +277,10 @@ namespace RNGOEngine::Core::Renderer
                                 shaderProgramID, name, std::span<const float, 16>(glm::value_ptr(arg), 16)
                             );
                         }
-                        else if constexpr (std::is_same_v<T, AssetHandling::MaterialTextureSpecification>)
+                        else if constexpr (std::is_same_v<T, GPUMaterialTextureSpecification>)
                         {
-                            const auto textureAssetOpt =
-                                runtimeRegistry.TryGet<AssetHandling::TextureAsset>(arg.textureHandle);
-
-                            const auto textureAsset = textureAssetOpt.value_or(
-                                runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
-                                    AssetHandling::BuiltinAssets::GetErrorHandle(
-                                        AssetHandling::AssetType::Texture
-                                    )
-                                ).value()
-                            );
-                            const auto& textureAssetRef = textureAsset.get();
-
-                            const auto textureID = Resources::ResourceManager::GetInstance()
-                                                       .GetTextureResourceManager()
-                                                       .GetTexture(textureAssetRef.GetTextureKey());
-                            if (!textureID)
-                            {
-                                RNGO_ASSERT(false && "Invalid texture resource in RenderAPI::RenderOpaque.");
-                                return;
-                            }
-
-                            m_renderer.BindTexture(textureID.value(), arg.slot);
-                            m_renderer.SetTexture(shaderProgramID, name, arg.slot);
+                            m_renderer.BindTexture(arg.TextureHandle, arg.Slot);
+                            m_renderer.SetTexture(shaderProgramID, name, arg.Slot);
                         }
                         else
                         {
@@ -327,29 +292,10 @@ namespace RNGOEngine::Core::Renderer
                 );
             }
 
-            // TODO: I don't like the RenderAPI having to directly interact with the ResourceManager, but works for now!
-            auto& meshResourceManager = Resources::ResourceManager::GetInstance().GetMeshResourceManager();
-
-            const auto modelAssetOpt = runtimeRegistry.TryGet<AssetHandling::ModelAsset>(
-                opaqueDrawCall.ModelHandle
-            );
-            const auto modelAsset = modelAssetOpt.value_or(
-                runtimeRegistry.TryGet<AssetHandling::ModelAsset>(
-                    AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
-                ).value()
-            );
-
-            for (const auto& meshData : modelAsset.get().GetMeshKeys())
+            for (const auto& meshData : opaqueDrawCall.Model.Meshes)
             {
-                const auto meshResourceOpt = meshResourceManager.GetMeshResource(meshData);
-                if (!meshResourceOpt.has_value())
-                {
-                    RNGO_ASSERT(false && "Invalid mesh resource in RenderAPI::RenderOpaque.");
-                    continue;
-                }
-                const auto& meshResource = meshResourceOpt->get();
-                m_renderer.BindToVAO(meshResource.vao);
-                m_renderer.DrawElement(meshResource.elementCount);
+                m_renderer.BindToVAO(meshData.VAO);
+                m_renderer.DrawElement(meshData.ElementCount);
             }
         }
     }

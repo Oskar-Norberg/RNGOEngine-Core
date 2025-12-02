@@ -5,6 +5,8 @@
 #include "Systems/Core/RenderSystem.h"
 
 #include "Assets/AssetManager/AssetManager.h"
+#include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Profiling/Profiling.h"
 #include "Renderer/API/RenderAPI.h"
 #include "Systems/SystemContext.h"
@@ -30,20 +32,134 @@ namespace RNGOEngine::Systems::Core
         context.Renderer->SubmitDrawQueue(std::move(drawQueue));
     }
 
+    // TODO: Ugly ass function
     void RenderSystem::GatherOpaques(
         RNGOEngine::Core::World& world, EngineSystemContext& context,
         RNGOEngine::Core::Renderer::DrawQueue& drawQueue
     )
     {
+        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
+        auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
+        auto& meshManager = resourceManager.GetMeshResourceManager();
+
+        auto& assetManager = AssetHandling::AssetManager::GetInstance();
+        // TODO: I hate the material manager i hate the material manager i hate the material manager
+        auto& materialManager = assetManager.GetMaterialManager();
+
         const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
 
         for (const auto& [entity, meshRender] : renderView.each())
         {
+            const auto modelAssetOpt =
+                runtimeRegistry.TryGet<AssetHandling::ModelAsset>(meshRender.ModelHandle);
+
+            const auto& modelAsset =
+                modelAssetOpt
+                    .value_or(
+                        runtimeRegistry
+                            .TryGet<AssetHandling::ModelAsset>(
+                                AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
+                            )
+                            .value()
+                    ).get();
+
+            const auto meshKeySpan = modelAsset.GetMeshKeys();
+            std::vector<RNGOEngine::Core::Renderer::GPUMesh> gpuMeshes;
+            gpuMeshes.reserve(meshKeySpan.size());
+            for (const auto& mesh : modelAsset.GetMeshKeys())
+            {
+                const auto meshOpt = meshManager.GetMeshResource(mesh);
+                if (meshOpt)
+                {
+                    auto& meshResource = meshOpt->get();
+                    gpuMeshes.emplace_back(
+                        meshResource.vao, meshResource.vbo, meshResource.ebo, meshResource.elementCount
+                    );
+                }
+            }
+
+            const auto resolvedMaterialOpt = materialManager.GetMaterial(meshRender.MaterialKey);
+            const auto resolvedMaterial = resolvedMaterialOpt.value_or(
+                materialManager
+                    .GetMaterial(
+                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
+                    )
+                    .value()
+            );
+
+            RNGOEngine::Core::Renderer::GPUMaterial gpuMaterial{
+                .ShaderProgram = resolvedMaterial.shaderProgram, .Parameters = {}
+            };
+            gpuMaterial.Parameters.reserve(resolvedMaterial.uniforms.size());
+
+            for (const auto& uniform : resolvedMaterial.uniforms)
+            {
+                if (std::holds_alternative<bool>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<bool>(uniform.data));
+                }
+                else if (std::holds_alternative<int>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<int>(uniform.data));
+                }
+                else if (std::holds_alternative<float>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<float>(uniform.data));
+                }
+                else if (std::holds_alternative<glm::vec2>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::vec2>(uniform.data));
+                }
+                else if (std::holds_alternative<glm::vec3>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::vec3>(uniform.data));
+                }
+                else if (std::holds_alternative<glm::vec4>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::vec4>(uniform.data));
+                }
+                else if (std::holds_alternative<glm::mat4>(uniform.data))
+                {
+                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::mat4>(uniform.data));
+                }
+                else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.data))
+                {
+                    const auto& textureSpec =
+                        std::get<AssetHandling::MaterialTextureSpecification>(uniform.data);
+
+                    const auto textureAssetOpt =
+                        runtimeRegistry.TryGet<AssetHandling::TextureAsset>(textureSpec.textureHandle);
+
+                    const auto& textureAsset =
+                        textureAssetOpt
+                            .value_or(runtimeRegistry
+                                          .TryGet<AssetHandling::TextureAsset>(
+                                              AssetHandling::BuiltinAssets::GetErrorHandle(
+                                                  AssetHandling::AssetType::Texture
+                                              )
+                                          )
+                                          .value())
+                            .get();
+
+                    // Because the Asset is guaranteed to be valid, we can just .value() here.
+                    const auto textureResourceOpt = resourceManager.GetTextureResourceManager()
+                                                        .GetTexture(textureAsset.GetTextureKey())
+                                                        .value();
+
+                    RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
+                        .TextureHandle = textureResourceOpt, .Slot = textureSpec.slot
+                    };
+                    gpuMaterial.Parameters.emplace_back(uniform.name, gpuTextureSpec);
+                }
+            }
+
             const auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
                                        ? world.GetRegistry().get<Components::Transform>(entity)
                                        : Components::Transform();
 
-            drawQueue.OpaqueObjects.emplace_back(transform, meshRender.ModelHandle, meshRender.MaterialKey);
+            RNGOEngine::Core::Renderer::GPUModel gpuModel{.Meshes = gpuMeshes};
+
+            drawQueue.OpaqueObjects.emplace_back(transform, gpuModel, gpuMaterial);
         }
     }
 

@@ -5,19 +5,53 @@
 #pragma once
 
 #include <array>
+#include <variant>
 #include <vector>
 
 #include "Components/Components.h"
 #include "Data/Shaders/ShaderSpecification.h"
-#include "Uniforms.h"
+#include "RenderID.h"
 
 namespace RNGOEngine::Core::Renderer
 {
+    struct GPUMaterialTextureSpecification
+    {
+        TextureID TextureHandle;
+        int Slot;
+    };
+
+    struct GPUMaterialParameter
+    {
+        std::string Name;
+        std::variant<
+            bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat4, GPUMaterialTextureSpecification>
+            Data;
+    };
+
+    struct GPUMaterial
+    {
+        ShaderProgramID ShaderProgram;
+        std::vector<GPUMaterialParameter> Parameters;
+    };
+
+    struct GPUMesh
+    {
+        VAO VAO = INVALID_VAO;
+        VBO VBO = INVALID_VBO;
+        EBO EBO = INVALID_EBO;
+        size_t ElementCount = 0;
+    };
+
+    struct GPUModel
+    {
+        std::vector<GPUMesh> Meshes;
+    };
+
     struct Drawable
     {
         Components::Transform Transform;
-        AssetHandling::AssetHandle ModelHandle;
-        AssetHandling::AssetHandle Material;
+        GPUModel Model;
+        GPUMaterial Material;
     };
 
     struct CameraData

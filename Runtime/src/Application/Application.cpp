@@ -122,8 +122,11 @@ namespace RNGOEngine
 
             PollWindowEvents();
 
-            OnUpdate(deltaTime);
+            // TODO: These should both swap place and run on seperate threads.
+            // These are currently swapped because the Renderer needs to load Fallback Assets before first frame update.
             OnRender();
+            OnUpdate(deltaTime);
+            
             SwapBuffers();
 
             PollGameEvents();
