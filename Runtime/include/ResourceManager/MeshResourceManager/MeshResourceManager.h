@@ -26,10 +26,10 @@ namespace RNGOEngine::Resources
 {
     struct MeshResource
     {
-        Core::Renderer::VAO vao = Core::Renderer::INVALID_VAO;
-        Core::Renderer::VBO vbo = Core::Renderer::INVALID_VBO;
-        Core::Renderer::EBO ebo = Core::Renderer::INVALID_EBO;
-        size_t elementCount = 0;
+        Core::Renderer::VAO VAO = Core::Renderer::INVALID_VAO;
+        Core::Renderer::VBO VBO = Core::Renderer::INVALID_VBO;
+        Core::Renderer::EBO EBO = Core::Renderer::INVALID_EBO;
+        size_t ElementCount = 0;
     };
 
     class MeshResourceManager

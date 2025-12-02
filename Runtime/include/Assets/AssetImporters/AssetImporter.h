@@ -4,12 +4,14 @@
 
 #pragma once
 
-#include <memory>
 #include <expected>
 #include <filesystem>
+#include <memory>
 #include <span>
 
 #include "Assets/Asset.h"
+#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
+#include "Data/ThreadType.h"
 
 namespace RNGOEngine
 {
@@ -25,6 +27,7 @@ namespace RNGOEngine::AssetHandling
 {
     enum class ImportingError
     {
+        None,
         FileNotFound,
         UnsupportedFormat,
         MalformedFile,
@@ -36,15 +39,19 @@ namespace RNGOEngine::AssetHandling
     public:
         virtual ~AssetImporter() = default;
 
-        virtual std::expected<std::unique_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) = 0;
+        virtual ImportingError LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) = 0;
+        virtual ImportingError FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry) = 0;
+
         virtual void Unload(const AssetHandle& handle) = 0;
 
         virtual std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
             const std::filesystem::path& path
         ) const = 0;
 
+        // TODO: Function to get Finalization ThreadType? +Multiple finalization steps?
     public:
         // TODO: This isn't really being used anywhere right now.
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
+        virtual Data::ThreadType GetFinalizationThreadTypes() const = 0;
     };
 }

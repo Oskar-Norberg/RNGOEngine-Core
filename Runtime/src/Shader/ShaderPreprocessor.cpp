@@ -4,11 +4,15 @@
 
 #include "Shader/ShaderPreprocessor.h"
 
+#include <string.h>
+
+#include <cstring>
 #include <unordered_set>
 
+#include "Data/Shaders/ShaderSpecification.h"
 #include "Renderer/DrawQueue.h"
-#include "Utilities/RNGOAsserts.h"
 #include "Utilities/IO/SimpleFileReader/SimpleFileReader.h"
+#include "Utilities/RNGOAsserts.h"
 
 #ifndef ENGINE_SHADERS_DIR
 #error "ENGINE_SHADERS_DIR is not defined."
@@ -16,16 +20,22 @@
 
 namespace RNGOEngine::Shaders
 {
-    ShaderPreProcessor::ShaderPreProcessor()
+    ShaderPreProcessor::ShaderPreProcessor(std::span<const Data::Shader::ShaderDefinition> definitions)
     {
-        AddDefinition("NR_OF_POINTLIGHTS", std::to_string(Core::Renderer::NR_OF_POINTLIGHTS));
-        AddDefinition("NR_OF_SPOTLIGHTS", std::to_string(Core::Renderer::NR_OF_SPOTLIGHTS));
+        for (const auto& definition : definitions)
+        {
+            AddDefinition(definition);
+        }
     }
 
-    std::expected<std::string, ShaderPreProcessingError> ShaderPreProcessor::Parse(
-        const std::filesystem::path& source) const
+    std::expected<ShaderParseResult, ShaderPreProcessingError> ShaderPreProcessor::Parse(
+        const std::filesystem::path& source
+    ) const
     {
-        const auto foundPath = AssetHandling::AssetFetcher::GetInstance().GetPath(AssetHandling::AssetType::Shader, source);
+        // TODO: Should this be getting the path from asset fetcher?
+        // This should be passed an actualized path and the includes should be resolved through the Fetcher.
+        const auto foundPath =
+            AssetHandling::AssetFetcher::GetInstance().GetPath(AssetHandling::AssetType::Shader, source);
 
         if (!foundPath.has_value())
         {
@@ -33,27 +43,53 @@ namespace RNGOEngine::Shaders
             return std::unexpected(ShaderPreProcessingError::FileNotFound);
         }
 
-        std::string processedSource = Utilities::IO::ReadFile(foundPath.value());
+        std::string combinedShader = Utilities::IO::ReadFile(foundPath.value());
+        auto splitResult = SplitVertAndFrag(combinedShader);
 
-        const auto includeError = ParseIncludes(processedSource);
-        if (includeError != ShaderPreProcessingError::None)
+        if (!splitResult)
         {
-            return std::unexpected(includeError);
+            return std::unexpected(splitResult.error());
         }
 
-        const auto tokenError = ParseTokens(processedSource);
-        if (tokenError != ShaderPreProcessingError::None)
+        auto& splitShaders = splitResult.value();
+
+        auto processLambda = [this](std::string& shaderSource) -> ShaderPreProcessingError
         {
-            return std::unexpected(tokenError);
+            const auto includeError = ParseIncludes(shaderSource);
+            if (includeError != ShaderPreProcessingError::None)
+            {
+                return includeError;
+            }
+
+            const auto tokenError = ParseTokens(shaderSource);
+            if (tokenError != ShaderPreProcessingError::None)
+            {
+                return tokenError;
+            }
+
+            return ShaderPreProcessingError::None;
+        };
+
+        ShaderPreProcessingError vertexLambdaResult = processLambda(splitShaders.VertexShader);
+        ShaderPreProcessingError fragmentLambdaResult = processLambda(splitShaders.FragmentShader);
+
+        if (vertexLambdaResult != ShaderPreProcessingError::None)
+        {
+            return std::unexpected(vertexLambdaResult);
         }
 
-        return processedSource;
+        if (fragmentLambdaResult != ShaderPreProcessingError::None)
+        {
+            return std::unexpected(fragmentLambdaResult);
+        }
+
+        return splitShaders;
     }
 
-    void ShaderPreProcessor::AddDefinition(const std::string_view name, const std::string_view value)
+    void ShaderPreProcessor::AddDefinition(const Data::Shader::ShaderDefinition& definition)
     {
-        m_definitions[std::string(name)] = std::string(value);
-        m_tokens[std::string(name)] = [this](const std::string& token, std::string& source)
+        m_definitions[std::string(definition.Name)] = std::to_string(definition.Value);
+        m_tokens[std::string(definition.Name)] = [this](const std::string& token, std::string& source)
         {
             return ParseForDefinitions(token, source);
         };
@@ -65,6 +101,39 @@ namespace RNGOEngine::Shaders
         {
             m_definitions.erase(it);
         }
+    }
+
+    std::expected<ShaderParseResult, ShaderPreProcessingError> ShaderPreProcessor::SplitVertAndFrag(
+        const std::string_view source
+    ) const
+    {
+        const size_t vertStart =
+            source.find(Data::Shader::VERTEX_SHADER_START) + std::strlen(Data::Shader::VERTEX_SHADER_START);
+        const size_t fragStart = source.find(Data::Shader::FRAGMENT_SHADER_START);
+
+        if (vertStart == std::string::npos)
+        {
+            return std::unexpected(ShaderPreProcessingError::MissingVertexStart);
+        }
+        if (fragStart == std::string::npos)
+        {
+            return std::unexpected(ShaderPreProcessingError::MissingFragmentStart);
+        }
+
+        if (fragStart < vertStart)
+        {
+            return std::unexpected(ShaderPreProcessingError::MisorderedShaders);
+        }
+
+        const std::string sourceStr(source);
+
+        ShaderParseResult result;
+        result.VertexShader =
+            sourceStr.substr(vertStart, fragStart - std::strlen(Data::Shader::FRAGMENT_SHADER_START) - 1);
+        result.FragmentShader =
+            sourceStr.substr(fragStart + std::strlen(Data::Shader::FRAGMENT_SHADER_START));
+
+        return result;
     }
 
     ShaderPreProcessingError ShaderPreProcessor::ParseTokens(std::string& source) const
@@ -92,17 +161,16 @@ namespace RNGOEngine::Shaders
 
         while (true)
         {
-            const auto it = source.find(INCLUDE_DIRECTIVE);
+            const auto it = source.find(Data::Shader::INCLUDE_DIRECTIVE);
 
             if (it == std::string::npos)
             {
                 break;
             }
 
-            // Only supports diamond bracket includes for now.
             const auto endLineIt = source.find('\n', it);
-            const auto includeBeginIt = source.find('<', it);
-            const auto includeEndIt = source.find('>', includeBeginIt);
+            const auto includeBeginIt = source.find(Data::Shader::INCLUDE_START, it);
+            const auto includeEndIt = source.find(Data::Shader::INCLUDE_END, includeBeginIt);
 
             if (includeBeginIt > endLineIt || includeEndIt > endLineIt)
             {
@@ -110,10 +178,8 @@ namespace RNGOEngine::Shaders
                 return ShaderPreProcessingError::MalformedInclude;
             }
 
-            std::string_view includePath = std::string_view(
-                source.data() + includeBeginIt + 1,
-                includeEndIt - includeBeginIt - 1
-            );
+            std::string_view includePath =
+                std::string_view(source.data() + includeBeginIt + 1, includeEndIt - includeBeginIt - 1);
 
             if (includedFiles.contains(std::string(includePath)))
             {
@@ -125,7 +191,8 @@ namespace RNGOEngine::Shaders
                 includedFiles.insert(std::string(includePath));
 
                 const auto includeFilePath = AssetHandling::AssetFetcher::GetInstance().GetPath(
-                    AssetHandling::AssetType::Shader, includePath);
+                    AssetHandling::AssetType::Shader, includePath
+                );
 
                 if (!includeFilePath.has_value())
                 {
@@ -148,7 +215,8 @@ namespace RNGOEngine::Shaders
     }
 
     ShaderPreProcessingError ShaderPreProcessor::ParseForDefinitions(
-        const std::string& token, std::string& source) const
+        const std::string& token, std::string& source
+    ) const
     {
         const auto tokenIt = m_definitions.find(token);
 

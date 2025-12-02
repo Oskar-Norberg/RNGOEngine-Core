@@ -12,27 +12,39 @@
 #include <unordered_map>
 
 #include "Assets/AssetFetcher/AssetFetcher.h"
+#include "Data/Shaders/ShaderDefinition.h"
 
 namespace RNGOEngine::Shaders
 {
-    constexpr auto INCLUDE_DIRECTIVE = "#include";
-
+    struct ShaderParseResult
+    {
+        std::string VertexShader;
+        std::string FragmentShader;
+    };
+    
     enum class ShaderPreProcessingError
     {
         None,
         FileNotFound,
         MalformedInclude,
         TokenNotFound,
+        
+        MissingVertexStart,
+        MissingFragmentStart,
+        MisorderedShaders
     };
 
     class ShaderPreProcessor
     {
     public:
-        ShaderPreProcessor();
-        std::expected<std::string, ShaderPreProcessingError> Parse(const std::filesystem::path& source) const;
+        ShaderPreProcessor(std::span<const Data::Shader::ShaderDefinition> definitions = {});
+        std::expected<ShaderParseResult, ShaderPreProcessingError> Parse(const std::filesystem::path& source) const;
 
-        void AddDefinition(std::string_view name, std::string_view value);
+        void AddDefinition(const Data::Shader::ShaderDefinition& definition);
         void RemoveDefinition(std::string_view name);
+
+    private:
+        std::expected<ShaderParseResult, ShaderPreProcessingError> SplitVertAndFrag(std::string_view source) const;
 
     private:
         ShaderPreProcessingError ParseTokens(std::string& source) const;

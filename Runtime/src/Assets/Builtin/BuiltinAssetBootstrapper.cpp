@@ -43,12 +43,10 @@ namespace RNGOEngine::AssetHandling
     {
         auto& materialManager = AssetManager::GetInstance().GetMaterialManager();
         auto& loader = AssetLoader::GetInstance();
-
-        const auto vertexShader = loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidVertexShader);
-        const auto fragmentShader =
-            loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidFragmentShader);
-
+        
+        const auto fallbackShader = loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidVertexShader);
+        
         s_errorHandles[static_cast<size_t>(AssetType::Material)] =
-            materialManager.CreateMaterial(vertexShader, fragmentShader).GetMaterialAssetHandle();
+            materialManager.CreateMaterial(fallbackShader).GetMaterialAssetHandle();
     }
 }

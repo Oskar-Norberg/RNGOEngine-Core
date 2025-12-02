@@ -77,6 +77,7 @@ namespace RNGOEngine::AssetHandling
         AssetHandle m_handle;
     };
 
+    // TODO: Should AssetMetadata really be polymorphic? Or should it just store a Blackboard of key-value pairs?
     struct AssetMetadata
     {
         virtual ~AssetMetadata() = default;

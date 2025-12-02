@@ -10,53 +10,97 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::unique_ptr<Asset>, ImportingError> ShaderAssetImporter::Load(
-        const AssetMetadata& metadata
+    ImportingError ShaderAssetImporter::LoadFromDisk(
+        RuntimeAssetRegistry& registry, const AssetMetadata& metadata
     )
     {
-        auto& typedMetadata = static_cast<const ShaderMetadata&>(metadata);
+        const auto* typedMetadata = dynamic_cast<const ShaderMetadata*>(&metadata);
+        if (!typedMetadata)
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Metadata type mismatch.");
+        }
+        // TODO: This is shit, but it works.
+        auto sharedCopy = std::make_shared<ShaderMetadata>(*typedMetadata);
+        auto& safeTypedMetadata = *sharedCopy;
 
         // Preprocess Shader
-        const auto shaderResult = m_shaderLoader.LoadShader(typedMetadata.Path);
+        const auto shaderResult = m_shaderLoader.LoadShader(safeTypedMetadata.Path);
         if (!shaderResult)
         {
             switch (shaderResult.error())
             {
                 case Shaders::ShaderPreProcessingError::FileNotFound:
-                    return std::unexpected(ImportingError::FileNotFound);
+                    return ImportingError::FileNotFound;
                 case Shaders::ShaderPreProcessingError::MalformedInclude:
-                    return std::unexpected(ImportingError::MalformedFile);
                 case Shaders::ShaderPreProcessingError::TokenNotFound:
-                    return std::unexpected(ImportingError::MalformedFile);
+                    return ImportingError::MalformedFile;
                 default:
-                    return std::unexpected(ImportingError::UnknownError);
+                    return ImportingError::UnknownError;
             }
         }
-
-        // TODO: Really, really, really, unstable way to determine shader type. Works for now!
-        // const auto type = typedMetadata.Path.extension() == ".vert" ? Core::Renderer::ShaderType::Vertex
-        //                                               : Core::Renderer::ShaderType::Fragment;
+        const auto& shaderParseResult = shaderResult.value();
 
         // Upload Resources
-        auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
-            typedMetadata.UUID, shaderResult.value(), typedMetadata.ShaderType
-        );
+        auto& shaderManager = AssetManager::GetInstance().GetShaderManager();
+        auto uploadResult =
+            shaderManager.UploadShader(shaderParseResult.VertexShader, shaderParseResult.FragmentShader);
 
         if (!uploadResult)
         {
             switch (uploadResult.error())
             {
+                // TODO: Because we're processing multiple shaders, how should we best return errors?
                 case ShaderManagerError::None:
-                    return std::unexpected(ImportingError::UnknownError);
+                    return ImportingError::UnknownError;
             }
         }
 
-        return std::make_unique<ShaderAsset>(uploadResult.value());
+        auto& shaderKey = uploadResult.value();
+        auto& entry = registry.Insert<ShaderAsset>(
+            safeTypedMetadata.UUID,
+            ShaderAsset(AssetHandle(safeTypedMetadata.UUID), shaderKey)
+        );
+        entry.SetState(AssetState::Ready);
+
+        return ImportingError::None;
+    }
+
+    ImportingError ShaderAssetImporter::FinalizeLoad(
+        Data::ThreadType threadType, RuntimeAssetRegistry& registry
+    )
+    {
+        // TODO: For now, shaders are finalized in the load from disk.
+        return ImportingError::None;
+
+        // constexpr auto NUMBER_OF_SHADERS_TO_PROCESS_PER_CALL = 8;
+        // for (int i = 0; i < NUMBER_OF_SHADERS_TO_PROCESS_PER_CALL && !m_shaderDataQueue.IsEmpty(); ++i)
+        // {
+        //     auto [shaderMetadata, shaderString] = m_shaderDataQueue.Dequeue();
+        //
+        //     // Upload Resources
+        //     auto uploadResult = AssetManager::GetInstance().GetShaderManager().UploadShader(
+        //         shaderMetadata.UUID, shaderString, shaderMetadata.ShaderType
+        //     );
+        //
+        //     if (!uploadResult)
+        //     {
+        //         switch (uploadResult.error())
+        //         {
+        //             // TODO: Because we're processing multiple shaders, how should we best return errors?
+        //             case ShaderManagerError::None:
+        //                 return ImportingError::UnknownError;
+        //         }
+        //     }
+        //
+        //     auto& entry = registry.Insert<ShaderAsset>(shaderMetadata.UUID, std::move(uploadResult.value()));
+        //     entry.SetState(AssetState::Ready);
+        // }
     }
 
     void ShaderAssetImporter::Unload(const AssetHandle& handle)
     {
-        AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
+        // TODO: Get from the RuntimeRegistry and destroy the shader.
+        // AssetManager::GetInstance().GetShaderManager().DestroyShader(handle);
     }
 
     std::unique_ptr<AssetMetadata> ShaderAssetImporter::CreateDefaultMetadata(
@@ -66,21 +110,6 @@ namespace RNGOEngine::AssetHandling
         auto shaderMetadata = std::make_unique<ShaderMetadata>();
 
         shaderMetadata->Type = AssetType::Shader;
-
-        if (path.extension() == ".vert")
-        {
-            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Vertex;
-        }
-        else if (path.extension() == ".frag")
-        {
-            shaderMetadata->ShaderType = Core::Renderer::ShaderType::Fragment;
-        }
-        else
-        {
-            RNGO_ASSERT(
-                false && "ShaderAssetImporter::CreateDefaultMetadata - Unsupported shader extension."
-            );
-        }
 
         return std::move(shaderMetadata);
     }

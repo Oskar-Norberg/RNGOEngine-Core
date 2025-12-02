@@ -5,6 +5,8 @@
 #pragma once
 
 #include "AssetImporter.h"
+#include "Assets/AssetLoaders/ModelLoaders/ModelLoaderData.h"
+#include "Utilities/Containers/TSQueue/TSQueue.h"
 
 namespace RNGOEngine::AssetHandling
 {
@@ -13,7 +15,10 @@ namespace RNGOEngine::AssetHandling
     public:
         explicit ModelImporter(bool doFlipUVs);
 
-        std::expected<std::unique_ptr<Asset>, ImportingError> Load(const AssetMetadata& metadata) override;
+    public:
+        ImportingError LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata) override;
+        ImportingError FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry) override;
+
         void Unload(const AssetHandle& handle) override;
 
         std::unique_ptr<AssetMetadata> CreateDefaultMetadata(
@@ -21,6 +26,13 @@ namespace RNGOEngine::AssetHandling
         ) const override;
 
         std::span<const std::string_view> GetSupportedExtensions() const override;
+        Data::ThreadType GetFinalizationThreadTypes() const override
+        {
+            return Data::ThreadType::Render;
+        }
+
+    private:
+        Containers::TSQueue<std::pair<ModelMetadata, ModelLoading::ModelData>> m_modelDataQueue;
 
     private:
         bool m_doFlipUVs;

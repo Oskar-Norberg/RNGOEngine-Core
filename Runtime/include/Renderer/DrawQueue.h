@@ -5,22 +5,54 @@
 #pragma once
 
 #include <array>
+#include <variant>
 #include <vector>
 
-#include "RenderID.h"
-#include "Uniforms.h"
+// TODO: This should probably not be linked directly to Components. Make a GPUTransform?
 #include "Components/Components.h"
+#include "Data/Shaders/ShaderSpecification.h"
+#include "RenderID.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-    constexpr auto NR_OF_POINTLIGHTS = 16;
-    constexpr auto NR_OF_SPOTLIGHTS = 16;
+    struct GPUMaterialTextureSpecification
+    {
+        TextureID TextureHandle;
+        int Slot;
+    };
+
+    struct GPUMaterialParameter
+    {
+        std::string Name;
+        std::variant<
+            bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat4, GPUMaterialTextureSpecification>
+            Data;
+    };
+
+    struct GPUMaterial
+    {
+        ShaderProgramID ShaderProgram;
+        std::vector<GPUMaterialParameter> Parameters;
+    };
+
+    struct GPUMesh
+    {
+        VAO VAO = INVALID_VAO;
+        VBO VBO = INVALID_VBO;
+        EBO EBO = INVALID_EBO;
+        size_t ElementCount = 0;
+    };
+
+    struct GPUModel
+    {
+        std::vector<GPUMesh> Meshes;
+    };
 
     struct Drawable
     {
         Components::Transform Transform;
-        AssetHandling::AssetHandle ModelHandle;
-        AssetHandling::AssetHandle Material;
+        GPUModel Model;
+        GPUMaterial Material;
     };
 
     struct CameraData
@@ -87,10 +119,10 @@ namespace RNGOEngine::Core::Renderer
         AmbientLightData AmbientLight;
         DirectionalLightData DirectionalLight;
 
-        std::array<PointLightData, NR_OF_POINTLIGHTS> PointLights;
+        std::array<PointLightData, Data::Shader::NR_OF_POINTLIGHTS.Value> PointLights;
         size_t PointLightIndex = 0;
 
-        std::array<SpotlightData, NR_OF_POINTLIGHTS> Spotlights;
+        std::array<SpotlightData, Data::Shader::NR_OF_SPOTLIGHTS.Value> Spotlights;
         size_t SpotlightIndex = 0;
 
         BackgroundColorData BackgroundColor;

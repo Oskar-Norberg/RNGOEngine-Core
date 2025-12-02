@@ -10,24 +10,31 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    std::expected<std::unique_ptr<Asset>, ImportingError> TextureAssetImporter::Load(
-        const AssetMetadata& metadata
+    ImportingError TextureAssetImporter::LoadFromDisk(
+        RuntimeAssetRegistry& registry, const AssetMetadata& metadata
     )
     {
-        const auto& typedMetadata = static_cast<const TextureMetadata&>(metadata);
+        const auto* typedMetadata = dynamic_cast<const TextureMetadata*>(&metadata);
+        if (!typedMetadata)
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Metadata type mismatch.");
+        }
+        // TODO: This is shit, but it works.
+        auto sharedCopy = std::make_shared<TextureMetadata>(*typedMetadata);
+        auto& safeTypedMetadata = *sharedCopy;
 
         // Load Texture to RAM
-        const auto textureHandle = TextureLoader::LoadTexture(typedMetadata.Path);
+        const auto textureHandle = TextureLoader::LoadTexture(safeTypedMetadata.Path);
         if (!textureHandle)
         {
             switch (textureHandle.error())
             {
                 case TextureLoader::TextureLoadingError::FileNotFound:
-                    return std::unexpected(ImportingError::FileNotFound);
+                    return ImportingError::FileNotFound;
                 case TextureLoader::TextureLoadingError::FailedToLoad:
-                    return std::unexpected(ImportingError::MalformedFile);
+                    return ImportingError::MalformedFile;
                 default:
-                    return std::unexpected(ImportingError::UnknownError);
+                    return ImportingError::UnknownError;
             }
         }
 
@@ -45,32 +52,59 @@ namespace RNGOEngine::AssetHandling
                                                          ? Core::Renderer::TextureFormat::RGB
                                                          : Core::Renderer::TextureFormat::RGBA;
 
-        const Core::Renderer::Texture2DProperties properties{
-            .Format = format,
-            .MinifyingFilter = typedMetadata.MinifyingFilter,
-            .MagnifyingFilter = typedMetadata.MagnifyingFilter,
-            .WrappingMode = typedMetadata.WrappingMode,
-        };
-        const auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
-            typedMetadata.UUID, properties, textureHandle.value().width, textureHandle.value().height,
-            std::as_bytes(textureDataSpan)
-        );
+        // TODO: Weird copy to save the format. Fix later.
+        TextureMetadata textureMetadata = safeTypedMetadata;
+        textureMetadata.Format = format;
 
-        if (!textureResult)
+        m_textureQueue.Enqueue(std::make_pair(textureMetadata, std::move(textureHandle.value())));
+
+        return ImportingError::None;
+    }
+
+    ImportingError TextureAssetImporter::FinalizeLoad(
+        Data::ThreadType threadType, RuntimeAssetRegistry& registry
+    )
+    {
+        constexpr auto NUMBER_OF_TEXTURES_TO_PROCESS_PER_CALL = 8;
+        for (int i = 0; i < NUMBER_OF_TEXTURES_TO_PROCESS_PER_CALL && !m_textureQueue.IsEmpty(); ++i)
         {
-            switch (textureResult.error())
+            auto [textureMetadata, textureData] = m_textureQueue.Dequeue();
+
+            Core::Renderer::Texture2DProperties properties{
+                .Format = textureMetadata.Format,
+                .MinifyingFilter = textureMetadata.MinifyingFilter,
+                .MagnifyingFilter = textureMetadata.MagnifyingFilter,
+                .WrappingMode = textureMetadata.WrappingMode,
+            };
+
+            const auto textureDataSpan = std::as_bytes(
+                std::span(textureData.data, textureData.width * textureData.height * textureData.nrChannels)
+            );
+
+            auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
+                textureMetadata.UUID, properties, textureData.width, textureData.height,
+                std::as_bytes(textureDataSpan)
+            );
+
+            if (!textureResult)
             {
-                case TextureManagerError::None:
-                    break;
-                default:
-                    return std::unexpected(ImportingError::UnknownError);
+                switch (textureResult.error())
+                {
+                    case TextureManagerError::None:
+                        break;
+                    default:
+                        return ImportingError::UnknownError;
+                }
             }
+
+            // Unload Model from RAM
+            TextureLoader::FreeTexture(textureData);
+
+            auto& entry = registry.Insert<TextureAsset>(textureMetadata.UUID, std::move(textureResult.value()));
+            entry.SetState(AssetState::Ready);
         }
 
-        // Unload Model from RAM
-        TextureLoader::FreeTexture(textureHandle.value());
-
-        return std::make_unique<TextureAsset>(textureResult.value());
+        return ImportingError::None;
     }
 
     void TextureAssetImporter::Unload(const AssetHandle& handle)

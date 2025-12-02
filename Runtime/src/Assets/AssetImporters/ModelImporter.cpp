@@ -16,11 +16,19 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
-    std::expected<std::unique_ptr<Asset>, ImportingError> ModelImporter::Load(const AssetMetadata& metadata)
+    ImportingError ModelImporter::LoadFromDisk(RuntimeAssetRegistry& registry, const AssetMetadata& metadata)
     {
-        const auto& typedMetadata = static_cast<const ModelMetadata&>(metadata);
+        const auto* typedMetadata = dynamic_cast<const ModelMetadata*>(&metadata);
+        if (!typedMetadata)
+        {
+            RNGO_ASSERT(false && "ModelAssetImporter::Load - Metadata type mismatch.");
+        }
+        // TODO: This is shit, but it works.
+        auto sharedCopy = std::make_shared<ModelMetadata>(*typedMetadata);
+        auto& safeTypedMetadata = *sharedCopy;
 
-        const auto extension = typedMetadata.Path.extension().string();
+        auto extension = safeTypedMetadata.Path.extension().string();
+        std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
 
         std::expected<ModelLoading::ModelData, ModelLoading::ModelLoadingError> modelHandle;
 
@@ -43,25 +51,43 @@ namespace RNGOEngine::AssetHandling
         }
 #endif
 #if 1
-        modelHandle = ModelLoading::AssimpModelLoader::LoadModel(typedMetadata.Path, m_doFlipUVs);
+        modelHandle = ModelLoading::AssimpModelLoader::LoadModel(safeTypedMetadata.Path, m_doFlipUVs);
 #endif
-        
+
         if (!modelHandle)
         {
             // TODO: More specific error types
-            return std::unexpected(ImportingError::UnknownError);
+            return ImportingError::UnknownError;
         }
 
-        // Upload to GPU
-        const auto result = AssetManager::GetInstance().GetModelManager().UploadModel(
-            typedMetadata.UUID, modelHandle.value()
-        );
-        if (!result)
+        m_modelDataQueue.Enqueue(std::make_pair(safeTypedMetadata, std::move(modelHandle.value())));
+
+        return ImportingError::None;
+    }
+
+    ImportingError ModelImporter::FinalizeLoad(Data::ThreadType threadType, RuntimeAssetRegistry& registry)
+    {
+        constexpr auto NUMBER_OF_MODELS_TO_PROCESS_PER_CALL = 8;
+        // TODO: Is having a inline boolean in the for-loop cursed?
+        for (int i = 0; i < NUMBER_OF_MODELS_TO_PROCESS_PER_CALL && !m_modelDataQueue.IsEmpty(); ++i)
         {
-            return std::unexpected(ImportingError::UnknownError);
+            auto [modelMetadata, modelHandle] = m_modelDataQueue.Dequeue();
+
+            // Upload to GPU
+            auto result =
+                AssetManager::GetInstance().GetModelManager().UploadModel(modelMetadata.UUID, modelHandle);
+            auto& asset = result.value();
+
+            if (!result)
+            {
+                return ImportingError::UnknownError;
+            }
+
+            auto& entry = registry.Insert<ModelAsset>(modelMetadata.UUID, std::move(asset));
+            entry.SetState(AssetState::Ready);
         }
 
-        return std::make_unique<ModelAsset>(result.value());
+        return ImportingError::None;
     }
 
     void ModelImporter::Unload(const AssetHandle& handle)

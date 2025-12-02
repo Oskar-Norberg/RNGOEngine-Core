@@ -122,8 +122,12 @@ namespace RNGOEngine
 
             PollWindowEvents();
 
-            OnUpdate(deltaTime);
+            // TODO: These should both swap place and run on seperate threads.
+            // These are currently swapped because the Renderer needs to load Fallback Assets before first frame update.
+            // Ideally there should be some kind of block that ensures fallback assets are fully loaded.
             OnRender();
+            OnUpdate(deltaTime);
+            
             SwapBuffers();
 
             PollGameEvents();
@@ -142,6 +146,7 @@ namespace RNGOEngine
 
     void Application::OnRender()
     {
+        m_assetLoader->LoadPendingAssets(Data::ThreadType::Render);
     }
 
     void Application::SwitchPendingScene()
