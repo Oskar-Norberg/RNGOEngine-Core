@@ -46,28 +46,44 @@ namespace RNGOEngine::Shaders
         std::string combinedShader = Utilities::IO::ReadFile(foundPath.value());
         auto splitResult = SplitVertAndFrag(combinedShader);
 
-        auto processLambda =
-            [this](std::string& shaderSource) -> std::expected<std::string, ShaderPreProcessingError>
+        if (!splitResult)
+        {
+            return std::unexpected(splitResult.error());
+        }
+
+        auto& splitShaders = splitResult.value();
+
+        auto processLambda = [this](std::string& shaderSource) -> ShaderPreProcessingError
         {
             const auto includeError = ParseIncludes(shaderSource);
             if (includeError != ShaderPreProcessingError::None)
             {
-                return std::unexpected(includeError);
+                return includeError;
             }
 
             const auto tokenError = ParseTokens(shaderSource);
             if (tokenError != ShaderPreProcessingError::None)
             {
-                return std::unexpected(tokenError);
+                return tokenError;
             }
 
-            return shaderSource;
+            return ShaderPreProcessingError::None;
         };
 
-        processLambda(splitResult.VertexShader);
-        processLambda(splitResult.FragmentShader);
+        ShaderPreProcessingError vertexLambdaResult = processLambda(splitShaders.VertexShader);
+        ShaderPreProcessingError fragmentLambdaResult = processLambda(splitShaders.FragmentShader);
 
-        return splitResult;
+        if (vertexLambdaResult != ShaderPreProcessingError::None)
+        {
+            return std::unexpected(vertexLambdaResult);
+        }
+
+        if (fragmentLambdaResult != ShaderPreProcessingError::None)
+        {
+            return std::unexpected(fragmentLambdaResult);
+        }
+
+        return splitShaders;
     }
 
     void ShaderPreProcessor::AddDefinition(const Data::Shader::ShaderDefinition& definition)
@@ -87,17 +103,35 @@ namespace RNGOEngine::Shaders
         }
     }
 
-    ShaderParseResult ShaderPreProcessor::SplitVertAndFrag(std::string_view source) const
+    std::expected<ShaderParseResult, ShaderPreProcessingError> ShaderPreProcessor::SplitVertAndFrag(
+        const std::string_view source
+    ) const
     {
-        const auto vertStart =
+        const size_t vertStart =
             source.find(Data::Shader::VERTEX_SHADER_START) + std::strlen(Data::Shader::VERTEX_SHADER_START);
-        const auto fragStart = source.find(Data::Shader::FRAGMENT_SHADER_START);
+        const size_t fragStart = source.find(Data::Shader::FRAGMENT_SHADER_START);
 
-        std::string sourceStr(source);
+        if (vertStart == std::string::npos)
+        {
+            return std::unexpected(ShaderPreProcessingError::MissingVertexStart);
+        }
+        if (fragStart == std::string::npos)
+        {
+            return std::unexpected(ShaderPreProcessingError::MissingFragmentStart);
+        }
+
+        if (fragStart < vertStart)
+        {
+            return std::unexpected(ShaderPreProcessingError::MisorderedShaders);
+        }
+
+        const std::string sourceStr(source);
 
         ShaderParseResult result;
-        result.VertexShader = sourceStr.substr(vertStart, fragStart - std::strlen(Data::Shader::FRAGMENT_SHADER_START) - 1);
-        result.FragmentShader = sourceStr.substr(fragStart + std::strlen(Data::Shader::FRAGMENT_SHADER_START));
+        result.VertexShader =
+            sourceStr.substr(vertStart, fragStart - std::strlen(Data::Shader::FRAGMENT_SHADER_START) - 1);
+        result.FragmentShader =
+            sourceStr.substr(fragStart + std::strlen(Data::Shader::FRAGMENT_SHADER_START));
 
         return result;
     }

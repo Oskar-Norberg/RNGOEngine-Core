@@ -28,6 +28,10 @@ namespace RNGOEngine::Shaders
         FileNotFound,
         MalformedInclude,
         TokenNotFound,
+        
+        MissingVertexStart,
+        MissingFragmentStart,
+        MisorderedShaders
     };
 
     class ShaderPreProcessor
@@ -40,7 +44,7 @@ namespace RNGOEngine::Shaders
         void RemoveDefinition(std::string_view name);
 
     private:
-        ShaderParseResult SplitVertAndFrag(std::string_view source) const;
+        std::expected<ShaderParseResult, ShaderPreProcessingError> SplitVertAndFrag(std::string_view source) const;
 
     private:
         ShaderPreProcessingError ParseTokens(std::string& source) const;
