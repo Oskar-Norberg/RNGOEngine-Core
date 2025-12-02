@@ -78,8 +78,8 @@ namespace RNGOEngine::Resources
 
     void MeshResourceManager::DestroyMeshResource(const MeshResource& meshResource)
     {
-        m_renderer.DestroyVAO(meshResource.vao);
-        m_renderer.DestroyVBO(meshResource.vbo);
-        m_renderer.DestroyEBO(meshResource.ebo);
+        m_renderer.DestroyVAO(meshResource.VAO);
+        m_renderer.DestroyVBO(meshResource.VBO);
+        m_renderer.DestroyEBO(meshResource.EBO);
     }
 }

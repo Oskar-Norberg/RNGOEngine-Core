@@ -62,7 +62,7 @@ namespace RNGOEngine::AssetHandling
         auto& shaderResourceManager = Resources::ResourceManager::GetInstance().GetShaderResourceManager();
         const ResolvedMaterial mat{
             .shaderProgram = shaderResourceManager.GetShaderProgram(shaderProgramKey).value(),
-            .uniforms = params->get().uniforms
+            .uniforms = params->get().Parameters
         };
 
         return mat;
@@ -77,9 +77,9 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.push_back(
+        parametersOpt->get().Parameters.push_back(
             {"Texture" + std::to_string(slot),
-             MaterialTextureSpecification{.textureHandle = textureHandle, .slot = slot}}
+             MaterialTextureSpecification{.TextureHandle = textureHandle, .Slot = slot}}
         );
     }
 
@@ -93,7 +93,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         // TODO: So much repeated code between these, make a common function.
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     void MaterialManager::SetInt(const AssetHandle& materialHandle, std::string_view name, int value)
@@ -105,7 +105,7 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     void MaterialManager::SetFloat(const AssetHandle& materialHandle, std::string_view name, float value)
@@ -117,7 +117,7 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     void MaterialManager::SetVec2(
@@ -131,7 +131,7 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     void MaterialManager::SetVec3(
@@ -145,7 +145,7 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     void MaterialManager::SetVec4(
@@ -159,7 +159,7 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     void MaterialManager::SetMat4(
@@ -173,7 +173,7 @@ namespace RNGOEngine::AssetHandling
             return;
         }
 
-        parametersOpt->get().uniforms.emplace_back(name.data(), value);
+        parametersOpt->get().Parameters.emplace_back(name.data(), value);
     }
 
     std::optional<std::reference_wrapper<const MaterialParameters>>

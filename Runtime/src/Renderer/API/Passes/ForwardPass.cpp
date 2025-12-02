@@ -7,17 +7,11 @@
 #include <format>
 #include <glm/gtc/type_ptr.hpp>
 
-// TODO: Remove when MaterialManager is less shit
-#include "Assets/AssetManager/AssetManager.h"
-#include "Assets/AssetManager/Managers/Material/Material.h"
-#include "Assets/AssetTypes/ModelAsset.h"
-#include "Assets/AssetTypes/TextureAsset.h"
-#include "Assets/Builtin/BuiltinAssetBootstrapper.h"
-#include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Profiling/Profiling.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
-#include "ResourceManager/ResourceManager.h"
+
+// TODO: Remove when MaterialManager is less shit
 
 namespace RNGOEngine::Core::Renderer
 {

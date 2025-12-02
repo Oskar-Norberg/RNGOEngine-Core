@@ -73,7 +73,7 @@ namespace RNGOEngine::Systems::Core
                 {
                     auto& meshResource = meshOpt->get();
                     gpuMeshes.emplace_back(
-                        meshResource.vao, meshResource.vbo, meshResource.ebo, meshResource.elementCount
+                        meshResource.VAO, meshResource.VBO, meshResource.EBO, meshResource.ElementCount
                     );
                 }
             }
@@ -94,41 +94,41 @@ namespace RNGOEngine::Systems::Core
 
             for (const auto& uniform : resolvedMaterial.uniforms)
             {
-                if (std::holds_alternative<bool>(uniform.data))
+                if (std::holds_alternative<bool>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<bool>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<bool>(uniform.Value));
                 }
-                else if (std::holds_alternative<int>(uniform.data))
+                else if (std::holds_alternative<int>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<int>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<int>(uniform.Value));
                 }
-                else if (std::holds_alternative<float>(uniform.data))
+                else if (std::holds_alternative<float>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<float>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<float>(uniform.Value));
                 }
-                else if (std::holds_alternative<glm::vec2>(uniform.data))
+                else if (std::holds_alternative<glm::vec2>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::vec2>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::vec2>(uniform.Value));
                 }
-                else if (std::holds_alternative<glm::vec3>(uniform.data))
+                else if (std::holds_alternative<glm::vec3>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::vec3>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::vec3>(uniform.Value));
                 }
-                else if (std::holds_alternative<glm::vec4>(uniform.data))
+                else if (std::holds_alternative<glm::vec4>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::vec4>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::vec4>(uniform.Value));
                 }
-                else if (std::holds_alternative<glm::mat4>(uniform.data))
+                else if (std::holds_alternative<glm::mat4>(uniform.Value))
                 {
-                    gpuMaterial.Parameters.emplace_back(uniform.name, std::get<glm::mat4>(uniform.data));
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::mat4>(uniform.Value));
                 }
-                else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.data))
+                else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.Value))
                 {
                     const auto& textureSpec =
-                        std::get<AssetHandling::MaterialTextureSpecification>(uniform.data);
+                        std::get<AssetHandling::MaterialTextureSpecification>(uniform.Value);
 
                     const auto textureAssetOpt =
-                        runtimeRegistry.TryGet<AssetHandling::TextureAsset>(textureSpec.textureHandle);
+                        runtimeRegistry.TryGet<AssetHandling::TextureAsset>(textureSpec.TextureHandle);
 
                     const auto& textureAsset =
                         textureAssetOpt
@@ -147,9 +147,9 @@ namespace RNGOEngine::Systems::Core
                                                         .value();
 
                     RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
-                        .TextureHandle = textureResourceOpt, .Slot = textureSpec.slot
+                        .TextureHandle = textureResourceOpt, .Slot = textureSpec.Slot
                     };
-                    gpuMaterial.Parameters.emplace_back(uniform.name, gpuTextureSpec);
+                    gpuMaterial.Parameters.emplace_back(uniform.Name, gpuTextureSpec);
                 }
             }
 
