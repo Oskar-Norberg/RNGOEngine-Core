@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <Assets/AssetLoader.h>
 #include "Components/Components.h"
 #include "entt/entity/registry.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -31,9 +32,36 @@ namespace RNGOEngine::Editor
         if (registry.any_of<Components::MeshRenderer>(entity))
         {
             ImGui::Text("MeshRenderer");
-            const auto& meshRenderer = registry.get<Components::MeshRenderer>(entity);
+            auto& meshRenderer = registry.get<Components::MeshRenderer>(entity);
             ImGui::Text("ModelHandle %u", meshRenderer.ModelHandle.GetValue());
             ImGui::Text("MaterialHandle %u", meshRenderer.MaterialKey.GetValue());
+
+            if (ImGui::Button("Change Mesh"))
+            {
+                ImGui::OpenPopup("MeshProperties");
+            }
+
+            if (ImGui::BeginPopupModal("MeshProperties"))
+            {
+                ImGui::Text("Mesh Path");
+                ImGui::Separator();
+
+                static std::array<char, 256> meshPath{};
+                ImGui::InputText("Path", meshPath.data(), 256);
+                if (ImGui::Button("Load Mesh"))
+                {
+                    const auto newModelhandle = AssetHandling::AssetLoader::GetInstance().Load(
+                        AssetHandling::AssetType::Model, meshPath.data()
+                    );
+                    meshRenderer.ModelHandle = newModelhandle;
+                }
+
+                if (ImGui::Button("Close"))
+                {
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
         }
     }
 
