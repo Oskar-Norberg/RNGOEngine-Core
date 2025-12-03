@@ -23,12 +23,24 @@ namespace RNGOEngine::Core
     protected:
         void sink_it_(const spdlog::details::log_msg& msg) override
         {
-            m_logs.push_back(
-                LogEntry{
-                    .Level = SPDLogLevelToRNGOLevel(msg.level),
-                    .Message = std::string(msg.payload.data(), msg.payload.size())
-                }
-            );
+            const char* file = msg.source.filename ? msg.source.filename : "Unknown";
+            const char* function = msg.source.funcname ? msg.source.funcname : "Unknown";
+            const size_t Line = msg.source.line;
+
+            const LogLocation location{
+                .File = file,
+                .Function = function,
+                .Line = Line
+            };
+            
+            LogEntry entry{
+                .Level = SPDLogLevelToRNGOLevel(msg.level),
+                .Message = std::string(msg.payload.data(), msg.payload.size()),
+                .Location = location,
+                .TimePoint = msg.time
+            };
+            
+            m_logs.push_back(std::move(entry));
         }
 
         void flush_() override

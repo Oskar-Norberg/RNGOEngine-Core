@@ -26,5 +26,8 @@ namespace RNGOEngine::Editor
 
         void DrawLogs(std::span<const Core::LogEntry> logs);
         void ScrollDownIfNeeded(size_t numberOfMessages);
+
+    private:
+        static std::string_view GetFormattedTime(const Core::LogEntry& entry);
     };
 }

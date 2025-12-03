@@ -51,7 +51,7 @@ namespace RNGOEngine::Editor
                     break;
             }
 
-            ImGui::Text("%s", logEntry.Message.c_str());
+            ImGui::Text("[%s] %s", GetFormattedTime(logEntry).data(), logEntry.Message.c_str());
 
             if (pushedColor)
                 ImGui::PopStyleColor();
@@ -65,5 +65,16 @@ namespace RNGOEngine::Editor
             ImGui::SetScrollHereY(1.0f);
             m_previousNrOfMessages = numberOfMessages;
         }
+    }
+
+    std::string_view ConsolePanel::GetFormattedTime(const Core::LogEntry& entry)
+    {
+        const auto time = std::chrono::system_clock::to_time_t(entry.TimePoint);
+
+        // Three two-digit numbers + two colons + null terminator
+        static std::array<char, 8 + 1> timeBuffer{};
+        std::strftime(timeBuffer.data(), timeBuffer.size(), "%H:%M:%S", std::localtime(&time));
+
+        return {timeBuffer.data(), timeBuffer.size()};
     }
 }

@@ -57,10 +57,19 @@ namespace RNGOEngine::Core
         }
     }
 
+    struct LogLocation
+    {
+        std::string_view File;
+        std::string_view Function;
+        size_t Line;
+    };
+
     struct LogEntry
     {
         LogLevel Level;
         std::string Message;
+        LogLocation Location;
+        std::chrono::time_point<std::chrono::system_clock> TimePoint;
     };
 
     class Logger : public Utilities::Singleton<Logger>
