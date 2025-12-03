@@ -4,6 +4,9 @@
 
 #pragma once
 
+#include <span>
+
+#include "Logging/Logger.h"
 #include "UI/IDockablePanel.h"
 
 namespace RNGOEngine::Editor
@@ -17,5 +20,11 @@ namespace RNGOEngine::Editor
         {
             return "Console";
         }
+
+    private:
+        size_t m_previousNrOfMessages = 0;
+
+        void DrawLogs(std::span<const Core::LogEntry> logs);
+        void ScrollDownIfNeeded(size_t numberOfMessages);
     };
 }

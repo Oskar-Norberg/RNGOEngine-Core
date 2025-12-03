@@ -12,7 +12,15 @@ namespace RNGOEngine::Editor
     {
         IDockablePanel::Render(context);
 
-        for (const auto& logEntry : context.loggerSink->GetLogs())
+        const auto logSpan = context.loggerSink->GetLogs();
+
+        DrawLogs(logSpan);
+        ScrollDownIfNeeded(logSpan.size());
+    }
+
+    void ConsolePanel::DrawLogs(const std::span<const Core::LogEntry> logs)
+    {
+        for (const auto& logEntry : logs)
         {
             bool pushedColor = false;
 
@@ -47,6 +55,15 @@ namespace RNGOEngine::Editor
 
             if (pushedColor)
                 ImGui::PopStyleColor();
+        }
+    }
+
+    void ConsolePanel::ScrollDownIfNeeded(size_t numberOfMessages)
+    {
+        if (m_previousNrOfMessages != numberOfMessages)
+        {
+            ImGui::SetScrollHereY(1.0f);
+            m_previousNrOfMessages = numberOfMessages;
         }
     }
 }
