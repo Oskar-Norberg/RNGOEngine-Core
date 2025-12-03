@@ -38,12 +38,19 @@ namespace RNGOEngine::Editor
 
     void ConsolePanel::DrawLogs(const std::span<const Core::LogEntry> logs)
     {
+        DrawFilterSelection();
+
         constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg;
         if (ImGui::BeginTable("LogTable", 1, tableFlags))
         {
             for (size_t i = 0; i < logs.size(); i++)
             {
                 const auto& logEntry = logs[i];
+
+                if ((logEntry.Level & m_filterLevel) == Core::LogLevel::None)
+                {
+                    continue;
+                }
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
@@ -88,7 +95,7 @@ namespace RNGOEngine::Editor
                 {
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, IM_COL32(60, 60, 60, 255));
 
-                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+                    if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && !ImGui::IsAnyItemActive())
                     {
                         m_selectedMessage = i;
                     }
@@ -141,7 +148,40 @@ namespace RNGOEngine::Editor
             "%s:%s:%d", GetFromLastSlash(selectedMessage.Location.File.data()).data(),
             GetFunctionName(selectedMessage).data(), selectedMessage.Location.Line
         );
-        ImGui::Text("[%s] %s", magic_enum::enum_name(selectedMessage.Level).data(), selectedMessage.Message.c_str());
+        ImGui::Text(
+            "[%s] %s", magic_enum::enum_name(selectedMessage.Level).data(), selectedMessage.Message.c_str()
+        );
+    }
+    void ConsolePanel::DrawFilterSelection()
+    {
+        if (ImGui::BeginCombo("LogLevelCombo", "Filter"))
+        {
+            constexpr auto nrOfLogLevels = magic_enum::enum_count<Core::LogLevel>();
+            // Skip first "None" and last "All"
+            for (size_t i = 1; i < nrOfLogLevels - 1; ++i)
+            {
+                ImGui::PushID(i);
+                
+                const auto logLevel = magic_enum::enum_value<Core::LogLevel>(i);
+                const auto levelName = magic_enum::enum_name(logLevel);
+                bool isSelected = (m_filterLevel & logLevel) == logLevel;
+                if (ImGui::Selectable(levelName.data(), &isSelected))
+                {
+                    if (!isSelected)
+                    {
+                        m_filterLevel &= ~logLevel;
+                    }
+                    else
+                    {
+                        m_filterLevel |= logLevel;
+                    }
+                }
+
+                ImGui::PopID();
+            }
+
+            ImGui::EndCombo();
+        }
     }
 
     std::string_view ConsolePanel::GetFormattedTime(const Core::LogEntry& entry)

@@ -13,6 +13,7 @@ namespace RNGOEngine::Core
     // This is bit-wised purely for filtering purposes.
     enum class LogLevel
     {
+        None = 0,
         Info = 1 << 0,
         Warning = 1 << 1,
         Error = 1 << 2,
@@ -21,7 +22,6 @@ namespace RNGOEngine::Core
         All = Info | Warning | Error | Critical | Debug,
     };
     DEFINE_ENUM_CLASS_BITWISE_OPERATORS(LogLevel);
-    
 
     constexpr LogLevel SPDLogLevelToRNGOLevel(spdlog::level::level_enum level)
     {
