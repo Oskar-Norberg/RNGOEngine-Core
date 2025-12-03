@@ -23,6 +23,7 @@ namespace RNGOEngine
         {
             m_vectorSink = std::make_shared<Core::VectorSink>();
             m_logger.AttachSink(m_vectorSink.value());
+            m_vectorSink->get()->set_level(spdlog::level::debug);
         }
 
 #ifdef RNGOENGINE_TRACY_ENABLE

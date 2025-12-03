@@ -5,6 +5,7 @@
 #pragma once
 #include <type_traits>
 
+#include "Utilities/EnumDefinitions.h"
 #include "spdlog/common.h"
 
 namespace RNGOEngine::Core
@@ -17,24 +18,10 @@ namespace RNGOEngine::Core
         Error = 1 << 2,
         Critical = 1 << 3,
         Debug = 1 << 4,
+        All = Info | Warning | Error | Critical | Debug,
     };
+    DEFINE_ENUM_CLASS_BITWISE_OPERATORS(LogLevel);
     
-    constexpr LogLevel operator|(LogLevel a, LogLevel b)
-    {
-        return static_cast<LogLevel>(
-            static_cast<std::underlying_type_t<LogLevel>>(a) |
-            static_cast<std::underlying_type_t<LogLevel>>(b)
-        );
-    }
-    constexpr LogLevel operator&(LogLevel a, LogLevel b)
-    {
-        return static_cast<LogLevel>(
-            static_cast<std::underlying_type_t<LogLevel>>(a) &
-            static_cast<std::underlying_type_t<LogLevel>>(b)
-        );
-    }
-    constexpr LogLevel ALL_LEVELS =
-        LogLevel::Info | LogLevel::Warning | LogLevel::Error | LogLevel::Critical | LogLevel::Debug;
 
     constexpr LogLevel SPDLogLevelToRNGOLevel(spdlog::level::level_enum level)
     {

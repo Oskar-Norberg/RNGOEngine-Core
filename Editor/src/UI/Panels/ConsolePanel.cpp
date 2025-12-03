@@ -141,7 +141,7 @@ namespace RNGOEngine::Editor
             "%s:%s:%d", GetFromLastSlash(selectedMessage.Location.File.data()).data(),
             GetFunctionName(selectedMessage).data(), selectedMessage.Location.Line
         );
-        ImGui::Text("%s", selectedMessage.Message.c_str());
+        ImGui::Text("[%s] %s", magic_enum::enum_name(selectedMessage.Level).data(), selectedMessage.Message.c_str());
     }
 
     std::string_view ConsolePanel::GetFormattedTime(const Core::LogEntry& entry)
