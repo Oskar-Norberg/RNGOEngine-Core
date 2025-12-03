@@ -9,55 +9,11 @@
 #include <magic_enum/magic_enum.hpp>
 #include <source_location>
 
+#include "LogLevel.h"
 #include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine::Core
 {
-    enum class LogLevel
-    {
-        Info,
-        Warning,
-        Error,
-        Critical,
-        Debug
-    };
-
-    constexpr LogLevel SPDLogLevelToRNGOLevel(spdlog::level::level_enum level)
-    {
-        switch (level)
-        {
-            case spdlog::level::debug:
-                return LogLevel::Debug;
-            case spdlog::level::warn:
-                return LogLevel::Warning;
-            case spdlog::level::err:
-                return LogLevel::Error;
-            case spdlog::level::critical:
-                return LogLevel::Critical;
-            case spdlog::level::info:
-            default:
-                return LogLevel::Info;
-        }
-    }
-
-    constexpr spdlog::level::level_enum RNGOLevelToSPDLogLevel(LogLevel level)
-    {
-        switch (level)
-        {
-            case LogLevel::Debug:
-                return spdlog::level::debug;
-            case LogLevel::Warning:
-                return spdlog::level::warn;
-            case LogLevel::Error:
-                return spdlog::level::err;
-            case LogLevel::Critical:
-                return spdlog::level::critical;
-            case LogLevel::Info:
-            default:
-                return spdlog::level::info;
-        }
-    }
-
     struct LogLocation
     {
         std::string_view File;
@@ -87,11 +43,9 @@ namespace RNGOEngine::Core
         )
         {
             spdlog::source_loc loc{
-                location.file_name(),
-                static_cast<int>(location.line()),
-                location.function_name()
+                location.file_name(), static_cast<int>(location.line()), location.function_name()
             };
-            
+
             // TODO: What happens if logger is not yet initialized?
             auto& logger = GetInstance().m_logger;
 

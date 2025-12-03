@@ -1,5 +1,7 @@
 ﻿set(LOGGING_PROJECT_NAME RNGOEngine_Logging)
 add_library(${LOGGING_PROJECT_NAME} STATIC
+        include/Logging/LogLevel.h
+
         include/Logging/Logger.h
         src/Logging/Logger.cpp
 
