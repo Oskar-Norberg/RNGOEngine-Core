@@ -7,6 +7,7 @@
 #include <spdlog/spdlog.h>
 
 #include <magic_enum/magic_enum.hpp>
+#include <source_location>
 
 #include "Utilities/Singleton/Singleton.h"
 
@@ -80,28 +81,22 @@ namespace RNGOEngine::Core
 
     public:
         template<typename... Args>
-        static void Log(const LogLevel level, spdlog::format_string_t<Args...> fmt, Args&&... args)
+        static void Log(
+            std::source_location location, const LogLevel level, spdlog::format_string_t<Args...> fmt,
+            Args&&... args
+        )
         {
+            spdlog::source_loc loc{
+                location.file_name(),
+                static_cast<int>(location.line()),
+                location.function_name()
+            };
+            
             // TODO: What happens if logger is not yet initialized?
             auto& logger = GetInstance().m_logger;
 
-            switch (level)
-            {
-                // Implicitly default to info.
-                default:
-                case LogLevel::Info:
-                    logger.info(fmt, std::forward<Args>(args)...);
-                    break;
-                case LogLevel::Warning:
-                    logger.warn(fmt, std::forward<Args>(args)...);
-                    break;
-                case LogLevel::Error:
-                    logger.error(fmt, std::forward<Args>(args)...);
-                    break;
-                case LogLevel::Critical:
-                    logger.critical(fmt, std::forward<Args>(args)...);
-                    break;
-            }
+            const auto logLevel = RNGOLevelToSPDLogLevel(level);
+            logger.log(loc, logLevel, fmt, std::forward<Args>(args)...);
         }
 
     public:
@@ -113,4 +108,4 @@ namespace RNGOEngine::Core
     };
 }
 
-#define RNGO_LOG(level, ...) RNGOEngine::Core::Logger::Log(level, __VA_ARGS__)
+#define RNGO_LOG(level, ...) RNGOEngine::Core::Logger::Log(std::source_location::current(), level, __VA_ARGS__)

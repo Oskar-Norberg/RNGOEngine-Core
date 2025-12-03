@@ -23,8 +23,9 @@ namespace RNGOEngine::Core
     protected:
         void sink_it_(const spdlog::details::log_msg& msg) override
         {
-            const char* file = msg.source.filename ? msg.source.filename : "Unknown";
-            const char* function = msg.source.funcname ? msg.source.funcname : "Unknown";
+            constexpr auto UNKNOWN_TEXT = "Unknown";
+            const char* file = msg.source.filename ? msg.source.filename : UNKNOWN_TEXT;
+            const char* function = msg.source.funcname ? msg.source.funcname : UNKNOWN_TEXT;
             const size_t Line = msg.source.line;
 
             const LogLocation location{
