@@ -35,10 +35,8 @@ namespace RNGOEngine::Editor
         void DrawLogs(std::span<const Core::LogEntry> logs);
 
     private:
-        // TODO: Just return an owning string, its an editor panel it doesnt matter
-        static std::string_view GetFormattedTime(const Core::LogEntry& entry);
-        // TODO: Why does this return an owning-string? This is just a substring view??
-        static std::string GetFromLastSlash(std::string_view string);
+        static std::string GetFormattedTime(const Core::LogEntry& entry);
+        static std::string_view GetFromLastSlash(std::string_view string);
         static std::string GetFunctionName(const Core::LogEntry& entry);
     };
 }

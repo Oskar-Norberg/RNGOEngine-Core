@@ -33,7 +33,7 @@ namespace RNGOEngine::AssetHandling
     AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
     {
         RNGO_LOG(
-            Core::LogLevel::Info, "AssetLoader::Load - Loading asset of type {} from path '{}'.",
+            Core::LogLevel::Debug, "Loading {} from path '{}'.",
             magic_enum::enum_name(type), searchPath.string()
         );
 
@@ -56,7 +56,7 @@ namespace RNGOEngine::AssetHandling
         if (!fullPath)
         {
             RNGO_LOG(
-                Core::LogLevel::Error, "AssetLoader::Load - Failed to find asset of type {} at path '{}'.",
+                Core::LogLevel::Error, "Failed to find {} at path '{}'.",
                 magic_enum::enum_name(type), searchPath.string()
             );
             return BuiltinAssets::GetErrorHandle(type);

@@ -91,11 +91,6 @@ namespace RNGOEngine::Editor
                         pushedLogColor = true;
                         break;
 
-                    case Core::LogLevel::Debug:
-                        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.2f, 0.2f, 0.2f, 1.0f));
-                        pushedLogColor = true;
-                        break;
-
                     case Core::LogLevel::Info:
                     default:
                         break;
@@ -188,18 +183,18 @@ namespace RNGOEngine::Editor
         }
     }
 
-    std::string_view ConsolePanel::GetFormattedTime(const Core::LogEntry& entry)
+    std::string ConsolePanel::GetFormattedTime(const Core::LogEntry& entry)
     {
         const auto time = std::chrono::system_clock::to_time_t(entry.TimePoint);
 
         // Three two-digit numbers + two colons + null terminator
-        static std::array<char, 8 + 1> timeBuffer{};
+        std::string timeBuffer(8 + 1, '\0');
         std::strftime(timeBuffer.data(), timeBuffer.size(), "%H:%M:%S", std::localtime(&time));
 
-        return {timeBuffer.data(), timeBuffer.size()};
+        return timeBuffer;
     }
 
-    std::string ConsolePanel::GetFromLastSlash(std::string_view string)
+    std::string_view ConsolePanel::GetFromLastSlash(std::string_view string)
     {
         const auto lastSlash = string.find_last_of("/\\");
 
@@ -208,7 +203,7 @@ namespace RNGOEngine::Editor
             return {};
         }
 
-        return std::string(string.begin() + lastSlash + 1, string.end());
+        return {string.begin() + lastSlash + 1, string.end()};
     }
 
     std::string ConsolePanel::GetFunctionName(const Core::LogEntry& entry)
