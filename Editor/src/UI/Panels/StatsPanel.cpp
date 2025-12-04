@@ -8,7 +8,7 @@
 
 namespace RNGOEngine::Editor
 {
-    void StatsPanel::Update(UIContext& context, float deltaTime)
+    void StatsPanel::Update(UIContext& context, const float deltaTime)
     {
         IDockablePanel::Update(context, deltaTime);
 
@@ -21,6 +21,7 @@ namespace RNGOEngine::Editor
 
         RenderFPS(context);
         RenderStackUsage(context);
+        RenderHeapUsage(context);
     }
 
     void StatsPanel::RenderFPS(UIContext& context)
@@ -33,16 +34,54 @@ namespace RNGOEngine::Editor
     {
         if (ImGui::CollapsingHeader("Stack Usage"))
         {
-            const auto memory = Utilities::Memory::GetStackMemoryUsage();
-            const double percentUsed =
-                static_cast<float>(memory.currentUsage) / static_cast<float>(memory.available) * 100.0f;
-
-            const size_t usageKB = memory.currentUsage / 1024;
-            const size_t totalKB = memory.total / 1024;
-            ImGui::Text("Stack Memory Usage: %uKB", usageKB);
-            ImGui::Text("Stack Size: %uKB", totalKB);
-            ImGui::Text("Stack Memory Used: %.2f %%", percentUsed);
+            RenderMemoryUsage(context, Utilities::Memory::GetStackMemoryUsage(), MemoryUnit::KB);
         }
+    }
+
+    void StatsPanel::RenderHeapUsage(UIContext& context)
+    {
+        if (ImGui::CollapsingHeader("Heap Usage"))
+        {
+            RenderMemoryUsage(context, Utilities::Memory::GetHeapMemoryUsage(), MemoryUnit::GB);
+        }
+    }
+    void StatsPanel::RenderMemoryUsage(
+        UIContext& context, Utilities::Memory::MemoryUsage memoryUsage, MemoryUnit unit
+    )
+    {
+        const double percentUsed =
+            static_cast<float>(memoryUsage.currentUsage) / static_cast<float>(memoryUsage.available) * 100.0f;
+
+        size_t usage = memoryUsage.currentUsage;
+        size_t total = memoryUsage.total;
+
+        std::string_view unitView;
+        switch (unit)
+        {
+            default:
+            case MemoryUnit::Bytes:
+                unitView = "B";
+                break;
+            case MemoryUnit::KB:
+                unitView = "KB";
+                usage /= 1024;
+                total /= 1024;
+                break;
+            case MemoryUnit::MB:
+                unitView = "MB";
+                usage /= 1024 * 1024;
+                total /= 1024 * 1024;
+                break;
+            case MemoryUnit::GB:
+                unitView = "GB";
+                usage /= 1024 * 1024 * 1024;
+                total /= 1024 * 1024 * 1024;
+                break;
+        }
+
+        ImGui::Text("Memory Usage: %u%s", usage, unitView.data());
+        ImGui::Text("Size: %u%s", total, unitView.data());
+        ImGui::Text("Memory Used: %.2f %%", percentUsed);
     }
 
     void StatsPanel::AccumulateDeltaTime(float deltaTime)

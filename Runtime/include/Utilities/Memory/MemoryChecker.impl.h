@@ -5,7 +5,9 @@
 #pragma once
 
 #ifdef WIN32
+// NOTE: Do not reorder.
 #include <windows.h>
+#include <psapi.h>
 #endif
 
 namespace RNGOEngine::Utilities::Memory
@@ -38,5 +40,28 @@ namespace RNGOEngine::Utilities::Memory
 
         return usage;
     };
+
+    static MemoryUsage GetHeapMemoryWin32()
+    {
+        PROCESS_MEMORY_COUNTERS_EX pmc{};
+        if (GetProcessMemoryInfo(
+                GetCurrentProcess(), reinterpret_cast<PROCESS_MEMORY_COUNTERS*>(&pmc), sizeof(pmc)
+            ))
+        {
+            MEMORYSTATUSEX statex{};
+            statex.dwLength = sizeof(statex);
+            GlobalMemoryStatusEx(&statex);
+
+            const MemoryUsage usage{
+                .currentUsage = pmc.PrivateUsage,
+                .available = statex.ullAvailPhys,
+                .total = statex.ullTotalPhys
+            };
+
+            return usage;
+        }
+
+        return MemoryUsage{0, 0, 0};
+    }
 #endif
 }

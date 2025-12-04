@@ -17,4 +17,14 @@ namespace RNGOEngine::Utilities::Memory
         return MemoryUsage{};
 #endif
     }
+
+    static MemoryUsage GetHeapMemoryUsage()
+    {
+#ifdef WIN32
+        return GetHeapMemoryWin32();
+#else
+        // TODO: Implement for other platforms
+        return MemoryUsage{};
+#endif
+    }
 }
