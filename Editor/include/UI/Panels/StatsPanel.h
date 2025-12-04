@@ -26,5 +26,12 @@ namespace RNGOEngine::Editor
         float m_accumulatedDeltaTime = 0.0f;
         int m_frameCount = 0;
         float m_fps = 0.0f;
+
+    private:
+        void RenderFPS(UIContext& context);
+        void RenderStackUsage(UIContext& context);
+
+    private:
+        void AccumulateDeltaTime(float deltaTime);
     };
 }
