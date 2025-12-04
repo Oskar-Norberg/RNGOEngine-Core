@@ -24,7 +24,7 @@ namespace RNGOEngine::Editor
 
         {
             ImGui::BeginChild("Log", ImVec2(availableX, logY));
-            DrawLogs(logSpan);
+            DrawLogWindow(logSpan);
             ImGui::EndChild();
         }
 
@@ -36,10 +36,27 @@ namespace RNGOEngine::Editor
         }
     }
 
-    void ConsolePanel::DrawLogs(const std::span<const Core::LogEntry> logs)
+    void ConsolePanel::DrawLogWindow(const std::span<const Core::LogEntry> logs)
     {
         DrawFilterSelection();
+        ImGui::Separator();
+        {
+            ImGui::BeginChild("LogList");
+            DrawLogs(logs);
+            ImGui::EndChild();
+        }
+    }
 
+    void ConsolePanel::ScrollDownIfNeeded(const size_t numberOfMessages)
+    {
+        if (m_previousNrOfMessages != numberOfMessages)
+        {
+            ImGui::SetScrollHereY(1.0f);
+            m_previousNrOfMessages = numberOfMessages;
+        }
+    }
+    void ConsolePanel::DrawLogs(const std::span<const Core::LogEntry> logs)
+    {
         constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg;
         if (ImGui::BeginTable("LogTable", 1, tableFlags))
         {
@@ -108,15 +125,6 @@ namespace RNGOEngine::Editor
         ScrollDownIfNeeded(logs.size());
     }
 
-    void ConsolePanel::ScrollDownIfNeeded(size_t numberOfMessages)
-    {
-        if (m_previousNrOfMessages != numberOfMessages)
-        {
-            ImGui::SetScrollHereY(1.0f);
-            m_previousNrOfMessages = numberOfMessages;
-        }
-    }
-
     void ConsolePanel::DrawSelected(std::span<const Core::LogEntry> logs)
     {
         if (!m_selectedMessage)
@@ -154,14 +162,12 @@ namespace RNGOEngine::Editor
     }
     void ConsolePanel::DrawFilterSelection()
     {
-        if (ImGui::BeginCombo("LogLevelCombo", "Filter"))
+        if (ImGui::BeginCombo("##LogLevelCombo", "Filter"))
         {
             constexpr auto nrOfLogLevels = magic_enum::enum_count<Core::LogLevel>();
             // Skip first "None" and last "All"
             for (size_t i = 1; i < nrOfLogLevels - 1; ++i)
             {
-                ImGui::PushID(i);
-                
                 const auto logLevel = magic_enum::enum_value<Core::LogLevel>(i);
                 const auto levelName = magic_enum::enum_name(logLevel);
                 bool isSelected = (m_filterLevel & logLevel) == logLevel;
@@ -176,8 +182,6 @@ namespace RNGOEngine::Editor
                         m_filterLevel |= logLevel;
                     }
                 }
-
-                ImGui::PopID();
             }
 
             ImGui::EndCombo();

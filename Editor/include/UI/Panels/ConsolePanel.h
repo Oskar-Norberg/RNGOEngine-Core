@@ -26,12 +26,13 @@ namespace RNGOEngine::Editor
         Core::LogLevel m_filterLevel = Core::LogLevel::All;
         std::optional<size_t> m_selectedMessage;
 
-        void DrawLogs(std::span<const Core::LogEntry> logs);
-        void ScrollDownIfNeeded(size_t numberOfMessages);
+        void DrawLogWindow(std::span<const Core::LogEntry> logs);
         void DrawSelected(std::span<const Core::LogEntry> logs);
 
     private:
         void DrawFilterSelection();
+        void ScrollDownIfNeeded(size_t numberOfMessages);
+        void DrawLogs(std::span<const Core::LogEntry> logs);
 
     private:
         // TODO: Just return an owning string, its an editor panel it doesnt matter
