@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Assets/AssetLoader.h>
+#include "Assets/AssetManager/AssetManager.h"
 #include "Components/Components.h"
 #include "entt/entity/registry.hpp"
 #include "glm/gtc/type_ptr.hpp"
@@ -54,6 +55,35 @@ namespace RNGOEngine::Editor
                         AssetHandling::AssetType::Model, meshPath.data()
                     );
                     meshRenderer.ModelHandle = newModelhandle;
+                }
+
+                if (ImGui::Button("Close"))
+                {
+                    ImGui::CloseCurrentPopup();
+                }
+                ImGui::EndPopup();
+            }
+
+            if (ImGui::Button("Change Texture"))
+            {
+                ImGui::OpenPopup("TextureProperties");
+            }
+
+            if (ImGui::BeginPopupModal("TextureProperties"))
+            {
+                ImGui::Text("Texture Path");
+                ImGui::Separator();
+
+                static std::array<char, 256> texturePath{};
+                ImGui::InputText("Path", texturePath.data(), 256);
+                static int slot = 0;
+                ImGui::InputInt("Slot", &slot);
+                if (ImGui::Button("Load Texture"))
+                {
+                    const auto& materialHandle = meshRenderer.MaterialKey;
+
+                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(AssetHandling::AssetType::Texture, texturePath.data());
+                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(materialHandle, textureHandle, slot);
                 }
 
                 if (ImGui::Button("Close"))

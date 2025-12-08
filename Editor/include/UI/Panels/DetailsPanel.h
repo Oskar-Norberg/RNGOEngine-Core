@@ -28,7 +28,7 @@ namespace RNGOEngine::Editor
         {
             DrawProperties<T>(registry, entity);
 
-            if (typeid(T) != typeid(Components::Name) || typeid(T) != typeid(Components::Transform))
+            if (typeid(T) != typeid(Components::Name) && typeid(T) != typeid(Components::Transform))
             {
                 ImGui::PushID(typeid(T).name());
                 if (ImGui::Button("Remove Component"))

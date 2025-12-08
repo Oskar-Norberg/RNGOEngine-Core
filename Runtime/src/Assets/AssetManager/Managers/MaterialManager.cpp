@@ -6,6 +6,7 @@
 
 #include "Assets/AssetLoader.h"
 #include "Assets/AssetTypes/MaterialAsset.h"
+#include "Logging/Logger.h"
 #include "Renderer/Handles/MaterialHandle.h"
 #include "ResourceManager/ResourceManager.h"
 
@@ -203,6 +204,7 @@ namespace RNGOEngine::AssetHandling
             return std::ref(const_cast<MaterialParameters&>(materialMetadata->get()));
         }
 
+        RNGO_LOG(Core::LogLevel::Warning, "Material handle {} does not exist.", materialHandle.GetValue());
         return std::nullopt;
     }
 }
