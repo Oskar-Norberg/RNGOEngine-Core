@@ -41,6 +41,10 @@ namespace RNGOEngine::Editor
 
     private:
         void DrawFolder(UIContext& context, std::string_view label, const std::filesystem::path& path);
+        void DrawAsset(
+            UIContext& context, std::string_view label, AssetHandling::AssetType type,
+            const std::filesystem::path& path
+        );
 
     private:
         static Folder LoadFolder(const std::filesystem::path& path);

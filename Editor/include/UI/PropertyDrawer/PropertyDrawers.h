@@ -8,6 +8,8 @@
 
 #include "Assets/AssetManager/AssetManager.h"
 #include "Components/Components.h"
+#include "Logging/Logger.h"
+#include "UI/AssetDragAndDrop.h"
 #include "entt/entity/registry.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
@@ -35,46 +37,48 @@ namespace RNGOEngine::Editor
         {
             ImGui::Text("MeshRenderer");
             auto& meshRenderer = registry.get<Components::MeshRenderer>(entity);
-            const auto modelMetadataOpt =
+
+            auto modelMetadataOpt =
                 AssetHandling::AssetDatabase::GetInstance().TryGetAssetMetadata(meshRenderer.ModelHandle);
 
-            if (!modelMetadataOpt.has_value())
+            // Mesh Drag and Drop
             {
-                ImGui::Text("Model: None");
-            }
-            else
-            {
-                const auto fileName = modelMetadataOpt->get().Path.filename().string();
-                ImGui::Text("Model: %s", fileName.c_str());
-            }
+                const std::string filename =
+                    modelMetadataOpt ? modelMetadataOpt->get().Path.filename().string() : "Missing";
+                
+                ImGui::PushID(&meshRenderer);
 
-            ImGui::Text("MaterialHandle %u", meshRenderer.MaterialKey.GetValue());
+                ImGui::Selectable(filename.c_str());
 
-            if (ImGui::Button("Change Mesh"))
-            {
-                ImGui::OpenPopup("MeshProperties");
-            }
-
-            if (ImGui::BeginPopupModal("MeshProperties"))
-            {
-                ImGui::Text("Mesh Path");
-                ImGui::Separator();
-
-                static std::array<char, 256> meshPath{};
-                ImGui::InputText("Path", meshPath.data(), 256);
-                if (ImGui::Button("Load Mesh"))
+                if (ImGui::BeginDragDropTarget())
                 {
-                    const auto newModelhandle = AssetHandling::AssetLoader::GetInstance().Load(
-                        AssetHandling::AssetType::Model, meshPath.data()
-                    );
-                    meshRenderer.ModelHandle = newModelhandle;
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
+
+                        const auto& dragAndDropPayload =
+                            *static_cast<const AssetDragAndDropPayload*>(payload->Data);
+
+                        if (dragAndDropPayload.type != AssetHandling::AssetType::Model)
+                        {
+                            const auto badName = dragAndDropPayload.AssetPath.filename().string();
+                            RNGO_LOG(
+                                Core::LogLevel::Warning, "Cannot load asset {} as Model.", badName.c_str()
+                            );
+                        }
+                        else
+                        {
+                            const auto newModelHandle = AssetHandling::AssetLoader::GetInstance().Load(
+                                AssetHandling::AssetType::Model, dragAndDropPayload.AssetPath
+                            );
+                            meshRenderer.ModelHandle = newModelHandle;
+                        }
+                    }
+
+                    ImGui::EndDragDropTarget();
                 }
 
-                if (ImGui::Button("Close"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
+                ImGui::PopID();
             }
 
             if (ImGui::Button("Change Texture"))

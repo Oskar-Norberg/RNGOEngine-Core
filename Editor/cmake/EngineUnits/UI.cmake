@@ -2,6 +2,8 @@ set(UI_PROJECT_NAME RNGOEditor_UI)
 add_library(${UI_PROJECT_NAME} STATIC
         include/UI/UIContext.h
 
+        include/UI/AssetDragAndDrop.h
+
         # Managers
         include/UI/Managers/UISelectionManager.h
         src/UI/Managers/UISelectionManager.cpp
