@@ -65,6 +65,11 @@ namespace RNGOEngine::Editor
         {
             SetDeferredPath(m_currentPath);
         }
+        ImGui::SameLine();
+        if (ImGui::Button("Home"))
+        {
+            SetDeferredPath(std::filesystem::current_path());
+        }
     }
 
     void ContentDrawerPanel::DrawContent(UIContext& context)
