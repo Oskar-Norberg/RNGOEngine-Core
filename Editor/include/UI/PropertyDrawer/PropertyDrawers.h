@@ -5,6 +5,7 @@
 #pragma once
 
 #include <Assets/AssetLoader.h>
+
 #include "Assets/AssetManager/AssetManager.h"
 #include "Components/Components.h"
 #include "entt/entity/registry.hpp"
@@ -34,7 +35,19 @@ namespace RNGOEngine::Editor
         {
             ImGui::Text("MeshRenderer");
             auto& meshRenderer = registry.get<Components::MeshRenderer>(entity);
-            ImGui::Text("ModelHandle %u", meshRenderer.ModelHandle.GetValue());
+            const auto modelMetadataOpt =
+                AssetHandling::AssetDatabase::GetInstance().TryGetAssetMetadata(meshRenderer.ModelHandle);
+
+            if (!modelMetadataOpt.has_value())
+            {
+                ImGui::Text("Model: None");
+            }
+            else
+            {
+                const auto fileName = modelMetadataOpt->get().Path.filename().string();
+                ImGui::Text("Model: %s", fileName.c_str());
+            }
+
             ImGui::Text("MaterialHandle %u", meshRenderer.MaterialKey.GetValue());
 
             if (ImGui::Button("Change Mesh"))
@@ -82,8 +95,12 @@ namespace RNGOEngine::Editor
                 {
                     const auto& materialHandle = meshRenderer.MaterialKey;
 
-                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(AssetHandling::AssetType::Texture, texturePath.data());
-                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(materialHandle, textureHandle, slot);
+                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(
+                        AssetHandling::AssetType::Texture, texturePath.data()
+                    );
+                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(
+                        materialHandle, textureHandle, slot
+                    );
                 }
 
                 if (ImGui::Button("Close"))
