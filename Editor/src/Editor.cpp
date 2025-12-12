@@ -8,6 +8,7 @@
 #include "Logging/VectorSink.h"
 #include "TestScene.h"
 #include "UI/Panels/ConsolePanel.h"
+#include "UI/Panels/ContentDrawerPanel.h"
 #include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/StatsPanel.h"
@@ -29,6 +30,7 @@ namespace RNGOEngine::Editor
         m_UIManager.RegisterPanel<HierarchyPanel>();
         m_UIManager.RegisterPanel<DetailsPanel>();
         m_UIManager.RegisterPanel<ConsolePanel>();
+        m_UIManager.RegisterPanel<ContentDrawerPanel>();
 
         SetUpUIContext();
         SetUpEditorContext();
