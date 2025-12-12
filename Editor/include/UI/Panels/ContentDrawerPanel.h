@@ -40,6 +40,14 @@ namespace RNGOEngine::Editor
         Folder m_currentFolder;
 
     private:
+        void DrawHeader(UIContext& context);
+        void DrawContent(UIContext& context);
+
+    private:
+        void CheckDeferredPath();
+        void SetDeferredPath(const std::filesystem::path& path);
+
+    private:
         void DrawFolder(UIContext& context, std::string_view label, const std::filesystem::path& path);
         void DrawAsset(
             UIContext& context, std::string_view label, AssetHandling::AssetType type,

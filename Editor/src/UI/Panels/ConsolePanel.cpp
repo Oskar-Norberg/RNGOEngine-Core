@@ -151,7 +151,7 @@ namespace RNGOEngine::Editor
             "%s:%s:%d", GetFromLastSlash(selectedMessage.Location.File.data()).data(),
             GetFunctionName(selectedMessage).data(), selectedMessage.Location.Line
         );
-        ImGui::Text(
+        ImGui::TextWrapped(
             "[%s] %s", magic_enum::enum_name(selectedMessage.Level).data(), selectedMessage.Message.c_str()
         );
     }

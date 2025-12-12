@@ -10,20 +10,65 @@
 namespace RNGOEngine::Editor
 {
     ContentDrawerPanel::ContentDrawerPanel()
-        : m_currentPath(std::filesystem::current_path()), m_currentFolder(LoadFolder(m_currentPath))
     {
+        SetDeferredPath(std::filesystem::current_path());
     }
 
     void ContentDrawerPanel::Render(UIContext& context)
     {
         IDockablePanel::Render(context);
 
-        if (m_queuedSelectionPath)
+        // Preparation
+        CheckDeferredPath();
+
+        // Rendering
+        DrawHeader(context);
+        ImGui::Separator();
         {
-            m_currentPath = m_queuedSelectionPath.value();
-            m_currentFolder = LoadFolder(m_currentPath);
+            ImGui::BeginChild("ContentDrawerPanelContent");
+            DrawContent(context);
+            ImGui::EndChild();
+        }
+    }
+
+    Folder ContentDrawerPanel::LoadFolder(const std::filesystem::path& path)
+    {
+        Folder folder;
+
+        for (const auto& entry : std::filesystem::directory_iterator(path))
+        {
+            if (entry.is_directory())
+            {
+                folder.Folders.push_back(entry.path());
+            }
+            else
+            {
+                // TODO: Store asset type in the metadata and load that instead of just listing all files in path.
+
+                // TODO: EXTREMELY TEMPORARY HACK
+                AssetHandling::AssetType type = AssetHandling::AssetType::None;
+                const auto extension = entry.path().extension().string();
+                if (extension == ".obj" || extension == ".fbx" || extension == ".gltf")
+                {
+                    type = AssetHandling::AssetType::Model;
+                }
+                folder.Assets.emplace_back(type, entry.path());
+            }
         }
 
+        return folder;
+    }
+
+    void ContentDrawerPanel::DrawHeader(UIContext& context)
+    {
+        if (ImGui::Button("Refresh"))
+        {
+            SetDeferredPath(m_currentPath);
+        }
+    }
+
+    void ContentDrawerPanel::DrawContent(UIContext& context)
+    {
         constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg;
         if (ImGui::BeginTable("Folder", 1, tableFlags))
         {
@@ -61,32 +106,19 @@ namespace RNGOEngine::Editor
         }
     }
 
-    Folder ContentDrawerPanel::LoadFolder(const std::filesystem::path& path)
+    void ContentDrawerPanel::CheckDeferredPath()
     {
-        Folder folder;
-
-        for (const auto& entry : std::filesystem::directory_iterator(path))
+        if (m_queuedSelectionPath)
         {
-            if (entry.is_directory())
-            {
-                folder.Folders.push_back(entry.path());
-            }
-            else
-            {
-                // TODO: Store asset type in the metadata and load that instead of just listing all files in path.
-
-                // TODO: EXTREMELY TEMPORARY HACK
-                AssetHandling::AssetType type = AssetHandling::AssetType::None;
-                const auto extension = entry.path().extension().string();
-                if (extension == ".obj" || extension == ".fbx" || extension == ".gltf")
-                {
-                    type = AssetHandling::AssetType::Model;
-                }
-                folder.Assets.emplace_back(type, entry.path());
-            }
+            m_currentPath = m_queuedSelectionPath.value();
+            m_currentFolder = LoadFolder(m_currentPath);
+            m_queuedSelectionPath.reset();
         }
+    }
 
-        return folder;
+    void ContentDrawerPanel::SetDeferredPath(const std::filesystem::path& path)
+    {
+        m_queuedSelectionPath = path;
     }
 
     void ContentDrawerPanel::DrawFolder(
@@ -98,7 +130,7 @@ namespace RNGOEngine::Editor
         {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
-                m_queuedSelectionPath = path;
+                SetDeferredPath(path);
             }
         }
     }
@@ -110,7 +142,8 @@ namespace RNGOEngine::Editor
     {
         static AssetDragAndDropPayload assetDragAndDropPayload;
 
-        const auto labelWithType = "[" + std::string(magic_enum::enum_name(type)) + "] " + path.filename().string();
+        const auto labelWithType =
+            "[" + std::string(magic_enum::enum_name(type)) + "] " + path.filename().string();
         const auto labelWithTypeView = std::string_view(labelWithType);
         ImGui::Selectable(labelWithTypeView.data(), false, ImGuiSelectableFlags_AllowDoubleClick);
 
