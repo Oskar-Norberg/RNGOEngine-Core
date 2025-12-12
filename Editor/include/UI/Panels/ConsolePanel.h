@@ -23,7 +23,7 @@ namespace RNGOEngine::Editor
 
     private:
         size_t m_previousNrOfMessages = 0;
-        Core::LogLevel m_filterLevel = Core::LogLevel::All;
+        Core::LogLevel m_filterLevel = Core::LogLevel::All & ~Core::LogLevel::Debug;
         std::optional<size_t> m_selectedMessage;
 
         void DrawLogWindow(std::span<const Core::LogEntry> logs);

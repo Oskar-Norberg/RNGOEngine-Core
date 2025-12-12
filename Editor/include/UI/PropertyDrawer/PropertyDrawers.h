@@ -5,8 +5,11 @@
 #pragma once
 
 #include <Assets/AssetLoader.h>
+
 #include "Assets/AssetManager/AssetManager.h"
 #include "Components/Components.h"
+#include "Logging/Logger.h"
+#include "UI/AssetDragAndDrop.h"
 #include "entt/entity/registry.hpp"
 #include "glm/gtc/type_ptr.hpp"
 #include "imgui.h"
@@ -34,34 +37,48 @@ namespace RNGOEngine::Editor
         {
             ImGui::Text("MeshRenderer");
             auto& meshRenderer = registry.get<Components::MeshRenderer>(entity);
-            ImGui::Text("ModelHandle %u", meshRenderer.ModelHandle.GetValue());
-            ImGui::Text("MaterialHandle %u", meshRenderer.MaterialKey.GetValue());
 
-            if (ImGui::Button("Change Mesh"))
+            auto modelMetadataOpt =
+                AssetHandling::AssetDatabase::GetInstance().TryGetAssetMetadata(meshRenderer.ModelHandle);
+
+            // Mesh Drag and Drop
             {
-                ImGui::OpenPopup("MeshProperties");
-            }
+                const std::string filename =
+                    modelMetadataOpt ? modelMetadataOpt->get().Path.filename().string() : "Missing";
+                
+                ImGui::PushID(&meshRenderer);
 
-            if (ImGui::BeginPopupModal("MeshProperties"))
-            {
-                ImGui::Text("Mesh Path");
-                ImGui::Separator();
+                ImGui::Selectable(filename.c_str());
 
-                static std::array<char, 256> meshPath{};
-                ImGui::InputText("Path", meshPath.data(), 256);
-                if (ImGui::Button("Load Mesh"))
+                if (ImGui::BeginDragDropTarget())
                 {
-                    const auto newModelhandle = AssetHandling::AssetLoader::GetInstance().Load(
-                        AssetHandling::AssetType::Model, meshPath.data()
-                    );
-                    meshRenderer.ModelHandle = newModelhandle;
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
+
+                        const auto& dragAndDropPayload =
+                            *static_cast<const AssetDragAndDropPayload*>(payload->Data);
+
+                        if (dragAndDropPayload.type != AssetHandling::AssetType::Model)
+                        {
+                            const auto badName = dragAndDropPayload.AssetPath.filename().string();
+                            RNGO_LOG(
+                                Core::LogLevel::Warning, "Cannot load asset {} as Model.", badName.c_str()
+                            );
+                        }
+                        else
+                        {
+                            const auto newModelHandle = AssetHandling::AssetLoader::GetInstance().Load(
+                                AssetHandling::AssetType::Model, dragAndDropPayload.AssetPath
+                            );
+                            meshRenderer.ModelHandle = newModelHandle;
+                        }
+                    }
+
+                    ImGui::EndDragDropTarget();
                 }
 
-                if (ImGui::Button("Close"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
+                ImGui::PopID();
             }
 
             if (ImGui::Button("Change Texture"))
@@ -82,8 +99,12 @@ namespace RNGOEngine::Editor
                 {
                     const auto& materialHandle = meshRenderer.MaterialKey;
 
-                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(AssetHandling::AssetType::Texture, texturePath.data());
-                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(materialHandle, textureHandle, slot);
+                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(
+                        AssetHandling::AssetType::Texture, texturePath.data()
+                    );
+                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(
+                        materialHandle, textureHandle, slot
+                    );
                 }
 
                 if (ImGui::Button("Close"))
