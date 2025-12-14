@@ -37,9 +37,9 @@ namespace RNGOEngine::Core::Renderer
 
     struct GPUMesh
     {
-        VAO VAO = INVALID_VAO;
-        VBO VBO = INVALID_VBO;
-        EBO EBO = INVALID_EBO;
+        VAO Vao = INVALID_VAO;
+        VBO Vbo = INVALID_VBO;
+        EBO Ebo = INVALID_EBO;
         size_t ElementCount = 0;
     };
 

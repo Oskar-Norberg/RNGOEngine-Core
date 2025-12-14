@@ -288,7 +288,7 @@ namespace RNGOEngine::Core::Renderer
 
             for (const auto& meshData : opaqueDrawCall.Model.Meshes)
             {
-                m_renderer.BindToVAO(meshData.VAO);
+                m_renderer.BindToVAO(meshData.Vao);
                 m_renderer.DrawElement(meshData.ElementCount);
             }
         }

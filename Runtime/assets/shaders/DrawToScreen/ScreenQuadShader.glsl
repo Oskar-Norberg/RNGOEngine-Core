@@ -1,4 +1,4 @@
-﻿#vertex_shader
+#vertex_shader
 
 #version 330 core
 

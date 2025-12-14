@@ -33,7 +33,7 @@ namespace RNGOEngine
         bool doFlipTexturesVertically = false;
 
         // Set Up Renderer
-        switch (config.RenderType)
+        switch (config.Renderer)
         {
             case RenderType::GLFW_OpenGL:
             {
@@ -75,7 +75,7 @@ namespace RNGOEngine
         m_rendererAPI = std::make_unique<Core::Renderer::RenderAPI>(*m_renderer, config.Width, config.Height);
         switch (config.Pipeline)
         {
-            case Pipeline::Forward:
+            case PipelineType::Forward:
             {
                 m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
                     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
@@ -85,10 +85,10 @@ namespace RNGOEngine
                 );
             }
             break;
-            case Pipeline::ForwardPlus:
+            case PipelineType::ForwardPlus:
                 RNGO_ASSERT(false && "Forward Plus pipeline not implemented.");
                 break;
-            case Pipeline::Deferred:
+            case PipelineType::Deferred:
                 RNGO_ASSERT(false && "Deferred pipeline not implemented.");
                 break;
         }

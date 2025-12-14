@@ -1,4 +1,4 @@
-﻿#include <includes/light-definitions.common>
+#include <includes/light-definitions.common>
 
 // --- Light Variables ---
 // TODO: These should not be be set per object, but in a global uniform block.

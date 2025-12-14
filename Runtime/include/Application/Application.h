@@ -29,7 +29,7 @@ namespace RNGOEngine
         GLFW_OpenGL,
     };
 
-    enum class Pipeline
+    enum class PipelineType
     {
         Forward,
         ForwardPlus,
@@ -38,8 +38,8 @@ namespace RNGOEngine
 
     struct EngineConfig
     {
-        RenderType RenderType = RenderType::Headless;
-        Pipeline Pipeline = Pipeline::Forward;
+        RenderType Renderer = RenderType::Headless;
+        PipelineType Pipeline = PipelineType::Forward;
         size_t Width = 800;
         size_t Height = 600;
         std::string_view Name = "RNGOEngine Application";
