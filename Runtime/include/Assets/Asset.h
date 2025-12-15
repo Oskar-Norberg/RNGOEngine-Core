@@ -83,7 +83,7 @@ namespace RNGOEngine::AssetHandling
         virtual ~AssetMetadata() = default;
 
         Utilities::UUID UUID = Utilities::GenerateUUID();
-        std::filesystem::path Path;
+        std::filesystem::path Path = {};
         AssetType Type = AssetType::None;
     };
 }

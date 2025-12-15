@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include "Assets/Asset.h"
 
 namespace RNGOEngine::AssetHandling
@@ -13,7 +14,7 @@ namespace RNGOEngine::AssetHandling
     {
     public:
         TextureAsset(AssetHandle&& handle, TextureKey&& m_texture_key)
-            : Asset(std::move(handle)), m_textureKey(std::move(m_texture_key))
+            : Asset(std::move(handle)), m_textureKey(m_texture_key)
         {
         }
 

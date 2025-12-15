@@ -26,7 +26,6 @@ namespace RNGOEngine::AssetHandling
           m_assetRegistry(assetRegistry),
           m_assetDatabase(assetDatabase),
           m_assetFetcher(assetFetcher)
-
     {
     }
 
@@ -114,7 +113,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         // Save metadata to file?
-        // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
+        SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
 
         return handle;
     }

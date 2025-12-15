@@ -10,13 +10,26 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: NEED VERSIONING SYSTEM. METADATA SHITS ITSELF WHEN I ADD/REMOVE FIELDS.
+    constexpr auto METADATA_VERSION = 1;
+
     class AssetSerializer
     {
     public:
         virtual ~AssetSerializer() = default;
 
-        virtual void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter);
+        // API
+    public:
+        virtual void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter) = 0;
         virtual std::unique_ptr<AssetMetadata> Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) = 0;
+
+        // Common
+    protected:
+        void SerializeCommon(const AssetMetadata& metadata, YAML::Emitter& emitter);
+        void DeserializeCommon(YAML::Node& node, AssetMetadata& outMetadata, const std::filesystem::path& assetPath);
+
+        // Implementation
+    protected:
+        virtual void SerializeImpl(const AssetMetadata& metadata, YAML::Emitter& emitter) = 0;
+        virtual void DeserializeImpl(YAML::Node& node, AssetMetadata& outMetadata) = 0;
     };
 }

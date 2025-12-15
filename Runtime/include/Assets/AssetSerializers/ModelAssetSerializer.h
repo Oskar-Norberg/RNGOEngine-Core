@@ -15,24 +15,26 @@ namespace RNGOEngine::AssetHandling
     public:
         void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter) override
         {
-            AssetSerializer::Serialize(metadata, emitter);
-
-            // TODO: Potentially questionable downcast.
-            const auto& modelMetadata = static_cast<const ModelMetadata&>(metadata);
-            // ModelMetadata has no specific fields yet.
+            SerializeCommon(metadata, emitter);
+            SerializeImpl(metadata, emitter);
         }
 
-        std::unique_ptr<AssetMetadata> Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) override
+        std::unique_ptr<AssetMetadata> Deserialize(
+            YAML::Node& node, const std::filesystem::path& assetPath
+        ) override
         {
-            const auto uuidVal = node["UUID"].as<uint64_t>();
-            const auto type = static_cast<AssetType>(node["Type"].as<int>());
-
             auto metadata = std::make_unique<ModelMetadata>();
-            metadata->UUID = Utilities::UUID(uuidVal);
-            metadata->Type = type;
-            metadata->Path = assetPath;
-
+            DeserializeCommon(node, *metadata, assetPath);
+            DeserializeImpl(node, *metadata);
             return std::move(metadata);
+        }
+
+    protected:
+        void SerializeImpl(const AssetMetadata& metadata, YAML::Emitter& emitter) override
+        {
+        }
+        void DeserializeImpl(YAML::Node& node, AssetMetadata& outMetadata) override
+        {
         }
     };
 }
