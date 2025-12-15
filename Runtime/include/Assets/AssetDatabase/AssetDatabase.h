@@ -27,6 +27,7 @@ namespace RNGOEngine::AssetHandling
         // Register / Unregister
     public:
         void RegisterAsset(AssetType type, std::unique_ptr<AssetMetadata> metadata);
+
         void UnregisterAsset(const AssetHandle& uuid);
 
         // State

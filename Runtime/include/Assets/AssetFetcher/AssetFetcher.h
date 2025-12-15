@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <optional>
+#include <string_view>
 #include <vector>
 
 #include "Assets/Asset.h"
@@ -20,9 +21,14 @@ namespace RNGOEngine::AssetHandling
 
         // Accessors
     public:
-        std::optional<std::filesystem::path> GetPath(AssetType type,
-                                                           const std::filesystem::path& path) const;
+        std::optional<std::filesystem::path> GetPath(AssetType type, const std::filesystem::path& path) const;
         void AddAssetPath(AssetType type, const std::filesystem::path& path);
+
+    public:
+        // Recursively scan all asset paths and callback for each file with said extension.
+        void ForEachOfExtension(
+            std::string_view extension, const std::function<void(const std::filesystem::path&)>& callback
+        );
 
     private:
         std::array<std::vector<std::filesystem::path>, AssetTypeCount> m_assetPaths;

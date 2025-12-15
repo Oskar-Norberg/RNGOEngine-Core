@@ -29,7 +29,7 @@ namespace RNGOEngine
 #ifdef RNGOENGINE_TRACY_ENABLE
         RNGO_LOG(Core::LogLevel::Info, "Profiling with Tracy enabled.");
 #endif
-        
+
         bool doFlipTexturesVertically = false;
 
         // Set Up Renderer
@@ -67,6 +67,14 @@ namespace RNGOEngine
         );
         AssetHandling::BootstrapContext context = {*m_assetLoader, doFlipTexturesVertically};
         AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
+
+        m_assetFetcher.ForEachOfExtension(
+            ".meta",
+            [this](const std::filesystem::path& metaPath)
+            {
+                m_assetLoader->Register(metaPath);
+            }
+        );
 
         // Asset Managers
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_resourceManager);
@@ -128,7 +136,7 @@ namespace RNGOEngine
             // Ideally there should be some kind of block that ensures fallback assets are fully loaded.
             OnRender();
             OnUpdate(deltaTime);
-            
+
             SwapBuffers();
 
             PollGameEvents();

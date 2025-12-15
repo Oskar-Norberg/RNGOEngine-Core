@@ -32,7 +32,6 @@ namespace RNGOEngine::AssetHandling
         const AssetType type =
             magic_enum::enum_cast<AssetType>(node["Type"].as<std::string>()).value_or(AssetType::None);
         outMetadata.Type = type;
-
         outMetadata.Path = assetPath;
     }
 }

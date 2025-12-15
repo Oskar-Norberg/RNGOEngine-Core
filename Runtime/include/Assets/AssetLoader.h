@@ -29,6 +29,7 @@ namespace RNGOEngine::AssetHandling
         );
 
         AssetHandle Import(AssetType type, const std::filesystem::path& filePath) const;
+        void Register(const std::filesystem::path& metadataPath) const;
 
         // TODO: Make this async.
         void Load(const AssetHandle& handle) const;

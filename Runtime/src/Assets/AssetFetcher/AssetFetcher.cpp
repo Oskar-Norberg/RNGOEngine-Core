@@ -75,4 +75,35 @@ namespace RNGOEngine::AssetHandling
             m_assetPaths[assetTypeIndex].push_back(path);
         }
     }
+    void AssetFetcher::ForEachOfExtension(
+        const std::string_view extension, const std::function<void(const std::filesystem::path&)>& callback
+    )
+    {
+        const std::filesystem::path ext{extension};
+
+        for (const auto& pathCollection : m_assetPaths)
+        {
+            for (const auto& root : pathCollection)
+            {
+                if (!std::filesystem::exists(root) || !std::filesystem::is_directory(root))
+                {
+                    continue;
+                }
+
+                for (const auto& entry : std::filesystem::recursive_directory_iterator(root))
+                {
+                    if (!entry.is_regular_file())
+                    {
+                        continue;
+                    }
+
+                    if (entry.path().extension() == ext)
+                    {
+                        callback(entry.path());
+                    }
+                }
+            }
+        }
+    }
+
 }

@@ -32,6 +32,7 @@ namespace RNGOEngine::AssetHandling
         Material,
         Count
     };
+    // TODO: this should probably be replaced with the magic_enum count instead.
     constexpr std::size_t AssetTypeCount = std::to_underlying(AssetType::Count);
 
     enum class AssetState
