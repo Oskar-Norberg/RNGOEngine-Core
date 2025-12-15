@@ -4,8 +4,13 @@
 
 #include "UI/Panels/ContentDrawerPanel.h"
 
+#include <unordered_set>
+
+#include "Assets/AssetDatabase/AssetDatabase.h"
 #include "UI/AssetDragAndDrop.h"
 #include "magic_enum/magic_enum.hpp"
+#include "yaml-cpp/node/node.h"
+#include "yaml-cpp/node/parse.h"
 
 namespace RNGOEngine::Editor
 {
@@ -35,28 +40,110 @@ namespace RNGOEngine::Editor
     {
         Folder folder;
 
+        const auto metadataMap = ScanMetadata(path, folder);
+
+        ScanAssets(path, metadataMap, folder);
+        ScanFolders(path, folder);
+        ScanUnimportedFiles(path, metadataMap, folder);
+
+        return folder;
+    }
+
+    std::unordered_map<std::filesystem::path, AssetHandling::AssetType> ContentDrawerPanel::ScanMetadata(
+        const std::filesystem::path& path, Folder& outFolder
+    )
+    {
+        std::unordered_map<std::filesystem::path, AssetHandling::AssetType> metadataMap;
+
         for (const auto& entry : std::filesystem::directory_iterator(path))
         {
             if (entry.is_directory())
             {
-                folder.Folders.push_back(entry.path());
+                continue;
             }
-            else
-            {
-                // TODO: Store asset type in the metadata and load that instead of just listing all files in path.
 
-                // TODO: EXTREMELY TEMPORARY HACK
-                AssetHandling::AssetType type = AssetHandling::AssetType::None;
-                const auto extension = entry.path().extension().string();
-                if (extension == ".obj" || extension == ".fbx" || extension == ".gltf")
-                {
-                    type = AssetHandling::AssetType::Model;
-                }
-                folder.Assets.emplace_back(type, entry.path());
+            if (entry.path().extension() != ".meta")
+            {
+                continue;
             }
+
+            YAML::Node node = YAML::LoadFile(entry.path().string());
+            const auto typeOpt =
+                magic_enum::enum_cast<AssetHandling::AssetType>(node["Type"].as<std::string>());
+
+            if (!typeOpt)
+            {
+                // TODO: Log error? That's gonna spam console...
+                continue;
+            }
+
+            const auto type = typeOpt.value();
+            const auto assetPath = entry.path().parent_path() / entry.path().stem();
+            metadataMap.emplace(assetPath, type);
         }
 
-        return folder;
+        return metadataMap;
+    }
+
+    void ContentDrawerPanel::ScanAssets(
+        const std::filesystem::path& path,
+        const std::unordered_map<std::filesystem::path, AssetHandling::AssetType>& metadataMap,
+        Folder& outFolder
+    )
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(path))
+        {
+            if (entry.is_directory())
+            {
+                continue;
+            }
+
+            const auto it = metadataMap.find(entry.path());
+            if (it != metadataMap.end())
+            {
+                outFolder.Assets.emplace_back(it->second, entry.path());
+            }
+        }
+    }
+
+    void ContentDrawerPanel::ScanFolders(const std::filesystem::path& path, Folder& outFolder)
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(path))
+        {
+            if (!entry.is_directory())
+            {
+                continue;
+            }
+
+            outFolder.Folders.emplace_back(entry.path());
+        }
+    }
+
+    void ContentDrawerPanel::ScanUnimportedFiles(
+        const std::filesystem::path& path,
+        const std::unordered_map<std::filesystem::path, AssetHandling::AssetType>& metadataMap,
+        Folder& outFolder
+    )
+    {
+        for (const auto& entry : std::filesystem::directory_iterator(path))
+        {
+            if (entry.is_directory())
+            {
+                continue;
+            }
+
+            if (entry.path().extension() == ".meta")
+            {
+                continue;
+            }
+
+            if (metadataMap.contains(entry.path()))
+            {
+                continue;
+            }
+
+            outFolder.Assets.emplace_back(AssetHandling::AssetType::None, entry.path());
+        }
     }
 
     void ContentDrawerPanel::DrawHeader(UIContext& context)
@@ -155,19 +242,24 @@ namespace RNGOEngine::Editor
         constexpr ImGuiDragDropFlags src_flags =
             ImGuiDragDropFlags_SourceNoDisableHover | ImGuiDragDropFlags_SourceNoHoldToOpenOthers;
 
-        if (ImGui::BeginDragDropSource(src_flags))
+        if (AssetHandling::AssetDatabase::GetInstance().IsRegistered(path))
         {
-            if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
+            if (ImGui::BeginDragDropSource(src_flags))
             {
-                ImGui::Text("Moving");
-            }
+                if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
+                {
+                    ImGui::Text("Moving");
+                }
 
-            // TODO: TEMPORARYYYYYYYYYYYYYYYYYYY
-            assetDragAndDropPayload = {type, Utilities::GenerateUUID()};
-            ImGui::SetDragDropPayload(
-                AssetDragAndDropName, &assetDragAndDropPayload, sizeof(AssetDragAndDropPayload)
-            );
-            ImGui::EndDragDropSource();
+                const auto handle = AssetHandling::AssetDatabase::GetInstance().GetAssetHandle(path);
+
+                assetDragAndDropPayload = {type, handle};
+                ImGui::SetDragDropPayload(
+                    AssetDragAndDropName, &assetDragAndDropPayload, sizeof(AssetDragAndDropPayload)
+                );
+
+                ImGui::EndDragDropSource();
+            }
         }
     }
 }

@@ -71,13 +71,16 @@ namespace RNGOEngine::AssetHandling
             YAML::Node node = YAML::LoadFile(metaFilePath);
             std::unique_ptr<AssetMetadata> metadata = serializer.Deserialize(node, fullPath.value());
             assetHandle = metadata->UUID;
+            // TODO: Ugly absolute path hack. This should be stored relative to project root.
+            metadata->Path = absolute(fullPath.value());
 
             database.RegisterAsset(type, std::move(metadata));
         }
         else
         {
             std::unique_ptr<AssetMetadata> metadata = importer.CreateDefaultMetadata(fullPath.value());
-            metadata->Path = fullPath.value();
+            // TODO: Another ugly absolute path hack
+            metadata->Path = absolute(fullPath.value());
 
             assetHandle = metadata->UUID;
             AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
@@ -114,6 +117,8 @@ namespace RNGOEngine::AssetHandling
 
         const auto nonMetadataPath = metadataPath.parent_path() / metadataPath.stem();
         std::unique_ptr<AssetMetadata> metadata = serializer.Deserialize(node, nonMetadataPath);
+        // TODO: Another ugly absolute path hack
+        metadata->Path = absolute(nonMetadataPath);
 
         if (!AssetDatabase::GetInstance().IsRegistered(metadata->UUID))
         {
