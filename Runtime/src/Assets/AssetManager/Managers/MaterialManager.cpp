@@ -32,7 +32,7 @@ namespace RNGOEngine::AssetHandling
         auto& shaderAsset = shaderAssetOpt->get();
         auto shaderKey = shaderAsset.GetShaderKey();
 
-        const auto uuid = Utilities::UUID();
+        const auto uuid = Utilities::GenerateUUID();
 
         const auto runtimeMaterialData = RuntimeMaterial{.materialUUID = uuid, .shaderProgramKey = shaderKey};
 

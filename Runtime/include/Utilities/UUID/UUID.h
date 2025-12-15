@@ -4,8 +4,9 @@
 
 #pragma once
 
-#include <functional>
 #include <cstdint>
+#include <functional>
+#include <random>
 
 namespace RNGOEngine::Utilities
 {
@@ -15,9 +16,10 @@ namespace RNGOEngine::Utilities
     class UUID
     {
     public:
-        UUID();
         explicit UUID(std::uint64_t value);
-        
+        // NOTE: Default constructs to zero UUID. Make sure this is your intention. Use GenerateUUID() to get a random UUID.
+        UUID();
+
         ~UUID();
         UUID(const UUID& other);
         UUID& operator=(const UUID& other);
@@ -39,6 +41,15 @@ namespace RNGOEngine::Utilities
     private:
         std::uint64_t m_uuid;
     };
+
+    static UUID GenerateUUID()
+    {
+        static std::random_device s_randomDevice;
+        static std::mt19937_64 s_generator(s_randomDevice());
+        static std::uniform_int_distribution<uint64_t> s_distribution;
+
+        return UUID(s_distribution(s_generator));
+    }
 }
 
 // Hash Function for UUIDs

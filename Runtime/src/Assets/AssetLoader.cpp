@@ -64,6 +64,7 @@ namespace RNGOEngine::AssetHandling
 
         auto& database = AssetDatabase::GetInstance();
         auto& registry = RuntimeAssetRegistry::GetInstance();
+
         // Check if asset has already been loaded
         if (database.IsRegistered(fullPath.value()))
         {
