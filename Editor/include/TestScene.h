@@ -21,12 +21,18 @@ namespace RNGOEngine::Temporary
             auto& assetLoader = AssetHandling::AssetLoader::GetInstance();
             auto& materialManager = assetManager.GetMaterialManager();
 
-            const auto shaderHandle = assetLoader.Load(Shader, "default.glsl");
+            const auto shaderHandle = assetLoader.Import(Shader, "default.glsl");
+
+            assetLoader.Load(shaderHandle);
 
             {
                 // Cirno Setup
-                const auto cirnoMesh = assetLoader.Load(Model, "cirno/cirno.obj");
-                const auto cirnoTexture = assetLoader.Load(Texture, "cirno_albedo.jpeg");
+
+                const auto cirnoMesh = assetLoader.Import(Model, "cirno/cirno.obj");
+                const auto cirnoTexture = assetLoader.Import(Texture, "cirno_albedo.jpeg");
+
+                assetLoader.Load(cirnoMesh);
+                assetLoader.Load(cirnoTexture);
 
                 auto cirnoMaterial = assetManager.GetMaterialManager().CreateMaterial(shaderHandle);
                 cirnoMaterial.SetTexture(cirnoTexture, 0);
@@ -43,8 +49,11 @@ namespace RNGOEngine::Temporary
 
             // Reimu setup
             {
-                const auto reimuMesh = assetLoader.Load(Model, "reimu/reim2u.obj");
-                const auto reimuTexture = assetLoader.Load(Texture, "reimu_albedo.png");
+                const auto reimuMesh = assetLoader.Import(Model, "reimu/reim2u.obj");
+                const auto reimuTexture = assetLoader.Import(Texture, "reimu_albedo.png");
+                assetLoader.Load(reimuMesh);
+                assetLoader.Load(reimuTexture);
+
                 auto reimuMaterial = materialManager.CreateMaterial(shaderHandle);
                 reimuMaterial.SetTexture(reimuTexture, 0);
 
@@ -88,8 +97,11 @@ namespace RNGOEngine::Temporary
 
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);
 
-                const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
-                const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
+                const auto lampMesh = assetLoader.Import(Model, "sphere/sphere.fbx");
+                const auto lampTexture = assetLoader.Import(Texture, "reimu_albedo.png");
+                assetLoader.Load(lampMesh);
+                assetLoader.Load(lampTexture);
+
                 auto lampMaterial = materialManager.CreateMaterial(shaderHandle);
                 lampMaterial.SetTexture(lampTexture, 0);
 
@@ -110,8 +122,11 @@ namespace RNGOEngine::Temporary
 
                 auto pointLight = world.CreateEntity({"Point Light"}, transform);
 
-                const auto lampMesh = assetLoader.Load(Model, "sphere/sphere.fbx");
-                const auto lampTexture = assetLoader.Load(Texture, "reimu_albedo.png");
+                const auto lampMesh = assetLoader.Import(Model, "sphere/sphere.fbx");
+                const auto lampTexture = assetLoader.Import(Texture, "reimu_albedo.png");
+                assetLoader.Load(lampMesh);
+                assetLoader.Load(lampTexture);
+
                 auto lampMaterial = materialManager.CreateMaterial(shaderHandle);
                 lampMaterial.SetTexture(lampTexture, 0);
 

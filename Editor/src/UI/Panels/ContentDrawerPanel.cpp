@@ -162,7 +162,8 @@ namespace RNGOEngine::Editor
                 ImGui::Text("Moving");
             }
 
-            assetDragAndDropPayload = {type, path};
+            // TODO: TEMPORARYYYYYYYYYYYYYYYYYYY
+            assetDragAndDropPayload = {type, Utilities::GenerateUUID()};
             ImGui::SetDragDropPayload(
                 AssetDragAndDropName, &assetDragAndDropPayload, sizeof(AssetDragAndDropPayload)
             );

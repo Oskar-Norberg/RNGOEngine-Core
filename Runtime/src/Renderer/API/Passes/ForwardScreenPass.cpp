@@ -15,9 +15,11 @@ namespace RNGOEngine::Core::Renderer
     ForwardScreenPass::ForwardScreenPass(IRenderer& renderer, const int width, const int height)
         : RenderPass(renderer, width, height)
     {
-        m_screenShader = AssetHandling::AssetLoader::GetInstance().Load(
+        // TODO: Passes should REALLY not be handling their own asset loading. Create this shader elsewhere and pass it in.
+        m_screenShader = AssetHandling::AssetLoader::GetInstance().Import(
             AssetHandling::AssetType::Shader, "DrawToScreen/ScreenQuadShader.glsl"
         );
+        AssetHandling::AssetLoader::GetInstance().Load(m_screenShader);
 
         // TODO: This is really, really ugly. Horrible even.
         float quadVertices[] = {-1.0f, -1.0f, 0.0f, 0.0f, 1.0f,  -1.0f, 1.0f, 0.0f,

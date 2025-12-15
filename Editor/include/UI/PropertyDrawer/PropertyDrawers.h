@@ -45,7 +45,7 @@ namespace RNGOEngine::Editor
             {
                 const std::string filename =
                     modelMetadataOpt ? modelMetadataOpt->get().Path.filename().string() : "Missing";
-                
+
                 ImGui::PushID(&meshRenderer);
 
                 ImGui::Selectable(filename.c_str());
@@ -59,19 +59,17 @@ namespace RNGOEngine::Editor
                         const auto& dragAndDropPayload =
                             *static_cast<const AssetDragAndDropPayload*>(payload->Data);
 
-                        if (dragAndDropPayload.type != AssetHandling::AssetType::Model)
+                        if (dragAndDropPayload.Type != AssetHandling::AssetType::Model)
                         {
-                            const auto badName = dragAndDropPayload.AssetPath.filename().string();
                             RNGO_LOG(
-                                Core::LogLevel::Warning, "Cannot load asset {} as Model.", badName.c_str()
+                                Core::LogLevel::Warning, "Cannot load asset {} as Model.",
+                                dragAndDropPayload.Handle.GetValue()
                             );
                         }
                         else
                         {
-                            const auto newModelHandle = AssetHandling::AssetLoader::GetInstance().Load(
-                                AssetHandling::AssetType::Model, dragAndDropPayload.AssetPath
-                            );
-                            meshRenderer.ModelHandle = newModelHandle;
+                            AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
+                            meshRenderer.ModelHandle = dragAndDropPayload.Handle;
                         }
                     }
 
@@ -99,9 +97,10 @@ namespace RNGOEngine::Editor
                 {
                     const auto& materialHandle = meshRenderer.MaterialKey;
 
-                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(
+                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Import(
                         AssetHandling::AssetType::Texture, texturePath.data()
                     );
+                    AssetHandling::AssetLoader::GetInstance().Load(textureHandle);
                     AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(
                         materialHandle, textureHandle, slot
                     );

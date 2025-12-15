@@ -28,24 +28,39 @@ namespace RNGOEngine::AssetHandling
     void BuiltinAssets::SetUpModel()
     {
         auto& loader = AssetLoader::GetInstance();
+
+        // Import
         s_errorHandles[static_cast<size_t>(AssetType::Model)] =
-            loader.Load(AssetType::Model, Data::FallbackAssets::InvalidModel);
+            loader.Import(AssetType::Model, Data::FallbackAssets::InvalidModel);
+
+        // Load
+        loader.Load(s_errorHandles[static_cast<size_t>(AssetType::Model)]);
     }
 
     void BuiltinAssets::SetUpTexture()
     {
         auto& loader = AssetLoader::GetInstance();
+
+        // Import
         s_errorHandles[static_cast<size_t>(AssetType::Texture)] =
-            loader.Load(AssetType::Texture, Data::FallbackAssets::InvalidTexture);
+            loader.Import(AssetType::Texture, Data::FallbackAssets::InvalidTexture);
+
+        // Load
+        loader.Load(s_errorHandles[static_cast<size_t>(AssetType::Texture)]);
     }
 
     void BuiltinAssets::SetUpMaterial()
     {
         auto& materialManager = AssetManager::GetInstance().GetMaterialManager();
         auto& loader = AssetLoader::GetInstance();
-        
-        const auto fallbackShader = loader.Load(AssetType::Shader, Data::FallbackAssets::InvalidVertexShader);
-        
+
+        // Import Shader
+        const auto fallbackShader = loader.Import(AssetType::Shader, Data::FallbackAssets::InvalidShader);
+        s_errorHandles[static_cast<size_t>(AssetType::Shader)] = fallbackShader;
+        // Load Shader
+        loader.Load(fallbackShader);
+
+        // Create Material
         s_errorHandles[static_cast<size_t>(AssetType::Material)] =
             materialManager.CreateMaterial(fallbackShader).GetMaterialAssetHandle();
     }
