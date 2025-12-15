@@ -8,13 +8,19 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    void AssetSerializer::SerializeCommon(const AssetMetadata& metadata, YAML::Emitter& emitter)
+    void AssetSerializer::Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter)
     {
         emitter << YAML::BeginMap;
+        SerializeCommon(metadata, emitter);
+        SerializeImpl(metadata, emitter);
+        emitter << YAML::EndMap;
+    }
+
+    void AssetSerializer::SerializeCommon(const AssetMetadata& metadata, YAML::Emitter& emitter)
+    {
         emitter << YAML::Key << "Version" << YAML::Value << METADATA_VERSION;
         emitter << YAML::Key << "UUID" << YAML::Value << metadata.UUID.GetValue();
         emitter << YAML::Key << "Type" << YAML::Value << magic_enum::enum_name(metadata.Type).data();
-        emitter << YAML::EndMap;
     }
 
     void AssetSerializer::DeserializeCommon(

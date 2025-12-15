@@ -101,6 +101,8 @@ namespace RNGOEngine::AssetHandling
                 Core::LogLevel::Error, "Attempted to load unregistered asset with handle {}.",
                 handle.GetValue()
             );
+
+            return;
         }
 
         const auto& metadata = database.GetAssetMetadata(handle);

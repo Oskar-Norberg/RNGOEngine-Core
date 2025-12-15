@@ -10,7 +10,7 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    constexpr auto METADATA_VERSION = 1;
+    constexpr int METADATA_VERSION = 1;
 
     class AssetSerializer
     {
@@ -19,7 +19,8 @@ namespace RNGOEngine::AssetHandling
 
         // API
     public:
-        virtual void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter) = 0;
+        void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter);
+
         virtual std::unique_ptr<AssetMetadata> Deserialize(YAML::Node& node, const std::filesystem::path& assetPath) = 0;
 
         // Common

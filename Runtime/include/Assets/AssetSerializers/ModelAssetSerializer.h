@@ -13,12 +13,6 @@ namespace RNGOEngine::AssetHandling
     class ModelAssetSerializer : public AssetSerializer
     {
     public:
-        void Serialize(const AssetMetadata& metadata, YAML::Emitter& emitter) override
-        {
-            SerializeCommon(metadata, emitter);
-            SerializeImpl(metadata, emitter);
-        }
-
         std::unique_ptr<AssetMetadata> Deserialize(
             YAML::Node& node, const std::filesystem::path& assetPath
         ) override
