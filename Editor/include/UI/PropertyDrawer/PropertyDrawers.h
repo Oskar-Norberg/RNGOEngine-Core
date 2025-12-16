@@ -101,9 +101,9 @@ namespace RNGOEngine::Editor
                         AssetHandling::AssetType::Texture, texturePath.data()
                     );
                     AssetHandling::AssetLoader::GetInstance().Load(textureHandle);
-                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(
-                        materialHandle, textureHandle, slot
-                    );
+                    // AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(
+                    //     materialHandle, textureHandle, slot
+                    // );
                 }
 
                 if (ImGui::Button("Close"))

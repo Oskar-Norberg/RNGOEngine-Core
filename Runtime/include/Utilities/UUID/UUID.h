@@ -42,6 +42,7 @@ namespace RNGOEngine::Utilities
         std::uint64_t m_uuid;
     };
 
+    // TODO: Move into the UUID class as a static method?
     static UUID GenerateUUID()
     {
         static std::random_device s_randomDevice;

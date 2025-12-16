@@ -41,10 +41,7 @@ namespace RNGOEngine::Systems::Core
         auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
         auto& meshManager = resourceManager.GetMeshResourceManager();
-
-        auto& assetManager = AssetHandling::AssetManager::GetInstance();
-        // TODO: I hate the material manager i hate the material manager i hate the material manager
-        auto& materialManager = assetManager.GetMaterialManager();
+        auto& shaderManager = resourceManager.GetShaderResourceManager();
 
         const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
 
@@ -61,7 +58,8 @@ namespace RNGOEngine::Systems::Core
                                 AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
                             )
                             .value()
-                    ).get();
+                    )
+                    .get();
 
             const auto meshKeySpan = modelAsset.GetMeshKeys();
             std::vector<RNGOEngine::Core::Renderer::GPUMesh> gpuMeshes;
@@ -78,21 +76,36 @@ namespace RNGOEngine::Systems::Core
                 }
             }
 
-            const auto resolvedMaterialOpt = materialManager.GetMaterial(meshRender.MaterialKey);
-            const auto resolvedMaterial = resolvedMaterialOpt.value_or(
-                materialManager
-                    .GetMaterial(
-                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
+            auto& materialAsset = runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(meshRender.MaterialKey)
+                                      .value_or(runtimeRegistry
+                                                    .TryGet<AssetHandling::MaterialAsset>(
+                                                        AssetHandling::BuiltinAssets::GetErrorHandle(
+                                                            AssetHandling::AssetType::Material
+                                                        )
+                                                    )
+                                                    .value())
+                                      .get();
+
+            auto& shaderAsset =
+                runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetHandle())
+                    .value_or(
+                        runtimeRegistry
+                            .TryGet<AssetHandling::ShaderAsset>(
+                                AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
+                            )
+                            .value()
                     )
-                    .value()
-            );
+                    .get();
+
+            auto resolvedShader = shaderManager.GetShaderProgram(shaderAsset.GetShaderKey()).value();
 
             RNGOEngine::Core::Renderer::GPUMaterial gpuMaterial{
-                .ShaderProgram = resolvedMaterial.shaderProgram, .Parameters = {}
+                .ShaderProgram = resolvedShader, .Parameters = {}
             };
-            gpuMaterial.Parameters.reserve(resolvedMaterial.uniforms.size());
 
-            for (const auto& uniform : resolvedMaterial.uniforms)
+            gpuMaterial.Parameters.reserve(materialAsset.GetParameters().Parameters.size());
+
+            for (const auto& uniform : materialAsset.GetParameters().Parameters)
             {
                 if (std::holds_alternative<bool>(uniform.Value))
                 {

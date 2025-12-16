@@ -61,7 +61,9 @@ namespace RNGOEngine::AssetHandling
         loader.Load(fallbackShader);
 
         // Create Material
-        s_errorHandles[static_cast<size_t>(AssetType::Material)] =
-            materialManager.CreateMaterial(fallbackShader).GetMaterialAssetHandle();
+        auto handle = Utilities::GenerateUUID();
+        MaterialParameters params;
+        materialManager.CreateMaterial(handle, fallbackShader, params);
+        s_errorHandles[static_cast<size_t>(AssetType::Material)] = handle;
     }
 }
