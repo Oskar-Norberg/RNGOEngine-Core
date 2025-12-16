@@ -55,6 +55,9 @@ namespace RNGOEngine::Editor
         );
 
     private:
+        void RefreshCurrentFolder();
+
+    private:
         static Folder LoadFolder(const std::filesystem::path& path);
         static std::unordered_map<std::filesystem::path, AssetHandling::AssetType> ScanMetadata(
             const std::filesystem::path& path, Folder& outFolder

@@ -29,6 +29,24 @@ namespace RNGOEngine::AssetHandling
     {
     }
 
+    std::optional<AssetHandle> AssetLoader::TryImport(const std::filesystem::path& filePath) const
+    {
+        const auto importerOpt = GetImporterForExtension(filePath.extension());
+        if (!importerOpt)
+        {
+            RNGO_LOG(
+                Core::LogLevel::Warning, "No importer found for file extension '{}'.",
+                filePath.extension().string()
+            );
+            return std::nullopt;
+        }
+
+        const auto& importer = importerOpt.value().get();
+        const auto type = importer.GetAssetType();
+
+        return Import(type, filePath);
+    }
+
     AssetHandle AssetLoader::Import(const AssetType type, const std::filesystem::path& filePath) const
     {
         // Get full path for asset
@@ -207,5 +225,21 @@ namespace RNGOEngine::AssetHandling
         const auto& importer = m_importers.at(type);
 
         return std::make_pair(std::ref(*importer), std::ref(*serializer));
+    }
+
+    std::optional<std::reference_wrapper<AssetImporter>> AssetLoader::GetImporterForExtension(
+        const std::filesystem::path& extension
+    ) const
+    {
+        for (const auto& [type, importer] : m_importers)
+        {
+            const auto& supportedExtensions = importer->GetSupportedExtensions();
+            if (std::ranges::find(supportedExtensions, extension.string()) != supportedExtensions.end())
+            {
+                return std::ref(*importer);
+            }
+        }
+
+        return std::nullopt;
     }
 }

@@ -31,6 +31,11 @@ namespace RNGOEngine::AssetHandling
             return Data::ThreadType::Render;
         }
 
+        AssetType GetAssetType() const override
+        {
+            return AssetType::Model;
+        }
+
     private:
         Containers::TSQueue<std::pair<ModelMetadata, ModelLoading::ModelData>> m_modelDataQueue;
 

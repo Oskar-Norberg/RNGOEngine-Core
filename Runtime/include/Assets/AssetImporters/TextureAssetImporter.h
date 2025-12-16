@@ -27,6 +27,11 @@ namespace RNGOEngine::AssetHandling
             return Data::ThreadType::Render;
         }
 
+        AssetType GetAssetType() const override
+        {
+            return AssetType::Texture;
+        }
+
     private:
         Containers::TSQueue<std::pair<TextureMetadata, TextureLoader::TextureData>> m_textureQueue;
     };

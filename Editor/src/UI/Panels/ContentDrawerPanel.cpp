@@ -7,6 +7,8 @@
 #include <unordered_set>
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "Assets/AssetLoader.h"
+#include "Logging/Logger.h"
 #include "UI/AssetDragAndDrop.h"
 #include "magic_enum/magic_enum.hpp"
 #include "yaml-cpp/node/node.h"
@@ -150,7 +152,7 @@ namespace RNGOEngine::Editor
     {
         if (ImGui::Button("Refresh"))
         {
-            SetDeferredPath(m_currentPath);
+            RefreshCurrentFolder();
         }
         ImGui::SameLine();
         if (ImGui::Button("Home"))
@@ -239,6 +241,25 @@ namespace RNGOEngine::Editor
         const auto labelWithTypeView = std::string_view(labelWithType);
         ImGui::Selectable(labelWithTypeView.data(), false, ImGuiSelectableFlags_AllowDoubleClick);
 
+        if (ImGui::BeginPopupContextItem())
+        {
+            ImGui::Text("AssetContextMenu");
+
+            if (ImGui::MenuItem("Import"))
+            {
+                const auto assetHandleOpt = AssetHandling::AssetLoader::GetInstance().TryImport(path);
+                // Asset was just updated, refresh folder to show AssetType
+                if (assetHandleOpt)
+                {
+                    RefreshCurrentFolder();
+                }
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
+        }
+
         constexpr ImGuiDragDropFlags src_flags =
             ImGuiDragDropFlags_SourceNoDisableHover | ImGuiDragDropFlags_SourceNoHoldToOpenOthers;
 
@@ -261,5 +282,10 @@ namespace RNGOEngine::Editor
                 ImGui::EndDragDropSource();
             }
         }
+    }
+
+    void ContentDrawerPanel::RefreshCurrentFolder()
+    {
+        SetDeferredPath(m_currentPath);
     }
 }

@@ -48,10 +48,10 @@ namespace RNGOEngine::AssetHandling
             const std::filesystem::path& path
         ) const = 0;
 
-        // TODO: Function to get Finalization ThreadType? +Multiple finalization steps?
     public:
         // TODO: This isn't really being used anywhere right now.
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
         virtual Data::ThreadType GetFinalizationThreadTypes() const = 0;
+        virtual AssetType GetAssetType() const = 0;
     };
 }
