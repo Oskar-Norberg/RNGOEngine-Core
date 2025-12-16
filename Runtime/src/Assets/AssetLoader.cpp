@@ -170,6 +170,15 @@ namespace RNGOEngine::AssetHandling
         const auto& metadata = database.GetAssetMetadata(handle);
         const auto type = metadata.Type;
 
+        if (registry.GetState(type, handle) == AssetState::Ready)
+        {
+            RNGO_LOG(
+                Core::LogLevel::Debug, "Asset {} {} is already loaded.", magic_enum::enum_name(type),
+                handle.GetValue()
+            );
+            return;
+        }
+
         const auto& [importer, serializer] = GetImporterAndSerializerOrAssert(type);
 
         const auto importResult = importer.LoadFromDisk(registry, metadata);
