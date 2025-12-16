@@ -70,6 +70,11 @@ namespace RNGOEngine::AssetHandling
             return static_cast<const TAsset&>(*this);
         }
 
+        const AssetHandle& GetHandle() const
+        {
+            return m_handle;
+        }
+
     public:
         AssetState GetState() const;
         bool IsReady() const;

@@ -12,8 +12,11 @@ namespace RNGOEngine::AssetHandling
     class MaterialManager
     {
     public:
+        // CreateMaterial and insert it to RuntimeAssetRegistry.
         MaterialAsset& CreateMaterial(
             const AssetHandle& handle, const AssetHandle& shader, MaterialParameters& parameters
         );
+
+        // TODO: Create without inserting to registry?
     };
 }

@@ -51,6 +51,11 @@ namespace RNGOEngine::Utilities
 
         return UUID(s_distribution(s_generator));
     }
+
+    static bool IsValidUUID(const UUID& uuid)
+    {
+        return uuid.GetValue() != 0;
+    }
 }
 
 // Hash Function for UUIDs
