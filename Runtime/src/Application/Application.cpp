@@ -29,7 +29,7 @@ namespace RNGOEngine
 #ifdef RNGOENGINE_TRACY_ENABLE
         RNGO_LOG(Core::LogLevel::Info, "Profiling with Tracy enabled.");
 #endif
-        
+
         bool doFlipTexturesVertically = false;
 
         // Set Up Renderer
@@ -68,6 +68,14 @@ namespace RNGOEngine
         AssetHandling::BootstrapContext context = {*m_assetLoader, doFlipTexturesVertically};
         AssetHandling::AssetImporterBootstrapper::Bootstrap(context);
 
+        m_assetFetcher.ForEachOfExtension(
+            ".meta",
+            [this](const std::filesystem::path& metaPath)
+            {
+                m_assetLoader->Register(metaPath);
+            }
+        );
+
         // Asset Managers
         m_assetManager = std::make_unique<AssetHandling::AssetManager>(*m_resourceManager);
 
@@ -95,6 +103,8 @@ namespace RNGOEngine
 
         // Builtin Assets
         AssetHandling::BuiltinAssets::InitializeBuiltinAssets();
+        // TODO: Ugly
+        m_assetLoader->LoadPendingAssets(Data::ThreadType::Render);
 
         AddEngineSystems();
         SetupSystemContexts();
@@ -123,12 +133,9 @@ namespace RNGOEngine
 
             PollWindowEvents();
 
-            // TODO: These should both swap place and run on seperate threads.
-            // These are currently swapped because the Renderer needs to load Fallback Assets before first frame update.
-            // Ideally there should be some kind of block that ensures fallback assets are fully loaded.
-            OnRender();
             OnUpdate(deltaTime);
-            
+            OnRender();
+
             SwapBuffers();
 
             PollGameEvents();

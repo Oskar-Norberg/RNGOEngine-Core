@@ -38,23 +38,7 @@ namespace RNGOEngine::AssetHandling
             }
         }
 
-        // Upload to GPU
-        const auto textureDataSpan = std::as_bytes(
-            std::span(
-                textureHandle.value().data,
-                textureHandle.value().width * textureHandle.value().height * textureHandle.value().nrChannels
-            )
-        );
-
-        // TODO: For now, just get format from nrChannels. Should this be a part of the metadata?
-
-        const Core::Renderer::TextureFormat format = textureHandle->nrChannels == 3
-                                                         ? Core::Renderer::TextureFormat::RGB
-                                                         : Core::Renderer::TextureFormat::RGBA;
-
-        // TODO: Weird copy to save the format. Fix later.
         TextureMetadata textureMetadata = safeTypedMetadata;
-        textureMetadata.Format = format;
 
         m_textureQueue.Enqueue(std::make_pair(textureMetadata, std::move(textureHandle.value())));
 

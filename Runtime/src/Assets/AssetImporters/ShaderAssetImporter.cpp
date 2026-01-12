@@ -116,7 +116,7 @@ namespace RNGOEngine::AssetHandling
 
     std::span<const std::string_view> ShaderAssetImporter::GetSupportedExtensions() const
     {
-        static constexpr std::string_view supportedTypes[] = {".frag", ".vert"};
+        static constexpr std::string_view supportedTypes[] = {".glsl"};
 
         return supportedTypes;
     }

@@ -11,8 +11,7 @@ namespace RNGOEngine::AssetHandling
         : Singleton(this),
           m_shaderManager(resourceManager),
           m_modelManager(resourceManager),
-          m_textureManager(resourceManager),
-          m_materialManager(m_shaderManager, m_textureManager)
+          m_textureManager(resourceManager)
     {
     }
 }

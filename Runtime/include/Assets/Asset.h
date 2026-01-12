@@ -32,6 +32,7 @@ namespace RNGOEngine::AssetHandling
         Material,
         Count
     };
+    // TODO: this should probably be replaced with the magic_enum count instead.
     constexpr std::size_t AssetTypeCount = std::to_underlying(AssetType::Count);
 
     enum class AssetState
@@ -69,6 +70,11 @@ namespace RNGOEngine::AssetHandling
             return static_cast<const TAsset&>(*this);
         }
 
+        const AssetHandle& GetHandle() const
+        {
+            return m_handle;
+        }
+
     public:
         AssetState GetState() const;
         bool IsReady() const;
@@ -83,7 +89,7 @@ namespace RNGOEngine::AssetHandling
         virtual ~AssetMetadata() = default;
 
         Utilities::UUID UUID = Utilities::GenerateUUID();
-        std::filesystem::path Path;
+        std::filesystem::path Path = {};
         AssetType Type = AssetType::None;
     };
 }

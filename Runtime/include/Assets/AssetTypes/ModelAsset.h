@@ -32,6 +32,5 @@ namespace RNGOEngine::AssetHandling
 
     struct ModelMetadata : AssetMetadata
     {
-        // TODO:
     };
 }

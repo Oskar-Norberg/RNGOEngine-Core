@@ -45,7 +45,7 @@ namespace RNGOEngine::Editor
             {
                 const std::string filename =
                     modelMetadataOpt ? modelMetadataOpt->get().Path.filename().string() : "Missing";
-                
+
                 ImGui::PushID(&meshRenderer);
 
                 ImGui::Selectable(filename.c_str());
@@ -59,19 +59,17 @@ namespace RNGOEngine::Editor
                         const auto& dragAndDropPayload =
                             *static_cast<const AssetDragAndDropPayload*>(payload->Data);
 
-                        if (dragAndDropPayload.type != AssetHandling::AssetType::Model)
+                        if (dragAndDropPayload.Type != AssetHandling::AssetType::Model)
                         {
-                            const auto badName = dragAndDropPayload.AssetPath.filename().string();
                             RNGO_LOG(
-                                Core::LogLevel::Warning, "Cannot load asset {} as Model.", badName.c_str()
+                                Core::LogLevel::Warning, "Cannot load asset {} as Model.",
+                                dragAndDropPayload.Handle.GetValue()
                             );
                         }
                         else
                         {
-                            const auto newModelHandle = AssetHandling::AssetLoader::GetInstance().Load(
-                                AssetHandling::AssetType::Model, dragAndDropPayload.AssetPath
-                            );
-                            meshRenderer.ModelHandle = newModelHandle;
+                            AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
+                            meshRenderer.ModelHandle = dragAndDropPayload.Handle;
                         }
                     }
 
@@ -81,37 +79,105 @@ namespace RNGOEngine::Editor
                 ImGui::PopID();
             }
 
-            if (ImGui::Button("Change Texture"))
+            // Material
             {
-                ImGui::OpenPopup("TextureProperties");
+                if (!Utilities::IsValidUUID(meshRenderer.MaterialKey))
+                {
+                    ImGui::PushID(&meshRenderer);
+
+                    ImGui::Selectable("Drop Shader Here");
+
+                    if (ImGui::BeginDragDropTarget())
+                    {
+                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
+                        {
+                            IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
+
+                            const auto& dragAndDropPayload =
+                                *static_cast<const AssetDragAndDropPayload*>(payload->Data);
+
+                            if (dragAndDropPayload.Type != AssetHandling::AssetType::Shader)
+                            {
+                                RNGO_LOG(
+                                    Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
+                                    dragAndDropPayload.Handle.GetValue()
+                                );
+                            }
+                            else
+                            {
+                                auto materialHandle = Utilities::GenerateUUID();
+                                const auto& shaderHandle = dragAndDropPayload.Handle;
+                                AssetHandling::MaterialParameters params{};
+
+                                AssetHandling::AssetLoader::GetInstance().Load(shaderHandle);
+
+                                const auto& materialAsset =
+                                    AssetHandling::AssetManager::GetInstance()
+                                        .GetMaterialManager()
+                                        .CreateMaterial(materialHandle, shaderHandle, params);
+
+                                meshRenderer.MaterialKey = materialHandle;
+                            }
+                        }
+
+                        ImGui::EndDragDropTarget();
+                    }
+
+                    ImGui::PopID();
+                }
             }
 
-            if (ImGui::BeginPopupModal("TextureProperties"))
             {
-                ImGui::Text("Texture Path");
-                ImGui::Separator();
+                ImGui::PushID(&meshRenderer);
 
-                static std::array<char, 256> texturePath{};
-                ImGui::InputText("Path", texturePath.data(), 256);
-                static int slot = 0;
-                ImGui::InputInt("Slot", &slot);
-                if (ImGui::Button("Load Texture"))
+                // TODO: Texture preview?
+                ImGui::Selectable("Drop Texture Here");
+
+                if (ImGui::BeginDragDropTarget())
                 {
-                    const auto& materialHandle = meshRenderer.MaterialKey;
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
 
-                    const auto textureHandle = AssetHandling::AssetLoader::GetInstance().Load(
-                        AssetHandling::AssetType::Texture, texturePath.data()
-                    );
-                    AssetHandling::AssetManager::GetInstance().GetMaterialManager().SetTexture(
-                        materialHandle, textureHandle, slot
-                    );
+                        const auto& dragAndDropPayload =
+                            *static_cast<const AssetDragAndDropPayload*>(payload->Data);
+
+                        if (dragAndDropPayload.Type != AssetHandling::AssetType::Texture)
+                        {
+                            RNGO_LOG(
+                                Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
+                                dragAndDropPayload.Handle.GetValue()
+                            );
+                        }
+                        else
+                        {
+                            auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
+                            const auto& materialHandle = meshRenderer.MaterialKey;
+
+
+                            AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
+
+                            const auto materialAssetOpt =
+                                runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(materialHandle);
+
+                            if (materialAssetOpt)
+                            {
+                                // TODO: Hardcode to slot 0 for now.
+                                auto& materialAsset = materialAssetOpt->get();
+                                AssetHandling::MaterialTextureSpecification textureSpec{
+                                    .TextureHandle = dragAndDropPayload.Handle, .Slot = 0
+                                };
+                                materialAsset.GetParameters().Parameters.emplace_back(
+                                    "Texture0", textureSpec
+                                );
+                            }
+                        }
+                    }
+
+                    ImGui::EndDragDropTarget();
                 }
 
-                if (ImGui::Button("Close"))
-                {
-                    ImGui::CloseCurrentPopup();
-                }
-                ImGui::EndPopup();
+                ImGui::PopID();
             }
         }
     }

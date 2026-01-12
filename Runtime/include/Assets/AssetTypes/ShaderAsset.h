@@ -8,7 +8,6 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: Combine Vert and Frag Shaders into a single file.
     using ShaderKey = Containers::GenerationalKey<Core::Renderer::ShaderProgramID>;
 
     class ShaderAsset : public Asset

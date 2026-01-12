@@ -28,7 +28,13 @@ namespace RNGOEngine::AssetHandling
             RuntimeAssetRegistry& assetRegistry, AssetDatabase& assetDatabase, AssetFetcher& assetFetcher
         );
 
-        AssetHandle Load(AssetType type, const std::filesystem::path& searchPath) const;
+        // Check if asset is importable and import it.
+        std::optional<AssetHandle> TryImport(const std::filesystem::path& filePath) const;
+        AssetHandle Import(AssetType type, const std::filesystem::path& filePath) const;
+        void Register(const std::filesystem::path& metadataPath) const;
+
+        // TODO: Make this async.
+        void Load(const AssetHandle& handle) const;
 
         void LoadPendingAssets(Data::ThreadType threadType) const;
 
@@ -57,6 +63,11 @@ namespace RNGOEngine::AssetHandling
         void SaveMetadataToFile(
             const AssetHandle& handle, AssetSerializer& serializer, const std::filesystem::path& metaFilePath
         ) const;
+
+    private:
+        std::pair<AssetImporter&, AssetSerializer&> GetImporterAndSerializerOrAssert(const AssetType type) const;
+        std::optional<std::reference_wrapper<AssetImporter>> GetImporterForExtension(const std::filesystem::path& extension) const;
+
 
     private:
         RuntimeAssetRegistry& m_assetRegistry;

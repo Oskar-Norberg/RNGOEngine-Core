@@ -10,10 +10,37 @@
 
 namespace RNGOEngine::AssetHandling
 {
+    class MaterialAsset : public Asset
+    {
+    public:
+        MaterialAsset(
+            AssetHandle&& handle, const Utilities::UUID& shader, MaterialParameters&& parameters
+        )
+            : Asset(std::move(handle)), m_shader(shader), m_parameters(std::move(parameters))
+        {
+        }
+
+        AssetHandle GetHandle()
+        {
+            return m_shader;
+        }
+
+        MaterialParameters& GetParameters()
+        {
+            return m_parameters;
+        }
+
+        const MaterialParameters& GetParameters() const
+        {
+            return m_parameters;
+        }
+
+    private:
+        AssetHandle m_shader;
+        MaterialParameters m_parameters;
+    };
+
     struct MaterialMetadata : AssetMetadata
     {
-        Utilities::UUID VertexShader;
-        Utilities::UUID FragmentShader;
-        MaterialParameters Parameters;
     };
 }

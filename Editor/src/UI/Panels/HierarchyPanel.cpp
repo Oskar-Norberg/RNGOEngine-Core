@@ -24,9 +24,49 @@ namespace RNGOEngine::Editor
 
         auto& registry = world->GetRegistry();
 
-        if (ImGui::Button("Create Empty"))
+        if (ImGui::Button("Create Entity"))
         {
-            world->CreateEntity();
+            ImGui::OpenPopup("EntityCreationPopup");
+        }
+
+        if (ImGui::BeginPopup("EntityCreationPopup"))
+        {
+            if (ImGui::Button("Background Color"))
+            {
+                CreateBackgroundColorEntity(context);
+            }
+
+            if (ImGui::Button("Camera"))
+            {
+                CreateCameraEntity(context);
+            }
+
+            if (ImGui::Button("Ambient Light"))
+            {
+                CreateAmbientLightEntity(context);
+            }
+
+            if (ImGui::Button("Directional Light"))
+            {
+                CreateDirectionalLightEntity(context);
+            }
+
+            if (ImGui::Button("Point Light"))
+            {
+                CreatePointLightEntity(context);
+            }
+
+            if (ImGui::Button("Spotlight"))
+            {
+                CreateSpotlightEntity(context);
+            }
+
+            if (ImGui::Button("Mesh"))
+            {
+                CreateMeshEntity(context);
+            }
+
+            ImGui::EndPopup();
         }
 
         const auto entities = registry.view<entt::entity>();
@@ -86,5 +126,75 @@ namespace RNGOEngine::Editor
 
             ImGui::PopID();
         }
+    }
+
+    void HierarchyPanel::CreateBackgroundColorEntity(UIContext& context)
+    {
+        constexpr auto nameComponent = Components::Name{"Background Color"};
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent);
+        entity.AddComponent<Components::BackgroundColor>();
+        entity.AddComponent<Components::Color>();
+    }
+    void HierarchyPanel::CreateCameraEntity(UIContext& context)
+    {
+        // TODO: Again, having to wrap it in a name component from call-site is horrible.
+        constexpr auto nameComponent = Components::Name{"Camera"};
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent);
+        entity.AddComponent<Components::Camera>();
+    }
+
+    void HierarchyPanel::CreateAmbientLightEntity(UIContext& context)
+    {
+        constexpr auto nameComponent = Components::Name{"Ambient Light"};
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent);
+
+        entity.AddComponent<Components::AmbientLight>();
+        entity.AddComponent<Components::Color>();
+        entity.AddComponent<Components::Intensity>(0.2f);
+    }
+
+    void HierarchyPanel::CreateDirectionalLightEntity(UIContext& context)
+    {
+        constexpr auto nameComponent = Components::Name{"Directional Light"};
+        auto transform = Components::Transform{
+            .Position = glm::vec3(0.0f),
+            .Rotation = glm::quat(glm::radians(glm::vec3(-45.0f, -45.0f, 0.0f))),
+            .Scale = glm::vec3(1.0f)
+        };
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent, transform);
+
+        entity.AddComponent<Components::DirectionalLight>();
+        entity.AddComponent<Components::Color>();
+        entity.AddComponent<Components::Intensity>(0.75f);
+    }
+
+    void HierarchyPanel::CreatePointLightEntity(UIContext& context)
+    {
+        constexpr auto nameComponent = Components::Name{"Point Light"};
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent);
+
+        entity.AddComponent<Components::PointLight>();
+        entity.AddComponent<Components::Color>();
+        entity.AddComponent<Components::Intensity>(0.8f);
+        entity.AddComponent<Components::LightFalloff>();
+    }
+
+    void HierarchyPanel::CreateSpotlightEntity(UIContext& context)
+    {
+        constexpr auto nameComponent = Components::Name{"Spotlight"};
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent);
+
+        entity.AddComponent<Components::Spotlight>();
+        entity.AddComponent<Components::Color>();
+        entity.AddComponent<Components::Intensity>(0.8f);
+        entity.AddComponent<Components::LightFalloff>();
+    }
+
+    void HierarchyPanel::CreateMeshEntity(UIContext& context)
+    {
+        constexpr auto nameComponent = Components::Name{"Mesh"};
+        auto entity = context.sceneManager->GetCurrentWorld()->CreateEntity(nameComponent);
+
+        entity.AddComponent<Components::MeshRenderer>();
     }
 }

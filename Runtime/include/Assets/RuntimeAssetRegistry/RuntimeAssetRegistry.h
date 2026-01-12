@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "Assets/Asset.h"
+#include "Assets/AssetTypes/MaterialAsset.h"
 #include "Assets/AssetTypes/ModelAsset.h"
 #include "Assets/AssetTypes/ShaderAsset.h"
 #include "Assets/AssetTypes/TextureAsset.h"
@@ -63,7 +64,7 @@ namespace RNGOEngine::AssetHandling
             // TODO: Make Static Assert Macro
             static_assert(
                 std::is_same_v<TAsset, ModelAsset> || std::is_same_v<TAsset, TextureAsset> ||
-                    std::is_same_v<TAsset, ShaderAsset>,
+                    std::is_same_v<TAsset, ShaderAsset> || std::is_same_v<TAsset, MaterialAsset>,
                 "RuntimeAssetRegistry::Insert - Unsupported asset type."
             );
             auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
@@ -88,12 +89,12 @@ namespace RNGOEngine::AssetHandling
     private:
         // NOTE: These have to correspond with the AssetType enum.
         std::tuple<
-            std::monostate,          // Placeholder for None
-            AssetMap<ModelAsset>,    // Models
-            AssetMap<TextureAsset>,  // Textures
-            AssetMap<ShaderAsset>,   // Shaders
-            std::monostate,          // TODO: Materials....
-            std::monostate           // Placeholder for Count
+            std::monostate,           // Placeholder for None
+            AssetMap<ModelAsset>,     // Models
+            AssetMap<TextureAsset>,   // Textures
+            AssetMap<ShaderAsset>,    // Shaders
+            AssetMap<MaterialAsset>,  // Materials
+            std::monostate            // Placeholder for Count
             >
             m_assetStorage;
     };

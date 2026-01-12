@@ -27,6 +27,11 @@ namespace RNGOEngine::AssetHandling
             return Data::ThreadType::Render;
         }
 
+        AssetType GetAssetType() const override
+        {
+            return AssetType::Shader;
+        }
+
     private:
         // TODO:
         // Containers::TSQueue<std::pair<ShaderMetadata, std::string>> m_shaderDataQueue;

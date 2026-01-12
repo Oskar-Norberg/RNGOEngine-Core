@@ -26,97 +26,169 @@ namespace RNGOEngine::AssetHandling
           m_assetRegistry(assetRegistry),
           m_assetDatabase(assetDatabase),
           m_assetFetcher(assetFetcher)
-
     {
     }
 
-    AssetHandle AssetLoader::Load(const AssetType type, const std::filesystem::path& searchPath) const
+    std::optional<AssetHandle> AssetLoader::TryImport(const std::filesystem::path& filePath) const
     {
-        RNGO_LOG(
-            Core::LogLevel::Debug, "Loading {} from path '{}'.",
-            magic_enum::enum_name(type), searchPath.string()
-        );
-
-        // TODO: This should probably check the iterator against end instead of using contains. But this looks nicer.
-        if (!m_serializers.contains(type) || !m_importers.contains(type))
+        const auto importerOpt = GetImporterForExtension(filePath.extension());
+        if (!importerOpt)
         {
-            // TODO: Log error instead of asserting.
-            RNGO_ASSERT(false && "AssetLoader::Load - No serializer/importer registered for type.");
-            return BuiltinAssets::GetErrorHandle(type);
+            RNGO_LOG(
+                Core::LogLevel::Warning, "No importer found for file extension '{}'.",
+                filePath.extension().string()
+            );
+            return std::nullopt;
         }
 
-        // Find valid importer for type and extension
-        const auto& serializer = m_serializers.at(type);
-        const auto& importer = m_importers.at(type);
+        const auto& importer = importerOpt.value().get();
+        const auto type = importer.GetAssetType();
 
-        const std::string extension = searchPath.extension().string();
+        return Import(type, filePath);
+    }
 
+    AssetHandle AssetLoader::Import(const AssetType type, const std::filesystem::path& filePath) const
+    {
         // Get full path for asset
-        const auto fullPath = m_assetFetcher.GetPath(type, searchPath);
+        const auto fullPath = m_assetFetcher.GetPath(type, filePath);
         if (!fullPath)
         {
             RNGO_LOG(
-                Core::LogLevel::Error, "Failed to find {} at path '{}'.",
-                magic_enum::enum_name(type), searchPath.string()
+                Core::LogLevel::Error, "Failed to find {} at path '{}'.", magic_enum::enum_name(type),
+                filePath.string()
             );
             return BuiltinAssets::GetErrorHandle(type);
         }
 
         auto& database = AssetDatabase::GetInstance();
-        auto& registry = RuntimeAssetRegistry::GetInstance();
 
-        // Check if asset has already been loaded
+        // Check if Asset is already registered
         if (database.IsRegistered(fullPath.value()))
         {
-            const auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
-            auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(handle);
-
-            RNGO_ASSERT(metadata.Type == type && "AssetLoader::Load - Asset type mismatch.");
-            if (registry.GetState(type, handle) == AssetState::Ready)
+            const auto handleOpt = AssetDatabase::GetInstance().TryGetAssetHandle(fullPath.value());
+            if (handleOpt)
             {
-                return handle;
+                return handleOpt.value();
             }
+        }
+
+        RNGO_LOG(
+            Core::LogLevel::Debug, "Importing {} from path '{}'.", magic_enum::enum_name(type),
+            filePath.string()
+        );
+
+        const auto& [importer, serializer] = GetImporterAndSerializerOrAssert(type);
+
+        const std::string metaFilePath = fullPath.value().string() + ".meta";
+
+        std::optional<AssetHandle> assetHandle = std::nullopt;
+
+        // Import from Metadata file if it exists
+        if (Utilities::IO::FileExists(metaFilePath))
+        {
+            YAML::Node node = YAML::LoadFile(metaFilePath);
+            std::unique_ptr<AssetMetadata> metadata = serializer.Deserialize(node, fullPath.value());
+            assetHandle = metadata->UUID;
+            // TODO: Ugly absolute path hack. This should be stored relative to project root.
+            metadata->Path = absolute(fullPath.value());
+
+            database.RegisterAsset(type, std::move(metadata));
         }
         else
         {
-            const std::string metaFilePath = fullPath.value().string() + ".meta";
-            // Load Metadata if it exists, otherwise create a default and register it.
-            if (Utilities::IO::FileExists(metaFilePath))
-            {
-                YAML::Node node = YAML::LoadFile(metaFilePath);
-                std::unique_ptr<AssetMetadata> metadata = serializer->Deserialize(node, fullPath.value());
-                AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
-            }
-            else
-            {
-                std::unique_ptr<AssetMetadata> metadata = importer->CreateDefaultMetadata(fullPath.value());
-                metadata->Path = fullPath.value();
-                AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
-            }
+            std::unique_ptr<AssetMetadata> metadata = importer.CreateDefaultMetadata(fullPath.value());
+            // TODO: Another ugly absolute path hack
+            metadata->Path = absolute(fullPath.value());
+
+            assetHandle = metadata->UUID;
+            AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
         }
 
-        // Safe to assume asset is registered.
-        auto& metadata = AssetDatabase::GetInstance().GetAssetMetadata(
-            AssetDatabase::GetInstance().GetAssetHandle(fullPath.value())
-        );
+        RNGO_ASSERT(assetHandle && "AssetLoader::Import - AssetHandle should be valid after import.");
 
-        metadata.Path = fullPath.value();
-        auto handle = AssetDatabase::GetInstance().GetAssetHandle(fullPath.value());
+        // Save metadata to file?
+        SaveMetadataToFile(assetHandle.value(), serializer, fullPath.value().string() + ".meta");
+        return assetHandle.value();
+    }
 
-        const auto importResult = importer->LoadFromDisk(registry, metadata);
+    void AssetLoader::Register(const std::filesystem::path& metadataPath) const
+    {
+        if (!Utilities::IO::FileExists(metadataPath))
+        {
+            RNGO_ASSERT(false && "AssetLoader::Register - Metadata file does not exist.");
+            RNGO_LOG(Core::LogLevel::Warning, "Metadata file '{}' does not exist.", metadataPath.string());
+        }
+
+        YAML::Node node = YAML::LoadFile(metadataPath.string());
+        const auto typeOpt = magic_enum::enum_cast<AssetType>(node["Type"].as<std::string>());
+        if (!typeOpt)
+        {
+            RNGO_ASSERT(false && "AssetLoader::Register - Invalid asset type in metadata.");
+            RNGO_LOG(
+                Core::LogLevel::Error, "Invalid asset type in metadata file '{}'.", metadataPath.string()
+            );
+            return;
+        }
+
+        const auto type = typeOpt.value();
+        const auto& [importer, serializer] = GetImporterAndSerializerOrAssert(type);
+
+        const auto nonMetadataPath = metadataPath.parent_path() / metadataPath.stem();
+        std::unique_ptr<AssetMetadata> metadata = serializer.Deserialize(node, nonMetadataPath);
+        // TODO: Another ugly absolute path hack
+        metadata->Path = absolute(nonMetadataPath);
+
+        if (!AssetDatabase::GetInstance().IsRegistered(metadata->UUID))
+        {
+            AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
+            RNGO_LOG(
+                Core::LogLevel::Debug, "Registered asset '{}' of type {} from metadata file '{}'.",
+                metadataPath.string(), magic_enum::enum_name(type), metadataPath.string()
+            );
+        }
+        else
+        {
+            RNGO_LOG(Core::LogLevel::Debug, "Asset '{}' is already registered.", metadataPath.string());
+        }
+    }
+
+    void AssetLoader::Load(const AssetHandle& handle) const
+    {
+        auto& database = AssetDatabase::GetInstance();
+        auto& registry = RuntimeAssetRegistry::GetInstance();
+
+        if (!database.IsRegistered(handle))
+        {
+            RNGO_LOG(
+                Core::LogLevel::Error, "Attempted to load unregistered asset with handle {}.",
+                handle.GetValue()
+            );
+
+            return;
+        }
+
+        const auto& metadata = database.GetAssetMetadata(handle);
+        const auto type = metadata.Type;
+
+        if (registry.GetState(type, handle) == AssetState::Ready)
+        {
+            RNGO_LOG(
+                Core::LogLevel::Debug, "Asset {} {} is already loaded.", magic_enum::enum_name(type),
+                handle.GetValue()
+            );
+            return;
+        }
+
+        const auto& [importer, serializer] = GetImporterAndSerializerOrAssert(type);
+
+        const auto importResult = importer.LoadFromDisk(registry, metadata);
         if (importResult != ImportingError::None)
         {
             RNGO_LOG(
-                Core::LogLevel::Error, "Importing asset of type {} from path '{}' failed with error: {}.",
-                magic_enum::enum_name(type), fullPath.value().string(), magic_enum::enum_name(importResult)
+                Core::LogLevel::Error, "Loading {} {} failed with error: {}.", magic_enum::enum_name(type),
+                handle.GetValue(), magic_enum::enum_name(importResult)
             );
-            return BuiltinAssets::GetErrorHandle(type);
         }
-
-        // Save metadata to file?
-        // SaveMetadataToFile(handle, *serializer, fullPath.value().string() + ".meta");
-
-        return handle;
     }
 
     void AssetLoader::LoadPendingAssets(Data::ThreadType threadType) const
@@ -141,5 +213,42 @@ namespace RNGOEngine::AssetHandling
         std::ofstream metaFile(metaFilePath);
         metaFile << emitter.c_str();
         metaFile.close();
+    }
+
+    std::pair<AssetImporter&, AssetSerializer&> AssetLoader::GetImporterAndSerializerOrAssert(
+        const AssetType type
+    ) const
+    {
+        if (!m_serializers.contains(type) || !m_importers.contains(type))
+        {
+            RNGO_ASSERT(false && "AssetLoader::Load - No serializer/importer registered for type.");
+            RNGO_LOG(
+                Core::LogLevel::Critical, "No serializer/importer registered for asset type {}.",
+                magic_enum::enum_name(type)
+            );
+            // UBO land if asserts are disabled.
+        }
+
+        // Find valid importer for type and extension
+        const auto& serializer = m_serializers.at(type);
+        const auto& importer = m_importers.at(type);
+
+        return std::make_pair(std::ref(*importer), std::ref(*serializer));
+    }
+
+    std::optional<std::reference_wrapper<AssetImporter>> AssetLoader::GetImporterForExtension(
+        const std::filesystem::path& extension
+    ) const
+    {
+        for (const auto& [type, importer] : m_importers)
+        {
+            const auto& supportedExtensions = importer->GetSupportedExtensions();
+            if (std::ranges::find(supportedExtensions, extension.string()) != supportedExtensions.end())
+            {
+                return std::ref(*importer);
+            }
+        }
+
+        return std::nullopt;
     }
 }
