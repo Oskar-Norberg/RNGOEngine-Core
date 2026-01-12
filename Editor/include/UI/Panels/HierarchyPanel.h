@@ -19,5 +19,15 @@ namespace RNGOEngine::Editor
         {
             return "Hierarchy";
         }
+
+        // Spawning of Specialized Entities
+    private:
+        void CreateBackgroundColorEntity(UIContext& context);
+        void CreateCameraEntity(UIContext& context);
+        void CreateAmbientLightEntity(UIContext& context);
+        void CreateDirectionalLightEntity(UIContext& context);
+        void CreatePointLightEntity(UIContext& context);
+        void CreateSpotlightEntity(UIContext& context);
+        void CreateMeshEntity(UIContext& context);
     };
 }
