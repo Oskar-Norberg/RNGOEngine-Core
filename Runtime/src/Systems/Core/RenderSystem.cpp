@@ -299,11 +299,11 @@ namespace RNGOEngine::Systems::Core
                                        : 1.0f;
 
             RNGO_ASSERT(
-                currentPointLightIndex < Data::Shader::NR_OF_POINTLIGHTS.Value &&
+                currentPointLightIndex < Data::Shader::NR_OF_POINTLIGHTS &&
                 "Exceeded maximum number of point lights in scene!"
             );
 
-            drawQueue.PointLights[currentPointLightIndex++ % Data::Shader::NR_OF_POINTLIGHTS.Value] = {
+            drawQueue.PointLights[currentPointLightIndex++ % Data::Shader::NR_OF_POINTLIGHTS] = {
                 .Color = color,
                 .Intensity = intensity,
                 .Position = position,
@@ -341,11 +341,11 @@ namespace RNGOEngine::Systems::Core
                                        : 1.0f;
 
             RNGO_ASSERT(
-                currentSpotlightIndex < Data::Shader::NR_OF_SPOTLIGHTS.Value &&
+                currentSpotlightIndex < Data::Shader::NR_OF_SPOTLIGHTS &&
                 "Exceeded maximum number of spotlights in scene!"
             );
 
-            drawQueue.Spotlights[currentSpotlightIndex++ % Data::Shader::NR_OF_SPOTLIGHTS.Value] = {
+            drawQueue.Spotlights[currentSpotlightIndex++ % Data::Shader::NR_OF_SPOTLIGHTS] = {
                 .Color = color,
                 .Intensity = intensity,
                 .Position = transform.Position,

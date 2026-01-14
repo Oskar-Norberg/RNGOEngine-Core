@@ -42,15 +42,16 @@ uniform vec3 viewPosition;
 uniform float specularStrength;
 uniform int shininess;
 
-// TODO: Inconsistent uniform naming convention.
-uniform sampler2D Texture0;
+uniform sampler2D ALBEDO_TEXTURE;
+uniform sampler2D NORMAL_TEXTURE;
+uniform sampler2D SPECULAR_TEXTURE;
 
 void main()
 {
     vec3 normal = normalize(Normal);
-    
     LightAccumulation lightAccumulation = GetLight(FragPos, normal, specularStrength, shininess, viewPosition);
     
-    FragColor = texture(Texture0, TexCoord) * (lightAccumulation.ambient + lightAccumulation.diffuse + vec4(vec3(lightAccumulation.specular), 1.0));
+    FragColor = texture(ALBEDO_TEXTURE, TexCoord) * (lightAccumulation.ambient + lightAccumulation.diffuse)
+                    + texture(SPECULAR_TEXTURE, TexCoord) * vec4(vec3(lightAccumulation.specular), 1.0);
 };
         

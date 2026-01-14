@@ -95,7 +95,7 @@ namespace RNGOEngine::Core::Renderer
             const auto shaderProgramID = opaqueDrawCall.Material.ShaderProgram;
             m_renderer.BindShaderProgram(shaderProgramID);
 
-            // TODO: Not sure if this is a great idea.
+            // TODO: This is bad
             // TODO: Defaults should be set in the material system.
             // Default Uniforms.
             m_renderer.SetFloat(shaderProgramID, "specularStrength", 0.5f);

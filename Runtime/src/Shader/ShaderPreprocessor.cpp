@@ -88,7 +88,7 @@ namespace RNGOEngine::Shaders
 
     void ShaderPreProcessor::AddDefinition(const Data::Shader::ShaderDefinition& definition)
     {
-        m_definitions[std::string(definition.Name)] = std::to_string(definition.Value);
+        m_definitions[std::string(definition.Name)] = definition.Value;
         m_tokens[std::string(definition.Name)] = [this](const std::string& token, std::string& source)
         {
             return ParseForDefinitions(token, source);

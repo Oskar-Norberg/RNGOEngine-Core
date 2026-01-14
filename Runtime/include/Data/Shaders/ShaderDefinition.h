@@ -11,7 +11,6 @@ namespace RNGOEngine::Data::Shader
     struct ShaderDefinition
     {
         std::string_view Name;
-        // TODO: Add support for non-int definitions.
-        int Value;
+        std::string_view Value;
     };
 }

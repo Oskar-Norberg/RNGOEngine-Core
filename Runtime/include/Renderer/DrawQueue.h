@@ -119,10 +119,10 @@ namespace RNGOEngine::Core::Renderer
         AmbientLightData AmbientLight;
         DirectionalLightData DirectionalLight;
 
-        std::array<PointLightData, Data::Shader::NR_OF_POINTLIGHTS.Value> PointLights;
+        std::array<PointLightData, Data::Shader::NR_OF_POINTLIGHTS> PointLights;
         size_t PointLightIndex = 0;
 
-        std::array<SpotlightData, Data::Shader::NR_OF_SPOTLIGHTS.Value> Spotlights;
+        std::array<SpotlightData, Data::Shader::NR_OF_SPOTLIGHTS> Spotlights;
         size_t SpotlightIndex = 0;
 
         BackgroundColorData BackgroundColor;
