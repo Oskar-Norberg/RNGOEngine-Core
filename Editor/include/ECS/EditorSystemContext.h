@@ -47,7 +47,6 @@ namespace RNGOEngine::Editor
 
         
 
-        // TODO: This should probably not be owned by the SystemContext.
         // TODO: Ugly pointer bonanza over here
         Systems::Resources::ResourceMapper* engineResourceMapper = nullptr;
         Systems::Resources::ResourceMapper* gameResourceMapper = nullptr;

@@ -11,8 +11,6 @@
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
 
-// TODO: Remove when MaterialManager is less shit
-
 namespace RNGOEngine::Core::Renderer
 {
     ForwardPass::ForwardPass(IRenderer& renderer, const int width, const int height)

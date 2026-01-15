@@ -20,7 +20,6 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         const std::filesystem::path& modelPath, bool doFlipUVs
     )
     {
-        // TODO: Check for assimp memory leaks. Don't know if assimp cleans up using RAII
         Assimp::Importer importer;
 
         const auto flags = aiProcess_Triangulate | (doFlipUVs ? aiProcess_FlipUVs : 0) | aiProcess_GenNormals;

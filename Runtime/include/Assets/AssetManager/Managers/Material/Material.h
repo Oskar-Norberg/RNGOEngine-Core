@@ -14,7 +14,6 @@
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: PascalCase case public members
     struct MaterialTextureSpecification
     {
         AssetHandle TextureHandle;

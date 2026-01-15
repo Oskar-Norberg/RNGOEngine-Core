@@ -32,7 +32,7 @@ namespace RNGOEngine::AssetHandling::ModelLoading
         if (!fileStream.is_open())
         {
             RNGO_ASSERT(false && "OBJModelImporter::ParseOBJFile - Failed to open .obj file.");
-            // TODO: Load should probably be able to fail.
+            // TODO: Parse should return expected with error.
             return {};
         }
 

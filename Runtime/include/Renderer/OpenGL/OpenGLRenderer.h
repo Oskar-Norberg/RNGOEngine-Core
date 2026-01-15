@@ -8,11 +8,10 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-    // TODO: This class should be called OpenGLRenderer, whoops.
-    class GLFWRenderer : public IRenderer
+    class OpenGLRenderer : public IRenderer
     {
     public:
-        GLFWRenderer();
+        OpenGLRenderer();
 
     public:
         void EnableFeature(RenderFeature feature) override;

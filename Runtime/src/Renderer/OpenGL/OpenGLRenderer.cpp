@@ -2,19 +2,18 @@
 // Created by Oskar.Norberg on 2025-08-25.
 //
 
-#include "Renderer/GLFW/GLFWRenderer.h"
-
-#include <glad/gl.h>
 #include <GLFW/glfw3.h>
+#include <glad/gl.h>
 
 #include <format>
 
 #include "Data/MeshData.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Core::Renderer
 {
-    GLFWRenderer::GLFWRenderer()
+    OpenGLRenderer::OpenGLRenderer()
     {
         // TODO: Hardcoded to glfw.
         if (!gladLoadGL(glfwGetProcAddress))
@@ -23,115 +22,115 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    void GLFWRenderer::EnableFeature(const RenderFeature feature)
+    void OpenGLRenderer::EnableFeature(const RenderFeature feature)
     {
         EnableFeatures(feature);
     }
 
-    void GLFWRenderer::DisableFeature(const RenderFeature feature)
+    void OpenGLRenderer::DisableFeature(const RenderFeature feature)
     {
         DisableFeatures(feature);
     }
 
-    void GLFWRenderer::SetViewPortSize(const int width, const int height)
+    void OpenGLRenderer::SetViewPortSize(const int width, const int height)
     {
         glViewport(0, 0, width, height);
     }
 
-    void GLFWRenderer::SetClearColor(const float r, const float g, const float b, const float a)
+    void OpenGLRenderer::SetClearColor(const float r, const float g, const float b, const float a)
     {
         glClearColor(r, g, b, a);
     }
 
-    void GLFWRenderer::ClearColor()
+    void OpenGLRenderer::ClearColor()
     {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    void GLFWRenderer::ClearDepth()
+    void OpenGLRenderer::ClearDepth()
     {
         glClear(GL_DEPTH_BUFFER_BIT);
     }
 
-    void GLFWRenderer::DrawElement(const size_t numIndices)
+    void OpenGLRenderer::DrawElement(const size_t numIndices)
     {
         // TODO: Scary cast.
         glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_INT, nullptr);
     }
 
-    VAO GLFWRenderer::CreateVAO()
+    VAO OpenGLRenderer::CreateVAO()
     {
         unsigned int vao;
         glGenVertexArrays(1, &vao);
         return vao;
     }
 
-    VBO GLFWRenderer::CreateVBO()
+    VBO OpenGLRenderer::CreateVBO()
     {
         unsigned vbo;
         glGenBuffers(1, &vbo);
         return vbo;
     }
 
-    EBO GLFWRenderer::CreateEBO()
+    EBO OpenGLRenderer::CreateEBO()
     {
         unsigned ebo;
         glGenBuffers(1, &ebo);
         return ebo;
     }
 
-    void GLFWRenderer::DestroyVAO(const VAO vao)
+    void OpenGLRenderer::DestroyVAO(const VAO vao)
     {
         glDeleteVertexArrays(1, &vao);
     }
 
-    void GLFWRenderer::DestroyVBO(const VBO vbo)
+    void OpenGLRenderer::DestroyVBO(const VBO vbo)
     {
         glDeleteBuffers(1, &vbo);
     }
 
-    void GLFWRenderer::DestroyEBO(const EBO ebo)
+    void OpenGLRenderer::DestroyEBO(const EBO ebo)
     {
         glDeleteBuffers(1, &ebo);
     }
 
-    void GLFWRenderer::BindToVAO(const VAO vao)
+    void OpenGLRenderer::BindToVAO(const VAO vao)
     {
         glBindVertexArray(vao);
     }
 
-    void GLFWRenderer::BindToVBO(const VBO vbo)
+    void OpenGLRenderer::BindToVBO(const VBO vbo)
     {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
     }
 
-    void GLFWRenderer::BindToEBO(const EBO ebo)
+    void OpenGLRenderer::BindToEBO(const EBO ebo)
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     }
 
-    void GLFWRenderer::SetAttributePointer(const unsigned index, const int size, const size_t stride,
+    void OpenGLRenderer::SetAttributePointer(const unsigned index, const int size, const size_t stride,
                                            const size_t offset)
     {
         glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(offset));
         glEnableVertexAttribArray(index);
     }
 
-    void GLFWRenderer::BufferVBOData(const std::span<const std::byte> data, const bool isDynamic)
+    void OpenGLRenderer::BufferVBOData(const std::span<const std::byte> data, const bool isDynamic)
     {
         const auto usage = isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
         // TODO: Scary cast.
         glBufferData(GL_ARRAY_BUFFER, data.size_bytes(), data.data(), usage);
     }
 
-    void GLFWRenderer::BufferEBOData(const std::span<const std::byte> data, const bool isDynamic)
+    void OpenGLRenderer::BufferEBOData(const std::span<const std::byte> data, const bool isDynamic)
     {
         const auto usage = isDynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW;
         // TODO: Scary cast.
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size_bytes(), data.data(), usage);
     }
 
-    ShaderID GLFWRenderer::CreateShader(const std::string_view source, const ShaderType type)
+    ShaderID OpenGLRenderer::CreateShader(const std::string_view source, const ShaderType type)
     {
         const auto shaderType = type == ShaderType::Vertex ? GL_VERTEX_SHADER : GL_FRAGMENT_SHADER;
         const auto shaderID = glCreateShader(shaderType);
@@ -146,20 +145,20 @@ namespace RNGOEngine::Core::Renderer
         if (success == GL_FALSE)
         {
             glGetShaderInfoLog(shaderID, 512, nullptr, ShaderCompileInfoLog);
-            RNGO_ASSERT(false && "GLFWRenderer::CreateShader - Shader compilation failed.");
+            RNGO_ASSERT(false && "OpenGLRenderer::CreateShader - Shader compilation failed.");
         }
 
         return shaderID;
     }
 
-    ShaderProgramID GLFWRenderer::CreateShaderProgram(const ShaderID vertexShader,
+    ShaderProgramID OpenGLRenderer::CreateShaderProgram(const ShaderID vertexShader,
                                                       const ShaderID fragmentShader)
     {
         const auto shaderProgram = glCreateProgram();
         glAttachShader(shaderProgram, vertexShader);
         glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
-        
+
         int success;
         static char ShaderProgramLinkInfoLog[512];
         glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
@@ -167,80 +166,80 @@ namespace RNGOEngine::Core::Renderer
         {
             // TODO: Return expected?
             glGetProgramInfoLog(shaderProgram, 512, nullptr, ShaderProgramLinkInfoLog);
-            RNGO_ASSERT(false && "GLFWRenderer::CreateShaderProgram - Shader program linking failed.");
+            RNGO_ASSERT(false && "OpenGLRenderer::CreateShaderProgram - Shader program linking failed.");
         }
 
         return shaderProgram;
     }
 
-    void GLFWRenderer::DestroyShader(const ShaderID shader)
+    void OpenGLRenderer::DestroyShader(const ShaderID shader)
     {
         glDeleteShader(shader);
     }
 
-    void GLFWRenderer::DestroyShaderProgram(const ShaderProgramID program)
+    void OpenGLRenderer::DestroyShaderProgram(const ShaderProgramID program)
     {
         glDeleteProgram(program);
     }
 
-    void GLFWRenderer::BindShaderProgram(ShaderProgramID program)
+    void OpenGLRenderer::BindShaderProgram(ShaderProgramID program)
     {
         glUseProgram(program);
     }
 
-    void GLFWRenderer::SetBool(ShaderProgramID shader, std::string_view name, bool value)
+    void OpenGLRenderer::SetBool(ShaderProgramID shader, std::string_view name, bool value)
     {
         glUniform1i(glGetUniformLocation(shader, name.data()), static_cast<int>(value));
     }
 
-    void GLFWRenderer::SetInt(ShaderProgramID shader, std::string_view name, int value)
+    void OpenGLRenderer::SetInt(ShaderProgramID shader, std::string_view name, int value)
     {
         glUniform1i(glGetUniformLocation(shader, name.data()), value);
     }
 
-    void GLFWRenderer::SetFloat(ShaderProgramID shader, std::string_view name, float value)
+    void OpenGLRenderer::SetFloat(ShaderProgramID shader, std::string_view name, float value)
     {
         glUniform1f(glGetUniformLocation(shader, name.data()), value);
     }
 
-    void GLFWRenderer::SetVec2(ShaderProgramID shader, std::string_view name, std::span<const float, 2> value)
+    void OpenGLRenderer::SetVec2(ShaderProgramID shader, std::string_view name, std::span<const float, 2> value)
     {
         glUniform2fv(glGetUniformLocation(shader, name.data()), 1, value.data());
     }
 
-    void GLFWRenderer::SetVec3(ShaderProgramID shader, std::string_view name, std::span<const float, 3> value)
+    void OpenGLRenderer::SetVec3(ShaderProgramID shader, std::string_view name, std::span<const float, 3> value)
     {
         glUniform3fv(glGetUniformLocation(shader, name.data()), 1, value.data());
     }
 
-    void GLFWRenderer::SetVec4(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value)
+    void OpenGLRenderer::SetVec4(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value)
     {
         glUniform4fv(glGetUniformLocation(shader, name.data()), 1, value.data());
     }
 
-    void GLFWRenderer::SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value)
+    void OpenGLRenderer::SetMat2(ShaderProgramID shader, std::string_view name, std::span<const float, 4> value)
     {
         glUniformMatrix2fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value)
+    void OpenGLRenderer::SetMat3(ShaderProgramID shader, std::string_view name, std::span<const float, 9> value)
     {
         glUniformMatrix3fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetMat4(ShaderProgramID shader, std::string_view name,
+    void OpenGLRenderer::SetMat4(ShaderProgramID shader, std::string_view name,
                                std::span<const float, 16> value)
     {
         glUniformMatrix4fv(glGetUniformLocation(shader, name.data()), 1, GL_FALSE, value.data());
     }
 
-    void GLFWRenderer::SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot)
+    void OpenGLRenderer::SetTexture(ShaderProgramID shader, std::string_view name, unsigned slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glUniform1i(glGetUniformLocation(shader, name.data()), slot);
     }
 
-    TextureID GLFWRenderer::CreateTexture2D(const Texture2DProperties properties, const int width, const int height,
+    TextureID OpenGLRenderer::CreateTexture2D(const Texture2DProperties properties, const int width, const int height,
         const std::span<const std::byte> data)
     {
         unsigned int textureHandle;
@@ -279,7 +278,7 @@ namespace RNGOEngine::Core::Renderer
                              textureData);
                 break;
             default:
-                RNGO_ASSERT(false && "GLFWRenderer::CreateTexture2D - Unsupported TextureFormat");
+                RNGO_ASSERT(false && "OpenGLRenderer::CreateTexture2D - Unsupported TextureFormat");
         }
 
         if (GetGLUsingMipMaps(properties.MinifyingFilter, properties.MagnifyingFilter))
@@ -290,35 +289,35 @@ namespace RNGOEngine::Core::Renderer
         return textureHandle;
     }
 
-    void GLFWRenderer::DestroyTexture(const TextureID texture)
+    void OpenGLRenderer::DestroyTexture(const TextureID texture)
     {
         glDeleteTextures(1, &texture);
     }
 
-    void GLFWRenderer::BindTexture(const TextureID texture, unsigned slot)
+    void OpenGLRenderer::BindTexture(const TextureID texture, unsigned slot)
     {
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, texture);
     }
 
-    FrameBufferID GLFWRenderer::CreateFrameBuffer()
+    FrameBufferID OpenGLRenderer::CreateFrameBuffer()
     {
         unsigned int framebuffer;
         glGenFramebuffers(1, &framebuffer);
         return framebuffer;
     }
 
-    void GLFWRenderer::DestroyFrameBuffer(const FrameBufferID framebuffer)
+    void OpenGLRenderer::DestroyFrameBuffer(const FrameBufferID framebuffer)
     {
         glDeleteFramebuffers(1, &framebuffer);
     }
 
-    void GLFWRenderer::BindFrameBuffer(const FrameBufferID frameBuffer)
+    void OpenGLRenderer::BindFrameBuffer(const FrameBufferID frameBuffer)
     {
         glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
     }
 
-    void GLFWRenderer::AttachTextureToFrameBuffer(const TextureID texture,
+    void OpenGLRenderer::AttachTextureToFrameBuffer(const TextureID texture,
                                                   const FrameBufferAttachmentPoint attachmentPoint)
     {
         const unsigned int glAttachmentPoint = GetGLAttachmentPoint(attachmentPoint);
@@ -327,7 +326,7 @@ namespace RNGOEngine::Core::Renderer
         glFramebufferTexture2D(GL_FRAMEBUFFER, glAttachmentPoint, GL_TEXTURE_2D, texture, 0);
     }
 
-    RenderBufferID GLFWRenderer::CreateRenderBuffer(const RenderBufferFormat format, const unsigned width,
+    RenderBufferID OpenGLRenderer::CreateRenderBuffer(const RenderBufferFormat format, const unsigned width,
                                                     const unsigned height)
     {
         unsigned int rbo;
@@ -343,31 +342,30 @@ namespace RNGOEngine::Core::Renderer
         return rbo;
     }
 
-    void GLFWRenderer::DestroyRenderBuffer(const RenderBufferID renderBuffer)
+    void OpenGLRenderer::DestroyRenderBuffer(const RenderBufferID renderBuffer)
     {
         glDeleteRenderbuffers(1, &renderBuffer);
     }
 
-    void GLFWRenderer::BindRenderBuffer(const RenderBufferID renderBuffer)
+    void OpenGLRenderer::BindRenderBuffer(const RenderBufferID renderBuffer)
     {
         glBindRenderbuffer(GL_RENDERBUFFER, renderBuffer);
     }
 
-    FrameBufferStatus GLFWRenderer::GetFrameBufferStatus()
+    FrameBufferStatus OpenGLRenderer::GetFrameBufferStatus()
     {
         return GetFrameBufferStatusFromGL(glCheckFramebufferStatus(GL_FRAMEBUFFER));
     }
 
-    void GLFWRenderer::AttachRenderBufferToFrameBuffer(const RenderBufferID renderBuffer,
+    void OpenGLRenderer::AttachRenderBufferToFrameBuffer(const RenderBufferID renderBuffer,
                                                        const FrameBufferAttachmentPoint attachmentPoint)
     {
         const unsigned int glAttachmentPoint = GetGLAttachmentPoint(attachmentPoint);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, glAttachmentPoint, GL_RENDERBUFFER, renderBuffer);
     }
 
-    void GLFWRenderer::EnableFeatures(const RenderFeature feature)
+    void OpenGLRenderer::EnableFeatures(const RenderFeature feature)
     {
-        // TODO: Duplicate code.
         if (DepthTesting & feature)
         {
             glEnable(GL_DEPTH_TEST);
@@ -384,7 +382,7 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    void GLFWRenderer::DisableFeatures(const RenderFeature feature)
+    void OpenGLRenderer::DisableFeatures(const RenderFeature feature)
     {
         if (DepthTesting & feature)
         {
@@ -402,7 +400,7 @@ namespace RNGOEngine::Core::Renderer
         }
     }
 
-    unsigned int GLFWRenderer::GetGLTextureFiltering(const TextureFiltering filtering)
+    unsigned int OpenGLRenderer::GetGLTextureFiltering(const TextureFiltering filtering)
     {
         switch (filtering)
         {
@@ -419,12 +417,12 @@ namespace RNGOEngine::Core::Renderer
             case TextureFiltering::LINEAR_MIPMAP_LINEAR:
                 return GL_LINEAR_MIPMAP_LINEAR;
             default:
-                RNGO_ASSERT(false && "GLFWRenderer::GetGLTextureFiltering - Unsupported TextureFiltering");
-                // TODO: UB if assert disabled.
+                RNGO_ASSERT(false && "OpenGLRenderer::GetGLTextureFiltering - Unsupported TextureFiltering");
+                return GL_LINEAR;
         }
     }
 
-    bool GLFWRenderer::GetGLUsingMipMaps(const TextureFiltering minifying, const TextureFiltering magnifying)
+    bool OpenGLRenderer::GetGLUsingMipMaps(const TextureFiltering minifying, const TextureFiltering magnifying)
     {
         auto isMipmapped = [](const TextureFiltering filter)
         {
@@ -437,7 +435,7 @@ namespace RNGOEngine::Core::Renderer
         return isMipmapped(minifying) || isMipmapped(magnifying);
     }
 
-    unsigned int GLFWRenderer::GetGLTextureWrapping(const TextureWrapping wrapping)
+    unsigned int OpenGLRenderer::GetGLTextureWrapping(const TextureWrapping wrapping)
     {
         switch (wrapping)
         {
@@ -452,12 +450,12 @@ namespace RNGOEngine::Core::Renderer
             default:
                 RNGO_ASSERT(
                     false &&
-                    "GLFWRenderer::GetGLTextureWrapping - Unsupported TextureWrapping");
+                    "OpenGLRenderer::GetGLTextureWrapping - Unsupported TextureWrapping");
                 return GL_REPEAT;
         }
     }
 
-    unsigned int GLFWRenderer::GetGLAttachmentPoint(const FrameBufferAttachmentPoint attachmentPoint)
+    unsigned int OpenGLRenderer::GetGLAttachmentPoint(const FrameBufferAttachmentPoint attachmentPoint)
     {
         switch (attachmentPoint)
         {
@@ -482,12 +480,12 @@ namespace RNGOEngine::Core::Renderer
             default:
                 RNGO_ASSERT(
                     false &&
-                    "GLFWRenderer::AttachTextureToFrameBuffer - Unsupported FrameBufferAttachmentPoint");
+                    "OpenGLRenderer::AttachTextureToFrameBuffer - Unsupported FrameBufferAttachmentPoint");
                 return GL_COLOR_ATTACHMENT0;
         }
     }
 
-    unsigned int GLFWRenderer::GetGLRenderBufferFormat(const RenderBufferFormat renderBufferFormat)
+    unsigned int OpenGLRenderer::GetGLRenderBufferFormat(const RenderBufferFormat renderBufferFormat)
     {
         switch (renderBufferFormat)
         {
@@ -497,12 +495,12 @@ namespace RNGOEngine::Core::Renderer
                 return GL_DEPTH32F_STENCIL8;
             default:
                 RNGO_ASSERT(
-                    false && "GLFWRenderer::GetGLRenderBufferFormat - Unsupported RenderBufferFormat");
+                    false && "OpenGLRenderer::GetGLRenderBufferFormat - Unsupported RenderBufferFormat");
                 return GL_DEPTH24_STENCIL8;
         }
     }
 
-    unsigned int GLFWRenderer::GetGLTextureFormat(TextureFormat format)
+    unsigned int OpenGLRenderer::GetGLTextureFormat(TextureFormat format)
     {
         switch (format)
         {
@@ -516,12 +514,12 @@ namespace RNGOEngine::Core::Renderer
                 return GL_DEPTH32F_STENCIL8;
             default:
                 RNGO_ASSERT(
-                    false && "GLFWRenderer::GetGLTextureFormat - Unsupported TextureFormat");
+                    false && "OpenGLRenderer::GetGLTextureFormat - Unsupported TextureFormat");
                 return GL_RGBA;
         }
     }
 
-    FrameBufferStatus GLFWRenderer::GetFrameBufferStatusFromGL(unsigned int status)
+    FrameBufferStatus OpenGLRenderer::GetFrameBufferStatusFromGL(unsigned int status)
     {
         switch (status)
         {

@@ -195,7 +195,7 @@ namespace RNGOEngine::AssetHandling
     {
         for (const auto& [type, importer] : m_importers)
         {
-            if (importer->GetFinalizationThreadTypes() & threadType)
+            if ((importer->GetFinalizationThreadTypes() & threadType) != Data::ThreadType::None)
             {
                 importer->FinalizeLoad(threadType, m_assetRegistry);
             }

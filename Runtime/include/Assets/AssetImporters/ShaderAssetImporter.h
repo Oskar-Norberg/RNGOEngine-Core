@@ -33,8 +33,6 @@ namespace RNGOEngine::AssetHandling
         }
 
     private:
-        // TODO:
-        // Containers::TSQueue<std::pair<ShaderMetadata, std::string>> m_shaderDataQueue;
         ShaderLoader m_shaderLoader;
     };
 }

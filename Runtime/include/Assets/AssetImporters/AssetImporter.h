@@ -49,7 +49,6 @@ namespace RNGOEngine::AssetHandling
         ) const = 0;
 
     public:
-        // TODO: This isn't really being used anywhere right now.
         virtual std::span<const std::string_view> GetSupportedExtensions() const = 0;
         virtual Data::ThreadType GetFinalizationThreadTypes() const = 0;
         virtual AssetType GetAssetType() const = 0;

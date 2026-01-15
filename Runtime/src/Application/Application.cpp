@@ -9,7 +9,7 @@
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
-#include "Renderer/GLFW/GLFWRenderer.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
@@ -39,7 +39,7 @@ namespace RNGOEngine
             {
                 m_window =
                     std::make_unique<Core::Window::GLFWWindow>(config.Width, config.Height, config.Name);
-                m_renderer = std::make_unique<Core::Renderer::GLFWRenderer>();
+                m_renderer = std::make_unique<Core::Renderer::OpenGLRenderer>();
                 doFlipTexturesVertically = true;
                 break;
             }
