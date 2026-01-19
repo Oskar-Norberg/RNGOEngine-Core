@@ -11,9 +11,14 @@ uniform mat4 View;
 uniform mat4 Projection;
 uniform mat4 Model;
 
+// Shadow Mapping
+uniform mat4 LightSpaceMatrix;
+
+// TODO: Out block
 out vec3 FragPos;
 out vec2 TexCoord;
 out vec3 Normal;
+out vec4 FragPosLightSpace;
 
 void main()
 {
@@ -21,6 +26,7 @@ void main()
     Normal = mat3(transpose(inverse(Model))) * aNormal;
     TexCoord = aTexCoord;
     FragPos = (Model * vec4(aPos, 1.0)).xyz;
+    FragPosLightSpace = LightSpaceMatrix * vec4(FragPos, 1.0);
     
     gl_Position = Projection * View * Model * vec4(aPos, 1.0);
 }
@@ -34,6 +40,7 @@ void main()
 in vec3 FragPos;
 in vec2 TexCoord;
 in vec3 Normal;
+in vec4 FragPosLightSpace;
 
 out vec4 FragColor;
 
@@ -46,12 +53,26 @@ uniform sampler2D ALBEDO_TEXTURE;
 uniform sampler2D NORMAL_TEXTURE;
 uniform sampler2D SPECULAR_TEXTURE;
 
+uniform sampler2D DIRECTIONAL_SHADOWMAP_TEXTURE;
+
+#include <includes/shadowmapping.common>
+
 void main()
 {
     vec3 normal = normalize(Normal);
     LightAccumulation lightAccumulation = GetLight(FragPos, normal, specularStrength, shininess, viewPosition);
-    
-    FragColor = texture(ALBEDO_TEXTURE, TexCoord) * (lightAccumulation.ambient + lightAccumulation.diffuse)
-                    + texture(SPECULAR_TEXTURE, TexCoord) * vec4(vec3(lightAccumulation.specular), 1.0);
+    float shadow = CalculateShadows(normal, directionalLight.direction, FragPosLightSpace);
+
+    vec4 albedoTexture = texture(ALBEDO_TEXTURE, TexCoord);
+    vec4 specularTexture = texture(SPECULAR_TEXTURE, TexCoord);
+
+    vec3 lighting =
+    lightAccumulation.ambient.rgb * albedoTexture.rgb +
+    (1.0 - shadow) * (
+        lightAccumulation.diffuse.rgb * albedoTexture.rgb +
+        lightAccumulation.specular * specularTexture.rgb
+    );
+
+    FragColor = vec4(lighting, albedoTexture.a);
 };
         

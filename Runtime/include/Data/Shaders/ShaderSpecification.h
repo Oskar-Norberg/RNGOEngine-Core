@@ -23,6 +23,18 @@ namespace RNGOEngine::Data::Shader
     constexpr int SPECULAR_TEXTURE_SLOT = 2;
     constexpr ShaderDefinition SPECULAR_TEXTURE = {"SPECULAR_TEXTURE", "SPECULAR_SAMPLER"};
 
+    // Shadow Mapping
+    constexpr int DIRECTIONAL_SHADOWMAP_TEXTURE_SLOT = 3;
+    constexpr ShaderDefinition DIRECTIONAL_SHADOWMAP_TEXTURE = {
+        "DIRECTIONAL_SHADOWMAP_TEXTURE", "DIRECTIONAL_SHADOWMAP_SAMPLER"
+    };
+    constexpr ShaderDefinition MIN_SHADOW_BIAS = {
+        "MIN_SHADOW_BIAS", "0.05"
+    };
+    constexpr ShaderDefinition MAX_SHADOW_BIAS = {
+        "MAX_SHADOW_BIAS", "0.05"
+    };
+
     // Attribute Pointers
     // TODO: Stupid duplicates
     constexpr int POSITION_ATTRIBUTE_POINTER_INDEX = 0;
@@ -42,6 +54,10 @@ namespace RNGOEngine::Data::Shader
         ALBEDO_TEXTURE,
         NORMAL_TEXTURE,
         SPECULAR_TEXTURE,
+
+        DIRECTIONAL_SHADOWMAP_TEXTURE,
+        MIN_SHADOW_BIAS,
+        MAX_SHADOW_BIAS,
 
         POSITION_ATTRIBUTE_POINTER,
         NORMAL_ATTRIBUTE_POINTER,

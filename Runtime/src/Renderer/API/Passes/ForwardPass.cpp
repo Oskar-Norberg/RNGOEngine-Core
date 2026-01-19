@@ -64,7 +64,7 @@ namespace RNGOEngine::Core::Renderer
         const auto frameBufferID = context.renderPassResources.GetFrameBufferID("Forward Pass");
         m_renderer.BindFrameBuffer(frameBufferID);
         ClearAmbientColor(context.drawQueue);
-        RenderOpaque(context.drawQueue);
+        RenderOpaque(context);
     }
 
     void ForwardPass::OnResize(int width, int height)
@@ -84,8 +84,9 @@ namespace RNGOEngine::Core::Renderer
         m_renderer.ClearDepth();
     }
 
-    void ForwardPass::RenderOpaque(DrawQueue& queue) const
+    void ForwardPass::RenderOpaque(RenderContext& context) const
     {
+        auto& queue = context.drawQueue;
         const auto& camera = queue.Camera;
 
         for (const auto& opaqueDrawCall : queue.OpaqueObjects)
@@ -231,6 +232,45 @@ namespace RNGOEngine::Core::Renderer
                     m_renderer.SetFloat(shaderProgramID, quadratic.c_str(), queue.Spotlights[i].Quadratic);
                 }
                 m_renderer.SetInt(shaderProgramID, "numSpotlights", static_cast<int>(queue.SpotlightIndex));
+            }
+
+            // Shadow Mapping
+            {
+                const auto directionalShadowMapTextureID =
+                    context.renderPassResources.GetTextureID("DirectionalShadowMap");
+
+                m_renderer.BindTexture(
+                    directionalShadowMapTextureID, Data::Shader::DIRECTIONAL_SHADOWMAP_TEXTURE_SLOT
+                );
+                m_renderer.SetTexture(
+                    shaderProgramID, Data::Shader::DIRECTIONAL_SHADOWMAP_TEXTURE.Value,
+                    Data::Shader::DIRECTIONAL_SHADOWMAP_TEXTURE_SLOT
+                );
+
+                // TODO: Hardcoded and copy-pasted in two areas. terrible
+                // TODO: Hardcoded pieces of shit
+                constexpr float near_plane = 1.0f;
+                constexpr float far_plane  = 25.0f;
+
+                const glm::mat4 lightProjection =
+                    glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
+                const glm::vec3 lightDir =
+                    glm::normalize(context.drawQueue.DirectionalLight.Direction);
+
+                constexpr float lightDistance = 10.0f;
+                const glm::vec3 lightPos = lightDir * lightDistance;
+
+                const glm::vec3 sceneCenter(0.0f);
+
+                const glm::mat4 lightView =
+                    glm::lookAt(lightPos, sceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+
+                const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
+
+                m_renderer.SetMat4(
+                    shaderProgramID, "LightSpaceMatrix", std::span<const float, 16>(glm::value_ptr(lightSpaceMatrix), 16)
+                );
             }
 
             for (const auto& [name, data] : opaqueDrawCall.Material.Parameters)

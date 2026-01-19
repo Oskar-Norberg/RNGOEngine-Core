@@ -12,7 +12,6 @@
 
 namespace RNGOEngine::Core::Renderer
 {
-
     DirectionalShadowMapPass::DirectionalShadowMapPass(IRenderer& renderer, const int width, const int height)
         : RenderPass(renderer, width, height)
     {
@@ -39,9 +38,9 @@ namespace RNGOEngine::Core::Renderer
                 .AttachmentPoint = FrameBufferAttachmentPoint::DEPTH_ATTACHMENT,
                 .Size =
                     Resources::AttachmentSize{
-                        .SizeType = Resources::AttachmentSizeType::Absolute,
-                        .width = 1024,
-                        .height = 1024,
+                        .SizeType = Resources::AttachmentSizeType::PercentOfScreen,
+                        .width = 100,
+                        .height = 100,
                     },
             }},
         };
@@ -63,22 +62,33 @@ namespace RNGOEngine::Core::Renderer
         auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         auto& shaderResourceManager = Resources::ResourceManager::GetInstance().GetShaderResourceManager();
 
-        const auto shaderOpt = shaderResourceManager.GetShaderProgram(
-            runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(m_shadowShader).value().get().GetShaderKey()
-        );
-        const auto shader = shaderOpt.value();
+        const auto shader =
+            shaderResourceManager
+                .GetShaderProgram(runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(m_shadowShader)
+                                      .value()
+                                      .get()
+                                      .GetShaderKey())
+                .value();
         m_renderer.BindShaderProgram(shader);
 
         // TODO: Hardcoded pieces of shit
-        constexpr float near_plane = 1.0f, far_plane = 25.0f;
-        const glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        constexpr float near_plane = 1.0f;
+        constexpr float far_plane  = 25.0f;
 
-        const glm::vec3 lightDir = glm::normalize(context.drawQueue.DirectionalLight.Direction);
-        const float lightDistance = 10.0f;
-        const glm::vec3 lightPos = -lightDir * lightDistance;
-        const glm::vec3 sceneCenter = glm::vec3(0.0f);
+        const glm::mat4 lightProjection =
+            glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
-        const glm::mat4 lightView = glm::lookAt(lightPos, sceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+        const glm::vec3 lightDir =
+            glm::normalize(context.drawQueue.DirectionalLight.Direction);
+
+        constexpr float lightDistance = 10.0f;
+        const glm::vec3 lightPos = lightDir * lightDistance;
+
+        const glm::vec3 sceneCenter(0.0f);
+
+        const glm::mat4 lightView =
+            glm::lookAt(lightPos, sceneCenter, glm::vec3(0.0f, 1.0f, 0.0f));
+
         const glm::mat4 lightSpaceMatrix = lightProjection * lightView;
 
         m_renderer.SetMat4(
@@ -86,6 +96,7 @@ namespace RNGOEngine::Core::Renderer
         );
 
         // Render Shadow Casters
+        // TODO: Have some filter to mark objects as shadow casters. Right now all opaque objects cast shadows.
         for (const auto& opaque : context.drawQueue.OpaqueObjects)
         {
             // Model Transform

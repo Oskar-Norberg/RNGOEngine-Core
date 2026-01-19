@@ -27,6 +27,6 @@ namespace RNGOEngine::Core::Renderer
 
     private:
         void ClearAmbientColor(DrawQueue& queue) const;
-        void RenderOpaque(DrawQueue& queue) const;
+        void RenderOpaque(RenderContext& context) const;
     };
 }

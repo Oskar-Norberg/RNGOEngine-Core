@@ -7,6 +7,7 @@
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Renderer/API/Passes/DirectionalShadowMapDebugPass.h"
 #include "Renderer/API/Passes/DirectionalShadowMapPass.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
@@ -89,15 +90,12 @@ namespace RNGOEngine
                 m_rendererAPI->RegisterPass<Core::Renderer::DirectionalShadowMapPass>(
                     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
                 );
+                m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
+                    *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+                );
                 m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
                     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
                 );
-                // m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
-                //     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
-                // );
-                // m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
-                //     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
-                // );
             }
             break;
             case PipelineType::ForwardPlus:
