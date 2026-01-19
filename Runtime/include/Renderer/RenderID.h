@@ -40,6 +40,9 @@ namespace RNGOEngine::Core::Renderer
 
         DEPTH24_STENCIL8,
         DEPTH32F_STENCIL8,
+
+        // TODO: Support specific bit-wide depth formats
+        DEPTH_COMPONENT
     };
 
     enum class TextureFiltering

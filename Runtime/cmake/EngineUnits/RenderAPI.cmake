@@ -11,14 +11,18 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
         include/Renderer/API/RenderPass/RenderPassResources.h
         src/Renderer/API/RenderPass/RenderPassResources.cpp
 
+        include/Systems/Core/RenderSystem.h
+        src/Systems/Core/RenderSystem.cpp
+
+        # Passes (TODO: Consider moving to separate cmake unit)
         include/Renderer/API/Passes/ForwardPass.h
         src/Renderer/API/Passes/ForwardPass.cpp
 
         include/Renderer/API/Passes/ForwardScreenPass.h
         src/Renderer/API/Passes/ForwardScreenPass.cpp
 
-        include/Systems/Core/RenderSystem.h
-        src/Systems/Core/RenderSystem.cpp
+        include/Renderer/API/Passes/DirectionalShadowMapPass.h
+        src/Renderer/API/Passes/DirectionalShadowMapPass.cpp
 )
 target_include_directories(${RENDER_API_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${RENDER_API_PROJECT_NAME} PUBLIC

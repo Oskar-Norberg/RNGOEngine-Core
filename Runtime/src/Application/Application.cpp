@@ -7,10 +7,11 @@
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
+#include "Renderer/API/Passes/DirectionalShadowMapPass.h"
 #include "Renderer/API/Passes/ForwardPass.h"
 #include "Renderer/API/Passes/ForwardScreenPass.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Renderer/Null/NullRenderer.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Systems/Core/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
@@ -85,12 +86,18 @@ namespace RNGOEngine
         {
             case PipelineType::Forward:
             {
-                m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
+                m_rendererAPI->RegisterPass<Core::Renderer::DirectionalShadowMapPass>(
                     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
                 );
                 m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
                     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
                 );
+                // m_rendererAPI->RegisterPass<Core::Renderer::ForwardPass>(
+                //     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+                // );
+                // m_rendererAPI->RegisterPass<Core::Renderer::ForwardScreenPass>(
+                //     *m_renderer, m_window->GetWidth(), m_window->GetHeight()
+                // );
             }
             break;
             case PipelineType::ForwardPlus:

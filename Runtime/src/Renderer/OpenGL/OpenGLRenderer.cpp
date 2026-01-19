@@ -277,6 +277,10 @@ namespace RNGOEngine::Core::Renderer
                              GL_FLOAT_32_UNSIGNED_INT_24_8_REV,
                              textureData);
                 break;
+            case TextureFormat::DEPTH_COMPONENT:
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT,
+                             textureData);
+                break;
             default:
                 RNGO_ASSERT(false && "OpenGLRenderer::CreateTexture2D - Unsupported TextureFormat");
         }
