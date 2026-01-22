@@ -13,6 +13,7 @@
 #include "Renderer/Null/NullRenderer.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Systems/Core/RenderSystem.h"
+#include "Systems/Core/ScriptSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
 
@@ -248,5 +249,6 @@ namespace RNGOEngine
     void Application::AddEngineSystems()
     {
         m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::ScriptSystem>();
     }
 }

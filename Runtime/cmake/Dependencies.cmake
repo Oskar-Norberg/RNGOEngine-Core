@@ -9,6 +9,7 @@ add_subdirectory(./vendor/glad)
 add_subdirectory(./vendor/stb_image)
 add_subdirectory(./vendor/yaml-cpp)
 add_subdirectory(./vendor/spdlog)
+add_subdirectory(./vendor/lua)
 add_subdirectory(./vendor/sol2)
 add_subdirectory(./vendor/magic_enum)
 
