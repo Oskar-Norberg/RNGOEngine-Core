@@ -39,6 +39,6 @@ namespace RNGOEngine::AssetHandling
         }
 
     private:
-        Containers::TSQueue<std::string> m_scriptQueue;
+        Containers::TSQueue<std::pair<Utilities::UUID, std::string>> m_scriptQueue;
     };
 }

@@ -159,7 +159,8 @@ namespace RNGOEngine
 
     void Application::OnRender()
     {
-        m_assetLoader->LoadPendingAssets(Data::ThreadType::Render);
+        m_assetLoader->LoadPendingAssets(Data::ThreadType::Render | Data::ThreadType::Main);
+
     }
 
     void Application::SwitchPendingScene()
@@ -234,6 +235,7 @@ namespace RNGOEngine
         engineContext.JobSystem = &m_jobSystem;
         engineContext.EventQueue = &m_eventQueue;
         engineContext.AssetManager = m_assetManager.get();
+        engineContext.RuntimeAssetRegistry = &m_runtimeAssetRegistry;
         engineContext.Renderer = m_rendererAPI.get();
 
         // Game System Context

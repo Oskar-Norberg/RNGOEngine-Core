@@ -1,1 +1,3 @@
-﻿print('fortnight')
+function Update()
+    print('Test Script Update')
+end

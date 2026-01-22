@@ -25,7 +25,7 @@ namespace RNGOEngine::AssetHandling
         }
 
         auto script = Utilities::IO::ReadFile(metadata.Path);
-        m_scriptQueue.Enqueue(std::move(script));
+        m_scriptQueue.Enqueue(std::make_pair(metadata.UUID, std::move(script)));
 
         return ImportingError::None;
     }
@@ -40,8 +40,7 @@ namespace RNGOEngine::AssetHandling
                 break;
             }
 
-            auto script = m_scriptQueue.Dequeue();
-            Utilities::UUID uuid = Utilities::GenerateUUID();
+            auto [uuid, script] = m_scriptQueue.Dequeue();
             // TODO: Ugly shit
             auto uuidCopy = uuid;
             ScriptAsset asset(std::move(uuidCopy), std::move(script));

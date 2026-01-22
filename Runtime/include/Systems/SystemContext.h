@@ -22,6 +22,7 @@ namespace RNGOEngine
     namespace AssetHandling
     {
         class AssetManager;
+        class RuntimeAssetRegistry;
     }
 
     namespace Core
@@ -52,6 +53,7 @@ namespace RNGOEngine::Systems
         Utilities::JobSystem* JobSystem = nullptr;
         Events::EventQueue* EventQueue = nullptr;
         AssetHandling::AssetManager* AssetManager = nullptr;
+        AssetHandling::RuntimeAssetRegistry* RuntimeAssetRegistry = nullptr;
         RNGOEngine::Core::Renderer::RenderAPI* Renderer = nullptr;
     };
 

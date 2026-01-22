@@ -4,10 +4,11 @@
 
 #pragma once
 
-#include <sol/sol.hpp>
 #include <entt/entt.hpp>
+#include <sol/sol.hpp>
 #include <unordered_map>
 
+#include "Assets/Asset.h"
 #include "Systems/ISystem.h"
 
 namespace RNGOEngine::Systems::Core
@@ -15,11 +16,12 @@ namespace RNGOEngine::Systems::Core
     class ScriptSystem : public EngineSystem
     {
     public:
-        ScriptSystem() = default;
+        ScriptSystem();
         void Update(RNGOEngine::Core::World& world, EngineSystemContext& context) override;
 
     private:
         sol::state m_luaState;
-        std::unordered_map<entt::entity, sol::table> m_entityScripts;
+        // Maps entity to a map of Script Handles to their corresponding Lua environments
+        std::unordered_map<entt::entity, std::unordered_map<AssetHandling::AssetHandle, sol::environment>> m_entityScripts;
     };
 }
