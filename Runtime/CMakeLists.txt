@@ -74,7 +74,6 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${WINDOWING_PROJECT_NAME}
         ${RENDERING_PROJECT_NAME}
 
-        ${SCRIPT_CORE_PROJECT_NAME}
 
         ${RESOURCE_MANAGEMENT_PROJECT_NAME}
         ${ASSET_MANAGER_PROJECT_NAME}
@@ -84,6 +83,7 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${COMPONENT_PROJECT_NAME}
 
         ${RENDER_API_PROJECT_NAME}
+        ${SCRIPT_CORE_PROJECT_NAME}
 )
 
 # TODO: Get help with the asset copying mess.

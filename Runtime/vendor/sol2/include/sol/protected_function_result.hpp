@@ -56,7 +56,7 @@ namespace sol {
 
 		protected_function_result() noexcept : protected_function_result(nullptr) {}
 		protected_function_result(lua_State* Ls, int idx = -1, int retnum = 0, int popped = 0, call_status pferr = call_status::ok) noexcept
-		: L(Ls), index(idx), returncount(retnum), popcount(popped), err(pferr) {
+		: L( Ls), index(idx), returncount(retnum), popcount(popped), err(pferr) {
 		}
 
 		// We do not want anyone to copy these around willy-nilly
@@ -101,7 +101,9 @@ namespace sol {
 
 #if SOL_IS_ON(SOL_COMPILER_GCC)
 #pragma GCC diagnostic push
+#if !SOL_IS_ON(SOL_COMPILER_CLANG)
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #endif
 
 		template <typename T>
@@ -114,7 +116,7 @@ namespace sol {
 					if (valid()) {
 						return UT();
 					}
-					return UT(error(detail::direct_error, stack::get<std::string>(L, target)));
+					return UT(stack::stack_detail::get_error(L, target));
 				}
 				else {
 					if (!valid()) {
@@ -131,7 +133,7 @@ namespace sol {
 						type_panic_c_str(L, target, t, type::none, "bad get from protected_function_result (is an error)");
 					}
 #endif // Check Argument Safety
-					return error(detail::direct_error, stack::get<std::string>(L, target));
+					return stack::stack_detail::get_error(L, target);
 				}
 				else {
 #if SOL_IS_ON(SOL_SAFE_PROXIES)
