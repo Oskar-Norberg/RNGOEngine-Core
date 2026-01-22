@@ -9,6 +9,7 @@
 #include "Assets/Asset.h"
 #include "Assets/AssetTypes/MaterialAsset.h"
 #include "Assets/AssetTypes/ModelAsset.h"
+#include "Assets/AssetTypes/ScriptAsset.h"
 #include "Assets/AssetTypes/ShaderAsset.h"
 #include "Assets/AssetTypes/TextureAsset.h"
 #include "Concepts/Concepts.h"
@@ -64,7 +65,8 @@ namespace RNGOEngine::AssetHandling
             // TODO: Make Static Assert Macro
             static_assert(
                 std::is_same_v<TAsset, ModelAsset> || std::is_same_v<TAsset, TextureAsset> ||
-                    std::is_same_v<TAsset, ShaderAsset> || std::is_same_v<TAsset, MaterialAsset>,
+                    std::is_same_v<TAsset, ShaderAsset> || std::is_same_v<TAsset, MaterialAsset> ||
+                    std::is_same_v<TAsset, ScriptAsset>,
                 "RuntimeAssetRegistry::Insert - Unsupported asset type."
             );
             auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
@@ -94,6 +96,7 @@ namespace RNGOEngine::AssetHandling
             AssetMap<TextureAsset>,   // Textures
             AssetMap<ShaderAsset>,    // Shaders
             AssetMap<MaterialAsset>,  // Materials
+            AssetMap<ScriptAsset>,    // TODO: Lua Script
             std::monostate            // Placeholder for Count
             >
             m_assetStorage;

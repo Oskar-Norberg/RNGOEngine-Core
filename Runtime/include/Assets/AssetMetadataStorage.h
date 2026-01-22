@@ -7,6 +7,7 @@
 #include "Asset.h"
 #include "AssetTypes/MaterialAsset.h"
 #include "AssetTypes/ModelAsset.h"
+#include "AssetTypes/ScriptAsset.h"
 #include "AssetTypes/ShaderAsset.h"
 #include "AssetTypes/TextureAsset.h"
 #include "Concepts/Concepts.h"
@@ -61,6 +62,9 @@ namespace RNGOEngine::AssetHandling
                 break;
             case AssetType::Material:
                 return std::make_unique<AssetMetadataStorageTyped<MaterialMetadata>>();
+                break;
+            case AssetType::Script:
+                return std::make_unique<AssetMetadataStorageTyped<ScriptMetadata>>();
                 break;
             case AssetType::None:
             default:

@@ -38,6 +38,13 @@ namespace RNGOEngine::AssetHandling
                 storage.erase(handle);
             }
             break;
+            case AssetType::Script:
+            {
+                using TAsset = ClassForAssetType<AssetType::Script>::Type;
+                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+                storage.erase(handle);
+            }
+            break;
             case AssetType::Material:
             case AssetType::None:
             case AssetType::Count:
@@ -86,6 +93,17 @@ namespace RNGOEngine::AssetHandling
                 }
             }
             break;
+            case AssetType::Script:
+            {
+                using TAsset = ClassForAssetType<AssetType::Script>::Type;
+                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+                const auto it = storage.find(handle);
+                if (it != storage.end())
+                {
+                    state = it->second.State;
+                }
+            }
+            break;
             case AssetType::Material:
             case AssetType::None:
             case AssetType::Count:
@@ -117,6 +135,16 @@ namespace RNGOEngine::AssetHandling
             case AssetType::Texture:
             {
                 using TAsset = ClassForAssetType<AssetType::Texture>::Type;
+                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+                const auto it = storage.find(handle);
+                if (it != storage.end())
+                {
+                    it->second.State = state;
+                }
+            }
+            case AssetType::Script:
+            {
+                using TAsset = ClassForAssetType<AssetType::Script>::Type;
                 auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
                 const auto it = storage.find(handle);
                 if (it != storage.end())

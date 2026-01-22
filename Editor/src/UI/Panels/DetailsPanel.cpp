@@ -37,6 +37,8 @@ namespace RNGOEngine::Editor
         DrawComponent<Components::DirectionalLight>(registry, selectedEntity);
         DrawComponent<Components::PointLight>(registry, selectedEntity);
         DrawComponent<Components::Spotlight>(registry, selectedEntity);
+        DrawComponent<Components::ScriptComponent>(registry, selectedEntity);
+
 
         if (ImGui::Button("Add Component"))
         {
@@ -57,6 +59,8 @@ namespace RNGOEngine::Editor
             DrawAddComponent<Components::DirectionalLight>(registry, selectedEntity, "DirectionalLight");
             DrawAddComponent<Components::PointLight>(registry, selectedEntity, "PointLight");
             DrawAddComponent<Components::Spotlight>(registry, selectedEntity, "Spotlight");
+            DrawAddComponent<Components::ScriptComponent>(registry, selectedEntity, "Script");
+
             
             ImGui::EndPopup();
         }

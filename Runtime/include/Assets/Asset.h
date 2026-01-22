@@ -30,6 +30,7 @@ namespace RNGOEngine::AssetHandling
         // Or should they be merged into a single "Shader" file that contains both vertex and fragment shader code?
         Shader,
         Material,
+        Script,
         Count
     };
     // TODO: this should probably be replaced with the magic_enum count instead.

@@ -35,4 +35,10 @@ namespace RNGOEngine::AssetHandling
     {
         using Type = ShaderAsset;
     };
+
+    template<>
+    struct ClassForAssetType<AssetType::Script>
+    {
+        using Type = ScriptAsset;
+    };
 }

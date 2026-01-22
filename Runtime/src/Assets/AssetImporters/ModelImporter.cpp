@@ -69,8 +69,13 @@ namespace RNGOEngine::AssetHandling
     {
         constexpr auto NUMBER_OF_MODELS_TO_PROCESS_PER_CALL = 8;
         // TODO: Is having a inline boolean in the for-loop cursed?
-        for (int i = 0; i < NUMBER_OF_MODELS_TO_PROCESS_PER_CALL && !m_modelDataQueue.IsEmpty(); ++i)
+        for (int i = 0; i < NUMBER_OF_MODELS_TO_PROCESS_PER_CALL; ++i)
         {
+            if (m_modelDataQueue.IsEmpty())
+            {
+                break;
+            }
+
             auto [modelMetadata, modelHandle] = m_modelDataQueue.Dequeue();
 
             // Upload to GPU

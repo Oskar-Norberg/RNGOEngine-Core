@@ -5,9 +5,11 @@
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 
 #include "Assets/AssetImporters/ModelImporter.h"
+#include "Assets/AssetImporters/ScriptImporter.h"
 #include "Assets/AssetImporters/ShaderAssetImporter.h"
 #include "Assets/AssetImporters/TextureAssetImporter.h"
 #include "Assets/AssetSerializers/ModelAssetSerializer.h"
+#include "Assets/AssetSerializers/ScriptAssetSerializer.h"
 #include "Assets/AssetSerializers/ShaderAssetSerializer.h"
 #include "Assets/AssetSerializers/TextureAssetSerializer.h"
 
@@ -21,6 +23,7 @@ namespace RNGOEngine::AssetHandling
             assetLoader->RegisterImporter<ModelImporter>(AssetType::Model, context.DoFlipUVs);
             assetLoader->RegisterImporter<TextureAssetImporter>(AssetType::Texture);
             assetLoader->RegisterImporter<ShaderAssetImporter>(AssetType::Shader);
+            assetLoader->RegisterImporter<ScriptImporter>(AssetType::Script);
         }
 
         // Serializers
@@ -28,6 +31,7 @@ namespace RNGOEngine::AssetHandling
             assetLoader->RegisterSerializer<ModelAssetSerializer>(AssetType::Model);
             assetLoader->RegisterSerializer<TextureAssetSerializer>(AssetType::Texture);
             assetLoader->RegisterSerializer<ShaderAssetSerializer>(AssetType::Shader);
+            assetLoader->RegisterSerializer<ScriptAssetSerializer>(AssetType::Script);
         }
     }
 }

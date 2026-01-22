@@ -87,6 +87,12 @@ namespace RNGOEngine::Components
         float OuterCutOff = glm::cos(glm::radians(12.5f));
     };
 
+    // TODO: Support for multiple scripts
+    struct ScriptComponent
+    {
+        AssetHandling::AssetHandle ScriptHandle;
+    };
+
     // TODO: Implement a custom FixedString templated-type?
     constexpr auto MAX_NR_CHARACTERS = 24 + 1;
     constexpr auto UNNAMED_ENTITY = "Unnamed Entity";

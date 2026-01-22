@@ -353,4 +353,51 @@ namespace RNGOEngine::Editor
             ImGui::DragFloat("OuterCutOff", &spotlight.OuterCutOff, 0.01f);
         }
     }
+
+        template<>
+    inline void DrawProperties<Components::ScriptComponent>(entt::registry& registry, const entt::entity entity)
+    {
+        if (registry.any_of<Components::ScriptComponent>(entity))
+        {
+            ImGui::Text("ScriptComponent");
+            auto& scriptComponent = registry.get<Components::ScriptComponent>(entity);
+
+            auto scriptMetadataOpt = AssetHandling::AssetDatabase::GetInstance().TryGetAssetMetadata(scriptComponent.ScriptHandle);
+
+            // Mesh Drag and Drop
+            {
+                const std::string filename =
+                    scriptMetadataOpt ? scriptMetadataOpt->get().Path.filename().string() : "Missing";
+
+
+                ImGui::Selectable(filename.c_str());
+
+                if (ImGui::BeginDragDropTarget())
+                {
+                    if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
+                    {
+                        IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
+
+                        const auto& dragAndDropPayload =
+                            *static_cast<const AssetDragAndDropPayload*>(payload->Data);
+
+                        if (dragAndDropPayload.Type != AssetHandling::AssetType::Script)
+                        {
+                            RNGO_LOG(
+                                Core::LogLevel::Warning, "Cannot load asset {} as Script.",
+                                dragAndDropPayload.Handle.GetValue()
+                            );
+                        }
+                        else
+                        {
+                            AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
+                            scriptComponent.ScriptHandle = dragAndDropPayload.Handle;
+                        }
+                    }
+
+                    ImGui::EndDragDropTarget();
+                }
+            }
+        }
+    }
 }
