@@ -33,6 +33,8 @@ include(cmake/EngineUnits/Threading.cmake)
 include(cmake/EngineUnits/Windowing.cmake)
 include(cmake/EngineUnits/Rendering.cmake)
 
+include(cmake/EngineUnits/ScriptCore.cmake)
+
 include(cmake/EngineUnits/ResourceManagement.cmake)
 include(cmake/EngineUnits/AssetManagement.cmake)
 
@@ -71,6 +73,8 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
 
         ${WINDOWING_PROJECT_NAME}
         ${RENDERING_PROJECT_NAME}
+
+        ${SCRIPT_CORE_PROJECT_NAME}
 
         ${RESOURCE_MANAGEMENT_PROJECT_NAME}
         ${ASSET_MANAGER_PROJECT_NAME}
