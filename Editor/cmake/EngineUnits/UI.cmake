@@ -36,6 +36,9 @@ add_library(${UI_PROJECT_NAME} STATIC
         include/UI/Panels/ContentDrawerPanel.h
         src/UI/Panels/ContentDrawerPanel.cpp
 
+        include/UI/Panels/SceneManagementPanel.h
+        src/UI/Panels/SceneManagementPanel.cpp
+
 )
 target_include_directories(${UI_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake imguizmo-cmake RNGOEngine_Core)

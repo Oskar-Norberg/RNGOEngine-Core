@@ -15,19 +15,19 @@ namespace RNGOEngine::Utilities::IO
         const std::ifstream file(filePath);
         return file.good();
     }
-    
+
     ///
     /// Simply reads a file and returns its content as a string.
     /// Probably not the quickest thing in the world definitely not the safest thing in the world.
     /// But god-damn it works.
-    /// 
+    ///
     static std::string ReadFile(const std::filesystem::path& filePath)
     {
         std::string content;
-    
+
         std::ifstream file;
         file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-    
+
         try
         {
             file.open(filePath);
@@ -44,5 +44,18 @@ namespace RNGOEngine::Utilities::IO
         }
 
         return content;
+    }
+
+    ///
+    /// Same as above, quick and dirty implementation, no error handling whatsoever.
+    ///
+    static bool WriteToFile(const std::string_view content, const std::filesystem::path& filePath)
+    {
+        std::ofstream file;
+        file.open(filePath);
+        file << content;
+        file.close();
+
+        return true;
     }
 }
