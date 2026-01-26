@@ -11,6 +11,7 @@
 #include "UI/Panels/ContentDrawerPanel.h"
 #include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
+#include "UI/Panels/PlayPanel.h"
 #include "UI/Panels/StatsPanel.h"
 #include "UI/Panels/ViewportPanel.h"
 
@@ -31,6 +32,7 @@ namespace RNGOEngine::Editor
         m_UIManager.RegisterPanel<DetailsPanel>();
         m_UIManager.RegisterPanel<ConsolePanel>();
         m_UIManager.RegisterPanel<ContentDrawerPanel>();
+        m_UIManager.RegisterPanel<PlayPanel>();
 
         SetUpUIContext();
         SetUpEditorContext();
@@ -45,8 +47,12 @@ namespace RNGOEngine::Editor
 
         m_UIManager.Update(m_uiContext, deltaTime);
 
+        // TODO: Should Engine systems run when paused?
         UpdateEngineSystems(deltaTime);
-        UpdateGameSystems(deltaTime);
+        if (m_editorPlayState == EditorPlayState::Play)
+        {
+            UpdateGameSystems(deltaTime);
+        }
     }
 
     void Editor::OnRender()
@@ -81,6 +87,7 @@ namespace RNGOEngine::Editor
     void Editor::SetUpUIContext()
     {
         // Set up UIContext
+        m_uiContext.editorPlayState = &m_editorPlayState;
         m_uiContext.loggerSink = m_vectorSink.value().get();
         m_uiContext.selectionManager = &m_selectionManager;
         m_uiContext.sceneManager = &m_sceneManager;

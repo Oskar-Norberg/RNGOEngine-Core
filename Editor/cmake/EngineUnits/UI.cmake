@@ -13,6 +13,9 @@ add_library(${UI_PROJECT_NAME} STATIC
         
         include/UI/IDockablePanel.h
 
+        include/UI/Panels/PlayPanel.h
+        src/UI/Panels/PlayPanel.cpp
+
         include/UI/Panels/ViewportPanel.h
         src/UI/Panels/ViewportPanel.cpp
 
@@ -32,6 +35,7 @@ add_library(${UI_PROJECT_NAME} STATIC
         
         include/UI/Panels/ContentDrawerPanel.h
         src/UI/Panels/ContentDrawerPanel.cpp
+
 )
 target_include_directories(${UI_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake imguizmo-cmake RNGOEngine_Core)

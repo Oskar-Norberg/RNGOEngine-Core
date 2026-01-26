@@ -12,6 +12,13 @@
 
 namespace RNGOEngine::Editor
 {
+    enum class EditorPlayState
+    {
+        Stop,
+        Paused,
+        Play,
+    };
+
     class Editor : public Application
     {
     public:
@@ -20,6 +27,9 @@ namespace RNGOEngine::Editor
     public:
         void OnUpdate(float deltaTime) override;
         void OnRender() override;
+
+    private:
+        EditorPlayState m_editorPlayState = EditorPlayState::Stop;
 
     private:
         UIContext m_uiContext;
