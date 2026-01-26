@@ -4,6 +4,7 @@
 
 #include "Systems/Core/RenderSystem.h"
 
+#include "Assets/AssetLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
@@ -40,41 +41,13 @@ namespace RNGOEngine::Systems::Core
     {
         auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
-        auto& meshManager = resourceManager.GetMeshResourceManager();
         auto& shaderManager = resourceManager.GetShaderResourceManager();
 
         const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
 
         for (const auto& [entity, meshRender] : renderView.each())
         {
-            const auto modelAssetOpt =
-                runtimeRegistry.TryGet<AssetHandling::ModelAsset>(meshRender.ModelHandle);
-
-            const auto& modelAsset =
-                modelAssetOpt
-                    .value_or(
-                        runtimeRegistry
-                            .TryGet<AssetHandling::ModelAsset>(
-                                AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
-                            )
-                            .value()
-                    )
-                    .get();
-
-            const auto meshKeySpan = modelAsset.GetMeshKeys();
-            std::vector<RNGOEngine::Core::Renderer::GPUMesh> gpuMeshes;
-            gpuMeshes.reserve(meshKeySpan.size());
-            for (const auto& mesh : modelAsset.GetMeshKeys())
-            {
-                const auto meshOpt = meshManager.GetMeshResource(mesh);
-                if (meshOpt)
-                {
-                    auto& meshResource = meshOpt->get();
-                    gpuMeshes.emplace_back(
-                        meshResource.VAO, meshResource.VBO, meshResource.EBO, meshResource.ElementCount
-                    );
-                }
-            }
+            const auto gpuMeshes = GetOrLoadModel(meshRender.ModelHandle);
 
             auto& materialAsset = runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(meshRender.MaterialKey)
                                       .value_or(runtimeRegistry
@@ -358,5 +331,65 @@ namespace RNGOEngine::Systems::Core
             };
         }
         drawQueue.SpotlightIndex = currentSpotlightIndex;
+    }
+
+    std::vector<RNGOEngine::Core::Renderer::GPUMesh> RenderSystem::GetOrLoadModel(
+        const AssetHandling::AssetHandle& modelHandle
+    )
+    {
+        auto& assetDatabase = AssetHandling::AssetDatabase::GetInstance();
+        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
+        auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
+        auto& meshManager = resourceManager.GetMeshResourceManager();
+
+        // Is model Registered?
+        if (!assetDatabase.IsRegistered(modelHandle))
+        {
+            // Unregistered model, return error model.
+            return GetOrLoadModel(
+                AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
+            );
+        }
+
+        const auto assetState = AssetHandling::RuntimeAssetRegistry::GetInstance().GetState(
+            AssetHandling::AssetType::Model, modelHandle
+        );
+        // If model isn't ready, load it.
+        if (assetState != AssetHandling::AssetState::Ready)
+        {
+            AssetHandling::AssetLoader::GetInstance().Load(modelHandle);
+        }
+
+        const auto modelAssetOpt = runtimeRegistry.TryGet<AssetHandling::ModelAsset>(modelHandle);
+
+        // If model hasn't loaded yet, return empty.
+        if (!modelAssetOpt)
+        {
+            return {};
+        }
+
+        const auto& modelAsset = modelAssetOpt.value().get();
+
+        const auto meshKeySpan = modelAsset.GetMeshKeys();
+        std::vector<RNGOEngine::Core::Renderer::GPUMesh> gpuMeshes;
+        gpuMeshes.reserve(meshKeySpan.size());
+        for (const auto& mesh : modelAsset.GetMeshKeys())
+        {
+            const auto meshOpt = meshManager.GetMeshResource(mesh);
+            if (meshOpt)
+            {
+                auto& meshResource = meshOpt->get();
+                gpuMeshes.emplace_back(
+                    meshResource.VAO, meshResource.VBO, meshResource.EBO, meshResource.ElementCount
+                );
+            }
+        }
+
+        return gpuMeshes;
+    }
+    RNGOEngine::Core::Renderer::GPUMaterial RenderSystem::GetOrLoadMaterial(
+        const AssetHandling::AssetHandle& materialHandle
+    )
+    {
     }
 }

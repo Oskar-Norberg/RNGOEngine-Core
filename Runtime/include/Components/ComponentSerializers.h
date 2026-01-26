@@ -80,7 +80,6 @@ namespace RNGOEngine::Components
         emitter << YAML::EndMap;
     }
 
-
     // Tag Components
     static void SerializeBackgroundColor(YAML::Emitter& emitter)
     {
@@ -101,6 +100,4 @@ namespace RNGOEngine::Components
     {
         emitter << YAML::Key << "PointLight" << YAML::Value << true;
     }
-
-
 }
