@@ -4,6 +4,7 @@
 
 #pragma once
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
@@ -17,4 +18,5 @@ namespace RNGOEngine::Editor
             return "Play Panel";
         }
     };
+    EDITOR_PANEL(PlayPanel);
 }

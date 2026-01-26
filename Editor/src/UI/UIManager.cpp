@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include "ImGuizmo.h"
+#include "UI/PanelInitializer.h"
 #include "Window/IWindow.h"
 
 namespace RNGOEngine::Editor
@@ -29,6 +30,15 @@ namespace RNGOEngine::Editor
         // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
         ImGui_ImplOpenGL3_Init();
     }
+
+    void UIManager::Initialize()
+    {
+        for (const auto& factoryFunction : UI::GetRegisteredPanelFactories())
+        {
+            m_panels.push_back(factoryFunction());
+        }
+    }
+
     void UIManager::Update(UIContext& context, float deltaTime)
     {
         for (const auto& panel : m_panels)

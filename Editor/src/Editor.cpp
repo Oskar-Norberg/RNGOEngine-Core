@@ -27,14 +27,9 @@ namespace RNGOEngine::Editor
         m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
 
         // Set up UI Panels
-        m_UIManager.RegisterPanel<StatsPanel>();
+        m_UIManager.Initialize();
+        // TODO: Move this away from here.
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
-        m_UIManager.RegisterPanel<HierarchyPanel>();
-        m_UIManager.RegisterPanel<DetailsPanel>();
-        m_UIManager.RegisterPanel<ConsolePanel>();
-        m_UIManager.RegisterPanel<ContentDrawerPanel>();
-        m_UIManager.RegisterPanel<PlayPanel>();
-        m_UIManager.RegisterPanel<SceneManagementPanel>();
 
         SetUpUIContext();
         SetUpEditorContext();

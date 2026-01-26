@@ -42,6 +42,7 @@ namespace RNGOEngine::Editor
     {
         m_viewportRenderTargetKey = rendererAPI.CreateRenderTarget(ViewportPanelSpecialization, 1280, 720);
     }
+
     void ViewPortPanel::Render(UIContext& context)
     {
         IDockablePanel::Render(context);

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
@@ -18,4 +19,5 @@ namespace RNGOEngine::Editor
             return "Scene Manager";
         }
     };
+    EDITOR_PANEL(SceneManagementPanel);
 }

@@ -12,6 +12,7 @@ add_library(${UI_PROJECT_NAME} STATIC
         src/UI/UIManager.cpp
         
         include/UI/IDockablePanel.h
+        include/UI/PanelInitializer.h
 
         include/UI/Panels/PlayPanel.h
         src/UI/Panels/PlayPanel.cpp
