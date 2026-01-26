@@ -15,6 +15,10 @@
 
 namespace RNGOEngine::Editor
 {
+    static std::string GetSceneFilePath(const std::string_view sceneName)
+    {
+        return std::string(sceneName) + ".rngoscene";
+    }
 
     void SceneManagementPanel::Render(UIContext& context)
     {
@@ -25,7 +29,7 @@ namespace RNGOEngine::Editor
 
         if (ImGui::Button("Load Scene"))
         {
-            const auto path = std::string(sceneNameBuffer);
+            const auto path = GetSceneFilePath(sceneNameBuffer);
 
             if (!Utilities::IO::FileExists(path))
             {
@@ -33,16 +37,17 @@ namespace RNGOEngine::Editor
                 return;
             }
 
-            auto yaml = YAML::LoadFile(std::string(sceneNameBuffer));
+            auto yaml = YAML::LoadFile(path);
             context.sceneManager->GetCurrentScene()->Deserialize(yaml);
         }
 
         if (ImGui::Button("Save Scene"))
         {
-            const auto path = std::string(sceneNameBuffer);
+            // TODO: Currently just outputs to CWD, integrate to asset system? or just open a file dialogue?
+            const auto path = GetSceneFilePath(sceneNameBuffer);
             YAML::Emitter emitter;
             context.sceneManager->GetCurrentScene()->Serialize(emitter);
-            Utilities::IO::WriteToFile(path, emitter.c_str());
+            Utilities::IO::WriteToFile(emitter.c_str(), path);
         }
     }
 }
