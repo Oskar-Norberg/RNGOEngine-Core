@@ -29,6 +29,7 @@ namespace RNGOEngine::Editor
 
         if (ImGui::Button("Load Scene"))
         {
+
             const auto path = GetSceneFilePath(sceneNameBuffer);
 
             if (!Utilities::IO::FileExists(path))
@@ -37,6 +38,7 @@ namespace RNGOEngine::Editor
                 return;
             }
 
+            context.sceneManager->ClearScene();
             auto yaml = YAML::LoadFile(path);
             context.sceneManager->GetCurrentScene()->Deserialize(yaml);
         }

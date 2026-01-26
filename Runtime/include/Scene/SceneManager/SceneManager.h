@@ -12,6 +12,8 @@ namespace RNGOEngine::Core
     class SceneManager
     {
     public:
+        void ClearScene();
+
         template<Concepts::DerivedFrom<Scene> T>
         void LoadScene();
 
