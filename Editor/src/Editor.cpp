@@ -6,12 +6,12 @@
 
 #include "ECS/Systems/FreeFlyCameraSystem.h"
 #include "Logging/VectorSink.h"
-#include "TestScene.h"
 #include "UI/Panels/ConsolePanel.h"
 #include "UI/Panels/ContentDrawerPanel.h"
 #include "UI/Panels/DetailsPanel.h"
 #include "UI/Panels/HierarchyPanel.h"
 #include "UI/Panels/PlayPanel.h"
+#include "UI/Panels/SceneManagementPanel.h"
 #include "UI/Panels/StatsPanel.h"
 #include "UI/Panels/ViewportPanel.h"
 
@@ -20,19 +20,16 @@ namespace RNGOEngine::Editor
     Editor::Editor(const EngineConfig& config)
         : Application(config), m_UIManager(*m_window, m_sceneManager)
     {
-        m_sceneManager.LoadScene<Temporary::TestScene>();
+        // Load Empty
+        m_sceneManager.LoadScene<Core::Scene>();
 
         // Set up Editor Systems
         m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
 
         // Set up UI Panels
-        m_UIManager.RegisterPanel<StatsPanel>();
+        m_UIManager.Initialize();
+        // TODO: Move this away from here.
         m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
-        m_UIManager.RegisterPanel<HierarchyPanel>();
-        m_UIManager.RegisterPanel<DetailsPanel>();
-        m_UIManager.RegisterPanel<ConsolePanel>();
-        m_UIManager.RegisterPanel<ContentDrawerPanel>();
-        m_UIManager.RegisterPanel<PlayPanel>();
 
         SetUpUIContext();
         SetUpEditorContext();

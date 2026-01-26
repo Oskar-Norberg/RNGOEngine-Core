@@ -5,6 +5,7 @@
 #pragma once
 
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 #include "Utilities/Memory/MemoryChecker.impl.h"
 
 namespace RNGOEngine::Editor
@@ -48,4 +49,5 @@ namespace RNGOEngine::Editor
     private:
         void AccumulateDeltaTime(float deltaTime);
     };
+    EDITOR_PANEL(StatsPanel);
 }

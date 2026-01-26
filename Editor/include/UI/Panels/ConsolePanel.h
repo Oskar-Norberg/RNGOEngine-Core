@@ -8,6 +8,7 @@
 
 #include "Logging/Logger.h"
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
@@ -15,7 +16,7 @@ namespace RNGOEngine::Editor
     {
     public:
         void Render(UIContext& context) override;
-        
+
         std::string_view GetPanelName() const override
         {
             return "Console";
@@ -39,4 +40,5 @@ namespace RNGOEngine::Editor
         static std::string_view GetFromLastSlash(std::string_view string);
         static std::string GetFunctionName(const Core::LogEntry& entry);
     };
+    EDITOR_PANEL(ConsolePanel);
 }

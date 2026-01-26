@@ -3,20 +3,21 @@
 //
 
 #pragma once
+
 #include "UI/IDockablePanel.h"
 #include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
-    class PlayPanel : public IDockablePanel
+    class SceneManagementPanel : public IDockablePanel
     {
     public:
         void Render(UIContext& context) override;
 
         std::string_view GetPanelName() const override
         {
-            return "Play Panel";
+            return "Scene Manager";
         }
     };
-    EDITOR_PANEL(PlayPanel);
+    EDITOR_PANEL(SceneManagementPanel);
 }

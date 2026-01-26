@@ -30,6 +30,8 @@ namespace RNGOEngine::Editor
         // TODO: Passing SceneManager like this feels wrong.
         explicit UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager);
 
+        void Initialize();
+
         void Update(UIContext& context, float deltaTime);
 
         void BeginFrame();

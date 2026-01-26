@@ -46,7 +46,7 @@ namespace RNGOEngine::Editor
     class ViewPortPanel : public IDockablePanel
     {
     public:
-        // TODO: Add to UIContext?
+        // TODO: Add to UIContext, EditorPanels need to be default constructible for the factory.
         explicit ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI);
 
     public:

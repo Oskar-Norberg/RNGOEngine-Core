@@ -6,6 +6,16 @@
 
 namespace RNGOEngine::Core
 {
+    void SceneManager::ClearScene()
+    {
+        if (m_currentScene)
+        {
+            m_currentScene->Exit();
+            m_currentScene->world.GetRegistry().clear();
+            m_currentScene->Initialize();
+        }
+    }
+
     void SceneManager::SwitchToPendingScene()
     {
         if (!m_pendingScene)

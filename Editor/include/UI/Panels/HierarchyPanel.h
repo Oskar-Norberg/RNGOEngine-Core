@@ -7,6 +7,7 @@
 #include <Scene/SceneManager/SceneManager.h>
 
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
@@ -30,4 +31,5 @@ namespace RNGOEngine::Editor
         void CreateSpotlightEntity(UIContext& context);
         void CreateMeshEntity(UIContext& context);
     };
+    EDITOR_PANEL(HierarchyPanel);
 }

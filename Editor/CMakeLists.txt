@@ -22,7 +22,6 @@ include(cmake/EngineUnits/Systems.cmake)
 add_executable(${EDITOR_PROJECT_NAME} main.cpp
         include/Editor.h
         src/Editor.cpp
-        include/TestScene.h
 )
 
 target_include_directories(${EDITOR_PROJECT_NAME} PUBLIC include)

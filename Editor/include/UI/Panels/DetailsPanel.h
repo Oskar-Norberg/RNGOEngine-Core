@@ -6,6 +6,7 @@
 
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 #include "UI/PropertyDrawer/PropertyDrawers.h"
 
 namespace RNGOEngine::Editor
@@ -20,6 +21,7 @@ namespace RNGOEngine::Editor
             return "Details";
         }
     };
+    EDITOR_PANEL(DetailsPanel);
 
     template<typename T>
     void DrawComponent(entt::registry& registry, const entt::entity entity)

@@ -8,6 +8,7 @@
 
 #include "Assets/Asset.h"
 #include "UI/IDockablePanel.h"
+#include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
@@ -77,4 +78,5 @@ namespace RNGOEngine::Editor
             Folder& outFolder
         );
     };
+    EDITOR_PANEL(ContentDrawerPanel);
 }
