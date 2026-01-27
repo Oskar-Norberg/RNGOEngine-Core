@@ -1,5 +1,5 @@
-﻿//
-// Created by Oskar.Norberg on 2025-08-13.
+//
+// Created by ringo on 2026-01-27.
 //
 
 #pragma once
@@ -10,8 +10,8 @@ namespace RNGOEngine::Math
 {
     template<typename T>
         requires Concepts::IsArithmetic<T>
-    struct Point2D
+    struct Point3D
     {
-        T X, Y;
+        T X, Y, Z;
     };
 }

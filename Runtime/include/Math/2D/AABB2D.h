@@ -15,7 +15,7 @@ namespace RNGOEngine::Math
 
         bool Contains(Point2D<T> point) const
         {
-            return (point.x >= Start.x && point.x <= End.x) && (point.y >= Start.y && point.y <= End.y);
+            return (point.X >= Start.X && point.X <= End.X) && (point.Y >= Start.Y && point.Y <= End.Y);
         }
 
         bool Contains(const AABB2D<T>& other) const
@@ -26,8 +26,8 @@ namespace RNGOEngine::Math
         bool Intersects(const AABB2D<T>& other) const
         {
             return !(
-                other.End.x < Start.x || other.Start.x > End.x || other.End.y < Start.y ||
-                other.Start.y > End.y
+                other.End.X < Start.X || other.Start.X > End.X || other.End.Y < Start.Y ||
+                other.Start.Y > End.Y
             );
         }
     };
