@@ -15,6 +15,7 @@ namespace RNGOEngine::Math
 
         bool Contains(Point3D<T> point) const
         {
+            // TODO: Use epsilon if T is floating point?
             return point.X >= Start.X && point.X <= End.X && point.Y >= Start.Y && point.Y <= End.Y &&
                    point.Z >= Start.Z && point.Z <= End.Z;
         }

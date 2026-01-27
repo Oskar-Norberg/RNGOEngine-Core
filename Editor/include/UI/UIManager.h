@@ -11,6 +11,16 @@
 #include "Managers/UISelectionManager.h"
 #include "UIContext.h"
 
+// TODO: I don't want to have to include all of these, ruins the purpose of the panel initializer.
+#include "Panels/ConsolePanel.h"
+#include "Panels/ContentDrawerPanel.h"
+#include "Panels/DetailsPanel.h"
+#include "Panels/HierarchyPanel.h"
+#include "Panels/PlayPanel.h"
+#include "Panels/SceneManagementPanel.h"
+#include "Panels/StatsPanel.h"
+#include "Panels/ViewportPanel.h"
+
 namespace RNGOEngine
 {
     namespace Core
