@@ -9,7 +9,7 @@
 #include <stack>
 #include <vector>
 
-#include "Math/BoundingBox.h"
+#include "Math/2D/AABB2D.h"
 #include "Profiling/Profiling.h"
 #include "Utilities/Hash/PairHash.h"
 
@@ -22,7 +22,6 @@ namespace RNGOEngine::Containers::Graphs
         SOUTH_WEST = 2,
         SOUTH_EAST = 3
     };
-
 
     // ID of the node itself.
     using NodeID = size_t;
@@ -37,13 +36,14 @@ namespace RNGOEngine::Containers::Graphs
     using DataID = NodeDataID;
 
     // Store these in a struct because they will almost always be accessed together.
-    template<typename T>
+    template<typename TData, typename TCoordinate>
     struct DataEntry
     {
-        T data;
-        Math::BoundingBox bounds;
+        TData data;
+        Math::AABB2D<TCoordinate> bounds;
     };
 
+    template<typename TCoordinate>
     struct QuadTreeNode
     {
         // TODO: Data fragmentation because of vector. Unlucky.
@@ -51,20 +51,21 @@ namespace RNGOEngine::Containers::Graphs
         std::vector<NodeDataID> overflow;
 
         // See QuadTreeDirection for the ordering.
-        std::array<NodeID, 4> children;
-        Math::BoundingBox bounds;
+        std::array<NodeID, 4> children = {INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID, INVALID_NODE_ID};
+        Math::AABB2D<TCoordinate> bounds;
     };
 
-    /// 
-    /// @tparam T Payload/data type stored in tree.
+    ///
+    /// @tparam TData Payload/data type stored in tree.
+    /// @tparam TCoordinate Coordinate/Precision type for bounding box calculations.
     /// @tparam CAPACITY Max number of nodes in a quad.
     /// @brief Spatially partitioned QuadTree.
     ///
-    template<typename T, size_t CAPACITY>
+    template<typename TData, typename TCoordinate, size_t CAPACITY>
     class QuadTree
     {
     public:
-        explicit QuadTree(size_t nrNodesEstimate, const Math::BoundingBox& boundingBox)
+        explicit QuadTree(size_t nrNodesEstimate, const Math::AABB2D<TCoordinate>& boundingBox)
         {
             if (nrNodesEstimate > 0)
             {
@@ -76,64 +77,64 @@ namespace RNGOEngine::Containers::Graphs
             CreateNode(boundingBox);
         }
 
-        explicit QuadTree(const Math::BoundingBox& boundingBox)
+        explicit QuadTree(const Math::AABB2D<TCoordinate>& boundingBox)
             : QuadTree(0, boundingBox)
         {
         }
 
         ~QuadTree()
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("QuadTree Destructor");
+            RNGO_ZONE_SCOPED_N("QuadTree Destructor");
         }
 
     public:
-        void AddNode(T data, const Math::BoundingBox& bounds);
-        void AddNode(T&& data, const Math::BoundingBox& bounds);
+        void AddNode(TData data, const Math::AABB2D<TCoordinate>& bounds);
+        void AddNode(TData&& data, const Math::AABB2D<TCoordinate>& bounds);
 
     public:
-        inline std::vector<std::pair<T, T>> GetCollisionPairs() const;
-        std::vector<std::pair<T, T>> GetCollisionPairs(NodeID id) const;
+        inline std::vector<std::pair<TData, TData>> GetCollisionPairs() const;
+        std::vector<std::pair<TData, TData>> GetCollisionPairs(NodeID id) const;
 
     public:
         inline const std::array<NodeID, 4>& GetChildren(NodeID id) const;
         inline bool IsSubdivided(NodeID id) const;
 
     private:
-        std::vector<QuadTreeNode> m_trees;
+        std::vector<QuadTreeNode<TCoordinate>> m_trees{};
 
-        std::vector<DataEntry<T>> m_data;
+        std::vector<DataEntry<TData, TCoordinate>> m_data{};
 
         size_t totalCapacity = 0;
 
     private:
-        inline void AddNode(DataID dataID, const Math::BoundingBox& bounds);
+        inline void AddNode(DataID dataID, const Math::AABB2D<TCoordinate>& bounds);
 
     private:
-        inline const QuadTreeNode& GetNode(NodeID id) const;
+        inline const QuadTreeNode<TCoordinate>& GetNode(NodeID id) const;
 
     private:
         inline void Subdivide(NodeID id);
         inline bool IsFull(NodeID id) const;
+
     private:
         inline void ClearNodeDataHandles(NodeID id);
-        inline const DataEntry<T>& GetData(DataID id) const;
+        inline const DataEntry<TData, TCoordinate>& GetData(DataID id) const;
         inline const std::vector<DataID>& GetNodeDataHandles(NodeID id) const;
         inline const std::vector<DataID>& GetNodeOverflowHandles(NodeID id) const;
 
     private:
-        DataID EmplaceData(T data, const Math::BoundingBox& bounds);
-        DataID EmplaceData(T&& data, const Math::BoundingBox& bounds);
+        DataID EmplaceData(TData data, const Math::AABB2D<TCoordinate>& bounds);
+        DataID EmplaceData(TData&& data, const Math::AABB2D<TCoordinate>& bounds);
 
     private:
         // TODO: ID should really be the first parameter
-        inline void AddDataToNode(T&& data, const Math::BoundingBox& bounds, NodeID id);
+        inline void AddDataToNode(TData&& data, const Math::AABB2D<TCoordinate>& bounds, NodeID id);
         inline void MoveDataToNode(DataID dataID, NodeID nodeID);
 
         inline void MoveDataToOverflow(DataID dataID, NodeID nodeID);
 
     private:
-        inline NodeID CreateNode(const Math::BoundingBox& bounds);
+        inline NodeID CreateNode(const Math::AABB2D<TCoordinate>& bounds);
 
     private:
         inline void GenerateSubTrees(NodeID id);

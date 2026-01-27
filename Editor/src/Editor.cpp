@@ -5,14 +5,7 @@
 #include "Editor.h"
 
 #include "ECS/Systems/FreeFlyCameraSystem.h"
-#include "Logging/VectorSink.h"
-#include "UI/Panels/ConsolePanel.h"
-#include "UI/Panels/ContentDrawerPanel.h"
 #include "UI/Panels/DetailsPanel.h"
-#include "UI/Panels/HierarchyPanel.h"
-#include "UI/Panels/PlayPanel.h"
-#include "UI/Panels/SceneManagementPanel.h"
-#include "UI/Panels/StatsPanel.h"
 #include "UI/Panels/ViewportPanel.h"
 
 namespace RNGOEngine::Editor
@@ -20,6 +13,7 @@ namespace RNGOEngine::Editor
     Editor::Editor(const EngineConfig& config)
         : Application(config), m_UIManager(*m_window, m_sceneManager)
     {
+
         // Load Empty
         m_sceneManager.LoadScene<Core::Scene>();
 

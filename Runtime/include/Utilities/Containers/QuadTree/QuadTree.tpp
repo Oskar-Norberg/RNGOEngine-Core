@@ -1,29 +1,28 @@
-﻿template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddNode(T data, const Math::BoundingBox& bounds)
+﻿template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::AddNode(TData data, const Math::AABB2D<TCoordinate>& bounds)
 {
     DataID dataID = EmplaceData(data, bounds);
     AddNode(dataID, bounds);
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddNode(T&& data, const Math::BoundingBox& bounds)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::AddNode(TData&& data, const Math::AABB2D<TCoordinate>& bounds)
 {
-    DataID dataID = EmplaceData(std::forward<T>(data), bounds);
+    DataID dataID = EmplaceData(std::forward<TData>(data), bounds);
     
     AddNode(dataID, bounds);
 }
 
-template<typename T, size_t CAPACITY>
-std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs() const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+std::vector<std::pair<TData, TData>> QuadTree<TData, TCoordinate, CAPACITY>::GetCollisionPairs() const
 {
     return GetCollisionPairs(ROOT_NODE_ID);
 }
 
-template<typename T, size_t CAPACITY>
-std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+std::vector<std::pair<TData, TData>> QuadTree<TData, TCoordinate, CAPACITY>::GetCollisionPairs(NodeID id) const
 {
-    RNGO_ZONE_SCOPE;
-    RNGO_ZONE_NAME_C("QuadTree::GetCollisionPairs");
+    RNGO_ZONE_SCOPED_N("QuadTree::GetCollisionPairs");
 
     std::vector<NodeID> stack;
     stack.emplace_back(id);
@@ -51,7 +50,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
         }
     }
 
-    std::vector<std::pair<T, T>> collisionPairs;
+    std::vector<std::pair<TData, TData>> collisionPairs;
 
     const auto TryAddIntersection = [this, &collisionPairs](
         const DataID nodeAHandle, const DataID nodeBHandle)
@@ -71,8 +70,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
 
         // Tree - Tree
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("QuadTree::Tree - Tree Collision Detection");
+            RNGO_ZONE_SCOPED_N("QuadTree::Tree - Tree Collision Detection");
 
             for (size_t i = 0; i < currentTreeSize; i++)
             {
@@ -101,8 +99,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
         size_t overFlowSize = currentTreeOverflow.size();
         // Tree - Overflow
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("QuadTree::Tree - Tree Collision Detection");
+            RNGO_ZONE_SCOPED_N("QuadTree::Tree - Tree Collision Detection");
 
             for (size_t i = 0; i < currentTreeSize; i++)
             {
@@ -115,8 +112,7 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
 
         // Overflow - Overflow
         {
-            RNGO_ZONE_SCOPE;
-            RNGO_ZONE_NAME_C("QuadTree::Overflow - Overflow Collision Detection");
+            RNGO_ZONE_SCOPED_N("QuadTree::Overflow - Overflow Collision Detection");
             for (size_t i = 0; i < overFlowSize; i++)
             {
                 for (size_t j = i + 1; j < overFlowSize; j++)
@@ -130,20 +126,20 @@ std::vector<std::pair<T, T>> QuadTree<T, CAPACITY>::GetCollisionPairs(NodeID id)
     return collisionPairs;
 }
 
-template<typename T, size_t CAPACITY>
-const std::array<NodeID, 4>& QuadTree<T, CAPACITY>::GetChildren(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+const std::array<NodeID, 4>& QuadTree<TData, TCoordinate, CAPACITY>::GetChildren(NodeID id) const
 {
     return m_trees[id].children;
 }
 
-template<typename T, size_t CAPACITY>
-bool QuadTree<T, CAPACITY>::IsSubdivided(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+bool QuadTree<TData, TCoordinate, CAPACITY>::IsSubdivided(NodeID id) const
 {
     return m_trees[id].children[0] != INVALID_NODE_ID;
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddNode(DataID dataID, const Math::BoundingBox& bounds)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::AddNode(DataID dataID, const Math::AABB2D<TCoordinate>& bounds)
 {
     totalCapacity++;
 
@@ -201,47 +197,47 @@ void QuadTree<T, CAPACITY>::AddNode(DataID dataID, const Math::BoundingBox& boun
     }
 }
 
-template<typename T, size_t CAPACITY>
-const QuadTreeNode& QuadTree<T, CAPACITY>::GetNode(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+const QuadTreeNode<TCoordinate>& QuadTree<TData, TCoordinate, CAPACITY>::GetNode(NodeID id) const
 {
     return m_trees[id];
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::Subdivide(NodeID id)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::Subdivide(NodeID id)
 {
     GenerateSubTrees(id);
     TransferDataToChildren(id);
 }
 
-template<typename T, size_t CAPACITY>
-const std::vector<DataID>& QuadTree<T, CAPACITY>::GetNodeDataHandles(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+const std::vector<DataID>& QuadTree<TData, TCoordinate, CAPACITY>::GetNodeDataHandles(NodeID id) const
 {
     return m_trees[id].data;
 }
 
-template<typename T, size_t CAPACITY>
-const std::vector<DataID>& QuadTree<T, CAPACITY>::GetNodeOverflowHandles(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+const std::vector<DataID>& QuadTree<TData, TCoordinate, CAPACITY>::GetNodeOverflowHandles(NodeID id) const
 {
     return m_trees[id].overflow;
 }
 
-template<typename T, size_t CAPACITY>
-DataID QuadTree<T, CAPACITY>::EmplaceData(T data, const Math::BoundingBox& bounds)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+DataID QuadTree<TData, TCoordinate, CAPACITY>::EmplaceData(TData data, const Math::AABB2D<TCoordinate>& bounds)
 {
     m_data.emplace_back(data, bounds);
     return m_data.size() - 1;
 }
 
-template<typename T, size_t CAPACITY>
-DataID QuadTree<T, CAPACITY>::EmplaceData(T&& data, const Math::BoundingBox& bounds)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+DataID QuadTree<TData, TCoordinate, CAPACITY>::EmplaceData(TData&& data, const Math::AABB2D<TCoordinate>& bounds)
 {
     m_data.emplace_back(std::move(data), bounds);
     return m_data.size() - 1;
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::AddDataToNode(T&& data, const Math::BoundingBox& bounds, NodeID id)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::AddDataToNode(TData&& data, const Math::AABB2D<TCoordinate>& bounds, NodeID id)
 {
     m_data.emplace_back(std::move(data), bounds);
 
@@ -249,41 +245,41 @@ void QuadTree<T, CAPACITY>::AddDataToNode(T&& data, const Math::BoundingBox& bou
     treeNode.data.emplace_back(m_data.size() - 1);
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::MoveDataToNode(DataID dataID, NodeID nodeID)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::MoveDataToNode(DataID dataID, NodeID nodeID)
 {
     auto& node = m_trees[nodeID];
 
     node.data.emplace_back(dataID);
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::MoveDataToOverflow(DataID dataID, NodeID nodeID)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::MoveDataToOverflow(DataID dataID, NodeID nodeID)
 {
     m_trees[nodeID].overflow.emplace_back(dataID);
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::ClearNodeDataHandles(NodeID id)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::ClearNodeDataHandles(NodeID id)
 {
     m_trees[id].data.clear();
     m_trees[id].overflow.clear();
 }
 
-template<typename T, size_t CAPACITY>
-const DataEntry<T>& QuadTree<T, CAPACITY>::GetData(DataID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+const DataEntry<TData, TCoordinate>& QuadTree<TData, TCoordinate, CAPACITY>::GetData(DataID id) const
 {
     return m_data[id];
 }
 
-template<typename T, size_t CAPACITY>
-bool QuadTree<T, CAPACITY>::IsFull(NodeID id) const
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+bool QuadTree<TData, TCoordinate, CAPACITY>::IsFull(NodeID id) const
 {
     return m_trees[id].data.size() >= CAPACITY;
 }
 
-template<typename T, size_t CAPACITY>
-NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+NodeID QuadTree<TData, TCoordinate, CAPACITY>::CreateNode(const Math::AABB2D<TCoordinate>& bounds)
 {
     // QuadTreeNode newNode = {
     //     {},
@@ -302,19 +298,19 @@ NodeID QuadTree<T, CAPACITY>::CreateNode(const Math::BoundingBox& bounds)
     return m_trees.size() - 1;
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::GenerateSubTrees(NodeID id)
 {
     const auto& bounds = m_trees[id].bounds;
-    const Math::BoundingBox& boundingBox = bounds;
+    const Math::AABB2D<TCoordinate>& boundingBox = bounds;
     // Midpoint
     const float midX = (boundingBox.Start.x + boundingBox.End.x) / 2;
     const float midY = (boundingBox.Start.y + boundingBox.End.y) / 2;
 
-    const Math::BoundingBox nwBox = {boundingBox.Start, {midX, midY}};
-    const Math::BoundingBox neBox = {{midX, boundingBox.Start.y}, {boundingBox.End.x, midY}};
-    const Math::BoundingBox swBox = {{boundingBox.Start.x, midY}, {midX, boundingBox.End.y}};
-    const Math::BoundingBox seBox = {{midX, midY}, boundingBox.End};
+    const Math::AABB2D<TCoordinate> nwBox = {boundingBox.Start, {midX, midY}};
+    const Math::AABB2D<TCoordinate> neBox = {{midX, boundingBox.Start.y}, {boundingBox.End.x, midY}};
+    const Math::AABB2D<TCoordinate> swBox = {{boundingBox.Start.x, midY}, {midX, boundingBox.End.y}};
+    const Math::AABB2D<TCoordinate> seBox = {{midX, midY}, boundingBox.End};
 
     const auto nwChild = CreateNode(nwBox);
     const auto neChild = CreateNode(neBox);
@@ -324,8 +320,8 @@ void QuadTree<T, CAPACITY>::GenerateSubTrees(NodeID id)
     SetChildren(id, {nwChild, neChild, swChild, seChild});
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::TransferDataToChildren(NodeID id)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::TransferDataToChildren(NodeID id)
 {
     const auto& nodeDataHandles = GetNodeDataHandles(id);
 
@@ -371,8 +367,8 @@ void QuadTree<T, CAPACITY>::TransferDataToChildren(NodeID id)
     ClearNodeDataHandles(id);
 }
 
-template<typename T, size_t CAPACITY>
-void QuadTree<T, CAPACITY>::SetChildren(NodeID id, std::array<NodeID, 4> children)
+template<typename TData, typename TCoordinate, size_t CAPACITY>
+void QuadTree<TData, TCoordinate, CAPACITY>::SetChildren(NodeID id, std::array<NodeID, 4> children)
 {
     m_trees[id].children = children;
 }

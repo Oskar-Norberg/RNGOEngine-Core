@@ -4,26 +4,26 @@
 
 #pragma once
 
-#include "Point.h"
+#include "Point2D.h"
 
 namespace RNGOEngine::Math
 {
-    struct BoundingBox
+    template<class T>
+    struct AABB2D
     {
-        Point Start, End;
+        Point2D<T> Start, End;
 
-        bool Contains(Point point) const
+        bool Contains(Point2D<T> point) const
         {
-            return (point.x >= Start.x && point.x <= End.x) &&
-                   (point.y >= Start.y && point.y <= End.y);
+            return (point.x >= Start.x && point.x <= End.x) && (point.y >= Start.y && point.y <= End.y);
         }
 
-        bool Contains(const BoundingBox& other) const
+        bool Contains(const AABB2D<T>& other) const
         {
             return Contains(other.Start) && Contains(other.End);
         }
 
-        bool Intersects(const BoundingBox& other) const
+        bool Intersects(const AABB2D<T>& other) const
         {
             return !(
                 other.End.x < Start.x || other.Start.x > End.x || other.End.y < Start.y ||
