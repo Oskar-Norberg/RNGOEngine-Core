@@ -12,10 +12,10 @@ namespace RNGOEngine::Systems::Core
     void CollisionSystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
     {
         EngineSystem::Update(world, context);
-        CollisionList collisions;
+        CollisionList collisions = {};
 
         // Sphere -> Sphere CD
-        auto sphereView = world.GetRegistry().view<Components::Transform, Components::SphereCollider>();
+        const auto sphereView = world.GetRegistry().view<Components::Transform, Components::SphereCollider>();
 
         // Simple O(n^2) for now
         for (const auto& [entityA, transformA, sphereA] : sphereView.each())
@@ -34,6 +34,9 @@ namespace RNGOEngine::Systems::Core
             }
         }
 
-        context.GameResourceMapper->AddTransientResource<CollisionList>(std::move(collisions), true);
+        // Register collisions for both engine and game systems. This will copy the data, but it's fine for now.
+        // TODO: Consider using a shared pointer if this becomes a problem.
+        context.EngineResourceMapper->AddTransientResource(CollisionList{collisions}, false);
+        context.GameResourceMapper->AddTransientResource(std::move(collisions), true);
     }
 }

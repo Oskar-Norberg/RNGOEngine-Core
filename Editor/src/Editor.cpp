@@ -13,7 +13,6 @@ namespace RNGOEngine::Editor
     Editor::Editor(const EngineConfig& config)
         : Application(config), m_UIManager(*m_window)
     {
-
         // Load Empty
         m_sceneManager.LoadScene<Core::Scene>();
 

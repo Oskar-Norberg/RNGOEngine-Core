@@ -27,6 +27,10 @@ namespace RNGOEngine::Core
         {
             Components::SerializeCamera(registry.get<Components::Camera>(entity), emitter);
         }
+        if (registry.any_of<Components::SphereCollider>(entity))
+        {
+            Components::SerializeSphereCollider(registry.get<Components::SphereCollider>(entity), emitter);
+        }
         if (registry.any_of<Components::Color>(entity))
         {
             Components::SerializeColor(registry.get<Components::Color>(entity), emitter);
@@ -86,6 +90,12 @@ namespace RNGOEngine::Core
         {
             auto camera = Components::DeserializeCamera(node["Camera"]);
             registry.emplace<Components::Camera>(entity, camera);
+        }
+
+        if (node["SphereCollider"])
+        {
+            auto sphereCollider = Components::DeserializeSphereCollider(node["SphereCollider"]);
+            registry.emplace<Components::SphereCollider>(entity, sphereCollider);
         }
 
         if (node["Color"])
