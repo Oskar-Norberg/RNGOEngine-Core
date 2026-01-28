@@ -14,7 +14,7 @@
 
 namespace RNGOEngine::Editor
 {
-    UIManager::UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager)
+    UIManager::UIManager(Core::Window::IWindow& window)
         : m_window(window)
     {
         // Setup Dear ImGui context
@@ -29,10 +29,7 @@ namespace RNGOEngine::Editor
         ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow*>(window.GetNativeWindow()), true);
         // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
         ImGui_ImplOpenGL3_Init();
-    }
 
-    void UIManager::Initialize()
-    {
         for (const auto& factoryFunction : UI::GetRegisteredPanelFactories())
         {
             m_panels.push_back(factoryFunction());

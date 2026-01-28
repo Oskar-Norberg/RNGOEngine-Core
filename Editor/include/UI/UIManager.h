@@ -8,7 +8,6 @@
 #include <vector>
 
 #include "IDockablePanel.h"
-#include "Managers/UISelectionManager.h"
 #include "UIContext.h"
 
 // TODO: I don't want to have to include all of these, ruins the purpose of the panel initializer.
@@ -37,10 +36,7 @@ namespace RNGOEngine::Editor
     class UIManager
     {
     public:
-        // TODO: Passing SceneManager like this feels wrong.
-        explicit UIManager(Core::Window::IWindow& window, Core::SceneManager& sceneManager);
-
-        void Initialize();
+        explicit UIManager(Core::Window::IWindow& window);
 
         void Update(UIContext& context, float deltaTime);
 

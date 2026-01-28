@@ -11,7 +11,7 @@
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config), m_UIManager(*m_window, m_sceneManager)
+        : Application(config), m_UIManager(*m_window)
     {
 
         // Load Empty
@@ -19,11 +19,6 @@ namespace RNGOEngine::Editor
 
         // Set up Editor Systems
         m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
-
-        // Set up UI Panels
-        m_UIManager.Initialize();
-        // TODO: Move this away from here.
-        m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
 
         SetUpUIContext();
         SetUpEditorContext();
@@ -80,7 +75,6 @@ namespace RNGOEngine::Editor
         // Set up UIContext
         m_uiContext.editorPlayState = &m_editorPlayState;
         m_uiContext.loggerSink = m_vectorSink.value().get();
-        m_uiContext.selectionManager = &m_selectionManager;
         m_uiContext.sceneManager = &m_sceneManager;
         m_uiContext.rendererAPI = m_rendererAPI.get();
     }

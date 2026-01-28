@@ -13,7 +13,7 @@ namespace RNGOEngine::Editor
     {
         IDockablePanel::Render(context);
 
-        auto& selectionManager = *context.selectionManager;
+        const auto& selectionManager = context.selectionManager;
         const auto selectedEntity = selectionManager.GetSelectedEntity();
         if (selectedEntity == entt::null)
         {

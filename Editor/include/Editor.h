@@ -37,7 +37,6 @@ namespace RNGOEngine::Editor
 
     private:
         EditorSystemContext m_editorSystemContext;
-        UISelectionManager m_selectionManager;
         Systems::SystemScheduler<EditorSystemContext> m_editorSystems;
 
     private:
