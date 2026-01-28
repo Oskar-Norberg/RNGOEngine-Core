@@ -18,6 +18,11 @@ add_library(${RENDER_API_PROJECT_NAME} STATIC
         src/Systems/Core/Rendering/RenderSystem.cpp
         include/Systems/Core/Rendering/EndFrameSystem.h
 
+        # Debug Systems
+        include/Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h
+        src/Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.cpp
+
+
         # Passes (TODO: Consider moving to separate cmake unit)
         include/Renderer/API/Passes/ForwardPass.h
         src/Renderer/API/Passes/ForwardPass.cpp
