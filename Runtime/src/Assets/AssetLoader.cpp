@@ -50,7 +50,7 @@ namespace RNGOEngine::AssetHandling
     AssetHandle AssetLoader::Import(const AssetType type, const std::filesystem::path& filePath) const
     {
         // Get full path for asset
-        const auto fullPath = m_assetFetcher.GetPath(type, filePath);
+        const auto fullPath = m_assetFetcher.GetPath(filePath);
         if (!fullPath)
         {
             RNGO_LOG(

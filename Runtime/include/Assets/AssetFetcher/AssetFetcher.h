@@ -21,8 +21,8 @@ namespace RNGOEngine::AssetHandling
 
         // Accessors
     public:
-        std::optional<std::filesystem::path> GetPath(AssetType type, const std::filesystem::path& path) const;
-        void AddAssetPath(AssetType type, const std::filesystem::path& path);
+        std::optional<std::filesystem::path> GetPath(const std::filesystem::path& path) const;
+        void AddAssetPath(const std::filesystem::path& path);
 
     public:
         // Recursively scan all asset paths and callback for each file with said extension.
@@ -31,6 +31,6 @@ namespace RNGOEngine::AssetHandling
         );
 
     private:
-        std::array<std::vector<std::filesystem::path>, AssetTypeCount> m_assetPaths;
+        std::vector<std::filesystem::path> m_assetPaths;
     };
 }

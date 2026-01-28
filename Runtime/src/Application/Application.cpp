@@ -58,9 +58,9 @@ namespace RNGOEngine
         }
 
         // Add Asset Paths
-        for (const auto& [path, type] : config.AssetPaths)
+        for (const auto& path : config.AssetPaths)
         {
-            m_assetFetcher.AddAssetPath(type, path);
+            m_assetFetcher.AddAssetPath(path);
         }
 
         // Resource Manager

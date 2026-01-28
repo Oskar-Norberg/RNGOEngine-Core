@@ -44,7 +44,7 @@ namespace RNGOEngine
         size_t Height = 600;
         std::string_view Name = "RNGOEngine Application";
 
-        std::span<const std::pair<std::filesystem::path, AssetHandling::AssetType>> AssetPaths;
+        std::span<const std::filesystem::path> AssetPaths;
         bool LogToVectorSink = false;
     };
 
