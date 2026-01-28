@@ -7,10 +7,24 @@
 #include <filesystem>
 
 // Paths to all fallback assets.
-namespace RNGOEngine::Data::FallbackAssets
+namespace RNGOEngine::Data::Assets
 {
-    const std::filesystem::path InvalidModel = "fallbacks/InvalidModel.obj";
-    const std::filesystem::path InvalidTexture = "fallbacks/InvalidTexture.png";
+    struct DefaultAsset
+    {
+        AssetHandling::AssetType Type;
+        std::filesystem::path Path;
+    };
+    // Invalid Fallbacks
+    const DefaultAsset InvalidModel = {AssetHandling::AssetType::Model, "fallbacks/InvalidModel.obj"};
+    const DefaultAsset InvalidTexture = {AssetHandling::AssetType::Texture, "fallbacks/InvalidTexture.png"};
+    const DefaultAsset InvalidShader = {AssetHandling::AssetType::Shader, "fallbacks/InvalidShader.glsl"};
 
-    const std::filesystem::path InvalidShader = "fallbacks/InvalidShader.glsl";
+    // Builtin Assets
+    const DefaultAsset SphereModel = {AssetHandling::AssetType::Model, "builtin/UnitSphere.fbx"};
+
+    const static DefaultAsset AllBuiltinAssets[] = {
+        InvalidModel, InvalidTexture, InvalidShader,
+
+        SphereModel
+    };
 }

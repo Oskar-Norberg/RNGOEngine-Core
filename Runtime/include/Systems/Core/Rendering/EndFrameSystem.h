@@ -4,9 +4,8 @@
 
 #pragma once
 
-#pragma once
-
 #include "Renderer/API/RenderAPI.h"
+#include "Systems/ISystem.h"
 
 namespace RNGOEngine::Systems::Core
 {

@@ -15,6 +15,9 @@ namespace RNGOEngine::AssetHandling
         static AssetHandle GetErrorHandle(AssetType type);
 
     private:
+        static void LoadBuiltin();
+
+    private:
         static void SetUpModel();
         static void SetUpTexture();
         static void SetUpMaterial();

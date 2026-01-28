@@ -14,6 +14,8 @@ namespace RNGOEngine::AssetHandling
 
     void BuiltinAssets::InitializeBuiltinAssets()
     {
+        LoadBuiltin();
+
         SetUpModel();
         SetUpTexture();
         SetUpMaterial();
@@ -25,28 +27,29 @@ namespace RNGOEngine::AssetHandling
         return s_errorHandles[static_cast<size_t>(type)];
     }
 
-    void BuiltinAssets::SetUpModel()
+    void BuiltinAssets::LoadBuiltin()
     {
         auto& loader = AssetLoader::GetInstance();
 
-        // Import
-        s_errorHandles[static_cast<size_t>(AssetType::Model)] =
-            loader.Import(AssetType::Model, Data::FallbackAssets::InvalidModel);
+        for (const auto& [type, path] : Data::Assets::AllBuiltinAssets)
+        {
+            const AssetHandle handle = loader.Import(type, path);
+            loader.Load(handle);
+        }
+    }
 
-        // Load
-        loader.Load(s_errorHandles[static_cast<size_t>(AssetType::Model)]);
+    void BuiltinAssets::SetUpModel()
+    {
+        auto& loader = AssetLoader::GetInstance();
+        const AssetHandle handle = loader.Import(AssetType::Model, Data::Assets::InvalidModel.Path);
+        s_errorHandles[static_cast<size_t>(AssetType::Model)] = handle;
     }
 
     void BuiltinAssets::SetUpTexture()
     {
         auto& loader = AssetLoader::GetInstance();
-
-        // Import
-        s_errorHandles[static_cast<size_t>(AssetType::Texture)] =
-            loader.Import(AssetType::Texture, Data::FallbackAssets::InvalidTexture);
-
-        // Load
-        loader.Load(s_errorHandles[static_cast<size_t>(AssetType::Texture)]);
+        const AssetHandle handle = loader.Import(AssetType::Texture, Data::Assets::InvalidTexture.Path);
+        s_errorHandles[static_cast<size_t>(AssetType::Texture)] = handle;
     }
 
     void BuiltinAssets::SetUpMaterial()
@@ -55,12 +58,11 @@ namespace RNGOEngine::AssetHandling
         auto& loader = AssetLoader::GetInstance();
 
         // Import Shader
-        const auto fallbackShader = loader.Import(AssetType::Shader, Data::FallbackAssets::InvalidShader);
+        const AssetHandle fallbackShader = loader.Import(AssetType::Shader, Data::Assets::InvalidShader.Path);
         s_errorHandles[static_cast<size_t>(AssetType::Shader)] = fallbackShader;
-        // Load Shader
-        loader.Load(fallbackShader);
 
         // Create Material
+        // TODO: shit ass material system
         auto handle = Utilities::GenerateUUID();
         MaterialParameters params;
         materialManager.CreateMaterial(handle, fallbackShader, params);
