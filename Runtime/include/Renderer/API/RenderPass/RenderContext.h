@@ -11,6 +11,7 @@ namespace RNGOEngine::Core::Renderer
 {
     struct RenderContext
     {
+        // TODO: I hate that the DrawQueue is owned here. This should be a ref/pointer?
         DrawQueue drawQueue;
         RenderPassResources renderPassResources;
     };

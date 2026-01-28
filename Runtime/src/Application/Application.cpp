@@ -14,7 +14,10 @@
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Systems/Core/CollisionSystem.h"
 
-#include "Systems/Core/RenderSystem.h"
+#include "Systems/Core/Rendering/BeginFrameSystem.h"
+#include "Systems/Core/Rendering/RenderSystem.h"
+#include "Systems/Core/Rendering/EndFrameSystem.h"
+
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
 
@@ -249,7 +252,10 @@ namespace RNGOEngine
 
     void Application::AddEngineSystems()
     {
-        m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::CollisionSystem>();
+
+        m_engineSystems.RegisterSystem<Systems::Core::BeginFrameSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::EndFrameSystem>();
     }
 }

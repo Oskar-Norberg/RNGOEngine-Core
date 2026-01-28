@@ -53,6 +53,7 @@ namespace RNGOEngine::Core::Renderer
         Components::Transform Transform;
         GPUModel Model;
         GPUMaterial Material;
+        // TODO: Transparents
     };
 
     struct CameraData
@@ -129,7 +130,5 @@ namespace RNGOEngine::Core::Renderer
 
         // Opaque Objects
         std::vector<Drawable> OpaqueObjects;
-
-        // TODO: Transparents
     };
 }

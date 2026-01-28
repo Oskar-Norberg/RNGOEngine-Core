@@ -25,7 +25,20 @@ namespace RNGOEngine::Core::Renderer
     public:
         explicit RenderAPI(IRenderer& renderer, int width, int height);
 
-        void SubmitDrawQueue(DrawQueue&& drawQueue);
+        void BeginFrame();
+        // TODO: For now submit the resolved GPU-Buffers and stuff.
+        // TODO: But in the future it would be nice to just have a SubmitModel(AssetHandle model, AssetHandle material) that handles the rest.
+        // TODO: Pass by ref or perfect forwarding?
+        // TODO: Move to some sort of DrawQueueManager? This class is doing a lot.
+        void SetCameraData(const CameraData& cameraData);
+        void SetBackgroundColorData(const BackgroundColorData& backgroundColorData);
+        void SetAmbientLightData(const AmbientLightData& ambientLightData);
+        void SetDirectionalLightData(const DirectionalLightData& directionalLightData);
+        void SetPointLightData(std::span<const PointLightData> pointLightData);
+        void SetSpotlightData(std::span<const SpotlightData> spotlightData);
+        void SubmitDrawable(const Drawable& drawable);
+        void EndFrame();
+
         // TODO: I kind of dislike this not being const.
         // TODO: Pass deltaTime / frame info? Pass in Target FrameBuffer and its parameters. (Wrap into a FrameBuffer struct)
         void RenderToScreen(int width, int height);
@@ -64,6 +77,7 @@ namespace RNGOEngine::Core::Renderer
         IRenderer& m_renderer;
 
     private:
+        // TODO: RenderContext shouldn't own the DrawQueue. Fix.
         RenderContext m_context;
         std::vector<std::unique_ptr<RenderPass>> m_passes;
 
