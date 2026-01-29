@@ -2,6 +2,10 @@ set(PHYSICS_SYSTEM_PROJECT_NAME RNGOEngine_CollisionSystem)
 add_library(${PHYSICS_SYSTEM_PROJECT_NAME} STATIC
         include/Systems/Core/Physics/CollisionSystem.h
         src/Systems/Core/Physics/CollisionSystem.cpp
+
+        include/Systems/Core/Physics/RigidbodyGravitySystem.h
+        src/Systems/Core/Physics/RigidbodyGravitySystem.cpp
+
 )
 target_include_directories(${PHYSICS_SYSTEM_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PHYSICS_SYSTEM_PROJECT_NAME} PUBLIC EnTT)

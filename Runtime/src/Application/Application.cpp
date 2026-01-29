@@ -13,6 +13,7 @@
 #include "Renderer/Null/NullRenderer.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Systems/Core/Physics/CollisionSystem.h"
+#include "Systems/Core/Physics/RigidbodyGravitySystem.h"
 #include "Systems/Core/Rendering/BeginFrameSystem.h"
 #include "Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
 #include "Systems/Core/Rendering/Debug/RenderDebugCollisionsSystem.h"
@@ -253,6 +254,7 @@ namespace RNGOEngine
     void Application::AddEngineSystems()
     {
         m_engineSystems.RegisterSystem<Systems::Core::CollisionSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RigidbodyGravitySystem>();
 
         m_engineSystems.RegisterSystem<Systems::Core::BeginFrameSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();

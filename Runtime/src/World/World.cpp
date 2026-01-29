@@ -15,20 +15,20 @@ namespace RNGOEngine::Core
         auto entity = Entity(entityID, m_registry);
         entity.AddComponent<Components::Name>(name);
         entity.AddComponent<Components::Transform>(transform);
-        
+
         return entity;
     }
-    
+
     Entity World::CreateEntity(const Components::Name name)
     {
         return CreateEntity(name, Components::Transform{});
     }
-    
+
     Entity World::CreateEntity(const Components::Transform transform)
     {
         return CreateEntity(Components::Name{}, transform);
     }
-    
+
     Entity World::CreateEntity()
     {
         return CreateEntity(Components::Name{});
@@ -37,5 +37,15 @@ namespace RNGOEngine::Core
     void World::DestroyEntity(entt::entity entity)
     {
         m_registry.destroy(entity);
+    }
+
+    float World::GetGravity() const
+    {
+        return m_gravity;
+    }
+
+    void World::SetGravity(const float gravity)
+    {
+        m_gravity = gravity;
     }
 }
