@@ -36,7 +36,7 @@ namespace RNGOEngine::Systems::Core
 
         // Register collisions for both engine and game systems. This will copy the data, but it's fine for now.
         // TODO: Consider using a shared pointer if this becomes a problem.
-        context.EngineResourceMapper->AddTransientResource(CollisionList{collisions}, false);
+        context.EngineResourceMapper->AddTransientResource(CollisionList{collisions}, true);
         context.GameResourceMapper->AddTransientResource(std::move(collisions), true);
     }
 }

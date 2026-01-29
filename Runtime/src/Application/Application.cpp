@@ -15,6 +15,7 @@
 #include "Systems/Core/CollisionSystem.h"
 #include "Systems/Core/Rendering/BeginFrameSystem.h"
 #include "Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
+#include "Systems/Core/Rendering/Debug/RenderDebugCollisionsSystem.h"
 #include "Systems/Core/Rendering/EndFrameSystem.h"
 #include "Systems/Core/Rendering/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
@@ -256,6 +257,7 @@ namespace RNGOEngine
         m_engineSystems.RegisterSystem<Systems::Core::BeginFrameSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RenderDebugCollidersSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RenderDebugCollisionsSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::EndFrameSystem>();
     }
 }

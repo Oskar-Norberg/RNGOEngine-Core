@@ -12,8 +12,8 @@ namespace RNGOEngine::Systems::Core
 {
     struct CollisionData
     {
-        entt::entity entityA;
-        entt::entity entityB;
+        entt::entity EntityA;
+        entt::entity EntityB;
     };
 
     struct CollisionList
