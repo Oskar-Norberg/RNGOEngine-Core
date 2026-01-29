@@ -12,7 +12,7 @@
 #include "Renderer/API/Passes/ForwardScreenPass.h"
 #include "Renderer/Null/NullRenderer.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
-#include "Systems/Core/CollisionSystem.h"
+#include "Systems/Core/Physics/CollisionSystem.h"
 #include "Systems/Core/Rendering/BeginFrameSystem.h"
 #include "Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
 #include "Systems/Core/Rendering/Debug/RenderDebugCollisionsSystem.h"

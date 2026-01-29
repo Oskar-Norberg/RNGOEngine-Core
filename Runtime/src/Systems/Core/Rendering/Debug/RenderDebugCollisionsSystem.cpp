@@ -10,7 +10,7 @@
 #include "Logging/Logger.h"
 #include "Renderer/API/RenderAPI.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Systems/Core/CollisionSystem.h"
+#include "Systems/Core/Physics/CollisionSystem.h"
 #include "Systems/SystemContext.h"
 #include "World/World.h"
 

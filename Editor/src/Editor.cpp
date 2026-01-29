@@ -51,19 +51,20 @@ namespace RNGOEngine::Editor
         m_UIManager.EndFrame();
     }
 
-    void Editor::UpdateEngineSystems(float deltaTime)
+    void Editor::UpdateEngineSystems(const float deltaTime)
     {
         m_engineSystemContext.DeltaTime = deltaTime;
+        m_engineSystemContext.DoRunPhysics = (m_editorPlayState == EditorPlayState::Play);
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineSystemContext);
     }
 
-    void Editor::UpdateEditorSystems(float deltaTime)
+    void Editor::UpdateEditorSystems(const float deltaTime)
     {
         m_editorSystemContext.deltaTime = deltaTime;
         m_editorSystems.Update(*m_sceneManager.GetCurrentWorld(), m_editorSystemContext);
     }
 
-    void Editor::UpdateGameSystems(float deltaTime)
+    void Editor::UpdateGameSystems(const float deltaTime)
     {
         m_gameSystemContext.DeltaTime = deltaTime;
         m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameSystemContext);

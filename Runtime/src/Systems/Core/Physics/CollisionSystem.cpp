@@ -2,7 +2,7 @@
 // Created by ringo on 2026-01-27.
 //
 
-#include "Systems/Core/CollisionSystem.h"
+#include "Systems/Core/Physics/CollisionSystem.h"
 
 #include "Systems/SystemContext.h"
 #include "World/World.h"
