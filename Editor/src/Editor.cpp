@@ -11,19 +11,13 @@
 namespace RNGOEngine::Editor
 {
     Editor::Editor(const EngineConfig& config)
-        : Application(config), m_UIManager(*m_window, m_sceneManager)
+        : Application(config), m_UIManager(*m_window)
     {
-
         // Load Empty
         m_sceneManager.LoadScene<Core::Scene>();
 
         // Set up Editor Systems
         m_editorSystems.RegisterSystem<FreeFlyCameraSystem>();
-
-        // Set up UI Panels
-        m_UIManager.Initialize();
-        // TODO: Move this away from here.
-        m_UIManager.RegisterPanel<ViewPortPanel>(*m_rendererAPI);
 
         SetUpUIContext();
         SetUpEditorContext();
@@ -57,19 +51,49 @@ namespace RNGOEngine::Editor
         m_UIManager.EndFrame();
     }
 
-    void Editor::UpdateEngineSystems(float deltaTime)
+    void Editor::Stop()
+    {
+        m_editorPlayState = EditorPlayState::Stop;
+        if (m_prePlayScene)
+        {
+            m_sceneManager.LoadScene(std::move(m_prePlayScene));
+        }
+    }
+
+    void Editor::Pause()
+    {
+        m_editorPlayState = EditorPlayState::Paused;
+    }
+
+    void Editor::Play()
+    {
+        // Only cache the scene if we are not already in paused/play mode.
+        if (m_editorPlayState == EditorPlayState::Stop)
+        {
+            m_prePlayScene = std::make_unique<Core::Scene>(m_sceneManager.GetCurrentScene()->Copy());
+        }
+        m_editorPlayState = EditorPlayState::Play;
+    }
+
+    EditorPlayState Editor::GetPlayState() const
+    {
+        return m_editorPlayState;
+    }
+
+    void Editor::UpdateEngineSystems(const float deltaTime)
     {
         m_engineSystemContext.DeltaTime = deltaTime;
+        m_engineSystemContext.DoRunPhysics = (m_editorPlayState == EditorPlayState::Play);
         m_engineSystems.Update(*m_sceneManager.GetCurrentWorld(), m_engineSystemContext);
     }
 
-    void Editor::UpdateEditorSystems(float deltaTime)
+    void Editor::UpdateEditorSystems(const float deltaTime)
     {
         m_editorSystemContext.deltaTime = deltaTime;
         m_editorSystems.Update(*m_sceneManager.GetCurrentWorld(), m_editorSystemContext);
     }
 
-    void Editor::UpdateGameSystems(float deltaTime)
+    void Editor::UpdateGameSystems(const float deltaTime)
     {
         m_gameSystemContext.DeltaTime = deltaTime;
         m_gameSystems.Update(*m_sceneManager.GetCurrentWorld(), m_gameSystemContext);
@@ -78,9 +102,8 @@ namespace RNGOEngine::Editor
     void Editor::SetUpUIContext()
     {
         // Set up UIContext
-        m_uiContext.editorPlayState = &m_editorPlayState;
+        m_uiContext.Editor = this;
         m_uiContext.loggerSink = m_vectorSink.value().get();
-        m_uiContext.selectionManager = &m_selectionManager;
         m_uiContext.sceneManager = &m_sceneManager;
         m_uiContext.rendererAPI = m_rendererAPI.get();
     }

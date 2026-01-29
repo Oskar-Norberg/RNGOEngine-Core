@@ -40,6 +40,7 @@ include(cmake/EngineUnits/Components.cmake)
 include(cmake/EngineUnits/Scene.cmake)
 include(cmake/EngineUnits/Systems.cmake)
 
+include(cmake/EngineUnits/Physics.cmake)
 include(cmake/EngineUnits/RenderAPI.cmake)
 
 # Testing
@@ -79,6 +80,7 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${SYSTEM_PROJECT_NAME}
         ${COMPONENT_PROJECT_NAME}
 
+        ${PHYSICS_SYSTEM_PROJECT_NAME}
         ${RENDER_API_PROJECT_NAME}
 )
 

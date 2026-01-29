@@ -41,6 +41,20 @@ namespace RNGOEngine::Components
         emitter << YAML::EndMap;
     }
 
+    static void SerializeSphereCollider(const SphereCollider& sphereCollider, YAML::Emitter& emitter)
+    {
+        emitter << YAML::Key << "SphereCollider" << YAML::Value << YAML::BeginMap;
+        emitter << YAML::Key << "Radius" << YAML::Value << sphereCollider.Radius;
+        emitter << YAML::EndMap;
+    }
+
+    static void SerializeRigidbody(const Rigidbody& rigidbody, YAML::Emitter& emitter)
+    {
+        emitter << YAML::Key << "Rigidbody" << YAML::Value << YAML::BeginMap;
+        emitter << YAML::Key << "HasGravity" << YAML::Value << rigidbody.HasGravity;
+        emitter << YAML::EndMap;
+    }
+
     static void SerializeColor(const Color& color, YAML::Emitter& emitter)
     {
         emitter << YAML::Key << "Color" << YAML::Value << YAML::BeginMap;

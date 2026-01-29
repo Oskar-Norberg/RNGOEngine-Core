@@ -3,13 +3,16 @@
 //
 
 #pragma once
+#include "Managers/UISelectionManager.h"
 
-namespace RNGOEngine::Editor
-{
-    enum class EditorPlayState;
-}
 namespace RNGOEngine
 {
+    namespace Editor
+    {
+        class Editor;
+        enum class EditorPlayState;
+
+    }
     namespace Core
     {
         class VectorSink;
@@ -20,20 +23,17 @@ namespace RNGOEngine
             class RenderAPI;
         }
     }
-
-    namespace Editor
-    {
-        class UISelectionManager;
-    }
 }
 
 namespace RNGOEngine::Editor
 {
+    // TODO: These should be pascal-cased.
     struct UIContext
     {
-        EditorPlayState* editorPlayState = nullptr;
+        UISelectionManager selectionManager{};
+
+        Editor* Editor = nullptr;
         Core::VectorSink* loggerSink = nullptr;
-        UISelectionManager* selectionManager = nullptr;
         Core::SceneManager* sceneManager = nullptr;
         Core::Renderer::RenderAPI* rendererAPI = nullptr;
     };

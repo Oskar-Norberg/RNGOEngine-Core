@@ -6,18 +6,20 @@
 
 #define GLM_ENABLE_EXPERIMENTAL
 
-#include <glm/glm.hpp>
 #include <glm/ext/matrix_transform.hpp>
-#include "glm/gtx/quaternion.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
 
 #include "Assets/Asset.h"
 
 namespace RNGOEngine::Components
 {
-    struct MeshRenderer
+    // TODO: Implement a custom FixedString templated-type?
+    constexpr auto MAX_NR_CHARACTERS = 24 + 1;
+    constexpr auto UNNAMED_ENTITY = "Unnamed Entity";
+    struct Name
     {
-        AssetHandling::AssetHandle ModelHandle;
-        AssetHandling::AssetHandle MaterialKey;
+        std::array<char, MAX_NR_CHARACTERS> NameArr;
     };
 
     struct Transform
@@ -39,11 +41,28 @@ namespace RNGOEngine::Components
         }
     };
 
+    struct MeshRenderer
+    {
+        AssetHandling::AssetHandle ModelHandle;
+        AssetHandling::AssetHandle MaterialKey;
+    };
+
     struct Camera
     {
         float FOV = 45.0f;
         float NearPlane = 0.1f;
         float FarPlane = 100.0f;
+    };
+
+    struct SphereCollider
+    {
+        float Radius = 1.0f;
+    };
+
+    // TODO: More properties
+    struct Rigidbody
+    {
+        bool HasGravity = true;
     };
 
     struct Color
@@ -85,13 +104,5 @@ namespace RNGOEngine::Components
     {
         float CutOff = glm::cos(glm::radians(10.0f));
         float OuterCutOff = glm::cos(glm::radians(12.5f));
-    };
-
-    // TODO: Implement a custom FixedString templated-type?
-    constexpr auto MAX_NR_CHARACTERS = 24 + 1;
-    constexpr auto UNNAMED_ENTITY = "Unnamed Entity";
-    struct Name
-    {
-        std::array<char, MAX_NR_CHARACTERS> NameArr;
     };
 }

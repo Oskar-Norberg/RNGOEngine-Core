@@ -12,30 +12,26 @@ namespace RNGOEngine::AssetHandling
     AssetFetcher::AssetFetcher()
         : Singleton(this)
     {
-        using enum AssetType;
+        AddAssetPath(ENGINE_ASSETS_DIR);
+        AddAssetPath(ENGINE_FALLBACKS_DIR);
 
-        AddAssetPath(None, ENGINE_ASSETS_DIR);
-        AddAssetPath(None, ENGINE_FALLBACKS_DIR);
+        AddAssetPath(ENGINE_SHADERS_DIR);
+        AddAssetPath(ENGINE_SHADER_INCLUDE_DIR);
 
-        AddAssetPath(Shader, ENGINE_SHADERS_DIR);
-        AddAssetPath(Shader, ENGINE_SHADER_INCLUDE_DIR);
-
-        AddAssetPath(Model, ENGINE_MODELS_DIR);
-        AddAssetPath(Texture, ENGINE_TEXTURES_DIR);
+        AddAssetPath(ENGINE_MODELS_DIR);
+        AddAssetPath(ENGINE_TEXTURES_DIR);
     }
 
-    std::optional<std::filesystem::path> AssetFetcher::GetPath(
-        const AssetType type, const std::filesystem::path& path
-    ) const
+    std::optional<std::filesystem::path> AssetFetcher::GetPath(const std::filesystem::path& path) const
     {
-        // First try relative to current working directory.
+        // First try relative to CWD.
         if (Utilities::IO::FileExists(path))
         {
             return path;
         }
 
         // Then inside registered paths
-        for (const auto& includeDirectory : m_assetPaths.at(static_cast<size_t>(type)))
+        for (const auto& includeDirectory : m_assetPaths)
         {
             const std::filesystem::path fullAssetPath = includeDirectory / path;
 
@@ -48,33 +44,11 @@ namespace RNGOEngine::AssetHandling
         return std::nullopt;
     }
 
-    void AssetFetcher::AddAssetPath(const AssetType type, const std::filesystem::path& path)
+    void AssetFetcher::AddAssetPath(const std::filesystem::path& path)
     {
-        using enum AssetType;
-
-        size_t assetTypeIndex = static_cast<size_t>(type);
-
-        if (type == None)
-        {
-            // Add to all
-            // TODO: Feels like a bit of a hack treating 'None' as 'All'.
-            for (size_t i = 0; i < AssetTypeCount; ++i)
-            {
-                const auto assetType = static_cast<AssetType>(i);
-                if (assetType == None)
-                {
-                    continue;
-                }
-
-                m_assetPaths[i].push_back(path);
-            }
-        }
-        else
-        {
-            // Add to specific type
-            m_assetPaths[assetTypeIndex].push_back(path);
-        }
+        m_assetPaths.emplace_back(path);
     }
+
     void AssetFetcher::ForEachOfExtension(
         const std::string_view extension, const std::function<void(const std::filesystem::path&)>& callback
     )
@@ -105,5 +79,4 @@ namespace RNGOEngine::AssetHandling
             }
         }
     }
-
 }

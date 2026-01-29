@@ -12,7 +12,13 @@
 #include "Renderer/API/Passes/ForwardScreenPass.h"
 #include "Renderer/Null/NullRenderer.h"
 #include "Renderer/OpenGL/OpenGLRenderer.h"
-#include "Systems/Core/RenderSystem.h"
+#include "Systems/Core/Physics/CollisionSystem.h"
+#include "Systems/Core/Physics/RigidbodyGravitySystem.h"
+#include "Systems/Core/Rendering/BeginFrameSystem.h"
+#include "Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
+#include "Systems/Core/Rendering/Debug/RenderDebugCollisionsSystem.h"
+#include "Systems/Core/Rendering/EndFrameSystem.h"
+#include "Systems/Core/Rendering/RenderSystem.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
 
@@ -54,9 +60,9 @@ namespace RNGOEngine
         }
 
         // Add Asset Paths
-        for (const auto& [path, type] : config.AssetPaths)
+        for (const auto& path : config.AssetPaths)
         {
-            m_assetFetcher.AddAssetPath(type, path);
+            m_assetFetcher.AddAssetPath(path);
         }
 
         // Resource Manager
@@ -247,6 +253,13 @@ namespace RNGOEngine
 
     void Application::AddEngineSystems()
     {
+        m_engineSystems.RegisterSystem<Systems::Core::CollisionSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RigidbodyGravitySystem>();
+
+        m_engineSystems.RegisterSystem<Systems::Core::BeginFrameSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RenderDebugCollidersSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RenderDebugCollisionsSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::EndFrameSystem>();
     }
 }

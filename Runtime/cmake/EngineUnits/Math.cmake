@@ -5,7 +5,6 @@ add_library(${MATH_PROJECT_NAME} INTERFACE
 
         include/Math/3D/Point3D.h
         include/Math/3D/AABB3D.h
-
 )
 target_include_directories(${MATH_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${MATH_PROJECT_NAME} INTERFACE glm)

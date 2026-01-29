@@ -165,7 +165,8 @@ namespace RNGOEngine::Editor
                                 {
                                     auto& materialAsset = materialAssetOpt->get();
                                     AssetHandling::MaterialTextureSpecification textureSpec{
-                                        .TextureHandle = dragAndDropPayload.Handle, .Slot = Data::Shader::ALBEDO_TEXTURE_SLOT
+                                        .TextureHandle = dragAndDropPayload.Handle,
+                                        .Slot = Data::Shader::ALBEDO_TEXTURE_SLOT
                                     };
                                     materialAsset.GetParameters().Parameters.emplace_back(
                                         std::string(Data::Shader::ALBEDO_TEXTURE.Value), textureSpec
@@ -214,7 +215,8 @@ namespace RNGOEngine::Editor
                                 {
                                     auto& materialAsset = materialAssetOpt->get();
                                     AssetHandling::MaterialTextureSpecification textureSpec{
-                                        .TextureHandle = dragAndDropPayload.Handle, .Slot = Data::Shader::SPECULAR_TEXTURE_SLOT
+                                        .TextureHandle = dragAndDropPayload.Handle,
+                                        .Slot = Data::Shader::SPECULAR_TEXTURE_SLOT
                                     };
                                     materialAsset.GetParameters().Parameters.emplace_back(
                                         std::string(Data::Shader::SPECULAR_TEXTURE.Value), textureSpec
@@ -260,6 +262,32 @@ namespace RNGOEngine::Editor
 
             auto& camera = registry.get<Components::Camera>(entity);
             ImGui::DragFloat("FOV", &camera.FOV, 0.1f, 0.1f, 180.0f);
+        }
+    }
+
+    template<>
+    inline void DrawProperties<Components::SphereCollider>(
+        entt::registry& registry, const entt::entity entity
+    )
+    {
+        if (registry.any_of<Components::SphereCollider>(entity))
+        {
+            ImGui::Text("Sphere");
+
+            auto& sphereCollider = registry.get<Components::SphereCollider>(entity);
+            ImGui::DragFloat("Radius", &sphereCollider.Radius, 0.01f, 0.0f);
+        }
+    }
+
+    template<>
+    inline void DrawProperties<Components::Rigidbody>(entt::registry& registry, const entt::entity entity)
+    {
+        if (registry.any_of<Components::Rigidbody>(entity))
+        {
+            ImGui::Text("Rigidbody");
+
+            auto& rigidbody = registry.get<Components::Rigidbody>(entity);
+            ImGui::Checkbox("HasGravity", &rigidbody.HasGravity);
         }
     }
 

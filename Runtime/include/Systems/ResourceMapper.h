@@ -11,6 +11,8 @@ namespace RNGOEngine::Systems::Resources
     class ResourceMapper
     {
     public:
+        // TODO: What the fuck is this API? Just return an optional please
+        // TODO: Best to fix this before it creeps into every system
         template<typename T>
         bool TryGetTransientResource(T& outResource) const
         {

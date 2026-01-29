@@ -37,15 +37,23 @@ namespace RNGOEngine::Editor
             },
     };
 
-    ViewPortPanel::ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI)
-        : m_rendererAPI(rendererAPI), m_viewportRenderTargetKey()
+    void ViewPortPanel::Initialize(Core::Renderer::RenderAPI& rendererAPI)
     {
-        m_viewportRenderTargetKey = rendererAPI.CreateRenderTarget(ViewportPanelSpecialization, 1280, 720);
+        m_viewportRenderTargetKeyOpt = rendererAPI.CreateRenderTarget(ViewportPanelSpecialization, 1280, 720);
     }
 
     void ViewPortPanel::Render(UIContext& context)
     {
         IDockablePanel::Render(context);
+
+        auto& m_rendererAPI = *context.rendererAPI;
+
+        if (!m_viewportRenderTargetKeyOpt)
+        {
+            Initialize(*context.rendererAPI);
+        }
+
+        auto& m_viewportRenderTargetKey = m_viewportRenderTargetKeyOpt.value();
 
         const auto& targetManager = Resources::ResourceManager::GetInstance().GetRenderTargetManager();
         const auto renderTarget = targetManager.GetRenderTarget(m_viewportRenderTargetKey);
@@ -145,7 +153,7 @@ namespace RNGOEngine::Editor
         UIContext& context, const ImVec2 pos, const ImVec2 size
     )
     {
-        auto entity = context.selectionManager->GetSelectedEntity();
+        auto entity = context.selectionManager.GetSelectedEntity();
         if (entity == entt::null)
         {
             return std::unexpected(GizmoContextError::NoTargetEntity);

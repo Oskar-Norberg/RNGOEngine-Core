@@ -85,7 +85,7 @@ namespace RNGOEngine::Editor
 
             if (ImGui::Selectable(name.data()))
             {
-                context.selectionManager->SetSelectedEntity(entity);
+                context.selectionManager.SetSelectedEntity(entity);
             }
 
             if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))

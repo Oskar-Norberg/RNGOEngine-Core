@@ -29,7 +29,18 @@ namespace RNGOEngine::Core
             return m_registry;
         }
 
+        const entt::registry& GetRegistry() const
+        {
+            return m_registry;
+        }
+
+        // Gravity
+    public:
+        float GetGravity() const;
+        void SetGravity(float gravity);
+
     private:
+        float m_gravity = 9.82f;
         entt::registry m_registry;
     };
 }

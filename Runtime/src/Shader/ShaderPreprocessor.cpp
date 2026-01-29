@@ -34,8 +34,7 @@ namespace RNGOEngine::Shaders
     {
         // TODO: Should this be getting the path from asset fetcher?
         // This should be passed an actualized path and the includes should be resolved through the Fetcher.
-        const auto foundPath =
-            AssetHandling::AssetFetcher::GetInstance().GetPath(AssetHandling::AssetType::Shader, source);
+        const auto foundPath = AssetHandling::AssetFetcher::GetInstance().GetPath(source);
 
         if (!foundPath.has_value())
         {
@@ -190,9 +189,7 @@ namespace RNGOEngine::Shaders
             {
                 includedFiles.insert(std::string(includePath));
 
-                const auto includeFilePath = AssetHandling::AssetFetcher::GetInstance().GetPath(
-                    AssetHandling::AssetType::Shader, includePath
-                );
+                const auto includeFilePath = AssetHandling::AssetFetcher::GetInstance().GetPath(includePath);
 
                 if (!includeFilePath.has_value())
                 {

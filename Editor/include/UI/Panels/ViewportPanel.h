@@ -12,6 +12,7 @@
 
 // NOTE: Cannot be included before imgui.h
 #include "ImGuizmo.h"
+#include "UI/PanelInitializer.h"
 
 namespace RNGOEngine::Editor
 {
@@ -47,7 +48,7 @@ namespace RNGOEngine::Editor
     {
     public:
         // TODO: Add to UIContext, EditorPanels need to be default constructible for the factory.
-        explicit ViewPortPanel(Core::Renderer::RenderAPI& rendererAPI);
+        void Initialize(Core::Renderer::RenderAPI& rendererAPI);
 
     public:
         void Render(UIContext& context) override;
@@ -58,10 +59,7 @@ namespace RNGOEngine::Editor
         }
 
     private:
-        Core::Renderer::RenderAPI& m_rendererAPI;
-
-    private:
-        Containers::GenerationalKey<Resources::RenderTarget> m_viewportRenderTargetKey;
+        std::optional<Containers::GenerationalKey<Resources::RenderTarget>> m_viewportRenderTargetKeyOpt{};
 
         // TODO: Move to UIContext?
         GizmoData m_gizmoData;
@@ -75,4 +73,5 @@ namespace RNGOEngine::Editor
             UIContext& context, ImVec2 pos, ImVec2 size
         );
     };
+    EDITOR_PANEL(ViewPortPanel);
 }

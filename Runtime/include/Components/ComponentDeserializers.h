@@ -52,6 +52,22 @@ namespace RNGOEngine::Components
         return camera;
     }
 
+    static SphereCollider DeserializeSphereCollider(const YAML::Node& node)
+    {
+        SphereCollider sphereCollider;
+        sphereCollider.Radius = node["Radius"].as<float>();
+
+        return sphereCollider;
+    }
+
+    static Rigidbody DeserializeRigidbody(const YAML::Node& node)
+    {
+        Rigidbody rigidbody;
+        rigidbody.HasGravity = node["HasGravity"].as<bool>();
+
+        return rigidbody;
+    }
+
     static Color DeserializeColor(const YAML::Node& node)
     {
         Color color;

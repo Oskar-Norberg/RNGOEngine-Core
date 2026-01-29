@@ -40,10 +40,10 @@ namespace RNGOEngine::Systems
 {
     struct EngineSystemContext
     {
+        bool DoRunPhysics = true;
         // Should be a time-span, but for now we use a float.
         float DeltaTime = 0.0f;
 
-        // TODO: This should probably not be owned by the SystemContext.
         // TODO: Ugly pointer bonanza over here
         Resources::ResourceMapper* EngineResourceMapper = nullptr;
         Resources::ResourceMapper* GameResourceMapper = nullptr;

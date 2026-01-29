@@ -12,7 +12,7 @@ namespace RNGOEngine::Editor
     {
         IDockablePanel::Render(context);
 
-        auto& editorPlayState = *context.editorPlayState;
+        const auto editorPlayState = context.Editor->GetPlayState();
 
         bool canStop = editorPlayState != EditorPlayState::Stop;
         bool canPause = editorPlayState == EditorPlayState::Play;
@@ -21,7 +21,7 @@ namespace RNGOEngine::Editor
         ImGui::BeginDisabled(!canStop);
         if (ImGui::Button("Stop"))
         {
-            editorPlayState = EditorPlayState::Stop;
+            context.Editor->Stop();
         }
         ImGui::EndDisabled();
 
@@ -30,7 +30,7 @@ namespace RNGOEngine::Editor
         ImGui::BeginDisabled(!canPause);
         if (ImGui::Button("Pause"))
         {
-            editorPlayState = EditorPlayState::Paused;
+            context.Editor->Pause();
         }
         ImGui::EndDisabled();
 
@@ -39,7 +39,7 @@ namespace RNGOEngine::Editor
         ImGui::BeginDisabled(!canPlay);
         if (ImGui::Button("Play"))
         {
-            editorPlayState = EditorPlayState::Play;
+            context.Editor->Play();
         }
         ImGui::EndDisabled();
 
