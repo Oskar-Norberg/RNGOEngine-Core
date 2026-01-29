@@ -13,17 +13,11 @@ namespace RNGOEngine::Core
     class Scene
     {
     public:
-        virtual void Initialize()
-        {
-        }
-
-        virtual void Exit()
-        {
-        }
+        void Deserialize(YAML::Node& node);
+        void Serialize(YAML::Emitter& emitter) const;
 
     public:
-        void Deserialize(YAML::Node& node);
-        void Serialize(YAML::Emitter& emitter);
+        Scene Copy() const;
 
         World world;
     };

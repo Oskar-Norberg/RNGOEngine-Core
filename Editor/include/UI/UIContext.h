@@ -5,12 +5,14 @@
 #pragma once
 #include "Managers/UISelectionManager.h"
 
-namespace RNGOEngine::Editor
-{
-    enum class EditorPlayState;
-}
 namespace RNGOEngine
 {
+    namespace Editor
+    {
+        class Editor;
+        enum class EditorPlayState;
+
+    }
     namespace Core
     {
         class VectorSink;
@@ -30,7 +32,7 @@ namespace RNGOEngine::Editor
     {
         UISelectionManager selectionManager{};
 
-        EditorPlayState* editorPlayState = nullptr;
+        Editor* Editor = nullptr;
         Core::VectorSink* loggerSink = nullptr;
         Core::SceneManager* sceneManager = nullptr;
         Core::Renderer::RenderAPI* rendererAPI = nullptr;

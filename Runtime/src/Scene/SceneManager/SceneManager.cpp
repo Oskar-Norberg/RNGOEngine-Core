@@ -10,9 +10,7 @@ namespace RNGOEngine::Core
     {
         if (m_currentScene)
         {
-            m_currentScene->Exit();
             m_currentScene->world.GetRegistry().clear();
-            m_currentScene->Initialize();
         }
     }
 
@@ -23,12 +21,7 @@ namespace RNGOEngine::Core
             return;
         }
 
-        if (m_currentScene)
-        {
-            m_currentScene->Exit();
-        }
         m_currentScene = std::move(m_pendingScene);
-        m_currentScene->Initialize();
     }
 
     Scene* SceneManager::GetCurrentScene() const
@@ -39,5 +32,15 @@ namespace RNGOEngine::Core
     World* SceneManager::GetCurrentWorld() const
     {
         return m_currentScene ? &m_currentScene->world : nullptr;
+    }
+
+    const std::unique_ptr<Scene>& SceneManager::GetScene() const
+    {
+        return m_currentScene;
+    }
+
+    void SceneManager::LoadScene(std::unique_ptr<Scene>&& scene)
+    {
+        m_currentScene = std::move(scene);
     }
 }

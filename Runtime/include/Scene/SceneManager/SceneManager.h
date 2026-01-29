@@ -9,6 +9,7 @@
 
 namespace RNGOEngine::Core
 {
+    // TODO: Why isn't this doing the loading from file?
     class SceneManager
     {
     public:
@@ -21,6 +22,10 @@ namespace RNGOEngine::Core
 
         Scene* GetCurrentScene() const;
         World* GetCurrentWorld() const;
+
+    public:
+        const std::unique_ptr<Scene>& GetScene() const;
+        void LoadScene(std::unique_ptr<Scene>&& scene);
 
     private:
         std::unique_ptr<Scene> m_currentScene;

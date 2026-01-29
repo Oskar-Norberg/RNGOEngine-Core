@@ -11,7 +11,7 @@
 namespace RNGOEngine::Core
 {
     static void SerializeComponents(
-        entt::registry& registry, const entt::entity entity, YAML::Emitter& emitter
+        const entt::registry& registry, const entt::entity entity, YAML::Emitter& emitter
     )
     {
         // TODO: Garbage ass duplicate code
@@ -149,9 +149,9 @@ namespace RNGOEngine::Core
         }
     }
 
-    void Scene::Serialize(YAML::Emitter& emitter)
+    void Scene::Serialize(YAML::Emitter& emitter) const
     {
-        auto& registry = world.GetRegistry();
+        const auto& registry = world.GetRegistry();
         const auto entities = registry.view<entt::entity>();
         emitter << YAML::BeginSeq;
         for (const auto entity : entities)
@@ -161,5 +161,16 @@ namespace RNGOEngine::Core
             emitter << YAML::EndMap;
         }
         emitter << YAML::EndSeq;
+    }
+
+    Scene Scene::Copy() const
+    {
+        Scene newScene;
+        YAML::Emitter emitter;
+        Serialize(emitter);
+        YAML::Node node = YAML::Load(emitter.c_str());
+        newScene.Deserialize(node);
+
+        return newScene;
     }
 }

@@ -28,8 +28,19 @@ namespace RNGOEngine::Editor
         void OnUpdate(float deltaTime) override;
         void OnRender() override;
 
+    public:
+        void Stop();
+        void Pause();
+        void Play();
+
+        EditorPlayState GetPlayState() const;
+
     private:
         EditorPlayState m_editorPlayState = EditorPlayState::Stop;
+
+    private:
+        // Scene cached before entering play mode.
+        std::unique_ptr<Core::Scene> m_prePlayScene;
 
     private:
         UIContext m_uiContext;

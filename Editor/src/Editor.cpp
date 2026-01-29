@@ -51,6 +51,35 @@ namespace RNGOEngine::Editor
         m_UIManager.EndFrame();
     }
 
+    void Editor::Stop()
+    {
+        m_editorPlayState = EditorPlayState::Stop;
+        if (m_prePlayScene)
+        {
+            m_sceneManager.LoadScene(std::move(m_prePlayScene));
+        }
+    }
+
+    void Editor::Pause()
+    {
+        m_editorPlayState = EditorPlayState::Paused;
+    }
+
+    void Editor::Play()
+    {
+        // Only cache the scene if we are not already in paused/play mode.
+        if (m_editorPlayState == EditorPlayState::Stop)
+        {
+            m_prePlayScene = std::make_unique<Core::Scene>(m_sceneManager.GetCurrentScene()->Copy());
+        }
+        m_editorPlayState = EditorPlayState::Play;
+    }
+
+    EditorPlayState Editor::GetPlayState() const
+    {
+        return m_editorPlayState;
+    }
+
     void Editor::UpdateEngineSystems(const float deltaTime)
     {
         m_engineSystemContext.DeltaTime = deltaTime;
@@ -73,7 +102,7 @@ namespace RNGOEngine::Editor
     void Editor::SetUpUIContext()
     {
         // Set up UIContext
-        m_uiContext.editorPlayState = &m_editorPlayState;
+        m_uiContext.Editor = this;
         m_uiContext.loggerSink = m_vectorSink.value().get();
         m_uiContext.sceneManager = &m_sceneManager;
         m_uiContext.rendererAPI = m_rendererAPI.get();
