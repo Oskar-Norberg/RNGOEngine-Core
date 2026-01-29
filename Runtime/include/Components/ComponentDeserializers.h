@@ -60,6 +60,14 @@ namespace RNGOEngine::Components
         return sphereCollider;
     }
 
+    static Rigidbody DeserializeRigidbody(const YAML::Node& node)
+    {
+        Rigidbody rigidbody;
+        rigidbody.HasGravity = node["HasGravity"].as<bool>();
+
+        return rigidbody;
+    }
+
     static Color DeserializeColor(const YAML::Node& node)
     {
         Color color;

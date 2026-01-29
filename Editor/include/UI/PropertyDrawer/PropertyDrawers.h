@@ -280,6 +280,18 @@ namespace RNGOEngine::Editor
     }
 
     template<>
+    inline void DrawProperties<Components::Rigidbody>(entt::registry& registry, const entt::entity entity)
+    {
+        if (registry.any_of<Components::Rigidbody>(entity))
+        {
+            ImGui::Text("Rigidbody");
+
+            auto& rigidbody = registry.get<Components::Rigidbody>(entity);
+            ImGui::Checkbox("HasGravity", &rigidbody.HasGravity);
+        }
+    }
+
+    template<>
     inline void DrawProperties<Components::Color>(entt::registry& registry, const entt::entity entity)
     {
         if (registry.any_of<Components::Color>(entity))

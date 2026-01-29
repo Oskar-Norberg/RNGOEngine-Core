@@ -59,6 +59,12 @@ namespace RNGOEngine::Components
         float Radius = 1.0f;
     };
 
+    // TODO: More properties
+    struct Rigidbody
+    {
+        bool HasGravity = true;
+    };
+
     struct Color
     {
         glm::vec3 ColorValue = glm::vec3(1.0f, 1.0f, 1.0f);
