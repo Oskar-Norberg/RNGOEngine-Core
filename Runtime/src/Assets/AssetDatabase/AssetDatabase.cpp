@@ -24,8 +24,8 @@ namespace RNGOEngine::AssetHandling
         const auto& storage = m_metadataStorages.at(type);
         const auto index = storage->Insert(std::move(metadata));
 
-        m_handleToStorageIndex.insert({uuid, std::make_pair(type, index)});
-        m_pathToHandle.insert({path, uuid});
+        m_handleToStorageIndex.insert({{uuid, type}, std::make_pair(type, index)});
+        m_pathToHandle.insert({path, {uuid, type}});
     }
 
     void AssetDatabase::UnregisterAsset(const AssetHandle& uuid)
@@ -78,7 +78,7 @@ namespace RNGOEngine::AssetHandling
         {
             if (const auto* metadata = GetMetadataOrNullptr(m_pathToHandle.at(path)); metadata != nullptr)
             {
-                return metadata->UUID;
+                return AssetHandle{metadata->UUID, metadata->Type};
             }
         }
 

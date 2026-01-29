@@ -88,7 +88,7 @@ namespace RNGOEngine::AssetHandling
         {
             YAML::Node node = YAML::LoadFile(metaFilePath);
             std::unique_ptr<AssetMetadata> metadata = serializer.Deserialize(node, fullPath.value());
-            assetHandle = metadata->UUID;
+            assetHandle = {metadata->UUID, type};
             // TODO: Ugly absolute path hack. This should be stored relative to project root.
             metadata->Path = absolute(fullPath.value());
 
@@ -100,7 +100,7 @@ namespace RNGOEngine::AssetHandling
             // TODO: Another ugly absolute path hack
             metadata->Path = absolute(fullPath.value());
 
-            assetHandle = metadata->UUID;
+            assetHandle = {metadata->UUID, type};
             AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
         }
 
@@ -138,7 +138,7 @@ namespace RNGOEngine::AssetHandling
         // TODO: Another ugly absolute path hack
         metadata->Path = absolute(nonMetadataPath);
 
-        if (!AssetDatabase::GetInstance().IsRegistered(metadata->UUID))
+        if (!AssetDatabase::GetInstance().IsRegistered({metadata->UUID, type}))
         {
             AssetDatabase::GetInstance().RegisterAsset(type, std::move(metadata));
             RNGO_LOG(
@@ -161,7 +161,7 @@ namespace RNGOEngine::AssetHandling
         {
             RNGO_LOG(
                 Core::LogLevel::Error, "Attempted to load unregistered asset with handle {}.",
-                handle.GetValue()
+                handle.UUID.GetValue()
             );
 
             return;
@@ -174,7 +174,7 @@ namespace RNGOEngine::AssetHandling
         {
             RNGO_LOG(
                 Core::LogLevel::Debug, "Asset {} {} is already loaded.", magic_enum::enum_name(type),
-                handle.GetValue()
+                handle.UUID.GetValue()
             );
             return;
         }
@@ -186,7 +186,7 @@ namespace RNGOEngine::AssetHandling
         {
             RNGO_LOG(
                 Core::LogLevel::Error, "Loading {} {} failed with error: {}.", magic_enum::enum_name(type),
-                handle.GetValue(), magic_enum::enum_name(importResult)
+                handle.UUID.GetValue(), magic_enum::enum_name(importResult)
             );
         }
     }

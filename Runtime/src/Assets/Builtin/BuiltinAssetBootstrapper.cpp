@@ -65,7 +65,7 @@ namespace RNGOEngine::AssetHandling
         // TODO: shit ass material system
         auto handle = Utilities::GenerateUUID();
         MaterialParameters params;
-        materialManager.CreateMaterial(handle, fallbackShader, params);
-        s_errorHandles[static_cast<size_t>(AssetType::Material)] = handle;
+        materialManager.CreateMaterial(MaterialHandle{handle}, fallbackShader, params);
+        s_errorHandles[static_cast<size_t>(AssetType::Material)] = MaterialHandle{handle};
     }
 }

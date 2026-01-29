@@ -50,7 +50,7 @@ namespace RNGOEngine::AssetHandling
     };
 
     template<Concepts::DerivedFrom<Asset> TAsset>
-    using AssetMap = std::unordered_map<AssetHandle, AssetRegistryEntryT<TAsset>>;
+    using AssetMap = std::unordered_map<AssetHandle, AssetRegistryEntryT<TAsset>, AssetHandleHasher>;
 
     // TODO: Make Thread Safe
     class RuntimeAssetRegistry : public Utilities::Singleton<RuntimeAssetRegistry>

@@ -75,7 +75,7 @@ namespace RNGOEngine::AssetHandling
 
             // Upload to GPU
             auto result =
-                AssetManager::GetInstance().GetModelManager().UploadModel(modelMetadata.UUID, modelHandle);
+                AssetManager::GetInstance().GetModelManager().UploadModel(ModelHandle{modelMetadata.UUID}, modelHandle);
             auto& asset = result.value();
 
             if (!result)
@@ -83,7 +83,7 @@ namespace RNGOEngine::AssetHandling
                 return ImportingError::UnknownError;
             }
 
-            auto& entry = registry.Insert<ModelAsset>(modelMetadata.UUID, std::move(asset));
+            auto& entry = registry.Insert<ModelAsset>(ModelHandle{modelMetadata.UUID}, std::move(asset));
             entry.SetState(AssetState::Ready);
         }
 

@@ -14,8 +14,10 @@ namespace RNGOEngine::Components
     {
         MeshRenderer meshRenderer;
 
-        meshRenderer.ModelHandle = AssetHandling::AssetHandle(node["ModelHandle"].as<uint64_t>());
-        meshRenderer.MaterialKey = AssetHandling::AssetHandle(node["MaterialKey"].as<uint64_t>());
+        meshRenderer.ModelHandle =
+            AssetHandling::ModelHandle(Utilities::UUID{node["ModelHandle"].as<uint64_t>()});
+        meshRenderer.MaterialKey =
+            AssetHandling::MaterialHandle(Utilities::UUID{node["MaterialKey"].as<uint64_t>()});
 
         return meshRenderer;
     }

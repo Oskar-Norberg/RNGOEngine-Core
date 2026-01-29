@@ -67,7 +67,7 @@ namespace RNGOEngine::AssetHandling
     private:
         std::unordered_map<AssetType, std::unique_ptr<AssetMetadataStorage>> m_metadataStorages;
         // TODO: Slight memory waste storing the AssetType again here.
-        std::unordered_map<AssetHandle, std::pair<AssetType, size_t>> m_handleToStorageIndex;
+        std::unordered_map<AssetHandle, std::pair<AssetType, size_t>, AssetHandleHasher> m_handleToStorageIndex;
         std::unordered_map<std::filesystem::path, AssetHandle> m_pathToHandle;
 
     private:

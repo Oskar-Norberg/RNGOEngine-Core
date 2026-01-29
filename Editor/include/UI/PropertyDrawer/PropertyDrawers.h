@@ -63,13 +63,13 @@ namespace RNGOEngine::Editor
                         {
                             RNGO_LOG(
                                 Core::LogLevel::Warning, "Cannot load asset {} as Model.",
-                                dragAndDropPayload.Handle.GetValue()
+                                dragAndDropPayload.Handle.UUID.GetValue()
                             );
                         }
                         else
                         {
                             AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
-                            meshRenderer.ModelHandle = dragAndDropPayload.Handle;
+                            meshRenderer.ModelHandle = AssetHandling::ModelHandle{dragAndDropPayload.Handle.UUID};
                         }
                     }
 
@@ -81,7 +81,7 @@ namespace RNGOEngine::Editor
 
             // Material
             {
-                if (!Utilities::IsValidUUID(meshRenderer.MaterialKey))
+                if (!Utilities::IsValidUUID(meshRenderer.MaterialKey.UUID))
                 {
                     ImGui::PushID(&meshRenderer);
 
@@ -100,7 +100,7 @@ namespace RNGOEngine::Editor
                             {
                                 RNGO_LOG(
                                     Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
-                                    dragAndDropPayload.Handle.GetValue()
+                                    dragAndDropPayload.Handle.UUID.GetValue()
                                 );
                             }
                             else
@@ -114,9 +114,12 @@ namespace RNGOEngine::Editor
                                 const auto& materialAsset =
                                     AssetHandling::AssetManager::GetInstance()
                                         .GetMaterialManager()
-                                        .CreateMaterial(materialHandle, shaderHandle, params);
+                                        .CreateMaterial(
+                                            AssetHandling::MaterialHandle{materialHandle}, shaderHandle,
+                                            params
+                                        );
 
-                                meshRenderer.MaterialKey = materialHandle;
+                                meshRenderer.MaterialKey = AssetHandling::MaterialHandle{materialHandle};
                             }
                         }
 
@@ -148,7 +151,7 @@ namespace RNGOEngine::Editor
                             {
                                 RNGO_LOG(
                                     Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
-                                    dragAndDropPayload.Handle.GetValue()
+                                    dragAndDropPayload.Handle.UUID.GetValue()
                                 );
                             }
                             else
@@ -198,7 +201,7 @@ namespace RNGOEngine::Editor
                             {
                                 RNGO_LOG(
                                     Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
-                                    dragAndDropPayload.Handle.GetValue()
+                                    dragAndDropPayload.Handle.UUID.GetValue()
                                 );
                             }
                             else
