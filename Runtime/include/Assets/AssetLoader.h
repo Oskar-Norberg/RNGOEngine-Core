@@ -9,7 +9,7 @@
 #include "Asset.h"
 #include "AssetImporters/AssetImporter.h"
 #include "AssetSerializers/AssetSerializer.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine::AssetHandling

@@ -7,7 +7,7 @@
 #include <Assets/AssetLoader.h>
 
 #include "Assets/AssetManager/AssetManager.h"
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 #include "Logging/Logger.h"
 #include "UI/AssetDragAndDrop.h"
 #include "entt/entity/registry.hpp"

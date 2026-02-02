@@ -2,10 +2,10 @@
 // Created by Oskar.Norberg on 2026-01-29.
 //
 
-#include "Systems/Core/Physics/RigidbodyGravitySystem.h"
+#include "ECS/Systems/Core/Physics/RigidbodyGravitySystem.h"
 
-#include "Systems/SystemContext.h"
-#include "World/World.h"
+#include "ECS/Systems/SystemContext.h"
+#include "Scene/World/World.h"
 
 namespace RNGOEngine::Systems::Core
 {

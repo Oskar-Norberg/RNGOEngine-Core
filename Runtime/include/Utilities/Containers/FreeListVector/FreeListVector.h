@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "Utilities/RNGOAsserts.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 
 namespace RNGOEngine::Containers
 {

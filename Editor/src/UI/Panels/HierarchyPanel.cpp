@@ -4,7 +4,7 @@
 
 #include "UI/Panels/HierarchyPanel.h"
 
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/Managers/UISelectionManager.h"
 #include "glm/gtc/type_ptr.inl"

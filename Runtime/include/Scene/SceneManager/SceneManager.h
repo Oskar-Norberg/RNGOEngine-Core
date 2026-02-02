@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "Scene/Scene.h"
 
 namespace RNGOEngine::Core

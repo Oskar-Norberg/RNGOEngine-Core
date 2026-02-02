@@ -3,7 +3,7 @@ add_library(${UTILITIES_PROJECT_NAME} STATIC
         include/Utilities/RNGOAsserts.h
         
         include/Utilities/IO/SimpleFileReader/SimpleFileReader.h
-        include/Benchmarking/STDOUTStopwatch.h
+        include/Utilities/Benchmarking/STDOUTStopwatch.h
         
         include/Utilities/AssetCache/AssetCache.h
         include/Utilities/AssetCache/AssetCache.tpp

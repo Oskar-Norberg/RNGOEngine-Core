@@ -4,11 +4,11 @@
 
 #include "ECS/Systems/FreeFlyCameraSystem.h"
 
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 #include "Data/KeyCodes.h"
 #include "Data/MouseCodes.h"
-#include "Systems/SystemContext.h"
-#include "World/World.h"
+#include "ECS/Systems/SystemContext.h"
+#include "Scene/World/World.h"
 
 namespace RNGOEngine::Editor
 {

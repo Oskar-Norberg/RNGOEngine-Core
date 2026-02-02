@@ -2,17 +2,17 @@
 // Created by ringo on 2025-09-21.
 //
 
-#include "Systems/Core/Rendering/RenderSystem.h"
+#include "ECS/Systems/Core/Rendering/RenderSystem.h"
 
 #include "Assets/AssetLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
-#include "Profiling/Profiling.h"
+#include "Utilities/Profiling/Profiling.h"
 #include "Renderer/API/RenderAPI.h"
-#include "Systems/SystemContext.h"
+#include "ECS/Systems/SystemContext.h"
 #include "Utilities/RNGOAsserts.h"
-#include "World/World.h"
+#include "Scene/World/World.h"
 
 namespace RNGOEngine::Systems::Core
 {

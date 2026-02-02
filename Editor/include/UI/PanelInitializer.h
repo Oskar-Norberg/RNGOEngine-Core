@@ -7,7 +7,7 @@
 #include <memory>
 #include <span>
 
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "IDockablePanel.h"
 
 namespace RNGOEngine::Editor::UI

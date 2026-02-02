@@ -8,7 +8,7 @@
 #include "AssetTypes/ModelAsset.h"
 #include "AssetTypes/ShaderAsset.h"
 #include "AssetTypes/TextureAsset.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 
 namespace RNGOEngine::AssetHandling
 {

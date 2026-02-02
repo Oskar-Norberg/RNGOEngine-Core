@@ -3,8 +3,8 @@ add_library(${SCENE_PROJECT_NAME} STATIC
         include/ECS/Entity/Entity.h
         include/ECS/Entity/Entity.tpp
 
-        include/World/World.h
-        src/World/World.cpp
+        include/Scene/World/World.h
+        src/Scene/World/World.cpp
         
         include/Scene/Scene.h
         src/Scene/Scene.cpp

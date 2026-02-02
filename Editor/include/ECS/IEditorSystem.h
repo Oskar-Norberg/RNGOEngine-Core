@@ -5,7 +5,7 @@
 #pragma once
 
 #include "EditorSystemContext.h"
-#include "Systems/ISystem.h"
+#include "ECS/Systems/ISystem.h"
 
 namespace RNGOEngine::Editor
 {

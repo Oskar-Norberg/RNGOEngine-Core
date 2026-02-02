@@ -9,7 +9,7 @@
 #include <typeindex>
 #include <unordered_map>
 
-#include "Profiling/Profiling.h"
+#include "Utilities/Profiling/Profiling.h"
 
 namespace RNGOEngine::Events
 {

@@ -8,7 +8,7 @@
 
 #include "Renderer/DrawQueue.h"
 #include "Renderer/RenderID.h"
-#include "Systems/ISystem.h"
+#include "ECS/Systems/ISystem.h"
 
 namespace RNGOEngine
 {

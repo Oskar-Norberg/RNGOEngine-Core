@@ -1,8 +1,8 @@
 set(COMPONENT_PROJECT_NAME RNGOEngine_Components)
 add_library(${COMPONENT_PROJECT_NAME} INTERFACE
-        include/Components/Components.h
-        include/Components/ComponentSerializers.h
-        include/Components/ComponentDeserializers.h
+        include/ECS/Components/Components.h
+        include/ECS/Components/ComponentSerializers.h
+        include/ECS/Components/ComponentDeserializers.h
 )
 target_include_directories(${COMPONENT_PROJECT_NAME} INTERFACE include)
 target_link_libraries(${COMPONENT_PROJECT_NAME} INTERFACE yaml-cpp)

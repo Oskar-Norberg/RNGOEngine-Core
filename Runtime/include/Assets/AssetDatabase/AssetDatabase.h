@@ -9,7 +9,7 @@
 #include "Assets/Asset.h"
 #include "Assets/AssetMetadataStorage.h"
 #include  "Assets/AssetMetadataTypes.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "Utilities/Singleton/Singleton.h"
 #include "Utilities/UUID/UUID.h"
 #include "Utilities/RNGOAsserts.h"

@@ -11,7 +11,7 @@
 #include "Assets/AssetTypes/ModelAsset.h"
 #include "Assets/AssetTypes/ShaderAsset.h"
 #include "Assets/AssetTypes/TextureAsset.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine::AssetHandling

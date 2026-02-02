@@ -2,10 +2,10 @@
 // Created by ringo on 2026-01-27.
 //
 
-#include "Systems/Core/Physics/CollisionSystem.h"
+#include "ECS/Systems/Core/Physics/CollisionSystem.h"
 
-#include "Systems/SystemContext.h"
-#include "World/World.h"
+#include "ECS/Systems/SystemContext.h"
+#include "Scene/World/World.h"
 
 namespace RNGOEngine::Systems::Core
 {
