@@ -21,9 +21,20 @@ namespace RNGOEngine::Systems::Core
         std::vector<CollisionData> collisions;
     };
 
+    // TODO: Broadphase
     class CollisionSystem : public EngineSystem
     {
     public:
         void Update(RNGOEngine::Core::World& world, EngineSystemContext& context) override;
+
+    private:
+        void SphereToSphereCollisionDetection(
+            RNGOEngine::Core::World& world, CollisionList& collisions
+        );
+
+        void BoxToBoxCollisionDetection(
+            RNGOEngine::Core::World& world, CollisionList& collisions
+        );
+
     };
 }
