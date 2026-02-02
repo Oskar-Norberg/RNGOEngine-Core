@@ -27,5 +27,5 @@ namespace RNGOEngine::Utilities
         std::optional<std::future<T>> m_future;
     };
 
-#include "Utilities/JobSystem/Handle/JobHandle.tpp"
+#include "Utilities/JobSystem/Handle/JobHandle.inl"
 }

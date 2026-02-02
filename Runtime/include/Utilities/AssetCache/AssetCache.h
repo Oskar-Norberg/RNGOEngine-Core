@@ -26,5 +26,5 @@ namespace RNGOEngine::Utilities
         std::unordered_map<T, T2, Hash> m_cache;
     };
 
-#include "Utilities/AssetCache/AssetCache.tpp"
+#include "Utilities/AssetCache/AssetCache.inl"
 }

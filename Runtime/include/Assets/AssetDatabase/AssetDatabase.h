@@ -74,5 +74,5 @@ namespace RNGOEngine::AssetHandling
         const AssetMetadata* GetMetadataOrNullptr(const AssetHandle& handle) const;
     };
 
-#include "AssetDatabase.tpp"
+#include "AssetDatabase.inl"
 }

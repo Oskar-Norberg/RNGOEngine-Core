@@ -47,5 +47,5 @@ namespace RNGOEngine::Systems
 
     
 
-#include "SystemScheduler.tpp"
+#include "SystemScheduler.inl"
 }

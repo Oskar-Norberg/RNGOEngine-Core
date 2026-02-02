@@ -3,7 +3,7 @@ add_library(${SYSTEM_PROJECT_NAME} STATIC
         include/ECS/Systems/ISystem.h
         include/ECS/Systems/SystemContext.h
         include/ECS/Systems/SystemScheduler.h
-        include/ECS/Systems/SystemScheduler.tpp
+        include/ECS/Systems/SystemScheduler.inl
         include/ECS/Systems/ResourceMap.h
         include/ECS/Systems/ResourceMapper.h
 )

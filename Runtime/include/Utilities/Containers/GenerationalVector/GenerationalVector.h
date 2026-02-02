@@ -52,8 +52,8 @@ namespace RNGOEngine::Containers
     class GenerationalVector
     {
     public:
-#include "UnmarkedIterator.tpp"
-#include "MarkedIterator.tpp"
+#include "UnmarkedIterator.inl"
+#include "MarkedIterator.inl"
 
     public:
         inline static const GenerationalKey<T> INVALID_GENERATIONAL_KEY = GenerationalKey<T>{
@@ -137,7 +137,7 @@ namespace RNGOEngine::Containers
         bool IsMarked(const GenerationalKey<T>& key) const;
     };
 
-#include "GenerationalVector.tpp"
+#include "GenerationalVector.inl"
 }
 
 // Hash Function for GenerationalKeys

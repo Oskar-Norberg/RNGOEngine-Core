@@ -33,5 +33,5 @@ namespace RNGOEngine::Core
         std::unique_ptr<Scene> m_pendingScene;
     };
 
-#include "SceneManager.tpp"
+#include "SceneManager.inl"
 }

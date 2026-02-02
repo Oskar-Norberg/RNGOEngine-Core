@@ -99,5 +99,5 @@ namespace RNGOEngine::AssetHandling
             m_assetStorage;
     };
 
-#include "RuntimeAssetRegistry.tpp"
+#include "RuntimeAssetRegistry.inl"
 }

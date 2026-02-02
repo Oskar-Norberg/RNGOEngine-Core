@@ -33,5 +33,5 @@ namespace RNGOEngine::Containers
         std::vector<size_t> m_freeIndices;
     };
 
-#include "FreeListVector.tpp"
+#include "FreeListVector.inl"
 }

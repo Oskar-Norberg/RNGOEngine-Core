@@ -143,5 +143,5 @@ namespace RNGOEngine::Containers::Graphs
         inline void SetChildren(NodeID id, std::array<NodeID, 4> children);
     };
 
-#include "Utilities/Containers/QuadTree/QuadTree.tpp"
+#include "Utilities/Containers/QuadTree/QuadTree.inl"
 }
