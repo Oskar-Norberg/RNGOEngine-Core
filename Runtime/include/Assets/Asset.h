@@ -7,14 +7,12 @@
 #include <filesystem>
 #include <utility>
 
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
+#include "Utilities/Hash/PairHash.h"
 #include "Utilities/UUID/UUID.h"
 
 namespace RNGOEngine::AssetHandling
 {
-    // TODO: AssetHandles should store Type.
-    using AssetHandle = Utilities::UUID;
-
     // NOTE: To add new AssetType, add here and create corresponding Metadata struct inheriting from AssetMetadata.
     // Then update AssetMetadataTypes.h to map Metadata to AssetType.
     // Also create corresponding AssetImporter and register it in AssetLoader.
@@ -34,6 +32,46 @@ namespace RNGOEngine::AssetHandling
     };
     // TODO: this should probably be replaced with the magic_enum count instead.
     constexpr std::size_t AssetTypeCount = std::to_underlying(AssetType::Count);
+
+    struct AssetHandle
+    {
+        Utilities::UUID UUID;
+        AssetType Type = AssetType::None;
+
+        bool operator==(const AssetHandle&) const = default;
+    };
+
+    template<AssetType T>
+    struct AssetHandleT : AssetHandle
+    {
+        static constexpr AssetType TypeValue = T;
+
+        AssetHandleT()
+            : AssetHandle{{}, T}
+        {
+        }
+
+        explicit AssetHandleT(const Utilities::UUID& uuid)
+            : AssetHandle{uuid, T}
+        {
+        }
+    };
+
+    using ModelHandle = AssetHandleT<AssetType::Model>;
+    using TextureHandle = AssetHandleT<AssetType::Texture>;
+    using ShaderHandle = AssetHandleT<AssetType::Shader>;
+    using MaterialHandle = AssetHandleT<AssetType::Material>;
+
+    struct AssetHandleHasher
+    {
+        std::size_t operator()(const AssetHandle& assetHandle) const
+        {
+            const std::size_t h1 = std::hash<Utilities::UUID>()(assetHandle.UUID);
+            const std::size_t h2 =
+                std::hash<std::underlying_type_t<AssetType>>()(std::to_underlying(assetHandle.Type));
+            return Utilities::Hash::CombineHashes(h1, h2);
+        }
+    };
 
     enum class AssetState
     {

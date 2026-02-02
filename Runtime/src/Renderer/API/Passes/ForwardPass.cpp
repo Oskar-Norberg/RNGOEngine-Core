@@ -7,7 +7,7 @@
 #include <format>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Profiling/Profiling.h"
+#include "Utilities/Profiling/Profiling.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
 

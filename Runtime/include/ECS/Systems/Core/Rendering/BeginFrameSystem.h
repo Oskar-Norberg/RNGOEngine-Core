@@ -5,7 +5,7 @@
 #pragma once
 
 #include "Renderer/API/RenderAPI.h"
-#include "Systems/ISystem.h"
+#include "ECS/Systems/ISystem.h"
 
 namespace RNGOEngine::Systems::Core
 {

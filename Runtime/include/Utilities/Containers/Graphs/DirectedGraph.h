@@ -38,5 +38,5 @@ namespace RNGOEngine::Containers::Graphs
                  std::function<void(VertexPtr)> callback);
     };
 
-#include "DirectedGraph.tpp"
+#include "DirectedGraph.inl"
 }

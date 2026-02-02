@@ -1,66 +1,80 @@
 ﻿//
-// Created by Oskar.Norberg on 2026-01-28.
+// Created by Oskar.Norberg on 2026-01-29.
 //
 
-#include "Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
+#include "ECS/Systems/Core/Rendering/Debug/RenderDebugCollisionsSystem.h"
 
 #include "Assets/AssetLoader.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "Data/FallbackAssets.h"
 #include "Logging/Logger.h"
 #include "Renderer/API/RenderAPI.h"
-#include "Renderer/DrawQueue.h"
 #include "ResourceManager/ResourceManager.h"
-#include "Systems/SystemContext.h"
-#include "World/World.h"
+#include "ECS/Systems/Core/Physics/CollisionSystem.h"
+#include "ECS/Systems/SystemContext.h"
+#include "Scene/World/World.h"
 
 namespace RNGOEngine::Systems::Core
 {
-    void RenderDebugCollidersSystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
+    void RenderDebugCollisionsSystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
     {
         EngineSystem::Update(world, context);
+        const static auto debugColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        constexpr auto DEBUG_SPHERE_SCALE = 0.5f;
 
-        SubmitSphereColliders(world, *context.Renderer);
-    }
+        auto& renderAPI = *context.Renderer;
 
-    void RenderDebugCollidersSystem::SubmitSphereColliders(
-        RNGOEngine::Core::World& world, RNGOEngine::Core::Renderer::RenderAPI& renderAPI
-    )
-    {
-        static const auto debugColor = glm::vec4(0.0f, 0.0f, 1.0f, 1.0f);
-
-        const auto colliderView =
-            world.GetRegistry().view<Components::Transform, Components::SphereCollider>();
-
-        const auto wireframeShaderOpt = GetWireframeShaderProgram();
+        const auto shaderOpt = GetWireframeShaderProgram();
         const auto sphereMeshOpt = GetSphereMesh();
-        if (!wireframeShaderOpt || !sphereMeshOpt)
+        if (!shaderOpt || !sphereMeshOpt)
         {
             RNGO_LOG(
                 RNGOEngine::Core::LogLevel::Warning,
-                "Unable to render debug sphere colliders - Missing wireframe shader or sphere mesh."
+                "Unable to render debug collisions - Missing wireframe shader or sphere mesh."
             );
             return;
         }
 
-        RNGOEngine::Core::Renderer::GPUModel sphereModel{.Meshes = {sphereMeshOpt.value()}};
         RNGOEngine::Core::Renderer::GPUMaterial wireframeMaterial{
-            .ShaderProgram = wireframeShaderOpt.value(), .Parameters = {{"LineColor", debugColor}}
+            .ShaderProgram = shaderOpt.value(), .Parameters = {{"LineColor", debugColor}}
         };
 
-        for (const auto& [entity, transform, sphereCollider] : colliderView.each())
-        {
-            RNGOEngine::Core::Renderer::Drawable debugSphereDrawable{
-                transform, sphereModel, wireframeMaterial
-            };
-            debugSphereDrawable.Transform.Scale *= sphereCollider.Radius;
+        CollisionList collisions;
+        const auto collisionsFound =
+            context.EngineResourceMapper->TryGetTransientResource<CollisionList>(collisions);
 
-            renderAPI.SubmitDrawable(debugSphereDrawable);
+        if (!collisionsFound)
+        {
+            RNGO_LOG(
+                RNGOEngine::Core::LogLevel::Warning, "No collision data found, is CollisionSystem running?"
+            );
+            return;
+        }
+
+        for (const auto& collisionData : collisions.collisions)
+        {
+            auto entityA = collisionData.EntityA;
+            auto entityB = collisionData.EntityB;
+
+            const auto& transformA = world.GetRegistry().get<Components::Transform>(entityA);
+            const auto& transformB = world.GetRegistry().get<Components::Transform>(entityB);
+
+            const auto midPoint = (transformA.Position + transformB.Position) / 2.0f;
+
+            const Components::Transform transform = {
+                .Position = midPoint, .Rotation = glm::quat(), .Scale = glm::vec3(DEBUG_SPHERE_SCALE)
+            };
+
+            renderAPI.SubmitDrawable(
+                {transform, RNGOEngine::Core::Renderer::GPUModel{.Meshes = {sphereMeshOpt.value()}},
+                 wireframeMaterial}
+            );
         }
     }
 
+    // TODO: Copy pasted bullshit.
     std::optional<RNGOEngine::Core::Renderer::ShaderProgramID>
-    RenderDebugCollidersSystem::GetWireframeShaderProgram()
+    RenderDebugCollisionsSystem::GetWireframeShaderProgram()
     {
         // TODO: This will just circumvent the entire AssetLoading step, probably unsafe but I cannot be arsed.
         if (m_wireframeShaderProgram)
@@ -91,7 +105,7 @@ namespace RNGOEngine::Systems::Core
         return m_wireframeShaderProgram;
     }
 
-    std::optional<RNGOEngine::Core::Renderer::GPUMesh> RenderDebugCollidersSystem::GetSphereMesh()
+    std::optional<RNGOEngine::Core::Renderer::GPUMesh> RenderDebugCollisionsSystem::GetSphereMesh()
     {
         if (m_sphereMesh)
         {

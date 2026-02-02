@@ -5,8 +5,8 @@
 #include "Scene/Scene.h"
 
 #include "Assets/AssetLoader.h"
-#include "Components/ComponentDeserializers.h"
-#include "Components/ComponentSerializers.h"
+#include "ECS/Components/ComponentDeserializers.h"
+#include "ECS/Components/ComponentSerializers.h"
 
 namespace RNGOEngine::Core
 {

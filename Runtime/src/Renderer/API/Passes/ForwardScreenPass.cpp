@@ -6,7 +6,7 @@
 
 #include "Assets/AssetLoader.h"
 #include "Assets/AssetManager/AssetManager.h"
-#include "Profiling/Profiling.h"
+#include "Utilities/Profiling/Profiling.h"
 #include "Renderer/API/RenderPass/RenderContext.h"
 #include "Renderer/IRenderer.h"
 

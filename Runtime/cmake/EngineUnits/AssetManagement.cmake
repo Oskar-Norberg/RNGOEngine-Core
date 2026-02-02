@@ -44,14 +44,14 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
 
         # Runtime Asset Registry
         include/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h
-        include/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.tpp
+        include/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.inl
         src/Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.cpp
         
         include/Assets/AssetMetadataStorage.h
         
         # Asset Database
         include/Assets/AssetDatabase/AssetDatabase.h
-        include/Assets/AssetDatabase/AssetDatabase.tpp
+        include/Assets/AssetDatabase/AssetDatabase.inl
         src/Assets/AssetDatabase/AssetDatabase.cpp
 
         include/Assets/AssetManager/AssetManager.h

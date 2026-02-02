@@ -22,5 +22,5 @@ namespace RNGOEngine::Utilities
         ThreadPool::ThreadPool m_threadPool;
     };
 
-#include "Utilities/JobSystem/JobSystem.tpp"
+#include "Utilities/JobSystem/JobSystem.inl"
 }

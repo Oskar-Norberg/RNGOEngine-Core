@@ -1,7 +1,7 @@
 set(PROFILING_PROJECT_NAME RNGOEngine_Profiling)
 add_library(${PROFILING_PROJECT_NAME} STATIC
-        include/Profiling/Profiling.h
-        src/Profiling/Profiling.cpp
+        include/Utilities/Profiling/Profiling.h
+        src/Utilities/Profiling/Profiling.cpp
 )
 target_include_directories(${PROFILING_PROJECT_NAME} INTERFACE include)
 if (RNGOENGINE_TRACY_ENABLE)

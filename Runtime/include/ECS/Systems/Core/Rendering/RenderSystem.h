@@ -6,7 +6,7 @@
 
 #include "Renderer/DrawQueue.h"
 #include "ResourceManager/MeshResourceManager/MeshResourceManager.h"
-#include "Systems/ISystem.h"
+#include "ECS/Systems/ISystem.h"
 #include "Utilities/Containers/GenerationalVector/GenerationalVector.h"
 
 namespace RNGOEngine::Core::Renderer

@@ -6,7 +6,7 @@
 
 #include <entt/entt.hpp>
 
-#include "Systems/ISystem.h"
+#include "ECS/Systems/ISystem.h"
 
 namespace RNGOEngine::Systems::Core
 {

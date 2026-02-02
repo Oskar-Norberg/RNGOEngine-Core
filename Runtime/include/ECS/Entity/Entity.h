@@ -54,5 +54,5 @@ namespace RNGOEngine::Core
         entt::registry& m_registry;
     };
 
-#include "Entity.tpp"
+#include "Entity.inl"
 }

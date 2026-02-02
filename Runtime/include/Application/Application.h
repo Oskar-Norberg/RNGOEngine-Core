@@ -16,8 +16,8 @@
 #include "Renderer/API/RenderAPI.h"
 #include "Renderer/IRenderer.h"
 #include "Scene/SceneManager/SceneManager.h"
-#include "Systems/SystemContext.h"
-#include "Systems/SystemScheduler.h"
+#include "ECS/Systems/SystemContext.h"
+#include "ECS/Systems/SystemScheduler.h"
 #include "Utilities/JobSystem/JobSystem.h"
 #include "Window/IWindow.h"
 

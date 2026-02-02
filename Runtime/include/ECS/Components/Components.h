@@ -43,8 +43,8 @@ namespace RNGOEngine::Components
 
     struct MeshRenderer
     {
-        AssetHandling::AssetHandle ModelHandle;
-        AssetHandling::AssetHandle MaterialKey;
+        AssetHandling::ModelHandle ModelHandle;
+        AssetHandling::MaterialHandle MaterialKey;
     };
 
     struct Camera

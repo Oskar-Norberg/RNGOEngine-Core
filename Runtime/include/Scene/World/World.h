@@ -6,7 +6,7 @@
 
 #include <entt/entt.hpp>
 
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 #include "ECS/Entity/Entity.h"
 
 namespace RNGOEngine::Core

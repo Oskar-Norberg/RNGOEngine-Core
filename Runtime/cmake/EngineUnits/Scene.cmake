@@ -1,16 +1,16 @@
 set(SCENE_PROJECT_NAME RNGOEngine_Scene)
 add_library(${SCENE_PROJECT_NAME} STATIC
         include/ECS/Entity/Entity.h
-        include/ECS/Entity/Entity.tpp
+        include/ECS/Entity/Entity.inl
 
-        include/World/World.h
-        src/World/World.cpp
+        include/Scene/World/World.h
+        src/Scene/World/World.cpp
         
         include/Scene/Scene.h
         src/Scene/Scene.cpp
 
         include/Scene/SceneManager/SceneManager.h
-        include/Scene/SceneManager/SceneManager.tpp
+        include/Scene/SceneManager/SceneManager.inl
         src/Scene/SceneManager/SceneManager.cpp
 )
 target_include_directories(${SCENE_PROJECT_NAME} PUBLIC include)

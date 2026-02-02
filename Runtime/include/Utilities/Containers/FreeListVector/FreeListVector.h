@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "Utilities/RNGOAsserts.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 
 namespace RNGOEngine::Containers
 {
@@ -33,5 +33,5 @@ namespace RNGOEngine::Containers
         std::vector<size_t> m_freeIndices;
     };
 
-#include "FreeListVector.tpp"
+#include "FreeListVector.inl"
 }

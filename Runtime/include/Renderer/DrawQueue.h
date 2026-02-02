@@ -9,7 +9,7 @@
 #include <vector>
 
 // TODO: This should probably not be linked directly to Components. Make a GPUTransform?
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 #include "Data/Shaders/ShaderSpecification.h"
 #include "RenderID.h"
 

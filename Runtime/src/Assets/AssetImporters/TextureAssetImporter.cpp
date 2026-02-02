@@ -66,7 +66,7 @@ namespace RNGOEngine::AssetHandling
             );
 
             auto textureResult = AssetManager::GetInstance().GetTextureManager().UploadTexture(
-                textureMetadata.UUID, properties, textureData.width, textureData.height,
+                TextureHandle{textureMetadata.UUID}, properties, textureData.width, textureData.height,
                 std::as_bytes(textureDataSpan)
             );
 
@@ -84,7 +84,8 @@ namespace RNGOEngine::AssetHandling
             // Unload Model from RAM
             TextureLoader::FreeTexture(textureData);
 
-            auto& entry = registry.Insert<TextureAsset>(textureMetadata.UUID, std::move(textureResult.value()));
+            auto& entry =
+                registry.Insert<TextureAsset>(TextureHandle{textureMetadata.UUID}, std::move(textureResult.value()));
             entry.SetState(AssetState::Ready);
         }
 

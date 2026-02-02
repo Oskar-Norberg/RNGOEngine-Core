@@ -16,7 +16,7 @@ int main()
         RNGOEngine::PipelineType::Forward,
         1280,
         720,
-        "The Renderer",
+        "RNGOEngine Editor",
         assetPaths,
         true
     };

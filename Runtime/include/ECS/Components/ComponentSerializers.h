@@ -12,8 +12,8 @@ namespace RNGOEngine::Components
     static void SerializeMeshRenderer(const MeshRenderer& meshRenderer, YAML::Emitter& emitter)
     {
         emitter << YAML::Key << "MeshRenderer" << YAML::Value << YAML::BeginMap;
-        emitter << YAML::Key << "ModelHandle" << YAML::Value << meshRenderer.ModelHandle.GetValue();
-        emitter << YAML::Key << "MaterialKey" << YAML::Value << meshRenderer.MaterialKey.GetValue();
+        emitter << YAML::Key << "ModelHandle" << YAML::Value << meshRenderer.ModelHandle.UUID.GetValue();
+        emitter << YAML::Key << "MaterialKey" << YAML::Value << meshRenderer.MaterialKey.UUID.GetValue();
         emitter << YAML::EndMap;
     }
 

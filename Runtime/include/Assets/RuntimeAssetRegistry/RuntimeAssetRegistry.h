@@ -11,7 +11,7 @@
 #include "Assets/AssetTypes/ModelAsset.h"
 #include "Assets/AssetTypes/ShaderAsset.h"
 #include "Assets/AssetTypes/TextureAsset.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "Utilities/Singleton/Singleton.h"
 
 namespace RNGOEngine::AssetHandling
@@ -50,7 +50,7 @@ namespace RNGOEngine::AssetHandling
     };
 
     template<Concepts::DerivedFrom<Asset> TAsset>
-    using AssetMap = std::unordered_map<AssetHandle, AssetRegistryEntryT<TAsset>>;
+    using AssetMap = std::unordered_map<AssetHandle, AssetRegistryEntryT<TAsset>, AssetHandleHasher>;
 
     // TODO: Make Thread Safe
     class RuntimeAssetRegistry : public Utilities::Singleton<RuntimeAssetRegistry>
@@ -99,5 +99,5 @@ namespace RNGOEngine::AssetHandling
             m_assetStorage;
     };
 
-#include "RuntimeAssetRegistry.tpp"
+#include "RuntimeAssetRegistry.inl"
 }

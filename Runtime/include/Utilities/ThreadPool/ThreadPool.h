@@ -35,5 +35,5 @@ namespace RNGOEngine::Utilities::ThreadPool
 
     void ThreadJob(ThreadPool& threadPool);
 
-#include "Utilities/ThreadPool/ThreadPool.tpp"
+#include "Utilities/ThreadPool/ThreadPool.inl"
 }

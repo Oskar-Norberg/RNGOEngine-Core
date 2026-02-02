@@ -2,9 +2,9 @@
 // Created by Oskar.Norberg on 2025-06-17.
 //
 
-#include "World/World.h"
+#include "Scene/World/World.h"
 
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 
 namespace RNGOEngine::Core
 {

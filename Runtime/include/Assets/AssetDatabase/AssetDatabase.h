@@ -9,7 +9,7 @@
 #include "Assets/Asset.h"
 #include "Assets/AssetMetadataStorage.h"
 #include  "Assets/AssetMetadataTypes.h"
-#include "Concepts/Concepts.h"
+#include "Utilities/Concepts/Concepts.h"
 #include "Utilities/Singleton/Singleton.h"
 #include "Utilities/UUID/UUID.h"
 #include "Utilities/RNGOAsserts.h"
@@ -67,12 +67,12 @@ namespace RNGOEngine::AssetHandling
     private:
         std::unordered_map<AssetType, std::unique_ptr<AssetMetadataStorage>> m_metadataStorages;
         // TODO: Slight memory waste storing the AssetType again here.
-        std::unordered_map<AssetHandle, std::pair<AssetType, size_t>> m_handleToStorageIndex;
+        std::unordered_map<AssetHandle, std::pair<AssetType, size_t>, AssetHandleHasher> m_handleToStorageIndex;
         std::unordered_map<std::filesystem::path, AssetHandle> m_pathToHandle;
 
     private:
         const AssetMetadata* GetMetadataOrNullptr(const AssetHandle& handle) const;
     };
 
-#include "AssetDatabase.tpp"
+#include "AssetDatabase.inl"
 }

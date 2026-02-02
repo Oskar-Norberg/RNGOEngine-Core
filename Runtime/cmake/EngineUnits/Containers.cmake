@@ -3,15 +3,15 @@ add_library(${CONTAINERS_PROJECT_NAME} INTERFACE
         include/Utilities/Containers/Graphs/DirectedGraph.h
         
         include/Utilities/Containers/QuadTree/QuadTree.h
-        include/Utilities/Containers/QuadTree/QuadTree.tpp
+        include/Utilities/Containers/QuadTree/QuadTree.inl
 
         include/Utilities/Containers/FreeListVector/FreeListVector.h
         
         include/Utilities/Containers/GenerationalVector/GenerationalVector.h
-        include/Utilities/Containers/GenerationalVector/GenerationalVector.tpp
+        include/Utilities/Containers/GenerationalVector/GenerationalVector.inl
         
-        include/Utilities/Containers/GenerationalVector/MarkedIterator.tpp
-        include/Utilities/Containers/GenerationalVector/UnmarkedIterator.tpp
+        include/Utilities/Containers/GenerationalVector/MarkedIterator.inl
+        include/Utilities/Containers/GenerationalVector/UnmarkedIterator.inl
         
         include/Utilities/Containers/TSQueue/TSQueue.h
 )
