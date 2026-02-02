@@ -48,6 +48,15 @@ namespace RNGOEngine::Components
         emitter << YAML::EndMap;
     }
 
+    static void SerializeBoxCollider(const BoxCollider& boxCollider, YAML::Emitter& emitter)
+    {
+        emitter << YAML::Key << "BoxCollider" << YAML::Value << YAML::BeginMap;
+        emitter << YAML::Key << "HalfExtents" << YAML::Value << YAML::Flow << YAML::BeginSeq
+                << boxCollider.HalfExtents.x << boxCollider.HalfExtents.y << boxCollider.HalfExtents.z
+                << YAML::EndSeq;
+        emitter << YAML::EndMap;
+    }
+
     static void SerializeRigidbody(const Rigidbody& rigidbody, YAML::Emitter& emitter)
     {
         emitter << YAML::Key << "Rigidbody" << YAML::Value << YAML::BeginMap;

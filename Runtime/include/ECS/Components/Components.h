@@ -59,6 +59,11 @@ namespace RNGOEngine::Components
         float Radius = 1.0f;
     };
 
+    struct BoxCollider
+    {
+        glm::vec3 HalfExtents = glm::vec3(0.5f, 0.5f, 0.5f);
+    };
+
     // TODO: More properties
     struct Rigidbody
     {

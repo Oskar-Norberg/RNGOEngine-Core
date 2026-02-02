@@ -30,6 +30,7 @@ namespace RNGOEngine::Editor
         DrawComponent<Components::MeshRenderer>(registry, selectedEntity);
         DrawComponent<Components::Camera>(registry, selectedEntity);
         DrawComponent<Components::SphereCollider>(registry, selectedEntity);
+        DrawComponent<Components::BoxCollider>(registry, selectedEntity);
         DrawComponent<Components::Rigidbody>(registry, selectedEntity);
         DrawComponent<Components::Color>(registry, selectedEntity);
         DrawComponent<Components::Intensity>(registry, selectedEntity);
@@ -52,6 +53,7 @@ namespace RNGOEngine::Editor
             DrawAddComponent<Components::MeshRenderer>(registry, selectedEntity, "MeshRenderer");
             DrawAddComponent<Components::Camera>(registry, selectedEntity, "Camera");
             DrawAddComponent<Components::SphereCollider>(registry, selectedEntity, "SphereCollider");
+            DrawAddComponent<Components::BoxCollider>(registry, selectedEntity, "BoxCollider");
             DrawAddComponent<Components::Rigidbody>(registry, selectedEntity, "Rigidbody");
             DrawAddComponent<Components::Color>(registry, selectedEntity, "Color");
             DrawAddComponent<Components::Intensity>(registry, selectedEntity, "Intensity");

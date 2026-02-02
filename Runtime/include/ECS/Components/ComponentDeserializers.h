@@ -62,6 +62,17 @@ namespace RNGOEngine::Components
         return sphereCollider;
     }
 
+    static BoxCollider DeserializeBoxCollider(const YAML::Node& node)
+    {
+        BoxCollider boxCollider;
+        auto& halfExtentsNode = node["HalfExtents"];
+        boxCollider.HalfExtents = glm::vec3(
+            halfExtentsNode[0].as<float>(), halfExtentsNode[1].as<float>(), halfExtentsNode[2].as<float>()
+        );
+
+        return boxCollider;
+    }
+
     static Rigidbody DeserializeRigidbody(const YAML::Node& node)
     {
         Rigidbody rigidbody;

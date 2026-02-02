@@ -31,6 +31,10 @@ namespace RNGOEngine::Core
         {
             Components::SerializeSphereCollider(registry.get<Components::SphereCollider>(entity), emitter);
         }
+        if (registry.any_of<Components::BoxCollider>(entity))
+        {
+            Components::SerializeBoxCollider(registry.get<Components::BoxCollider>(entity), emitter);
+        }
         if (registry.any_of<Components::Rigidbody>(entity))
         {
             Components::SerializeRigidbody(registry.get<Components::Rigidbody>(entity), emitter);
@@ -92,6 +96,11 @@ namespace RNGOEngine::Core
         {
             auto sphereCollider = Components::DeserializeSphereCollider(node["SphereCollider"]);
             registry.emplace<Components::SphereCollider>(entity, sphereCollider);
+        }
+        if (node["BoxCollider"])
+        {
+            auto boxCollider = Components::DeserializeBoxCollider(node["BoxCollider"]);
+            registry.emplace<Components::BoxCollider>(entity, boxCollider);
         }
         if (node["Rigidbody"])
         {
