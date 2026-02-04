@@ -69,7 +69,8 @@ namespace RNGOEngine::Editor
                         else
                         {
                             AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
-                            meshRenderer.ModelHandle = AssetHandling::ModelHandle{dragAndDropPayload.Handle.UUID};
+                            meshRenderer.ModelHandle =
+                                AssetHandling::ModelHandle{dragAndDropPayload.Handle.UUID};
                         }
                     }
 
@@ -279,6 +280,18 @@ namespace RNGOEngine::Editor
 
             auto& sphereCollider = registry.get<Components::SphereCollider>(entity);
             ImGui::DragFloat("Radius", &sphereCollider.Radius, 0.01f, 0.0f);
+        }
+    }
+
+    template<>
+    inline void DrawProperties<Components::BoxCollider>(entt::registry& registry, const entt::entity entity)
+    {
+        if (registry.any_of<Components::BoxCollider>(entity))
+        {
+            ImGui::Text("Box");
+
+            auto& boxCollider = registry.get<Components::BoxCollider>(entity);
+            ImGui::DragFloat3("HalfExtents", glm::value_ptr(boxCollider.HalfExtents), 0.01f, 0.0f);
         }
     }
 

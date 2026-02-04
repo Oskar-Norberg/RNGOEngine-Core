@@ -22,11 +22,12 @@ namespace RNGOEngine::Data::Assets
 
     // Builtin Assets
     const DefaultAsset SphereModel = {AssetHandling::AssetType::Model, "builtin/UnitSphere.fbx"};
+    const DefaultAsset Cube = {AssetHandling::AssetType::Model, "builtin/UnitCube.obj"};
     const DefaultAsset WireframeShader = {AssetHandling::AssetType::Shader, "builtin/Wireframe.glsl"};
 
     const static DefaultAsset AllBuiltinAssets[] = {
         InvalidModel, InvalidTexture, InvalidShader,
 
-        SphereModel, WireframeShader,
+        SphereModel, Cube, WireframeShader,
     };
 }
