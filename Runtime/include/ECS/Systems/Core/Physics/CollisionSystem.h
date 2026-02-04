@@ -36,5 +36,9 @@ namespace RNGOEngine::Systems::Core
             RNGOEngine::Core::World& world, CollisionList& collisions
         );
 
+        void SphereToBoxCollisionDetection(
+            RNGOEngine::Core::World& world, CollisionList& collisions
+        );
+
     };
 }

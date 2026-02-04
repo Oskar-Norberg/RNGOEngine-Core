@@ -17,6 +17,7 @@ namespace RNGOEngine::Systems::Core
 
         SphereToSphereCollisionDetection(world, collisions);
         BoxToBoxCollisionDetection(world, collisions);
+        SphereToBoxCollisionDetection(world, collisions);
 
         // Register collisions for both engine and game systems. This will copy the data, but it's fine for now.
         // TODO: Consider using a shared pointer if this becomes a problem.
@@ -28,7 +29,6 @@ namespace RNGOEngine::Systems::Core
         RNGOEngine::Core::World& world, CollisionList& collisions
     )
     {
-        // Sphere -> Sphere CD
         const auto sphereView = world.GetRegistry().view<Components::Transform, Components::SphereCollider>();
 
         // Simple O(n^2) for now
@@ -53,7 +53,6 @@ namespace RNGOEngine::Systems::Core
         RNGOEngine::Core::World& world, CollisionList& collisions
     )
     {
-        // Box -> Box CD
         const auto boxView = world.GetRegistry().view<Components::Transform, Components::BoxCollider>();
 
         // Simple O(n^2) for now
@@ -77,6 +76,34 @@ namespace RNGOEngine::Systems::Core
                 if (aabbA.Intersects(aabbB))
                 {
                     collisions.collisions.emplace_back(entityA, entityB);
+                }
+            }
+        }
+    }
+
+    void CollisionSystem::SphereToBoxCollisionDetection(
+        RNGOEngine::Core::World& world, CollisionList& collisions
+    )
+    {
+        const auto boxView = world.GetRegistry().view<Components::Transform, Components::BoxCollider>();
+        const auto sphereView = world.GetRegistry().view<Components::Transform, Components::SphereCollider>();
+
+        for (const auto& [boxEntity, boxTransform, boxCollider] : boxView.each())
+        {
+            for (const auto& [sphereEntity, sphereTransform, sphereCollider] : sphereView.each())
+            {
+                const glm::vec3 boxMin = boxTransform.Position - boxCollider.HalfExtents;
+                const glm::vec3 boxMax = boxTransform.Position + boxCollider.HalfExtents;
+
+                const glm::vec3 closestPoint = glm::clamp(sphereTransform.Position, boxMin, boxMax);
+
+                const float distanceSquared = glm::dot(
+                    closestPoint - sphereTransform.Position, closestPoint - sphereTransform.Position
+                );
+
+                if (distanceSquared <= sphereCollider.Radius * sphereCollider.Radius)
+                {
+                    collisions.collisions.emplace_back(boxEntity, sphereEntity);
                 }
             }
         }
