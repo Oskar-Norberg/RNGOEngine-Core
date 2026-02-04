@@ -274,7 +274,7 @@ namespace RNGOEngine::Systems::Core
                                       .get();
 
             auto& shaderAsset =
-                runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetHandle())
+                runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetShaderHandle())
                     .value_or(
                         runtimeRegistry
                             .TryGet<AssetHandling::ShaderAsset>(

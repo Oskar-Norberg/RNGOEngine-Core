@@ -257,6 +257,20 @@ namespace RNGOEngine::Editor
                 ImGui::CloseCurrentPopup();
             }
 
+            // Debug only
+            if (ImGui::MenuItem("Force Load"))
+            {
+                const auto assetHandleOpt = AssetHandling::AssetLoader::GetInstance().TryImport(path);
+                if (assetHandleOpt)
+                {
+                    RefreshCurrentFolder();
+                }
+
+                AssetHandling::AssetLoader::GetInstance().Load(assetHandleOpt.value());
+
+                ImGui::CloseCurrentPopup();
+            }
+
             ImGui::EndPopup();
         }
 

@@ -13,12 +13,12 @@ namespace RNGOEngine::AssetHandling
     class MaterialAsset : public Asset
     {
     public:
-        MaterialAsset(AssetHandle&& handle, const Utilities::UUID& shader, MaterialParameters&& parameters)
+        MaterialAsset(AssetHandle&& handle, const ShaderHandle& shader, MaterialParameters&& parameters)
             : Asset(std::move(handle)), m_shader(shader), m_parameters(std::move(parameters))
         {
         }
 
-        AssetHandle GetHandle() const
+        AssetHandle GetShaderHandle() const
         {
             return m_shader;
         }
@@ -34,7 +34,7 @@ namespace RNGOEngine::AssetHandling
         }
 
     private:
-        AssetHandle m_shader;
+        ShaderHandle m_shader;
         MaterialParameters m_parameters;
     };
 

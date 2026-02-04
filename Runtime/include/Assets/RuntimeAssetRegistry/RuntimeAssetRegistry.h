@@ -70,7 +70,7 @@ namespace RNGOEngine::AssetHandling
             auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
 
             const auto it = storage.emplace(
-                AssetHandle(handle), AssetRegistryEntryT(AssetState::Invalid, std::move(asset))
+                handle, AssetRegistryEntryT(AssetState::Invalid, std::forward<TAsset>(asset))
             );
             return it.first->second;
         }

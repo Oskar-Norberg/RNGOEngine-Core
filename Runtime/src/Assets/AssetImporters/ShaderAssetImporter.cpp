@@ -58,7 +58,7 @@ namespace RNGOEngine::AssetHandling
         auto& shaderKey = uploadResult.value();
         auto& entry = registry.Insert<ShaderAsset>(
             ShaderHandle{safeTypedMetadata.UUID},
-            ShaderAsset(AssetHandle(safeTypedMetadata.UUID), shaderKey)
+            ShaderAsset(ShaderHandle(safeTypedMetadata.UUID), shaderKey)
         );
         entry.SetState(AssetState::Ready);
 

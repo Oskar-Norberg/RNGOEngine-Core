@@ -86,7 +86,7 @@ namespace RNGOEngine::Editor
                 {
                     ImGui::PushID(&meshRenderer);
 
-                    ImGui::Selectable("Drop Shader Here");
+                    ImGui::Selectable("Drop Material Here");
 
                     if (ImGui::BeginDragDropTarget())
                     {
@@ -97,30 +97,18 @@ namespace RNGOEngine::Editor
                             const auto& dragAndDropPayload =
                                 *static_cast<const AssetDragAndDropPayload*>(payload->Data);
 
-                            if (dragAndDropPayload.Type != AssetHandling::AssetType::Shader)
+                            if (dragAndDropPayload.Type != AssetHandling::AssetType::Material)
                             {
                                 RNGO_LOG(
-                                    Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
+                                    Core::LogLevel::Warning, "Cannot load asset {} as material.",
                                     dragAndDropPayload.Handle.UUID.GetValue()
                                 );
                             }
                             else
                             {
-                                auto materialHandle = Utilities::GenerateUUID();
-                                const auto& shaderHandle = dragAndDropPayload.Handle;
-                                AssetHandling::MaterialParameters params{};
-
-                                AssetHandling::AssetLoader::GetInstance().Load(shaderHandle);
-
-                                const auto& materialAsset =
-                                    AssetHandling::AssetManager::GetInstance()
-                                        .GetMaterialManager()
-                                        .CreateMaterial(
-                                            AssetHandling::MaterialHandle{materialHandle}, shaderHandle,
-                                            params
-                                        );
-
-                                meshRenderer.MaterialKey = AssetHandling::MaterialHandle{materialHandle};
+                                AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
+                                meshRenderer.MaterialKey =
+                                    AssetHandling::MaterialHandle{dragAndDropPayload.Handle.UUID};
                             }
                         }
 
@@ -129,111 +117,6 @@ namespace RNGOEngine::Editor
 
                     ImGui::PopID();
                 }
-            }
-
-            {
-                ImGui::PushID(&meshRenderer);
-
-                // TODO: Texture previews?
-
-                // Albedo
-                {
-                    ImGui::Selectable("Albedo Texture");
-                    if (ImGui::BeginDragDropTarget())
-                    {
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
-                        {
-                            IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
-
-                            const auto& dragAndDropPayload =
-                                *static_cast<const AssetDragAndDropPayload*>(payload->Data);
-
-                            if (dragAndDropPayload.Type != AssetHandling::AssetType::Texture)
-                            {
-                                RNGO_LOG(
-                                    Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
-                                    dragAndDropPayload.Handle.UUID.GetValue()
-                                );
-                            }
-                            else
-                            {
-                                auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
-                                const auto& materialHandle = meshRenderer.MaterialKey;
-
-                                AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
-
-                                const auto materialAssetOpt =
-                                    runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(materialHandle);
-
-                                if (materialAssetOpt)
-                                {
-                                    auto& materialAsset = materialAssetOpt->get();
-                                    AssetHandling::MaterialTextureSpecification textureSpec{
-                                        .TextureHandle = dragAndDropPayload.Handle,
-                                        .Slot = Data::Shader::ALBEDO_TEXTURE_SLOT
-                                    };
-                                    materialAsset.GetParameters().Parameters.emplace_back(
-                                        std::string(Data::Shader::ALBEDO_TEXTURE.Value), textureSpec
-                                    );
-                                }
-                            }
-                        }
-
-                        ImGui::EndDragDropTarget();
-                    }
-                }
-
-                // TODO: Normal
-
-                // TODO: Ugly copy paste, works for now
-                // Specular
-                {
-                    ImGui::Selectable("Specular");
-                    if (ImGui::BeginDragDropTarget())
-                    {
-                        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload(AssetDragAndDropName))
-                        {
-                            IM_ASSERT(payload->DataSize == sizeof(AssetDragAndDropPayload));
-
-                            const auto& dragAndDropPayload =
-                                *static_cast<const AssetDragAndDropPayload*>(payload->Data);
-
-                            if (dragAndDropPayload.Type != AssetHandling::AssetType::Texture)
-                            {
-                                RNGO_LOG(
-                                    Core::LogLevel::Warning, "Cannot load asset {} as Shader.",
-                                    dragAndDropPayload.Handle.UUID.GetValue()
-                                );
-                            }
-                            else
-                            {
-                                auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
-                                const auto& materialHandle = meshRenderer.MaterialKey;
-
-                                AssetHandling::AssetLoader::GetInstance().Load(dragAndDropPayload.Handle);
-
-                                const auto materialAssetOpt =
-                                    runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(materialHandle);
-
-                                if (materialAssetOpt)
-                                {
-                                    auto& materialAsset = materialAssetOpt->get();
-                                    AssetHandling::MaterialTextureSpecification textureSpec{
-                                        .TextureHandle = dragAndDropPayload.Handle,
-                                        .Slot = Data::Shader::SPECULAR_TEXTURE_SLOT
-                                    };
-                                    materialAsset.GetParameters().Parameters.emplace_back(
-                                        std::string(Data::Shader::SPECULAR_TEXTURE.Value), textureSpec
-                                    );
-                                }
-                            }
-                        }
-
-                        ImGui::EndDragDropTarget();
-                    }
-                }
-
-                ImGui::PopID();
             }
         }
     }
