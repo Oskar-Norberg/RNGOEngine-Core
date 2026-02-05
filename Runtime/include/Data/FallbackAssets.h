@@ -19,6 +19,7 @@ namespace RNGOEngine::Data::Assets
     const DefaultAsset InvalidModel = {AssetHandling::AssetType::Model, "fallbacks/InvalidModel.obj"};
     const DefaultAsset InvalidTexture = {AssetHandling::AssetType::Texture, "fallbacks/InvalidTexture.png"};
     const DefaultAsset InvalidShader = {AssetHandling::AssetType::Shader, "fallbacks/InvalidShader.glsl"};
+    const DefaultAsset InvalidMaterial = {AssetHandling::AssetType::Material, "fallbacks/InvalidMaterial.mat"};
 
     // Builtin Assets
     const DefaultAsset SphereModel = {AssetHandling::AssetType::Model, "builtin/UnitSphere.fbx"};
@@ -26,7 +27,7 @@ namespace RNGOEngine::Data::Assets
     const DefaultAsset WireframeShader = {AssetHandling::AssetType::Shader, "builtin/Wireframe.glsl"};
 
     const static DefaultAsset AllBuiltinAssets[] = {
-        InvalidModel, InvalidTexture, InvalidShader,
+        InvalidModel, InvalidTexture, InvalidShader, InvalidMaterial,
 
         SphereModel, Cube, WireframeShader,
     };

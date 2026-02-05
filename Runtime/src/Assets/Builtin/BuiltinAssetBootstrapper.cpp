@@ -54,18 +54,8 @@ namespace RNGOEngine::AssetHandling
 
     void BuiltinAssets::SetUpMaterial()
     {
-        auto& materialManager = AssetManager::GetInstance().GetMaterialManager();
         auto& loader = AssetLoader::GetInstance();
-
-        // Import Shader
-        const AssetHandle fallbackShader = loader.Import(AssetType::Shader, Data::Assets::InvalidShader.Path);
-        s_errorHandles[static_cast<size_t>(AssetType::Shader)] = fallbackShader;
-
-        // Create Material
-        // TODO: shit ass material system
-        auto handle = Utilities::GenerateUUID();
-        MaterialParameters params;
-        materialManager.CreateMaterial(MaterialHandle{handle}, fallbackShader, params);
-        s_errorHandles[static_cast<size_t>(AssetType::Material)] = MaterialHandle{handle};
+        const AssetHandle handle = loader.Import(AssetType::Material, Data::Assets::InvalidMaterial.Path);
+        s_errorHandles[static_cast<size_t>(AssetType::Material)] = handle;
     }
 }
