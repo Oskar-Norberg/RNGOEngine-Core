@@ -9,6 +9,7 @@
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
 #include "ECS/Systems/SystemContext.h"
+#include "Logging/Logger.h"
 #include "Renderer/API/RenderAPI.h"
 #include "Scene/World/World.h"
 #include "Utilities/Profiling/Profiling.h"
@@ -260,20 +261,29 @@ namespace RNGOEngine::Systems::Core
             const auto gpuMeshes = GetOrLoadModel(meshRender.ModelHandle);
             const auto gpuMaterial = GetOrLoadMaterial(meshRender.MaterialKey);
 
+            if (!gpuMeshes || !gpuMaterial)
+            {
+                RNGO_LOG(
+                    RNGOEngine::Core::LogLevel::Warning,
+                    "Could not load model or material. Skipping rendering this entity."
+                );
+                continue;
+            }
+
             const auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
                                        ? world.GetRegistry().get<Components::Transform>(entity)
                                        : Components::Transform();
 
-            RNGOEngine::Core::Renderer::GPUModel gpuModel{.Meshes = gpuMeshes};
+            RNGOEngine::Core::Renderer::GPUModel gpuModel{.Meshes = gpuMeshes.value()};
 
-            drawables.emplace_back(transform, gpuModel, gpuMaterial);
+            drawables.emplace_back(transform, gpuModel, gpuMaterial.value());
         }
 
         return drawables;
     }
 
-    std::vector<RNGOEngine::Core::Renderer::GPUMesh> RenderSystem::GetOrLoadModel(
-        const AssetHandling::ModelHandle& modelHandle
+    std::optional<std::vector<RNGOEngine::Core::Renderer::GPUMesh>> RenderSystem::GetOrLoadModel(
+        const AssetHandling::ModelHandle& modelHandle, const bool isError
     )
     {
         auto& assetDatabase = AssetHandling::AssetDatabase::GetInstance();
@@ -284,11 +294,17 @@ namespace RNGOEngine::Systems::Core
         // Is model Registered?
         if (!assetDatabase.IsRegistered(modelHandle))
         {
+            // If we're already trying to load the error model, just return empty to avoid infinite recursion.
+            if (isError)
+            {
+                return std::nullopt;
+            }
             // Unregistered model, return error model.
             return GetOrLoadModel(
                 AssetHandling::ModelHandle{
                     AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model).UUID
-                }
+                },
+                true
             );
         }
 
@@ -328,8 +344,9 @@ namespace RNGOEngine::Systems::Core
 
         return gpuMeshes;
     }
-    RNGOEngine::Core::Renderer::GPUMaterial RenderSystem::GetOrLoadMaterial(
-        const AssetHandling::MaterialHandle& materialHandle
+
+    std::optional<RNGOEngine::Core::Renderer::GPUMaterial> RenderSystem::GetOrLoadMaterial(
+        const AssetHandling::MaterialHandle& materialHandle, const bool isError
     )
     {
         auto& database = AssetHandling::AssetDatabase::GetInstance();
@@ -340,11 +357,17 @@ namespace RNGOEngine::Systems::Core
         // Is material registered?
         if (!database.IsRegistered(materialHandle))
         {
+            // If we're already trying to load the error model, just return empty to avoid infinite recursion.
+            if (isError)
+            {
+                return std::nullopt;
+            }
             // Unregistered material, return error material.
             return GetOrLoadMaterial(
                 AssetHandling::MaterialHandle{
                     AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material).UUID
-                }
+                },
+                true
             );
         }
 
@@ -368,20 +391,26 @@ namespace RNGOEngine::Systems::Core
                 )
                 .get();
 
-        auto& shaderAsset =
+        auto shaderAssetOpt =
             runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetShaderHandle())
-                .value_or(
-                    runtimeRegistry
-                        .TryGet<AssetHandling::ShaderAsset>(
-                            AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
-                        )
-                        .value()
-                )
-                .get();
+                .or_else([&runtimeRegistry]() {
+                    return runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(
+                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
+                    );
+                });
 
-        auto resolvedShader = shaderManager.GetShaderProgram(shaderAsset.GetShaderKey()).value();
+        if (!shaderAssetOpt)
+        {
+            return std::nullopt;
+        }
 
-        return {.ShaderProgram = resolvedShader, .Parameters = ResolveMaterialParameters(materialAsset)};
+        const auto& shaderAsset = shaderAssetOpt.value().get();
+
+        const auto resolvedShader = shaderManager.GetShaderProgram(shaderAsset.GetShaderKey()).value();
+
+        return RNGOEngine::Core::Renderer::GPUMaterial{
+            .ShaderProgram = resolvedShader, .Parameters = ResolveMaterialParameters(materialAsset)
+        };
     }
 
     std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> RenderSystem::ResolveMaterialParameters(

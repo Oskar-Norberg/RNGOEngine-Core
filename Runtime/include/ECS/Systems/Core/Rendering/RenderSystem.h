@@ -20,6 +20,7 @@ namespace RNGOEngine::Core::Renderer
 
 namespace RNGOEngine::Systems::Core
 {
+    // TODO: Ideally I think this should just submit handles to the renderer. And the renderer looks up the resources for it. But alas, this is simpler for now.
     class RenderSystem : public EngineSystem
     {
     public:
@@ -54,12 +55,13 @@ namespace RNGOEngine::Systems::Core
         std::vector<RNGOEngine::Core::Renderer::Drawable> GetOpaqueDrawables(RNGOEngine::Core::World& world);
 
     private:
-        std::vector<RNGOEngine::Core::Renderer::GPUMesh> GetOrLoadModel(
-            const AssetHandling::ModelHandle& modelHandle
+        // TODO: I hate the fact that this returns optional. But it works for now.
+        std::optional<std::vector<RNGOEngine::Core::Renderer::GPUMesh>> GetOrLoadModel(
+            const AssetHandling::ModelHandle& modelHandle, bool isError = false
         );
 
-        RNGOEngine::Core::Renderer::GPUMaterial GetOrLoadMaterial(
-            const AssetHandling::MaterialHandle& materialHandle
+        std::optional<RNGOEngine::Core::Renderer::GPUMaterial> GetOrLoadMaterial(
+            const AssetHandling::MaterialHandle& materialHandle, bool isError = false
         );
 
         std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> ResolveMaterialParameters(
