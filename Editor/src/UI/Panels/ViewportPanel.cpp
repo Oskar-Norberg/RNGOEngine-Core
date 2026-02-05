@@ -86,20 +86,20 @@ namespace RNGOEngine::Editor
         const auto result = CreateGizmoContext(context, startPos, size);
         if (result)
         {
-            DrawGizmo(result.value());
+            DrawGizmo(context.gizmoData, result.value());
         }
     }
 
-    void ViewPortPanel::DrawGizmo(const DrawGizmoContext& context)
+    void ViewPortPanel::DrawGizmo(Gizmo::GizmoData& gizmoData, const DrawGizmoContext& context)
     {
         if (ImGui::IsWindowHovered())
         {
             if (ImGui::IsKeyPressed(ImGuiKey_T))
-                m_gizmoData.CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+                gizmoData.CurrentGizmoOperation = Gizmo::TRANSLATE;
             if (ImGui::IsKeyPressed(ImGuiKey_E))
-                m_gizmoData.CurrentGizmoOperation = ImGuizmo::ROTATE;
+                gizmoData.CurrentGizmoOperation = Gizmo::ROTATE;
             if (ImGui::IsKeyPressed(ImGuiKey_R))
-                m_gizmoData.CurrentGizmoOperation = ImGuizmo::SCALE;
+                gizmoData.CurrentGizmoOperation = Gizmo::SCALE;
         }
 
         auto& registry = context.Context.sceneManager->GetCurrentWorld()->GetRegistry();
@@ -125,8 +125,8 @@ namespace RNGOEngine::Editor
         ImGuizmo::SetRect(context.StartPos.x, context.StartPos.y, context.Size.x, context.Size.y);
 
         ImGuizmo::Manipulate(
-            viewMatrixPtr, projectionMatrixPtr, m_gizmoData.CurrentGizmoOperation,
-            m_gizmoData.CurrentGizmoMode, targetMatrixPtr
+            viewMatrixPtr, projectionMatrixPtr, Gizmo::ToImGuizmoOperation(gizmoData.CurrentGizmoOperation),
+            Gizmo::ToImGuizmoMode(gizmoData.CurrentGizmoMode), targetMatrixPtr
         );
 
         if (ImGuizmo::IsUsing())

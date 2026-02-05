@@ -15,9 +15,9 @@
 #include "Panels/ContentDrawerPanel.h"
 #include "Panels/DetailsPanel.h"
 #include "Panels/HierarchyPanel.h"
-#include "Panels/PlayPanel.h"
 #include "Panels/SceneManagementPanel.h"
 #include "Panels/StatsPanel.h"
+#include "Panels/ToolbarPanel.h"
 #include "Panels/ViewportPanel.h"
 
 namespace RNGOEngine

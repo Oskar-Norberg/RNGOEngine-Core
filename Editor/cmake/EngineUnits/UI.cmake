@@ -1,5 +1,6 @@
 set(UI_PROJECT_NAME RNGOEditor_UI)
 add_library(${UI_PROJECT_NAME} STATIC
+        include/UI/Gizmo/GizmoOperation.h
         include/UI/UIContext.h
 
         include/UI/AssetDragAndDrop.h
@@ -14,8 +15,8 @@ add_library(${UI_PROJECT_NAME} STATIC
         include/UI/IDockablePanel.h
         include/UI/PanelInitializer.h
 
-        include/UI/Panels/PlayPanel.h
-        src/UI/Panels/PlayPanel.cpp
+        include/UI/Panels/ToolbarPanel.h
+        src/UI/Panels/ToolbarPanel.cpp
 
         include/UI/Panels/ViewportPanel.h
         src/UI/Panels/ViewportPanel.cpp

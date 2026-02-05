@@ -3,6 +3,7 @@
 //
 
 #pragma once
+#include "Gizmo/GizmoOperation.h"
 #include "Managers/UISelectionManager.h"
 
 namespace RNGOEngine
@@ -31,10 +32,11 @@ namespace RNGOEngine::Editor
     struct UIContext
     {
         UISelectionManager selectionManager{};
+        Gizmo::GizmoData gizmoData{};
 
-        Editor* Editor = nullptr;
-        Core::VectorSink* loggerSink = nullptr;
-        Core::SceneManager* sceneManager = nullptr;
-        Core::Renderer::RenderAPI* rendererAPI = nullptr;
+        Editor* Editor{};
+        Core::VectorSink* loggerSink{};
+        Core::SceneManager* sceneManager{};
+        Core::Renderer::RenderAPI* rendererAPI{};
     };
 }

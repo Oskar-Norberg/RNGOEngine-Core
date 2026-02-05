@@ -32,16 +32,13 @@ namespace RNGOEngine::AssetHandling
         const auto albedoUUIDVal = node["Albedo"].as<std::uint64_t>();
         const auto specularUUIDVal = node["Specular"].as<std::uint64_t>();
 
-        const Utilities::UUID shaderUUID = Utilities::UUID(shaderUUIDVal);
-        const Utilities::UUID albedoUUID = Utilities::UUID(albedoUUIDVal);
-        const Utilities::UUID specularUUID = Utilities::UUID(specularUUIDVal);
+        const auto shaderUUID = Utilities::UUID(shaderUUIDVal);
+        const auto albedoUUID = Utilities::UUID(albedoUUIDVal);
+        const auto specularUUID = Utilities::UUID(specularUUIDVal);
 
         // TODO: Again, lazy load?
         AssetLoader::GetInstance().Load(TextureHandle{albedoUUID});
         AssetLoader::GetInstance().Load(TextureHandle{specularUUID});
-
-
-        // Shouldn't this just be lazy loaded on first-use?
         AssetLoader::GetInstance().Load(ShaderHandle{shaderUUID});
 
         // TODO: Read params
@@ -52,7 +49,7 @@ namespace RNGOEngine::AssetHandling
         };
 
         AssetManager::GetInstance().GetMaterialManager().CreateMaterial(
-            AssetHandle{metadata.UUID, AssetType::Material}, materialSpecification
+            MaterialHandle{metadata.UUID}, materialSpecification
         );
 
         return ImportingError::None;
