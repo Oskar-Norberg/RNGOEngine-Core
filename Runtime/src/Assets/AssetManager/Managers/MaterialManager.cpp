@@ -9,10 +9,10 @@
 namespace RNGOEngine::AssetHandling
 {
     MaterialAsset& MaterialManager::CreateMaterial(
-        const AssetHandle& handle, const AssetHandle& shader, MaterialParameters& parameters
+        const AssetHandle& handle, const MaterialSpecification& materialSpecification
     )
     {
-        MaterialAsset materialAsset(AssetHandle{handle.UUID, AssetType::Material}, ShaderHandle(shader.UUID), std::move(parameters));
+        MaterialAsset materialAsset({handle.UUID, AssetType::Material}, materialSpecification);
 
         auto& runtimeRegistry = RuntimeAssetRegistry::GetInstance();
         auto& entry = runtimeRegistry.Insert<MaterialAsset>(handle, std::move(materialAsset));

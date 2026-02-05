@@ -33,4 +33,15 @@ namespace RNGOEngine::AssetHandling
         // Consider stack allocated array with max size?
         std::vector<MaterialParameter> Parameters{};
     };
+
+    struct MaterialSpecification
+    {
+        ShaderHandle ShaderHandle{};
+
+        TextureHandle AlbedoTextureHandle{};
+        TextureHandle SpecularTextureHandle{};
+
+        // Consider stack allocated array with max size?
+        MaterialParameters Parameters{};
+    };
 }

@@ -29,17 +29,30 @@ namespace RNGOEngine::AssetHandling
 
         YAML::Node node = YAML::LoadFile(path.string());
         const auto shaderUUIDVal = node["Shader"].as<std::uint64_t>();
+        const auto albedoUUIDVal = node["Albedo"].as<std::uint64_t>();
+        const auto specularUUIDVal = node["Specular"].as<std::uint64_t>();
 
         const Utilities::UUID shaderUUID = Utilities::UUID(shaderUUIDVal);
+        const Utilities::UUID albedoUUID = Utilities::UUID(albedoUUIDVal);
+        const Utilities::UUID specularUUID = Utilities::UUID(specularUUIDVal);
 
+        // TODO: Again, lazy load?
+        AssetLoader::GetInstance().Load(TextureHandle{albedoUUID});
+        AssetLoader::GetInstance().Load(TextureHandle{specularUUID});
+
+
+        // Shouldn't this just be lazy loaded on first-use?
         AssetLoader::GetInstance().Load(ShaderHandle{shaderUUID});
 
         // TODO: Read params
-        MaterialParameters parameters = {};
+        const MaterialSpecification materialSpecification{
+            .ShaderHandle = ShaderHandle{shaderUUID},
+            .AlbedoTextureHandle = TextureHandle{albedoUUID},
+            .SpecularTextureHandle = TextureHandle{specularUUID},
+        };
 
         AssetManager::GetInstance().GetMaterialManager().CreateMaterial(
-            AssetHandle{metadata.UUID, AssetType::Material}, AssetHandle{shaderUUID, AssetType::Shader},
-            parameters
+            AssetHandle{metadata.UUID, AssetType::Material}, materialSpecification
         );
 
         return ImportingError::None;

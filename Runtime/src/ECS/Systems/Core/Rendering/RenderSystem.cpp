@@ -393,11 +393,14 @@ namespace RNGOEngine::Systems::Core
 
         auto shaderAssetOpt =
             runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetShaderHandle())
-                .or_else([&runtimeRegistry]() {
-                    return runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(
-                        AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
-                    );
-                });
+                .or_else(
+                    [&runtimeRegistry]()
+                    {
+                        return runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(
+                            AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
+                        );
+                    }
+                );
 
         if (!shaderAssetOpt)
         {
@@ -421,6 +424,61 @@ namespace RNGOEngine::Systems::Core
         auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
         std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> parameters;
         parameters.reserve(materialAsset.GetParameters().Parameters.size());
+
+        // Albedo
+        {
+            // TODO: Copy paste hell
+            const auto textureAssetOpt = runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
+                materialAsset.GetMaterialSpecification().AlbedoTextureHandle
+            );
+
+            const auto& textureAsset =
+                textureAssetOpt
+                    .value_or(
+                        runtimeRegistry
+                            .TryGet<AssetHandling::TextureAsset>(AssetHandling::BuiltinAssets::GetErrorHandle(
+                                AssetHandling::AssetType::Texture
+                            ))
+                            .value()
+                    )
+                    .get();
+
+            // Because the Asset is guaranteed to be valid, we can just .value() here.
+            const auto textureResourceOpt =
+                resourceManager.GetTextureResourceManager().GetTexture(textureAsset.GetTextureKey()).value();
+
+            RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
+                .TextureHandle = textureResourceOpt, .Slot = Data::Shader::ALBEDO_TEXTURE_SLOT
+            };
+            parameters.emplace_back(std::string(Data::Shader::ALBEDO_TEXTURE.Value), gpuTextureSpec);
+        }
+        // Specular
+        {
+            // TODO: Copy paste hell
+            const auto textureAssetOpt = runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
+                materialAsset.GetMaterialSpecification().SpecularTextureHandle
+            );
+
+            const auto& textureAsset =
+                textureAssetOpt
+                    .value_or(
+                        runtimeRegistry
+                            .TryGet<AssetHandling::TextureAsset>(AssetHandling::BuiltinAssets::GetErrorHandle(
+                                AssetHandling::AssetType::Texture
+                            ))
+                            .value()
+                    )
+                    .get();
+
+            // Because the Asset is guaranteed to be valid, we can just .value() here.
+            const auto textureResourceOpt =
+                resourceManager.GetTextureResourceManager().GetTexture(textureAsset.GetTextureKey()).value();
+
+            RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
+                .TextureHandle = textureResourceOpt, .Slot = Data::Shader::SPECULAR_TEXTURE_SLOT
+            };
+            parameters.emplace_back(std::string(Data::Shader::SPECULAR_TEXTURE.Value), gpuTextureSpec);
+        }
 
         for (const auto& uniform : materialAsset.GetParameters().Parameters)
         {
