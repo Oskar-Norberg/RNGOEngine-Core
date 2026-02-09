@@ -5,9 +5,11 @@
 #pragma once
 
 #ifdef WIN32
-// NOTE: Do not reorder.
+
+// clang-format off - These have to be included in order
 #include <windows.h>
 #include <psapi.h>
+// clang-format on
 #endif
 
 namespace RNGOEngine::Utilities::Memory

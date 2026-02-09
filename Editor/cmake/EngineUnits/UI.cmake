@@ -8,10 +8,10 @@ add_library(${UI_PROJECT_NAME} STATIC
         # Managers
         include/UI/Managers/UISelectionManager.h
         src/UI/Managers/UISelectionManager.cpp
-        
+
         include/UI/UIManager.h
         src/UI/UIManager.cpp
-        
+
         include/UI/IDockablePanel.h
         include/UI/PanelInitializer.h
 
@@ -23,10 +23,10 @@ add_library(${UI_PROJECT_NAME} STATIC
 
         include/UI/Panels/HierarchyPanel.h
         src/UI/Panels/HierarchyPanel.cpp
-        
+
         include/UI/Panels/StatsPanel.h
         src/UI/Panels/StatsPanel.cpp
-        
+
         include/UI/PropertyDrawer/PropertyDrawers.h
 
         # Details
@@ -37,11 +37,11 @@ add_library(${UI_PROJECT_NAME} STATIC
         include/UI/Panels/DetailsSubPanel/DetailsSubPanel.h
         include/UI/Panels/DetailsSubPanel/EntitySubPanel.h
         include/UI/Panels/DetailsSubPanel/AssetSubPanel.h
-
+        src/UI/Panels/DetailsSubPanel/AssetSubPanel.cpp
 
         include/UI/Panels/ConsolePanel.h
         src/UI/Panels/ConsolePanel.cpp
-        
+
         include/UI/Panels/ContentDrawerPanel.h
         src/UI/Panels/ContentDrawerPanel.cpp
 
