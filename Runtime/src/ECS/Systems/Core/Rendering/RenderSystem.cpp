@@ -422,98 +422,45 @@ namespace RNGOEngine::Systems::Core
     {
         auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
         auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
-        std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> parameters;
-        parameters.reserve(materialAsset.GetParameters().Parameters.size());
+        std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> resolvedParams;
+        const auto& params = materialAsset.GetParameters().GetAll();
+        resolvedParams.reserve(params.size());
 
         // Albedo
+        for (const auto& uniform : params)
         {
-            // TODO: Copy paste hell
-            const auto textureAssetOpt = runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
-                materialAsset.GetMaterialSpecification().AlbedoTextureHandle
-            );
-
-            const auto& textureAsset =
-                textureAssetOpt
-                    .value_or(
-                        runtimeRegistry
-                            .TryGet<AssetHandling::TextureAsset>(AssetHandling::BuiltinAssets::GetErrorHandle(
-                                AssetHandling::AssetType::Texture
-                            ))
-                            .value()
-                    )
-                    .get();
-
-            // Because the Asset is guaranteed to be valid, we can just .value() here.
-            const auto textureResourceOpt =
-                resourceManager.GetTextureResourceManager().GetTexture(textureAsset.GetTextureKey()).value();
-
-            RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
-                .TextureHandle = textureResourceOpt, .Slot = Data::Shader::ALBEDO_TEXTURE_SLOT
-            };
-            parameters.emplace_back(std::string(Data::Shader::ALBEDO_TEXTURE.Value), gpuTextureSpec);
-        }
-        // Specular
-        {
-            // TODO: Copy paste hell
-            const auto textureAssetOpt = runtimeRegistry.TryGet<AssetHandling::TextureAsset>(
-                materialAsset.GetMaterialSpecification().SpecularTextureHandle
-            );
-
-            const auto& textureAsset =
-                textureAssetOpt
-                    .value_or(
-                        runtimeRegistry
-                            .TryGet<AssetHandling::TextureAsset>(AssetHandling::BuiltinAssets::GetErrorHandle(
-                                AssetHandling::AssetType::Texture
-                            ))
-                            .value()
-                    )
-                    .get();
-
-            // Because the Asset is guaranteed to be valid, we can just .value() here.
-            const auto textureResourceOpt =
-                resourceManager.GetTextureResourceManager().GetTexture(textureAsset.GetTextureKey()).value();
-
-            RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
-                .TextureHandle = textureResourceOpt, .Slot = Data::Shader::SPECULAR_TEXTURE_SLOT
-            };
-            parameters.emplace_back(std::string(Data::Shader::SPECULAR_TEXTURE.Value), gpuTextureSpec);
-        }
-
-        for (const auto& uniform : materialAsset.GetParameters().Parameters)
-        {
-            if (std::holds_alternative<bool>(uniform.Value))
+            if (std::holds_alternative<bool>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<bool>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<bool>(uniform.Parameter));
             }
-            else if (std::holds_alternative<int>(uniform.Value))
+            else if (std::holds_alternative<int>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<int>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<int>(uniform.Parameter));
             }
-            else if (std::holds_alternative<float>(uniform.Value))
+            else if (std::holds_alternative<float>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<float>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<float>(uniform.Parameter));
             }
-            else if (std::holds_alternative<glm::vec2>(uniform.Value))
+            else if (std::holds_alternative<glm::vec2>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<glm::vec2>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::vec2>(uniform.Parameter));
             }
-            else if (std::holds_alternative<glm::vec3>(uniform.Value))
+            else if (std::holds_alternative<glm::vec3>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<glm::vec3>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::vec3>(uniform.Parameter));
             }
-            else if (std::holds_alternative<glm::vec4>(uniform.Value))
+            else if (std::holds_alternative<glm::vec4>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<glm::vec4>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::vec4>(uniform.Parameter));
             }
-            else if (std::holds_alternative<glm::mat4>(uniform.Value))
+            else if (std::holds_alternative<glm::mat4>(uniform.Parameter))
             {
-                parameters.emplace_back(uniform.Name, std::get<glm::mat4>(uniform.Value));
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::mat4>(uniform.Parameter));
             }
-            else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.Value))
+            else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.Parameter))
             {
                 const auto& textureSpec =
-                    std::get<AssetHandling::MaterialTextureSpecification>(uniform.Value);
+                    std::get<AssetHandling::MaterialTextureSpecification>(uniform.Parameter);
 
                 const auto textureAssetOpt =
                     runtimeRegistry.TryGet<AssetHandling::TextureAsset>(textureSpec.TextureHandle);
@@ -536,10 +483,10 @@ namespace RNGOEngine::Systems::Core
                 RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
                     .TextureHandle = textureResourceOpt, .Slot = textureSpec.Slot
                 };
-                parameters.emplace_back(uniform.Name, gpuTextureSpec);
+                resolvedParams.emplace_back(uniform.Name, gpuTextureSpec);
             }
         }
 
-        return parameters;
+        return resolvedParams;
     }
 }

@@ -3,11 +3,11 @@
 //
 
 #pragma once
+
 #include "ImGuizmo.h"
 
 namespace RNGOEngine::Editor::Gizmo
 {
-    // NOTE: Matches 1-1 with ImGuizmo::OPERATION, but we don't want to include ImGuizmo in the header.
     enum OPERATION
     {
         TRANSLATE_X = (1u << 0),

@@ -33,6 +33,7 @@ namespace RNGOEngine::AssetHandling
         const auto specularUUIDVal = node["Specular"].as<std::uint64_t>();
 
         const auto shaderUUID = Utilities::UUID(shaderUUIDVal);
+        // TODO: Hardcoded albedo / specular for now
         const auto albedoUUID = Utilities::UUID(albedoUUIDVal);
         const auto specularUUID = Utilities::UUID(specularUUIDVal);
 
@@ -41,11 +42,23 @@ namespace RNGOEngine::AssetHandling
         AssetLoader::GetInstance().Load(TextureHandle{specularUUID});
         AssetLoader::GetInstance().Load(ShaderHandle{shaderUUID});
 
-        // TODO: Read params
+        MaterialParameters parameters{};
+        parameters.Add(
+            Data::Shader::ALBEDO_TEXTURE.Value,
+            MaterialTextureSpecification{
+                .TextureHandle = TextureHandle{albedoUUID},
+                .Slot = Data::Shader::ALBEDO_TEXTURE_SLOT,
+            }
+        );
+        parameters.Add(
+            Data::Shader::SPECULAR_TEXTURE.Value,
+            MaterialTextureSpecification{
+                .TextureHandle = TextureHandle{specularUUID},
+                .Slot = Data::Shader::SPECULAR_TEXTURE_SLOT,
+            }
+        );
         const MaterialSpecification materialSpecification{
-            .ShaderHandle = ShaderHandle{shaderUUID},
-            .AlbedoTextureHandle = TextureHandle{albedoUUID},
-            .SpecularTextureHandle = TextureHandle{specularUUID},
+            .ShaderHandle = ShaderHandle{shaderUUID}, .Parameters = parameters
         };
 
         AssetManager::GetInstance().GetMaterialManager().CreateMaterial(
