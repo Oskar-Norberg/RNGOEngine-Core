@@ -59,7 +59,7 @@ namespace RNGOEngine::Editor
                         const auto& dragAndDropPayload =
                             *static_cast<const AssetDragAndDropPayload*>(payload->Data);
 
-                        if (dragAndDropPayload.Type != AssetHandling::AssetType::Model)
+                        if (dragAndDropPayload.Handle.Type != AssetHandling::AssetType::Model)
                         {
                             RNGO_LOG(
                                 Core::LogLevel::Warning, "Cannot load asset {} as Model.",
@@ -97,7 +97,7 @@ namespace RNGOEngine::Editor
                             const auto& dragAndDropPayload =
                                 *static_cast<const AssetDragAndDropPayload*>(payload->Data);
 
-                            if (dragAndDropPayload.Type != AssetHandling::AssetType::Material)
+                            if (dragAndDropPayload.Handle.Type != AssetHandling::AssetType::Material)
                             {
                                 RNGO_LOG(
                                     Core::LogLevel::Warning, "Cannot load asset {} as material.",

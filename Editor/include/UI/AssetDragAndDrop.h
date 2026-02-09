@@ -14,7 +14,6 @@ namespace RNGOEngine::Editor
     
     struct AssetDragAndDropPayload
     {
-        AssetHandling::AssetType Type;
         AssetHandling::AssetHandle Handle;
     };
 }

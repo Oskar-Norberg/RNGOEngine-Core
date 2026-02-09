@@ -12,6 +12,7 @@ namespace RNGOEngine::Utilities
 {
     // NOTE: Could be made into a templated class to support different sizes, but for now just 64 bit.
 
+    // TODO: Make an explicit getter for null UUID
     // 64-bit wide UUID.
     class UUID
     {

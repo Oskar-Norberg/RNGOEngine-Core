@@ -4,6 +4,7 @@
 
 #include "UI/Panels/DetailsPanel.h"
 
+#include "UI/Panels/DetailsSubPanel/AssetSubPanel.h"
 #include "UI/Panels/DetailsSubPanel/EntitySubPanel.h"
 
 namespace RNGOEngine::Editor
@@ -34,7 +35,7 @@ namespace RNGOEngine::Editor
         }
         if (std::holds_alternative<AssetSelection>(currentSelection))
         {
-            // SwitchToSubPanel<AssetDetailsSubPanel>(context);
+            SwitchToSubPanelIfNotOpen<AssetDetailsSubPanel>(context);
         }
     }
 }
