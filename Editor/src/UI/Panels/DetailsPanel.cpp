@@ -24,17 +24,22 @@ namespace RNGOEngine::Editor
         ImGui::Separator();
         m_subPanel->RenderSubPanel(context);
     }
-    void DetailsPanel::UpdateSubPanelBasedOnSelection(const UIContext& context)
+    void DetailsPanel::UpdateSubPanelBasedOnSelection(UIContext& context)
     {
         if (context.selectionManager.GetSelectedEntity() != entt::null)
         {
             if (!m_subPanel || dynamic_cast<EntityDetailsSubPanel*>(m_subPanel.get()) == nullptr)
             {
                 m_subPanel = std::make_unique<EntityDetailsSubPanel>();
+                m_subPanel->OnEnter(context);
             }
         }
         else
         {
+            if (m_subPanel)
+            {
+                m_subPanel->OnExit(context);
+            }
             m_subPanel.reset();
         }
     }

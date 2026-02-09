@@ -14,9 +14,18 @@ namespace RNGOEngine::Editor
     {
     public:
         virtual ~DetailsSubPanel() = default;
-
         virtual void RenderSubPanel(UIContext& context) = 0;
 
+    public:
+        virtual void OnEnter(UIContext& context)
+        {
+        }
+
+        virtual void OnExit(UIContext& context)
+        {
+        }
+
+    public:
         virtual std::string_view GetSubPanelName() const = 0;
     };
 }
