@@ -23,6 +23,8 @@ namespace RNGOEngine::Editor
 
     private:
         std::unique_ptr<DetailsSubPanel> m_subPanel{};
+
+        void UpdateSubPanelBasedOnSelection(const UIContext& context);
     };
     EDITOR_PANEL(DetailsPanel);
 }

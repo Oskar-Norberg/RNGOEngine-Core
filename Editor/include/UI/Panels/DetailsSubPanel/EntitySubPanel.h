@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "DetailsSubPanel.h"
 #include "Scene/SceneManager/SceneManager.h"
 #include "UI/PropertyDrawer/PropertyDrawers.h"

@@ -13,7 +13,7 @@ namespace RNGOEngine::Editor
     class DetailsSubPanel
     {
     public:
-        virtual ~DetailsSubPanel();
+        virtual ~DetailsSubPanel() = default;
 
         virtual void RenderSubPanel(UIContext& context) = 0;
 
