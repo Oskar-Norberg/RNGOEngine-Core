@@ -153,7 +153,12 @@ namespace RNGOEngine::Editor
         UIContext& context, const ImVec2 pos, const ImVec2 size
     )
     {
-        auto entity = context.selectionManager.GetSelectedEntity();
+        const auto currentSelection = context.selectionManager.GetCurrentSelection();
+        if (!std::holds_alternative<EntitySelection>(currentSelection))
+        {
+            return std::unexpected(GizmoContextError::NoTargetEntity);
+        }
+        const auto entity = std::get<EntitySelection>(currentSelection).Entity;
         if (entity == entt::null)
         {
             return std::unexpected(GizmoContextError::NoTargetEntity);

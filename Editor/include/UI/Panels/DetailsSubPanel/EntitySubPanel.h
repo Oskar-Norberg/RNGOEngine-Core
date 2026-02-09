@@ -52,7 +52,13 @@ namespace RNGOEngine::Editor
         void RenderSubPanel(UIContext& context) override
         {
             const auto& selectionManager = context.selectionManager;
-            const auto selectedEntity = selectionManager.GetSelectedEntity();
+            const auto currentSelection = selectionManager.GetCurrentSelection();
+            if (!std::holds_alternative<EntitySelection>(currentSelection))
+            {
+                ImGui::Text("No entity selected.");
+                return;
+            }
+            const auto selectedEntity = std::get<EntitySelection>(currentSelection).Entity;
             if (selectedEntity == entt::null)
             {
                 ImGui::Text("No entity selected.");

@@ -26,21 +26,15 @@ namespace RNGOEngine::Editor
     }
     void DetailsPanel::UpdateSubPanelBasedOnSelection(UIContext& context)
     {
-        if (context.selectionManager.GetSelectedEntity() != entt::null)
+        const auto currentSelection = context.selectionManager.GetCurrentSelection();
+
+        if (std::holds_alternative<EntitySelection>(currentSelection))
         {
-            if (!m_subPanel || dynamic_cast<EntityDetailsSubPanel*>(m_subPanel.get()) == nullptr)
-            {
-                m_subPanel = std::make_unique<EntityDetailsSubPanel>();
-                m_subPanel->OnEnter(context);
-            }
+            SwitchToSubPanelIfNotOpen<EntityDetailsSubPanel>(context);
         }
-        else
+        if (std::holds_alternative<AssetSelection>(currentSelection))
         {
-            if (m_subPanel)
-            {
-                m_subPanel->OnExit(context);
-            }
-            m_subPanel.reset();
+            // SwitchToSubPanel<AssetDetailsSubPanel>(context);
         }
     }
 }

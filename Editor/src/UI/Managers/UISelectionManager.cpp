@@ -6,13 +6,23 @@
 
 namespace RNGOEngine::Editor
 {
-    void UISelectionManager::SetSelectedEntity(const entt::entity entity)
+    void UISelectionManager::SelectEntity(const entt::entity entity)
     {
-        m_selectedEntity = entity;
+        m_currentSelection = EntitySelection{entity};
     }
 
-    entt::entity UISelectionManager::GetSelectedEntity() const
+    void UISelectionManager::SelectAsset(const AssetHandling::AssetHandle& assetHandle)
     {
-        return m_selectedEntity;
+        m_currentSelection = AssetSelection{assetHandle};
+    }
+
+    void UISelectionManager::Deselect()
+    {
+        m_currentSelection = NoSelection{};
+    }
+
+    SelectionVariant UISelectionManager::GetCurrentSelection() const
+    {
+        return m_currentSelection;
     }
 }
