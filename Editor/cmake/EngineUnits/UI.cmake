@@ -36,6 +36,8 @@ add_library(${UI_PROJECT_NAME} STATIC
         ### Sub Panels
         include/UI/Panels/DetailsSubPanel/DetailsSubPanel.h
         include/UI/Panels/DetailsSubPanel/EntitySubPanel.h
+        include/UI/Panels/DetailsSubPanel/AssetSubPanel.h
+
 
         include/UI/Panels/ConsolePanel.h
         src/UI/Panels/ConsolePanel.cpp
@@ -45,7 +47,6 @@ add_library(${UI_PROJECT_NAME} STATIC
 
         include/UI/Panels/SceneManagementPanel.h
         src/UI/Panels/SceneManagementPanel.cpp
-
 )
 target_include_directories(${UI_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${UI_PROJECT_NAME} PUBLIC imgui-cmake imguizmo-cmake RNGOEngine_Core)
