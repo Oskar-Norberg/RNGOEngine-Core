@@ -15,15 +15,15 @@ namespace RNGOEngine::Editor
 
         UpdateSubPanelBasedOnSelection(context);
 
-        if (!m_subPanel)
+        if (!m_subPanelManager.HasOpenSubPanel())
         {
             ImGui::Text("No details to show.");
             return;
         }
 
-        ImGui::Text("%s", m_subPanel->GetSubPanelName().data());
+        ImGui::Text("%s", m_subPanelManager.GetSubPanelName().data());
         ImGui::Separator();
-        m_subPanel->RenderSubPanel(context);
+        m_subPanelManager.RenderCurrentSubPanel(context);
     }
     void DetailsPanel::UpdateSubPanelBasedOnSelection(UIContext& context)
     {
@@ -31,11 +31,11 @@ namespace RNGOEngine::Editor
 
         if (std::holds_alternative<EntitySelection>(currentSelection))
         {
-            SwitchToSubPanelIfNotOpen<EntityDetailsSubPanel>(context);
+            m_subPanelManager.SwitchToSubPanelIfNotOpen<EntityDetailsSubPanel>(context);
         }
         if (std::holds_alternative<AssetSelection>(currentSelection))
         {
-            SwitchToSubPanelIfNotOpen<AssetDetailsSubPanel>(context);
+            m_subPanelManager.SwitchToSubPanelIfNotOpen<AssetDetailsSubPanel>(context);
         }
     }
 }
