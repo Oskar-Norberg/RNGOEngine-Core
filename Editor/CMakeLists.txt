@@ -6,6 +6,8 @@ project(${EDITOR_PROJECT_NAME})
 
 set(EDITOR_ASSET_DIR_ABSOLUTE "${CMAKE_CURRENT_SOURCE_DIR}/EditorAssets")
 
+option(RNGOENGINE_UNITY_BUILD "Enable Unity Build for Editor" ON)
+
 # Include Runtime
 add_subdirectory(
         ${CMAKE_CURRENT_SOURCE_DIR}/../Runtime
