@@ -5,6 +5,7 @@
 #include "UI/Panels/DetailsSubPanel/AssetSubPanel.h"
 
 #include "Assets/AssetDatabase/AssetDatabase.h"
+#include "UI/Panels/DetailsSubPanel/AssetPanels/MaterialEditor.h"
 #include "magic_enum/magic_enum.hpp"
 
 namespace RNGOEngine::Editor
@@ -34,5 +35,28 @@ namespace RNGOEngine::Editor
 
         const auto assetFilename = assetInfoOpt->get().Path.filename().string();
         ImGui::Text("%s", assetFilename.c_str());
+
+        SwitchSubPanelBasedOnAsset(selectedAssetHandle, context);
+        m_subPanelManager.RenderCurrentSubPanel(context);
+    }
+
+    void AssetDetailsSubPanel::SwitchSubPanelBasedOnAsset(
+        const AssetHandling::AssetHandle& assetHandle, UIContext& context
+    )
+    {
+        switch (assetHandle.Type)
+        {
+            case AssetHandling::AssetType::Model:
+            case AssetHandling::AssetType::Texture:
+            case AssetHandling::AssetType::Shader:
+            case AssetHandling::AssetType::None:
+            case AssetHandling::AssetType::Count:
+            default:
+                m_subPanelManager.CloseSubPanel(context);
+                break;
+            case AssetHandling::AssetType::Material:
+                m_subPanelManager.SwitchToSubPanelIfNotOpen<MaterialEditor>(context);
+                break;
+        }
     }
 }

@@ -5,6 +5,7 @@
 #pragma once
 
 #include "DetailsSubPanel.h"
+#include "SubPanelManager.h"
 
 namespace RNGOEngine::Editor
 {
@@ -17,5 +18,11 @@ namespace RNGOEngine::Editor
         {
             return "Asset Details";
         }
+
+    private:
+        void SwitchSubPanelBasedOnAsset(const AssetHandling::AssetHandle& assetHandle, UIContext& context);
+
+    private:
+        SubPanelManager m_subPanelManager{};
     };
 }

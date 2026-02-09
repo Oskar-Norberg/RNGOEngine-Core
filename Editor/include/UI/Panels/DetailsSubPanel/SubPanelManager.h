@@ -62,6 +62,16 @@ namespace RNGOEngine::Editor
             m_subPanel->OnEnter(context);
         }
 
+        void CloseSubPanel(UIContext& context)
+        {
+            if (m_subPanel)
+            {
+                m_subPanel->OnExit(context);
+            }
+
+            m_subPanel.reset();
+        }
+
     private:
         std::unique_ptr<DetailsSubPanel> m_subPanel{};
     };
