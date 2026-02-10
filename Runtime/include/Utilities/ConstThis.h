@@ -4,4 +4,6 @@
 
 #pragma once
 
-#define CONST_THIS const_cast<std::remove_const_t<std::remove_reference_t<decltype(*this)>>&>(*this)
+#include <type_traits>
+
+#define CONST_THIS std::as_const(*this)

@@ -60,6 +60,11 @@ namespace RNGOEngine::AssetHandling
             return Parameters;
         }
 
+        std::vector<MaterialParametersContainer>& GetAll()
+        {
+            return Parameters;
+        }
+
     private:
         // Consider stack allocated array with max size?
         std::vector<MaterialParametersContainer> Parameters{};

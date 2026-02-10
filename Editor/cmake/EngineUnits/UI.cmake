@@ -38,9 +38,12 @@ add_library(${UI_PROJECT_NAME} STATIC
         include/UI/Panels/DetailsSubPanel/SubPanelManager.h
 
         include/UI/Panels/DetailsSubPanel/EntitySubPanel.h
+
         include/UI/Panels/DetailsSubPanel/AssetSubPanel.h
         src/UI/Panels/DetailsSubPanel/AssetSubPanel.cpp
         include/UI/Panels/DetailsSubPanel/AssetPanels/MaterialEditor.h
+        src/UI/Panels/DetailsSubPanel/AssetPanels/MaterialEditor.cpp
+
 
         include/UI/Panels/ConsolePanel.h
         src/UI/Panels/ConsolePanel.cpp
