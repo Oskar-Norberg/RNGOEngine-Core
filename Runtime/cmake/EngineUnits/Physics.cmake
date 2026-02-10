@@ -1,4 +1,4 @@
-set(PHYSICS_SYSTEM_PROJECT_NAME RNGOEngine_CollisionSystem)
+set(PHYSICS_SYSTEM_PROJECT_NAME RNGOEngine_Physics)
 add_library(${PHYSICS_SYSTEM_PROJECT_NAME} STATIC
         include/ECS/Systems/Core/Physics/CollisionSystem.h
         src/ECS/Systems/Core/Physics/CollisionSystem.cpp
@@ -6,6 +6,8 @@ add_library(${PHYSICS_SYSTEM_PROJECT_NAME} STATIC
         include/ECS/Systems/Core/Physics/RigidbodyGravitySystem.h
         src/ECS/Systems/Core/Physics/RigidbodyGravitySystem.cpp
 
+        include/ECS/Systems/Core/Physics/RigidbodyApplyForces.h
+        src/ECS/Systems/Core/Physics/RigidbodyApplyForces.cpp
 )
 target_include_directories(${PHYSICS_SYSTEM_PROJECT_NAME} PUBLIC include)
 target_link_libraries(${PHYSICS_SYSTEM_PROJECT_NAME} PUBLIC EnTT)

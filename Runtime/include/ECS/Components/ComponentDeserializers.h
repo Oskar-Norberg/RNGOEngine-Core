@@ -77,6 +77,7 @@ namespace RNGOEngine::Components
     {
         Rigidbody rigidbody;
         rigidbody.HasGravity = node["HasGravity"].as<bool>();
+        rigidbody.IsKinematic = node["IsKinematic"].as<bool>();
 
         return rigidbody;
     }

@@ -36,11 +36,11 @@ namespace RNGOEngine::Core
 
         // Gravity
     public:
-        float GetGravity() const;
-        void SetGravity(float gravity);
+        glm::vec3 GetGravity() const;
+        void SetGravity(glm::vec3 gravity);
 
     private:
-        float m_gravity = 9.82f;
+        glm::vec3 m_gravity = {0.0f, -9.82f, 0.0f};
         entt::registry m_registry;
     };
 }

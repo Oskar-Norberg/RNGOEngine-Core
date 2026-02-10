@@ -7,18 +7,19 @@
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Bootstrapper/AssetImporterBootstrapper.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
-#include "Renderer/API/Passes/DirectionalShadowMapPass.h"
-#include "Renderer/API/Passes/ForwardPass.h"
-#include "Renderer/API/Passes/ForwardScreenPass.h"
-#include "Renderer/Null/NullRenderer.h"
-#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "ECS/Systems/Core/Physics/CollisionSystem.h"
+#include "ECS/Systems/Core/Physics/RigidbodyApplyForces.h"
 #include "ECS/Systems/Core/Physics/RigidbodyGravitySystem.h"
 #include "ECS/Systems/Core/Rendering/BeginFrameSystem.h"
 #include "ECS/Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
 #include "ECS/Systems/Core/Rendering/Debug/RenderDebugCollisionsSystem.h"
 #include "ECS/Systems/Core/Rendering/EndFrameSystem.h"
 #include "ECS/Systems/Core/Rendering/RenderSystem.h"
+#include "Renderer/API/Passes/DirectionalShadowMapPass.h"
+#include "Renderer/API/Passes/ForwardPass.h"
+#include "Renderer/API/Passes/ForwardScreenPass.h"
+#include "Renderer/Null/NullRenderer.h"
+#include "Renderer/OpenGL/OpenGLRenderer.h"
 #include "Window/GLFW/GLFWWindow.h"
 #include "Window/Null/NullWindow.h"
 
@@ -253,8 +254,9 @@ namespace RNGOEngine
 
     void Application::AddEngineSystems()
     {
-        m_engineSystems.RegisterSystem<Systems::Core::CollisionSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RigidbodyGravitySystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RigidbodyApplyForcesSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::CollisionSystem>();
 
         m_engineSystems.RegisterSystem<Systems::Core::BeginFrameSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
