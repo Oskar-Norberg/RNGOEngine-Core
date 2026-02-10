@@ -4,15 +4,9 @@
 
 #include "UI/Panels/ContentDrawerPanel.h"
 
-#include <unordered_set>
-
-#include "Assets/AssetDatabase/AssetDatabase.h"
 #include "Assets/AssetLoader.h"
-#include "Logging/Logger.h"
 #include "UI/AssetDragAndDrop.h"
 #include "magic_enum/magic_enum.hpp"
-#include "yaml-cpp/node/node.h"
-#include "yaml-cpp/node/parse.h"
 
 namespace RNGOEngine::Editor
 {
@@ -25,221 +19,142 @@ namespace RNGOEngine::Editor
     {
         IDockablePanel::Render(context);
 
-        // Preparation
-        CheckDeferredPath();
+        LoadDeferredPathIfAny();
+        RenderFolderView(context);
+    }
 
-        // Rendering
+    void ContentDrawerPanel::SetDeferredPath(const std::filesystem::path& path)
+    {
+        m_deferredPathOpt = path;
+    }
+
+    void ContentDrawerPanel::LoadDeferredPathIfAny()
+    {
+        if (!m_deferredPathOpt)
+        {
+            return;
+        }
+
+        const auto& folderToLoad = m_deferredPathOpt.value();
+        m_currentFolder = CurrentFolder{.Path = folderToLoad, .Content = GetFolderContent(folderToLoad)};
+
+        m_deferredPathOpt.reset();
+    }
+
+    void ContentDrawerPanel::RenderFolderView(UIContext& context)
+    {
         DrawHeader(context);
-        ImGui::Separator();
-        {
-            ImGui::BeginChild("ContentDrawerPanelContent");
-            DrawContent(context);
-            ImGui::EndChild();
-        }
-    }
-
-    Folder ContentDrawerPanel::LoadFolder(const std::filesystem::path& path)
-    {
-        Folder folder;
-
-        const auto metadataMap = ScanMetadata(path, folder);
-
-        ScanAssets(path, metadataMap, folder);
-        ScanFolders(path, folder);
-        ScanUnimportedFiles(path, metadataMap, folder);
-
-        return folder;
-    }
-
-    std::unordered_map<std::filesystem::path, AssetHandling::AssetType> ContentDrawerPanel::ScanMetadata(
-        const std::filesystem::path& path, Folder& outFolder
-    )
-    {
-        std::unordered_map<std::filesystem::path, AssetHandling::AssetType> metadataMap;
-
-        for (const auto& entry : std::filesystem::directory_iterator(path))
-        {
-            if (entry.is_directory())
-            {
-                continue;
-            }
-
-            if (entry.path().extension() != ".meta")
-            {
-                continue;
-            }
-
-            YAML::Node node = YAML::LoadFile(entry.path().string());
-            const auto typeOpt =
-                magic_enum::enum_cast<AssetHandling::AssetType>(node["Type"].as<std::string>());
-
-            if (!typeOpt)
-            {
-                // TODO: Log error? That's gonna spam console...
-                continue;
-            }
-
-            const auto type = typeOpt.value();
-            const auto assetPath = entry.path().parent_path() / entry.path().stem();
-            metadataMap.emplace(assetPath, type);
-        }
-
-        return metadataMap;
-    }
-
-    void ContentDrawerPanel::ScanAssets(
-        const std::filesystem::path& path,
-        const std::unordered_map<std::filesystem::path, AssetHandling::AssetType>& metadataMap,
-        Folder& outFolder
-    )
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(path))
-        {
-            if (entry.is_directory())
-            {
-                continue;
-            }
-
-            const auto it = metadataMap.find(entry.path());
-            if (it != metadataMap.end())
-            {
-                outFolder.Assets.emplace_back(it->second, entry.path());
-            }
-        }
-    }
-
-    void ContentDrawerPanel::ScanFolders(const std::filesystem::path& path, Folder& outFolder)
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(path))
-        {
-            if (!entry.is_directory())
-            {
-                continue;
-            }
-
-            outFolder.Folders.emplace_back(entry.path());
-        }
-    }
-
-    void ContentDrawerPanel::ScanUnimportedFiles(
-        const std::filesystem::path& path,
-        const std::unordered_map<std::filesystem::path, AssetHandling::AssetType>& metadataMap,
-        Folder& outFolder
-    )
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(path))
-        {
-            if (entry.is_directory())
-            {
-                continue;
-            }
-
-            if (entry.path().extension() == ".meta")
-            {
-                continue;
-            }
-
-            if (metadataMap.contains(entry.path()))
-            {
-                continue;
-            }
-
-            outFolder.Assets.emplace_back(AssetHandling::AssetType::None, entry.path());
-        }
+        DrawBody(context);
     }
 
     void ContentDrawerPanel::DrawHeader(UIContext& context)
     {
         if (ImGui::Button("Refresh"))
         {
-            RefreshCurrentFolder();
+            SetDeferredPath(m_currentFolder.Path);
         }
         ImGui::SameLine();
         if (ImGui::Button("Home"))
         {
             SetDeferredPath(std::filesystem::current_path());
         }
+        ImGui::SameLine();
+        ImGui::Text("%s", m_currentFolder.Path.string().data());
     }
 
-    void ContentDrawerPanel::DrawContent(UIContext& context)
+    void ContentDrawerPanel::DrawBody(UIContext& context)
     {
         constexpr ImGuiTableFlags tableFlags = ImGuiTableFlags_RowBg;
         if (ImGui::BeginTable("Folder", 1, tableFlags))
         {
-            if (m_currentPath.has_parent_path())
-            {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-
-                std::string_view label = "..";
-                DrawFolder(context, label, m_currentPath.parent_path());
-            }
-
-            for (const auto& folder : m_currentFolder.Folders)
-            {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-
-                const auto folderName = folder.filename().string();
-                const auto folderNameView = std::string_view(folderName);
-
-                DrawFolder(context, folderNameView, folder);
-            }
-
-            for (const auto& asset : m_currentFolder.Assets)
-            {
-                ImGui::TableNextRow();
-                ImGui::TableNextColumn();
-
-                const auto label = asset.Path.filename().string();
-                const auto labelView = std::string_view(label);
-                DrawAsset(context, labelView, asset.Type, asset.Path);
-            }
+            // TODO: Render ".." entry.
+            RenderSubfolders(context);
+            RenderAssets(context);
 
             ImGui::EndTable();
         }
     }
 
-    void ContentDrawerPanel::CheckDeferredPath()
+    void ContentDrawerPanel::RenderSubfolders(UIContext& context)
     {
-        if (m_queuedSelectionPath)
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+
+        RenderFolderEntry(m_currentFolder.Path.parent_path(), "..", context);
+
+        for (const auto& subfolderPath : m_currentFolder.Content.SubFolders)
         {
-            m_currentPath = m_queuedSelectionPath.value();
-            m_currentFolder = LoadFolder(m_currentPath);
-            m_queuedSelectionPath.reset();
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+
+            // TODO: Just do default args :sob:
+            RenderFolderEntry(subfolderPath, std::nullopt, context);
         }
     }
 
-    void ContentDrawerPanel::SetDeferredPath(const std::filesystem::path& path)
+    void ContentDrawerPanel::RenderAssets(UIContext& context)
     {
-        m_queuedSelectionPath = path;
-    }
+        for (const auto& assetEntry : m_currentFolder.Content.Assets)
+        {
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
 
-    void ContentDrawerPanel::DrawFolder(
-        UIContext& context, std::string_view label, const std::filesystem::path& path
+            RenderAssetEntry(assetEntry, context);
+        }
+    }
+    void ContentDrawerPanel::RenderFolderEntry(
+        const std::filesystem::path& folderPath, std::optional<std::string> customLabel, UIContext& context
     )
     {
-        std::string folderLabel = "[Folder] " + std::string(label);
+        const std::string folderLabel = "[Folder] " + customLabel.value_or(folderPath.filename().string());
+
         if (ImGui::Selectable(folderLabel.data(), false, ImGuiSelectableFlags_AllowDoubleClick))
         {
             if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
             {
-                SetDeferredPath(path);
+                SetDeferredPath(folderPath);
             }
         }
     }
 
-    void ContentDrawerPanel::DrawAsset(
-        UIContext& context, std::string_view label, AssetHandling::AssetType type,
-        const std::filesystem::path& path
-    )
+    // TODO: Too long.
+    void ContentDrawerPanel::RenderAssetEntry(const AssetEntry& assetEntry, UIContext& context)
     {
-        static AssetDragAndDropPayload assetDragAndDropPayload;
+        std::optional<AssetHandling::AssetHandle> assetHandleOpt;
+        auto path = std::filesystem::path{};
 
-        const auto labelWithType =
-            "[" + std::string(magic_enum::enum_name(type)) + "] " + path.filename().string();
-        const auto labelWithTypeView = std::string_view(labelWithType);
-        ImGui::Selectable(labelWithTypeView.data(), false, ImGuiSelectableFlags_AllowDoubleClick);
+        if (std::holds_alternative<RegisteredAsset>(assetEntry))
+        {
+            const auto& registeredAsset = std::get<RegisteredAsset>(assetEntry);
+            assetHandleOpt =
+                AssetHandling::AssetHandle{registeredAsset.Handle.UUID, registeredAsset.Handle.Type};
+            path = registeredAsset.Path;
+        }
+        else if (std::holds_alternative<UnregisteredAsset>(assetEntry))
+        {
+            const auto& unregisteredAsset = std::get<UnregisteredAsset>(assetEntry);
+            path = unregisteredAsset.Path;
+        }
+
+        const auto labelWithType = assetHandleOpt.has_value()
+                                       ? "[" + std::string(magic_enum::enum_name(assetHandleOpt->Type)) +
+                                             "] " + path.filename().string()
+                                       : "[None] " + path.filename().string();
+
+        // const auto labelWithType =
+        //     "[" + std::string(magic_enum::enum_name(assetType)) + "] " + path.filename().string();
+
+        if (ImGui::Selectable(labelWithType.c_str(), false, ImGuiSelectableFlags_AllowDoubleClick))
+        {
+            if (assetHandleOpt.has_value())
+            {
+                context.selectionManager.SelectAsset(assetHandleOpt.value());
+            }
+            else
+            {
+                context.selectionManager.Deselect();
+            }
+        }
 
         if (ImGui::BeginPopupContextItem())
         {
@@ -247,11 +162,22 @@ namespace RNGOEngine::Editor
 
             if (ImGui::MenuItem("Import"))
             {
-                const auto assetHandleOpt = AssetHandling::AssetLoader::GetInstance().TryImport(path);
-                // Asset was just updated, refresh folder to show AssetType
-                if (assetHandleOpt)
+                if (AssetHandling::AssetLoader::GetInstance().TryImport(path))
                 {
-                    RefreshCurrentFolder();
+                    SetDeferredPath(m_currentFolder.Path);
+                }
+
+                ImGui::CloseCurrentPopup();
+            }
+
+            // Debug only
+            if (ImGui::MenuItem("Force Load"))
+            {
+                const auto loadedAssetOpt = AssetHandling::AssetLoader::GetInstance().TryImport(path);
+                if (loadedAssetOpt)
+                {
+                    SetDeferredPath(m_currentFolder.Path);
+                    AssetHandling::AssetLoader::GetInstance().Load(loadedAssetOpt.value());
                 }
 
                 ImGui::CloseCurrentPopup();
@@ -260,10 +186,11 @@ namespace RNGOEngine::Editor
             ImGui::EndPopup();
         }
 
+        static AssetDragAndDropPayload assetDragAndDropPayload;
         constexpr ImGuiDragDropFlags src_flags =
             ImGuiDragDropFlags_SourceNoDisableHover | ImGuiDragDropFlags_SourceNoHoldToOpenOthers;
 
-        if (AssetHandling::AssetDatabase::GetInstance().IsRegistered(path))
+        if (assetHandleOpt.has_value())
         {
             if (ImGui::BeginDragDropSource(src_flags))
             {
@@ -272,9 +199,8 @@ namespace RNGOEngine::Editor
                     ImGui::Text("Moving");
                 }
 
-                const auto handle = AssetHandling::AssetDatabase::GetInstance().GetAssetHandle(path);
+                assetDragAndDropPayload.Handle = assetHandleOpt.value();
 
-                assetDragAndDropPayload = {type, handle};
                 ImGui::SetDragDropPayload(
                     AssetDragAndDropName, &assetDragAndDropPayload, sizeof(AssetDragAndDropPayload)
                 );
@@ -282,10 +208,5 @@ namespace RNGOEngine::Editor
                 ImGui::EndDragDropSource();
             }
         }
-    }
-
-    void ContentDrawerPanel::RefreshCurrentFolder()
-    {
-        SetDeferredPath(m_currentPath);
     }
 }

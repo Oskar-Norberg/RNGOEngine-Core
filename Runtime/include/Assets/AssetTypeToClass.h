@@ -17,7 +17,6 @@ namespace RNGOEngine::AssetHandling
 
     // TODO: It's ugly, but whenever we need to make a new AssetType.
     // Just add a mapping of its class to Type here.
-
     template<>
     struct ClassForAssetType<AssetType::Model>
     {
@@ -34,5 +33,11 @@ namespace RNGOEngine::AssetHandling
     struct ClassForAssetType<AssetType::Shader>
     {
         using Type = ShaderAsset;
+    };
+
+    template<>
+    struct ClassForAssetType<AssetType::Material>
+    {
+        using Type = MaterialAsset;
     };
 }

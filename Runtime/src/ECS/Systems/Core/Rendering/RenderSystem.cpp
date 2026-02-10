@@ -8,11 +8,12 @@
 #include "Assets/AssetManager/AssetManager.h"
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "Assets/RuntimeAssetRegistry/RuntimeAssetRegistry.h"
-#include "Utilities/Profiling/Profiling.h"
-#include "Renderer/API/RenderAPI.h"
 #include "ECS/Systems/SystemContext.h"
-#include "Utilities/RNGOAsserts.h"
+#include "Logging/Logger.h"
+#include "Renderer/API/RenderAPI.h"
 #include "Scene/World/World.h"
+#include "Utilities/Profiling/Profiling.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Systems::Core
 {
@@ -253,120 +254,36 @@ namespace RNGOEngine::Systems::Core
     {
         std::vector<RNGOEngine::Core::Renderer::Drawable> drawables;
 
-        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
-        auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
-        auto& shaderManager = resourceManager.GetShaderResourceManager();
-
         const auto renderView = world.GetRegistry().view<Components::MeshRenderer>();
 
         for (const auto& [entity, meshRender] : renderView.each())
         {
             const auto gpuMeshes = GetOrLoadModel(meshRender.ModelHandle);
+            const auto gpuMaterial = GetOrLoadMaterial(meshRender.MaterialKey);
 
-            auto& materialAsset = runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(meshRender.MaterialKey)
-                                      .value_or(runtimeRegistry
-                                                    .TryGet<AssetHandling::MaterialAsset>(
-                                                        AssetHandling::BuiltinAssets::GetErrorHandle(
-                                                            AssetHandling::AssetType::Material
-                                                        )
-                                                    )
-                                                    .value())
-                                      .get();
-
-            auto& shaderAsset =
-                runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetHandle())
-                    .value_or(
-                        runtimeRegistry
-                            .TryGet<AssetHandling::ShaderAsset>(
-                                AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
-                            )
-                            .value()
-                    )
-                    .get();
-
-            auto resolvedShader = shaderManager.GetShaderProgram(shaderAsset.GetShaderKey()).value();
-
-            RNGOEngine::Core::Renderer::GPUMaterial gpuMaterial{
-                .ShaderProgram = resolvedShader, .Parameters = {}
-            };
-
-            gpuMaterial.Parameters.reserve(materialAsset.GetParameters().Parameters.size());
-
-            for (const auto& uniform : materialAsset.GetParameters().Parameters)
+            if (!gpuMeshes || !gpuMaterial)
             {
-                if (std::holds_alternative<bool>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<bool>(uniform.Value));
-                }
-                else if (std::holds_alternative<int>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<int>(uniform.Value));
-                }
-                else if (std::holds_alternative<float>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<float>(uniform.Value));
-                }
-                else if (std::holds_alternative<glm::vec2>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::vec2>(uniform.Value));
-                }
-                else if (std::holds_alternative<glm::vec3>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::vec3>(uniform.Value));
-                }
-                else if (std::holds_alternative<glm::vec4>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::vec4>(uniform.Value));
-                }
-                else if (std::holds_alternative<glm::mat4>(uniform.Value))
-                {
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, std::get<glm::mat4>(uniform.Value));
-                }
-                else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.Value))
-                {
-                    const auto& textureSpec =
-                        std::get<AssetHandling::MaterialTextureSpecification>(uniform.Value);
-
-                    const auto textureAssetOpt =
-                        runtimeRegistry.TryGet<AssetHandling::TextureAsset>(textureSpec.TextureHandle);
-
-                    const auto& textureAsset =
-                        textureAssetOpt
-                            .value_or(runtimeRegistry
-                                          .TryGet<AssetHandling::TextureAsset>(
-                                              AssetHandling::BuiltinAssets::GetErrorHandle(
-                                                  AssetHandling::AssetType::Texture
-                                              )
-                                          )
-                                          .value())
-                            .get();
-
-                    // Because the Asset is guaranteed to be valid, we can just .value() here.
-                    const auto textureResourceOpt = resourceManager.GetTextureResourceManager()
-                                                        .GetTexture(textureAsset.GetTextureKey())
-                                                        .value();
-
-                    RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
-                        .TextureHandle = textureResourceOpt, .Slot = textureSpec.Slot
-                    };
-                    gpuMaterial.Parameters.emplace_back(uniform.Name, gpuTextureSpec);
-                }
+                RNGO_LOG(
+                    RNGOEngine::Core::LogLevel::Warning,
+                    "Could not load model or material. Skipping rendering this entity."
+                );
+                continue;
             }
 
             const auto transform = world.GetRegistry().all_of<Components::Transform>(entity)
                                        ? world.GetRegistry().get<Components::Transform>(entity)
                                        : Components::Transform();
 
-            RNGOEngine::Core::Renderer::GPUModel gpuModel{.Meshes = gpuMeshes};
+            RNGOEngine::Core::Renderer::GPUModel gpuModel{.Meshes = gpuMeshes.value()};
 
-            drawables.emplace_back(transform, gpuModel, gpuMaterial);
+            drawables.emplace_back(transform, gpuModel, gpuMaterial.value());
         }
 
         return drawables;
     }
 
-    std::vector<RNGOEngine::Core::Renderer::GPUMesh> RenderSystem::GetOrLoadModel(
-        const AssetHandling::AssetHandle& modelHandle
+    std::optional<std::vector<RNGOEngine::Core::Renderer::GPUMesh>> RenderSystem::GetOrLoadModel(
+        const AssetHandling::ModelHandle& modelHandle, const bool isError
     )
     {
         auto& assetDatabase = AssetHandling::AssetDatabase::GetInstance();
@@ -377,9 +294,17 @@ namespace RNGOEngine::Systems::Core
         // Is model Registered?
         if (!assetDatabase.IsRegistered(modelHandle))
         {
+            // If we're already trying to load the error model, just return empty to avoid infinite recursion.
+            if (isError)
+            {
+                return std::nullopt;
+            }
             // Unregistered model, return error model.
             return GetOrLoadModel(
-                AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model)
+                AssetHandling::ModelHandle{
+                    AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Model).UUID
+                },
+                true
             );
         }
 
@@ -419,9 +344,149 @@ namespace RNGOEngine::Systems::Core
 
         return gpuMeshes;
     }
-    RNGOEngine::Core::Renderer::GPUMaterial RenderSystem::GetOrLoadMaterial(
-        const AssetHandling::AssetHandle& materialHandle
+
+    std::optional<RNGOEngine::Core::Renderer::GPUMaterial> RenderSystem::GetOrLoadMaterial(
+        const AssetHandling::MaterialHandle& materialHandle, const bool isError
     )
     {
+        auto& database = AssetHandling::AssetDatabase::GetInstance();
+        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
+        auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
+        auto& shaderManager = resourceManager.GetShaderResourceManager();
+
+        // Is material registered?
+        if (!database.IsRegistered(materialHandle))
+        {
+            // If we're already trying to load the error model, just return empty to avoid infinite recursion.
+            if (isError)
+            {
+                return std::nullopt;
+            }
+            // Unregistered material, return error material.
+            return GetOrLoadMaterial(
+                AssetHandling::MaterialHandle{
+                    AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material).UUID
+                },
+                true
+            );
+        }
+
+        const auto assetState = AssetHandling::RuntimeAssetRegistry::GetInstance().GetState(
+            AssetHandling::AssetType::Material, materialHandle
+        );
+        // If model isn't ready, load it.
+        if (assetState != AssetHandling::AssetState::Ready)
+        {
+            AssetHandling::AssetLoader::GetInstance().Load(materialHandle);
+        }
+
+        auto& materialAsset =
+            runtimeRegistry.TryGet<AssetHandling::MaterialAsset>(materialHandle)
+                .value_or(
+                    runtimeRegistry
+                        .TryGet<AssetHandling::MaterialAsset>(
+                            AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Material)
+                        )
+                        .value()
+                )
+                .get();
+
+        auto shaderAssetOpt =
+            runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(materialAsset.GetShaderHandle())
+                .or_else(
+                    [&runtimeRegistry]()
+                    {
+                        return runtimeRegistry.TryGet<AssetHandling::ShaderAsset>(
+                            AssetHandling::BuiltinAssets::GetErrorHandle(AssetHandling::AssetType::Shader)
+                        );
+                    }
+                );
+
+        if (!shaderAssetOpt)
+        {
+            return std::nullopt;
+        }
+
+        const auto& shaderAsset = shaderAssetOpt.value().get();
+
+        const auto resolvedShader = shaderManager.GetShaderProgram(shaderAsset.GetShaderKey()).value();
+
+        return RNGOEngine::Core::Renderer::GPUMaterial{
+            .ShaderProgram = resolvedShader, .Parameters = ResolveMaterialParameters(materialAsset)
+        };
+    }
+
+    std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> RenderSystem::ResolveMaterialParameters(
+        const AssetHandling::MaterialAsset& materialAsset
+    )
+    {
+        auto& runtimeRegistry = AssetHandling::RuntimeAssetRegistry::GetInstance();
+        auto& resourceManager = RNGOEngine::Resources::ResourceManager::GetInstance();
+        std::vector<RNGOEngine::Core::Renderer::GPUMaterialParameter> resolvedParams;
+        const auto& params = materialAsset.GetParameters().GetAll();
+        resolvedParams.reserve(params.size());
+
+        // Albedo
+        for (const auto& uniform : params)
+        {
+            if (std::holds_alternative<bool>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<bool>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<int>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<int>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<float>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<float>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<glm::vec2>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::vec2>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<glm::vec3>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::vec3>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<glm::vec4>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::vec4>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<glm::mat4>(uniform.Parameter))
+            {
+                resolvedParams.emplace_back(uniform.Name, std::get<glm::mat4>(uniform.Parameter));
+            }
+            else if (std::holds_alternative<AssetHandling::MaterialTextureSpecification>(uniform.Parameter))
+            {
+                const auto& textureSpec =
+                    std::get<AssetHandling::MaterialTextureSpecification>(uniform.Parameter);
+
+                const auto textureAssetOpt =
+                    runtimeRegistry.TryGet<AssetHandling::TextureAsset>(textureSpec.TextureHandle);
+
+                const auto& textureAsset = textureAssetOpt
+                                               .value_or(runtimeRegistry
+                                                             .TryGet<AssetHandling::TextureAsset>(
+                                                                 AssetHandling::BuiltinAssets::GetErrorHandle(
+                                                                     AssetHandling::AssetType::Texture
+                                                                 )
+                                                             )
+                                                             .value())
+                                               .get();
+
+                // Because the Asset is guaranteed to be valid, we can just .value() here.
+                const auto textureResourceOpt = resourceManager.GetTextureResourceManager()
+                                                    .GetTexture(textureAsset.GetTextureKey())
+                                                    .value();
+
+                RNGOEngine::Core::Renderer::GPUMaterialTextureSpecification gpuTextureSpec{
+                    .TextureHandle = textureResourceOpt, .Slot = textureSpec.Slot
+                };
+                resolvedParams.emplace_back(uniform.Name, gpuTextureSpec);
+            }
+        }
+
+        return resolvedParams;
     }
 }

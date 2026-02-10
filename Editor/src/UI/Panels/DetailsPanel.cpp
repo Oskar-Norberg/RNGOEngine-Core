@@ -4,8 +4,8 @@
 
 #include "UI/Panels/DetailsPanel.h"
 
-#include "UI/Managers/UISelectionManager.h"
-#include "glm/gtc/type_ptr.hpp"
+#include "UI/Panels/DetailsSubPanel/AssetSubPanel.h"
+#include "UI/Panels/DetailsSubPanel/EntitySubPanel.h"
 
 namespace RNGOEngine::Editor
 {
@@ -13,58 +13,29 @@ namespace RNGOEngine::Editor
     {
         IDockablePanel::Render(context);
 
-        const auto& selectionManager = context.selectionManager;
-        const auto selectedEntity = selectionManager.GetSelectedEntity();
-        if (selectedEntity == entt::null)
+        UpdateSubPanelBasedOnSelection(context);
+
+        if (!m_subPanelManager.HasOpenSubPanel())
         {
-            ImGui::Text("No entity selected.");
+            ImGui::Text("No details to show.");
             return;
         }
 
-        // TODO:Temporarily display components directly in here. Later this will need a separate panel / proper serialization.
-        auto& registry = context.sceneManager->GetCurrentWorld()->GetRegistry();
+        ImGui::Text("%s", m_subPanelManager.GetSubPanelName().data());
+        ImGui::Separator();
+        m_subPanelManager.RenderCurrentSubPanel(context);
+    }
+    void DetailsPanel::UpdateSubPanelBasedOnSelection(UIContext& context)
+    {
+        const auto currentSelection = context.selectionManager.GetCurrentSelection();
 
-        // TODO: Not the best solution, but works for now.
-        DrawComponent<Components::Name>(registry, selectedEntity);
-        DrawComponent<Components::Transform>(registry, selectedEntity);
-        DrawComponent<Components::MeshRenderer>(registry, selectedEntity);
-        DrawComponent<Components::Camera>(registry, selectedEntity);
-        DrawComponent<Components::SphereCollider>(registry, selectedEntity);
-        DrawComponent<Components::BoxCollider>(registry, selectedEntity);
-        DrawComponent<Components::Rigidbody>(registry, selectedEntity);
-        DrawComponent<Components::Color>(registry, selectedEntity);
-        DrawComponent<Components::Intensity>(registry, selectedEntity);
-        DrawComponent<Components::BackgroundColor>(registry, selectedEntity);
-        DrawComponent<Components::LightFalloff>(registry, selectedEntity);
-        DrawComponent<Components::AmbientLight>(registry, selectedEntity);
-        DrawComponent<Components::DirectionalLight>(registry, selectedEntity);
-        DrawComponent<Components::PointLight>(registry, selectedEntity);
-        DrawComponent<Components::Spotlight>(registry, selectedEntity);
-
-        if (ImGui::Button("Add Component"))
+        if (std::holds_alternative<EntitySelection>(currentSelection))
         {
-            ImGui::OpenPopup("AddComponentPopup");
+            m_subPanelManager.SwitchToSubPanelIfNotOpen<EntityDetailsSubPanel>(context);
         }
-
-        if (ImGui::BeginPopup("AddComponentPopup"))
+        if (std::holds_alternative<AssetSelection>(currentSelection))
         {
-            DrawAddComponent<Components::Name>(registry, selectedEntity, "Name");
-            DrawAddComponent<Components::Transform>(registry, selectedEntity, "Transform");
-            DrawAddComponent<Components::MeshRenderer>(registry, selectedEntity, "MeshRenderer");
-            DrawAddComponent<Components::Camera>(registry, selectedEntity, "Camera");
-            DrawAddComponent<Components::SphereCollider>(registry, selectedEntity, "SphereCollider");
-            DrawAddComponent<Components::BoxCollider>(registry, selectedEntity, "BoxCollider");
-            DrawAddComponent<Components::Rigidbody>(registry, selectedEntity, "Rigidbody");
-            DrawAddComponent<Components::Color>(registry, selectedEntity, "Color");
-            DrawAddComponent<Components::Intensity>(registry, selectedEntity, "Intensity");
-            DrawAddComponent<Components::BackgroundColor>(registry, selectedEntity, "BackgroundColor");
-            DrawAddComponent<Components::LightFalloff>(registry, selectedEntity, "LightFalloff");
-            DrawAddComponent<Components::AmbientLight>(registry, selectedEntity, "AmbientLight");
-            DrawAddComponent<Components::DirectionalLight>(registry, selectedEntity, "DirectionalLight");
-            DrawAddComponent<Components::PointLight>(registry, selectedEntity, "PointLight");
-            DrawAddComponent<Components::Spotlight>(registry, selectedEntity, "Spotlight");
-            
-            ImGui::EndPopup();
+            m_subPanelManager.SwitchToSubPanelIfNotOpen<AssetDetailsSubPanel>(context);
         }
     }
 }

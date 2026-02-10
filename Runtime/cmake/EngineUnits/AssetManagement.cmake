@@ -21,6 +21,7 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
         include/Assets/AssetSerializers/TextureAssetSerializer.h
         include/Assets/AssetSerializers/ShaderAssetSerializer.h
         include/Assets/AssetSerializers/ModelAssetSerializer.h
+        include/Assets/AssetSerializers/MaterialAssetSerializer.h
 
         # Asset Importers
         include/Assets/AssetImporters/AssetImporter.h
@@ -33,6 +34,9 @@ add_library(${ASSET_MANAGER_PROJECT_NAME} STATIC
 
         include/Assets/AssetImporters/ShaderAssetImporter.h
         src/Assets/AssetImporters/ShaderAssetImporter.cpp
+
+        include/Assets/AssetImporters/MaterialImporter.h
+        src/Assets/AssetImporters/MaterialImporter.cpp
 
         include/Assets/AssetLoader.h
         src/Assets/AssetLoader.cpp

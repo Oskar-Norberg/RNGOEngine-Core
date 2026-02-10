@@ -14,7 +14,7 @@ namespace RNGOEngine::AssetHandling
     public:
         // CreateMaterial and insert it to RuntimeAssetRegistry.
         MaterialAsset& CreateMaterial(
-            const AssetHandle& handle, const AssetHandle& shader, MaterialParameters& parameters
+            const AssetHandle& handle, const MaterialSpecification& materialSpecification
         );
 
         // TODO: Create without inserting to registry?

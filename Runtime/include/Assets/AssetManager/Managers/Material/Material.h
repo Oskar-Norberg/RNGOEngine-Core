@@ -20,17 +20,60 @@ namespace RNGOEngine::AssetHandling
         int Slot;
     };
 
-    struct MaterialParameter
+    using MaterialParameter = std::variant<
+        bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat4, MaterialTextureSpecification>;
+
+    struct MaterialParametersContainer
     {
-        std::string Name;
-        std::variant<
-            bool, int, float, glm::vec2, glm::vec3, glm::vec4, glm::mat4, MaterialTextureSpecification>
-            Value;
+        std::string Name{};
+        MaterialParameter Parameter{};
     };
 
-    struct MaterialParameters
+    class MaterialParameters
     {
+    public:
+        void Add(std::string_view name, const MaterialParameter& parameter, const bool overwrite = false)
+        {
+            const auto it = std::ranges::find_if(
+                Parameters,
+                [&](const auto& paramPair)
+                {
+                    return paramPair.Name == name;
+                }
+            );
+
+            if (it != Parameters.end())
+            {
+                if (overwrite)
+                {
+                    it->Parameter = parameter;
+                }
+            }
+            else
+            {
+                Parameters.emplace_back(std::string(name), parameter);
+            }
+        }
+
+        const std::vector<MaterialParametersContainer>& GetAll() const
+        {
+            return Parameters;
+        }
+
+        std::vector<MaterialParametersContainer>& GetAll()
+        {
+            return Parameters;
+        }
+
+    private:
         // Consider stack allocated array with max size?
-        std::vector<MaterialParameter> Parameters{};
+        std::vector<MaterialParametersContainer> Parameters{};
+    };
+
+    struct MaterialSpecification
+    {
+        ShaderHandle ShaderHandle{};
+
+        MaterialParameters Parameters{};
     };
 }

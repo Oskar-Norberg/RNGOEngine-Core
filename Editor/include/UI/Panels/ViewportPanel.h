@@ -14,6 +14,10 @@
 #include "ImGuizmo.h"
 #include "UI/PanelInitializer.h"
 
+namespace RNGOEngine::Editor::Gizmo
+{
+    struct GizmoData;
+}
 namespace RNGOEngine::Editor
 {
     // TODO: I don't think these should be here. But works for now.
@@ -37,13 +41,6 @@ namespace RNGOEngine::Editor
         CameraMissingTransform,
     };
 
-    struct GizmoData
-    {
-        ImGuizmo::OPERATION CurrentGizmoOperation = ImGuizmo::TRANSLATE;
-        ImGuizmo::MODE CurrentGizmoMode = ImGuizmo::WORLD;
-        // Add snap and Snapping scale.
-    };
-
     class ViewPortPanel : public IDockablePanel
     {
     public:
@@ -61,12 +58,9 @@ namespace RNGOEngine::Editor
     private:
         std::optional<Containers::GenerationalKey<Resources::RenderTarget>> m_viewportRenderTargetKeyOpt{};
 
-        // TODO: Move to UIContext?
-        GizmoData m_gizmoData;
-
     private:
         // TODO: I don't think the Gizmo should be drawn in the ViewportPanel. More like it should be a layer over the Viewport. LayerStack?
-        void DrawGizmo(const DrawGizmoContext& context);
+        void DrawGizmo(Gizmo::GizmoData& gizmoData, const DrawGizmoContext& context);
 
     private:
         std::expected<DrawGizmoContext, GizmoContextError> CreateGizmoContext(

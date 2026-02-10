@@ -39,6 +39,11 @@ namespace RNGOEngine::AssetHandling
             }
             break;
             case AssetType::Material:
+            {
+                using TAsset = ClassForAssetType<AssetType::Material>::Type;
+                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+                storage.erase(handle);
+            }
             case AssetType::None:
             case AssetType::Count:
             default:
@@ -87,6 +92,16 @@ namespace RNGOEngine::AssetHandling
             }
             break;
             case AssetType::Material:
+            {
+                using TAsset = ClassForAssetType<AssetType::Material>::Type;
+                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+                const auto it = storage.find(handle);
+                if (it != storage.end())
+                {
+                    state = it->second.State;
+                }
+            }
+            break;
             case AssetType::None:
             case AssetType::Count:
             default:
@@ -137,6 +152,16 @@ namespace RNGOEngine::AssetHandling
             }
             break;
             case AssetType::Material:
+            {
+                using TAsset = ClassForAssetType<AssetType::Shader>::Type;
+                auto& storage = std::get<AssetMap<TAsset>>(m_assetStorage);
+                const auto it = storage.find(handle);
+                if (it != storage.end())
+                {
+                    it->second.State = state;
+                }
+            }
+            break;
             case AssetType::None:
             case AssetType::Count:
             default:
