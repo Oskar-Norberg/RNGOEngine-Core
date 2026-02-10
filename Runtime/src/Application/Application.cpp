@@ -9,6 +9,7 @@
 #include "Assets/Builtin/BuiltinAssetBootstrapper.h"
 #include "ECS/Systems/Core/Physics/CollisionSystem.h"
 #include "ECS/Systems/Core/Physics/RigidbodyApplyForces.h"
+#include "ECS/Systems/Core/Physics/RigidbodyCollisionResolutionSystem.h"
 #include "ECS/Systems/Core/Physics/RigidbodyGravitySystem.h"
 #include "ECS/Systems/Core/Rendering/BeginFrameSystem.h"
 #include "ECS/Systems/Core/Rendering/Debug/RenderDebugCollidersSystem.h"
@@ -257,6 +258,7 @@ namespace RNGOEngine
         m_engineSystems.RegisterSystem<Systems::Core::RigidbodyGravitySystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RigidbodyApplyForcesSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::CollisionSystem>();
+        m_engineSystems.RegisterSystem<Systems::Core::RigidbodyCollisionResolutionSystem>();
 
         m_engineSystems.RegisterSystem<Systems::Core::BeginFrameSystem>();
         m_engineSystems.RegisterSystem<Systems::Core::RenderSystem>();
