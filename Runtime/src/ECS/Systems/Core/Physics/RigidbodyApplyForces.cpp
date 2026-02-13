@@ -1,16 +1,15 @@
 ﻿//
-// Created by Oskar.Norberg on 2026-01-29.
+// Created by Oskar.Norberg on 2026-02-10.
 //
 
-#include "ECS/Systems/Core/Physics/RigidbodyGravitySystem.h"
+#include "ECS/Systems/Core/Physics/RigidbodyApplyForces.h"
 
 #include "ECS/Systems/SystemContext.h"
 #include "Scene/World/World.h"
 
 namespace RNGOEngine::Systems::Core
 {
-
-    void RigidbodyGravitySystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
+    void RigidbodyApplyForcesSystem::Update(RNGOEngine::Core::World& world, EngineSystemContext& context)
     {
         EngineSystem::Update(world, context);
 
@@ -23,12 +22,12 @@ namespace RNGOEngine::Systems::Core
 
         for (const auto& [entity, transform, rigidbody] : rigidbodyView.each())
         {
-            if (!rigidbody.HasGravity)
+            if (rigidbody.IsKinematic)
             {
                 continue;
             }
 
-            rigidbody.LinearVelocity += world.GetGravity() * context.DeltaTime;
+            transform.Position += rigidbody.LinearVelocity * context.DeltaTime;
         }
     }
 }

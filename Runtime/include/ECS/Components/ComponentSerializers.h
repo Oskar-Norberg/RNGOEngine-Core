@@ -61,6 +61,7 @@ namespace RNGOEngine::Components
     {
         emitter << YAML::Key << "Rigidbody" << YAML::Value << YAML::BeginMap;
         emitter << YAML::Key << "HasGravity" << YAML::Value << rigidbody.HasGravity;
+        emitter << YAML::Key << "IsKinematic" << YAML::Value << rigidbody.IsKinematic;
         emitter << YAML::EndMap;
     }
 

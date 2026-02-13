@@ -7,6 +7,7 @@
 #include <entt/entt.hpp>
 
 #include "ECS/Systems/ISystem.h"
+#include "glm/vec3.hpp"
 
 namespace RNGOEngine::Systems::Core
 {
@@ -14,6 +15,10 @@ namespace RNGOEngine::Systems::Core
     {
         entt::entity EntityA;
         entt::entity EntityB;
+
+        glm::vec3 ContactPoint;
+        glm::vec3 ContactNormal;
+        float PenetrationDepth;
     };
 
     struct CollisionList
@@ -28,17 +33,10 @@ namespace RNGOEngine::Systems::Core
         void Update(RNGOEngine::Core::World& world, EngineSystemContext& context) override;
 
     private:
-        void SphereToSphereCollisionDetection(
-            RNGOEngine::Core::World& world, CollisionList& collisions
-        );
+        void SphereToSphereCollisionDetection(RNGOEngine::Core::World& world, CollisionList& collisions);
 
-        void BoxToBoxCollisionDetection(
-            RNGOEngine::Core::World& world, CollisionList& collisions
-        );
+        void BoxToBoxCollisionDetection(RNGOEngine::Core::World& world, CollisionList& collisions);
 
-        void SphereToBoxCollisionDetection(
-            RNGOEngine::Core::World& world, CollisionList& collisions
-        );
-
+        void SphereToBoxCollisionDetection(RNGOEngine::Core::World& world, CollisionList& collisions);
     };
 }

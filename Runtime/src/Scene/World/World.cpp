@@ -34,17 +34,17 @@ namespace RNGOEngine::Core
         return CreateEntity(Components::Name{});
     }
 
-    void World::DestroyEntity(entt::entity entity)
+    void World::DestroyEntity(const entt::entity entity)
     {
         m_registry.destroy(entity);
     }
 
-    float World::GetGravity() const
+    glm::vec3 World::GetGravity() const
     {
         return m_gravity;
     }
 
-    void World::SetGravity(const float gravity)
+    void World::SetGravity(const glm::vec3 gravity)
     {
         m_gravity = gravity;
     }

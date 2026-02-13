@@ -186,6 +186,7 @@ namespace RNGOEngine::Editor
             ImGui::Text("Rigidbody");
 
             auto& rigidbody = registry.get<Components::Rigidbody>(entity);
+            ImGui::Checkbox("IsKinematic", &rigidbody.IsKinematic);
             ImGui::Checkbox("HasGravity", &rigidbody.HasGravity);
         }
     }

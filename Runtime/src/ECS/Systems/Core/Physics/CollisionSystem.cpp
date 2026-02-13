@@ -43,7 +43,19 @@ namespace RNGOEngine::Systems::Core
 
                 if (glm::length(transformA.Position - transformB.Position) <= sphereA.Radius + sphereB.Radius)
                 {
-                    collisions.collisions.emplace_back(entityA, entityB);
+                    const auto contactPoint = (transformA.Position + transformB.Position) / 2.0f;
+                    const auto contactNormal = glm::normalize(transformB.Position - transformA.Position);
+                    const auto penetrationDepth = (sphereA.Radius + sphereB.Radius) -
+                                                  glm::length(transformA.Position - transformB.Position);
+
+                    CollisionData collisionData = {
+                        .EntityA = entityA,
+                        .EntityB = entityB,
+                        .ContactPoint = contactPoint,
+                        .ContactNormal = contactNormal,
+                        .PenetrationDepth = penetrationDepth,
+                    };
+                    collisions.collisions.emplace_back(collisionData);
                 }
             }
         }
@@ -75,7 +87,18 @@ namespace RNGOEngine::Systems::Core
 
                 if (aabbA.Intersects(aabbB))
                 {
-                    collisions.collisions.emplace_back(entityA, entityB);
+                    const auto contactPoint = (transformA.Position + transformB.Position) / 2.0f;
+                    const auto contactNormal = glm::normalize(transformB.Position - transformA.Position);
+                    const auto penetrationDepth = glm::length(glm::min(maxA, maxB) - glm::max(minA, minB));
+
+                    CollisionData collisionData = {
+                        .EntityA = entityA,
+                        .EntityB = entityB,
+                        .ContactPoint = contactPoint,
+                        .ContactNormal = contactNormal,
+                        .PenetrationDepth = penetrationDepth,
+                    };
+                    collisions.collisions.emplace_back(collisionData);
                 }
             }
         }
@@ -103,7 +126,18 @@ namespace RNGOEngine::Systems::Core
 
                 if (distanceSquared <= sphereCollider.Radius * sphereCollider.Radius)
                 {
-                    collisions.collisions.emplace_back(boxEntity, sphereEntity);
+                    const auto contactPoint = closestPoint;
+                    const auto contactNormal = glm::normalize(sphereTransform.Position - closestPoint);
+                    const auto penetrationDepth = sphereCollider.Radius - glm::sqrt(distanceSquared);
+
+                    CollisionData collisionData = {
+                        .EntityA = boxEntity,
+                        .EntityB = sphereEntity,
+                        .ContactPoint = contactPoint,
+                        .ContactNormal = contactNormal,
+                        .PenetrationDepth = penetrationDepth,
+                    };
+                    collisions.collisions.emplace_back(collisionData);
                 }
             }
         }

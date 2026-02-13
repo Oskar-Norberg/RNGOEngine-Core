@@ -64,9 +64,10 @@ namespace RNGOEngine::Components
         glm::vec3 HalfExtents = glm::vec3(0.5f, 0.5f, 0.5f);
     };
 
-    // TODO: More properties
     struct Rigidbody
     {
+        bool IsKinematic = false;
+        glm::vec3 LinearVelocity = glm::vec3{0.0f};
         bool HasGravity = true;
     };
 
