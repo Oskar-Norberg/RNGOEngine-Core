@@ -23,6 +23,7 @@ include(cmake/EngineUnits/Concepts.cmake)
 include(cmake/EngineUnits/Math.cmake)
 include(cmake/EngineUnits/Utilities.cmake)
 include(cmake/EngineUnits/Logging.cmake)
+include(cmake/EngineUnits/Error.cmake)
 
 include(cmake/EngineUnits/Containers.cmake)
 include(cmake/EngineUnits/Events.cmake)
@@ -63,6 +64,7 @@ target_link_libraries(${CORE_PROJECT_NAME} PUBLIC
         ${MATH_PROJECT_NAME}
         ${UTILITIES_PROJECT_NAME}
         ${LOGGING_PROJECT_NAME}
+        ${ERROR_PROJECT_NAME}
 
         ${CONTAINERS_PROJECT_NAME}
         ${EVENTS_PROJECT_NAME}

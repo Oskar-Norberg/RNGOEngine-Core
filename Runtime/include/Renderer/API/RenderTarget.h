@@ -9,16 +9,17 @@
 #include <variant>
 #include <vector>
 
+#include "Errors/EngineError.h"
 #include "Renderer/RenderID.h"
-#include "Utilities/RNGOAsserts.h"
 #include "Utilities/Hash/PairHash.h"
+#include "Utilities/RNGOAsserts.h"
 
 namespace RNGOEngine::Resources
 {
     enum class AttachmentSizeType
     {
-        Absolute, // Fixed size
-        PercentOfScreen, // Size relative to current screen
+        Absolute,         // Fixed size
+        PercentOfScreen,  // Size relative to current screen
     };
 
     struct AttachmentSize
@@ -60,10 +61,8 @@ namespace RNGOEngine::Resources
                 const auto& a = Attachments[i];
                 const auto& b = other.Attachments[i];
 
-                if (a.Name != b.Name ||
-                    a.AttachmentPoint != b.AttachmentPoint ||
-                    a.Size.width != b.Size.width ||
-                    a.Size.height != b.Size.height)
+                if (a.Name != b.Name || a.AttachmentPoint != b.AttachmentPoint ||
+                    a.Size.width != b.Size.width || a.Size.height != b.Size.height)
                 {
                     return false;
                 }
@@ -78,8 +77,9 @@ namespace RNGOEngine::Resources
 {
     // TODO: Extremely ugly function.
     // Returns width, height. But this should probablt be a struct.
-    inline std::pair<int, int> GetDesiredAttachmentSize(const AttachmentSize& attachmentSize, const int viewportWidth,
-                                                        const int viewportHeight)
+    inline std::pair<int, int> GetDesiredAttachmentSize(
+        const AttachmentSize& attachmentSize, const int viewportWidth, const int viewportHeight
+    )
     {
         switch (attachmentSize.SizeType)
         {
@@ -89,15 +89,18 @@ namespace RNGOEngine::Resources
                 return std::make_pair(
                     static_cast<int>(
                         static_cast<float>(viewportWidth) *
-                        (static_cast<float>(attachmentSize.width) / 100.0f)),
+                        (static_cast<float>(attachmentSize.width) / 100.0f)
+                    ),
                     static_cast<int>(
-                        static_cast<float>(viewportHeight) * (
-                            static_cast<float>(attachmentSize.height) / 100.0f))
+                        static_cast<float>(viewportHeight) *
+                        (static_cast<float>(attachmentSize.height) / 100.0f)
+                    )
                 );
             default:
                 RNGO_ASSERT(false && "GetDesiredAttachmentSize - Unsupported AttachmentSizeType");
-                // TODO: UB if assert disabled.
         }
+
+        RNGO_IRRECOVERABLE_ERROR("Invalid SizeType found");
     }
 }
 
@@ -115,13 +118,17 @@ namespace std
             for (const auto& attachment : spec.Attachments)
             {
                 attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
-                    attachmentsHash, std::hash<std::string>{}(attachment.Name));
+                    attachmentsHash, std::hash<std::string>{}(attachment.Name)
+                );
                 attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
-                    attachmentsHash, std::hash<int>{}(static_cast<int>(attachment.AttachmentPoint)));
+                    attachmentsHash, std::hash<int>{}(static_cast<int>(attachment.AttachmentPoint))
+                );
                 attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
-                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.width));
+                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.width)
+                );
                 attachmentsHash = RNGOEngine::Utilities::Hash::CombineHashes(
-                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.height));
+                    attachmentsHash, std::hash<std::size_t>{}(attachment.Size.height)
+                );
             }
 
             return RNGOEngine::Utilities::Hash::CombineHashes(nameHash, attachmentsHash);
