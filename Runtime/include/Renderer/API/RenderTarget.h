@@ -100,7 +100,7 @@ namespace RNGOEngine::Resources
                 RNGO_ASSERT(false && "GetDesiredAttachmentSize - Unsupported AttachmentSizeType");
         }
 
-        RNGO_IRRECOVERABLE_ERROR("Invalid SizeType found");
+        RNGO_FATAL_ERROR("Invalid SizeType found");
     }
 }
 

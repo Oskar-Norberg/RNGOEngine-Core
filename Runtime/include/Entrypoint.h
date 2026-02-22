@@ -14,9 +14,19 @@ namespace RNGOEngine
 
     inline int Main(const int argc, char** argv)
     {
-        const auto application = CreateApplication();
-        application->Run();
+        int success = 0;
 
-        return 0;
+        try
+        {
+            const auto app = CreateApplication();
+            app->Run();
+        }
+        catch (FatalEngineError& e)
+        {
+            success = 1;
+            RNGO_LOG(Core::LogLevel::Critical, "{}", e.what());
+        }
+
+        return success;
     }
 }
