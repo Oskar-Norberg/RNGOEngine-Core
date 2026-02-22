@@ -22,6 +22,7 @@ include(cmake/Testing.cmake)
 add_library(${CORE_PROJECT_NAME} STATIC
         include/Application/Application.h
         src/Application/Application.cpp
+        include/Entrypoint.h
 )
 target_precompile_headers(${CORE_PROJECT_NAME} PRIVATE include/PCH/PCH.h)
 target_include_directories(${CORE_PROJECT_NAME} PUBLIC include)
